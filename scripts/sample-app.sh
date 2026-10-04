@@ -24,7 +24,11 @@ cd "$target"
 
 step "Install the app and the packed tools"
 npm install --silent --no-audit --no-fund
-npm install -D --silent --no-audit --no-fund ./.packs/rdloom-0.0.0.tgz ./.packs/rdloom-mcp-0.0.0.tgz
+# Whatever versions npm pack just wrote. [0-9] keeps rdloom-* off the mcp tarball.
+cli_pack=(./.packs/rdloom-[0-9]*.tgz)
+mcp_pack=(./.packs/rdloom-mcp-[0-9]*.tgz)
+test -e "${cli_pack[0]}" && test -e "${mcp_pack[0]}" || { echo "✗ no tarballs in .packs"; exit 1; }
+npm install -D --silent --no-audit --no-fund "${cli_pack[0]}" "${mcp_pack[0]}"
 test ! -e node_modules/rdloom/src || { echo "✗ the package shipped TypeScript source"; exit 1; }
 
 step "rdloom init + add"
