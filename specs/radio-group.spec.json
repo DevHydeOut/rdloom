@@ -1,0 +1,54 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "RadioGroup",
+  "version": "0.1.1",
+  "category": "input",
+  "status": "experimental",
+  "description": "Lets the user pick exactly one option from a small, visible set. Use with Radio children.",
+  "props": {
+    "label": { "type": "string", "required": true, "description": "Visible group label." },
+    "description": { "type": "string", "description": "Help text shown under the options." },
+    "errorMessage": { "type": "string", "description": "Shown when the group is invalid." },
+    "orientation": { "type": "enum", "values": ["vertical", "horizontal"], "default": "vertical", "description": "Layout direction of the options." },
+    "value": { "type": "string", "description": "Controlled selected value." },
+    "defaultValue": { "type": "string", "description": "Initial value when uncontrolled." },
+    "isDisabled": { "type": "boolean", "default": false, "description": "Disables every option." },
+    "isInvalid": { "type": "boolean", "default": false, "description": "Marks the group as invalid and shows errorMessage." },
+    "isRequired": { "type": "boolean", "default": false, "description": "Requires a selection for form submission." },
+    "children": { "type": "node", "required": true, "description": "Radio options." },
+    "onChange": { "type": "callback", "tsType": "(value: string) => void", "description": "Called with the newly selected value." }
+  },
+  "variants": ["orientation", "isDisabled", "isInvalid"],
+  "states": ["default", "hover", "focus", "selected", "disabled", "invalid"],
+  "slots": ["label", "options", "description", "error"],
+  "tokens": [
+    "color.action.primary",
+    "color.border.strong",
+    "color.surface.default",
+    "color.text.default",
+    "color.text.muted",
+    "color.feedback.danger",
+    "color.focus.ring"
+  ],
+  "a11y": {
+    "role": "radiogroup",
+    "keyboard": ["Arrow keys move and select", "Tab enters and leaves the group"],
+    "requirements": ["Group has a visible label", "Only the selected radio is in the tab order"],
+    "screenReader": [
+      "Entering the group announces the group label",
+      "Each option: radio button, its label, checked state and position (2 of 3)",
+      "Arrow keys announce the newly selected option"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["2 to 6 mutually exclusive options that should all be visible"],
+    "avoid_when": ["Many options: use Select", "Independent options: use Checkbox"],
+    "anti_patterns": ["A single radio on its own", "No option selected when a sensible default exists", "Passing isInvalid for required or format checks (even isInvalid={false}): any defined value takes over validity and hides the built-in errors. Use isRequired and validate; pass isInvalid only for errors the app finds itself, such as from the server"]
+  },
+  "examples": ["basic", "horizontal", "invalid", "disabled"],
+  "figma": {
+    "componentKey": null,
+    "variantMap": { "orientation": "Orientation", "isDisabled": "Disabled", "isInvalid": "Invalid" }
+  }
+}

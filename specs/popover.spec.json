@@ -1,0 +1,42 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Popover",
+  "version": "0.1.0",
+  "category": "overlay",
+  "status": "experimental",
+  "description": "Non-modal panel anchored to a trigger, for extra controls or details. Open it with DialogTrigger.",
+  "props": {
+    "label": { "type": "string", "required": true, "description": "Accessible name for the popover content." },
+    "placement": { "type": "enum", "values": ["top", "bottom", "start", "end"], "default": "bottom", "description": "Preferred side of the trigger. Flips when there isn't room." },
+    "showArrow": { "type": "boolean", "default": false, "description": "Shows an arrow pointing at the trigger." },
+    "children": {
+      "type": "custom",
+      "tsType": "ReactNode | ((opts: { close: () => void }) => ReactNode)",
+      "description": "Popover content. A function receives close()."
+    }
+  },
+  "variants": ["placement", "showArrow"],
+  "states": ["open"],
+  "slots": ["panel", "arrow"],
+  "tokens": ["color.surface.raised", "color.border.default", "color.text.default", "radius.overlay"],
+  "a11y": {
+    "role": "dialog",
+    "keyboard": ["Esc closes and returns focus to the trigger"],
+    "requirements": ["Has an accessible name", "Focus moves into the popover on open"],
+    "screenReader": [
+      "Opening announces a dialog named by its label (Filters)",
+      "Its controls are reachable with Tab; Esc announces the trigger again"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["Filters, quick settings or details related to a control"],
+    "avoid_when": ["Plain hints: use Tooltip", "Blocking tasks: use Dialog"],
+    "anti_patterns": ["Opening on hover", "Very long scrolling content"]
+  },
+  "examples": ["basic", "with-arrow", "placements"],
+  "figma": {
+    "componentKey": null,
+    "variantMap": { "placement": "Placement", "showArrow": "Arrow" }
+  }
+}

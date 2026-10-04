@@ -1,0 +1,53 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Toast",
+  "version": "0.1.0",
+  "category": "feedback",
+  "status": "experimental",
+  "description": "Brief, non-blocking message about the result of an action. Render ToastRegion once and call toast().",
+  "props": {
+    "title": { "type": "string", "required": true, "description": "Main message." },
+    "description": { "type": "string", "description": "Optional extra detail." },
+    "variant": { "type": "enum", "values": ["neutral", "success", "danger"], "default": "neutral", "description": "Tone of the message." },
+    "timeout": { "type": "number", "default": 5000, "description": "Auto-dismiss after this many ms. 0 keeps it open. Timers pause on hover and focus." }
+  },
+  "variants": ["variant"],
+  "states": ["default", "focus"],
+  "slots": ["region", "toast", "title", "description", "close"],
+  "tokens": [
+    "color.surface.raised",
+    "color.border.default",
+    "color.text.default",
+    "color.text.muted",
+    "color.feedback.success",
+    "color.feedback.danger",
+    "color.focus.ring",
+    "radius.overlay"
+  ],
+  "a11y": {
+    "role": "alertdialog",
+    "keyboard": ["F6 moves focus to the toast region", "Tab reaches the close button", "Esc dismisses the focused toast"],
+    "requirements": [
+      "New toasts are announced by screen readers",
+      "Auto-dismiss pauses on hover and focus",
+      "Messages with actions should not auto-dismiss"
+    ],
+    "screenReader": [
+      "A new toast is announced without moving focus",
+      "F6 moves into the notifications region; the toast's title and description are read",
+      "The dismiss button is announced as Dismiss",
+      "A focused toast does not disappear while you read it"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["Confirming a completed action, like 'Saved'", "Reporting a background failure"],
+    "avoid_when": ["Errors the user must fix in a form: show them inline", "Critical decisions: use Dialog"],
+    "anti_patterns": ["Several toasts at once for one action", "Important info that disappears too fast"]
+  },
+  "examples": ["success", "danger", "persistent"],
+  "figma": {
+    "componentKey": null,
+    "variantMap": { "variant": "Variant" }
+  }
+}

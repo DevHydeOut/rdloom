@@ -1,0 +1,46 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Switch",
+  "version": "0.1.0",
+  "category": "input",
+  "status": "experimental",
+  "description": "Turns a setting on or off, taking effect immediately.",
+  "props": {
+    "children": { "type": "node", "required": true, "description": "Visible label describing the setting." },
+    "isSelected": { "type": "boolean", "description": "Controlled on/off state." },
+    "defaultSelected": { "type": "boolean", "default": false, "description": "Initial state when uncontrolled." },
+    "size": { "type": "enum", "values": ["sm", "md"], "default": "md", "description": "Track and thumb size." },
+    "isDisabled": { "type": "boolean", "default": false, "description": "Prevents interaction and dims the switch." },
+    "onChange": { "type": "callback", "tsType": "(isSelected: boolean) => void", "description": "Called with the new state." }
+  },
+  "variants": ["size", "isDisabled"],
+  "states": ["default", "hover", "focus", "pressed", "selected", "disabled"],
+  "slots": ["track", "thumb", "label"],
+  "tokens": [
+    "color.action.primary",
+    "color.border.strong",
+    "color.surface.default",
+    "color.text.default",
+    "color.focus.ring"
+  ],
+  "a11y": {
+    "role": "switch",
+    "keyboard": ["Space toggles"],
+    "requirements": ["Label is part of the click target", "State is not conveyed by color alone (thumb position also changes)"],
+    "screenReader": [
+      "Announced as a switch (or toggle button) with its label and on or off",
+      "Toggling announces the new state"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["Settings that apply instantly, like dark mode or notifications"],
+    "avoid_when": ["Choices that only apply after pressing Save: use Checkbox"],
+    "anti_patterns": ["Labels that change with the state, like 'On'/'Off'"]
+  },
+  "examples": ["basic", "sizes", "disabled"],
+  "figma": {
+    "componentKey": null,
+    "variantMap": { "size": "Size", "isDisabled": "Disabled" }
+  }
+}

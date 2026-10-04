@@ -1,0 +1,40 @@
+{
+  "name": "rdloom-monorepo",
+  "private": true,
+  "license": "MIT",
+  "description": "Spec-driven UI components. One spec, every surface.",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "validate": "tsx packages/codegen/src/cli.ts validate",
+    "gen": "tsx packages/codegen/src/cli.ts all",
+    "cli": "tsx packages/cli/src/index.ts",
+    "typecheck": "tsc -p packages/react --noEmit && tsc -p examples/components && tsc -p apps/docs",
+    "build": "npm run gen && npm run typecheck && npm run typecheck:tools && npm run test:unit",
+    "dev": "npm run gen && npm run dev -w @rdloom/playground",
+    "test": "npm run gen --silent && npm run test:unit",
+    "typecheck:tools": "tsc -p tsconfig.tools.json && tsc -p packages/figma",
+    "build:figma": "npm run build -w @rdloom/figma",
+    "check:generated": "node scripts/check-generated.mjs",
+    "smoke:cli": "bash scripts/smoke-cli.sh",
+    "smoke:mcp": "node scripts/smoke-mcp.mjs",
+    "mcp": "node packages/mcp/src/index.ts",
+    "test:unit": "vitest run --root packages/react && vitest run --root packages/cli && vitest run --root packages/mcp && vitest run --root packages/figma",
+    "build:bins": "node scripts/build-bins.mjs",
+    "docs": "npm run gen && npm run dev -w @rdloom/docs",
+    "build:docs": "npm run build -w @rdloom/docs",
+    "test:visual": "playwright test",
+    "test:visual:update": "playwright test --update-snapshots"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "@types/node": "^22.20.4",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

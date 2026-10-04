@@ -1,0 +1,137 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Build and test (Linux, Node ${{ matrix.node }})
+    # Pinned so the runner image only changes when we choose to.
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [22, 24]
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Validate specs and generate
+        run: npm run gen
+
+      - name: Generated files are committed
+        run: npm run check:generated
+
+      - name: Typecheck components
+        run: npm run typecheck
+
+      - name: Typecheck codegen and CLI
+        run: npm run typecheck:tools
+
+      - name: Tests
+        run: npm run test:unit
+
+      - name: Build Figma plugin
+        run: npm run build:figma
+
+      - name: Build docs site
+        run: npm run build:docs
+
+      - name: Build playground
+        run: npm run build -w @rdloom/playground
+
+      - name: CLI smoke test
+        run: npm run smoke:cli
+
+      - name: MCP server smoke test
+        run: npm run smoke:mcp
+
+      - name: Sample app from packed tarballs
+        run: bash scripts/sample-app.sh
+
+  visual:
+    name: Visual regression (Linux)
+    # Pinned: baselines depend on the runner's fonts. When the image changes,
+    # run the "Update visual baselines" workflow and commit its output.
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Generate
+        run: npm run gen
+
+      - name: Check for baselines
+        id: baselines
+        run: |
+          if ls tests/visual/__screenshots__/linux/*.png >/dev/null 2>&1; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::No Linux visual baselines yet. Run the 'Update visual baselines' workflow and commit its output to tests/visual/__screenshots__/linux/."
+          fi
+
+      - name: Install Chromium
+        if: steps.baselines.outputs.present == 'true'
+        run: npx playwright install --with-deps chromium
+
+      - name: Compare screenshots
+        if: steps.baselines.outputs.present == 'true'
+        run: npm run test:visual
+
+      - name: Upload the report (diffs)
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: visual-report
+          path: playwright-report/
+          retention-days: 14
+
+  windows:
+    name: Tests and CLI (Windows)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Generate and test
+        run: npm test
+
+      - name: Generated files are committed
+        run: npm run check:generated
+
+      - name: CLI smoke test
+        shell: bash
+        run: npm run smoke:cli
+
+      - name: MCP server smoke test
+        run: npm run smoke:mcp

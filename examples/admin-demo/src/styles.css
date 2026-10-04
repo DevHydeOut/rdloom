@@ -1,0 +1,11 @@
+@import "tailwindcss";
+@import "./styles/rdloom-tokens.css";
+
+/* Tailwind only generates classes it finds; include the copied components. */
+@source "./components/rdloom";
+
+body {
+  background: var(--rd-color-surface-default);
+  color: var(--rd-color-text-default);
+  font-family: ui-sans-serif, system-ui, sans-serif;
+}

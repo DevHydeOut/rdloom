@@ -1,0 +1,33 @@
+name: Update visual baselines
+
+# Run from the Actions tab after an intended visual change (or when the
+# runner image changes fonts). It uploads new Linux screenshots as an
+# artifact: download it, review the images, and commit them to
+# tests/visual/__screenshots__/linux/.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  update:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+      - run: npm run gen
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:visual:update
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: visual-baselines-linux
+          path: tests/visual/__screenshots__/linux/
+          retention-days: 14

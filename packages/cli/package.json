@@ -1,0 +1,30 @@
+{
+  "name": "rdloom",
+  "version": "0.1.0",
+  "license": "MIT",
+  "type": "module",
+  "description": "Add rdloom components to your project. You own the code; the lock file keeps it upgradable.",
+  "bin": {
+    "rdloom": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "registry"
+  ],
+  "dependencies": {
+    "diff": "^9.0.0",
+    "node-diff3": "^3.2.1"
+  },
+  "devDependencies": {
+    "vitest": "^3.2.7"
+  },
+  "scripts": {
+    "prepack": "node ../../scripts/build-bins.mjs"
+  },
+  "homepage": "https://rdloom.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DevHydeOut/rdloom.git",
+    "directory": "packages/cli"
+  }
+}

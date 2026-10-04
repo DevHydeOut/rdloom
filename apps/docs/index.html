@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>rdloom: accessible React components you own</title>
+    <meta name="description" content="Spec-driven, accessible React components you own. Copy the code, edit it, and still take upgrades." />
+    <!--head-->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <script>
+      // Apply the theme before first paint, so dark mode doesn't flash light.
+      (function () {
+        var t;
+        try { t = localStorage.getItem("rdloom-theme"); } catch (e) {}
+        if (!t) t = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        document.documentElement.dataset.theme = t;
+        document.documentElement.style.colorScheme = t;
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"><!--app--></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

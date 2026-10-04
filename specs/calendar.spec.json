@@ -1,0 +1,52 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Calendar",
+  "version": "0.1.1",
+  "category": "input",
+  "status": "experimental",
+  "description": "Month grid for picking a date. RangeCalendar picks a start and end. Used inside DatePicker and DateRangePicker.",
+  "props": {
+    "visibleMonths": { "type": "number", "default": 1, "description": "How many months to show side by side." },
+    "minValue": { "type": "custom", "tsType": "import(\"react-aria-components\").DateValue", "description": "Earliest selectable date." },
+    "maxValue": { "type": "custom", "tsType": "import(\"react-aria-components\").DateValue", "description": "Latest selectable date." },
+    "isDisabled": { "type": "boolean", "default": false, "description": "Disables every date." }
+  },
+  "variants": ["isDisabled"],
+  "states": ["default", "hover", "focus", "selected", "disabled"],
+  "slots": ["header", "previous", "heading", "next", "grid", "cell"],
+  "tokens": [
+    "color.action.primary",
+    "color.action.on-primary",
+    "color.surface.subtle",
+    "color.text.default",
+    "color.text.muted",
+    "color.focus.ring",
+    "radius.control"
+  ],
+  "a11y": {
+    "role": "application",
+    "keyboard": [
+      "Arrow keys move by day and week",
+      "PageUp/PageDown change month, with Shift change year",
+      "Home/End jump to start/end of the week",
+      "Enter or Space selects"
+    ],
+    "requirements": ["Month heading is announced when it changes", "Unavailable dates are exposed as disabled"],
+    "screenReader": [
+      "The month and year are announced when the calendar opens and when paging months",
+      "Each day announces its full date (Friday, 20 March 2026), plus selected or today",
+      "Dates outside min/max are announced as unavailable"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["An always-visible calendar, such as a booking sidebar"],
+    "avoid_when": ["A compact form field: use DatePicker"],
+    "anti_patterns": ["Hiding which dates are unavailable until they're clicked"]
+  },
+  "examples": ["single", "range", "two-months", "min-max"],
+  "figma": {
+    "componentKey": null,
+    "variantMap": { "isDisabled": "Disabled" }
+  }
+}

@@ -1,0 +1,751 @@
+{
+  "collection": "rdloom",
+  "variables": [
+    {
+      "name": "color/action/primary",
+      "token": "color.action.primary",
+      "cssVar": "--rd-color-action-primary",
+      "type": "COLOR",
+      "light": "#4f46e5",
+      "dark": "#8386f7"
+    },
+    {
+      "name": "color/action/primary-hover",
+      "token": "color.action.primary-hover",
+      "cssVar": "--rd-color-action-primary-hover",
+      "type": "COLOR",
+      "light": "#4338ca",
+      "dark": "#a5a8ff"
+    },
+    {
+      "name": "color/action/on-primary",
+      "token": "color.action.on-primary",
+      "cssVar": "--rd-color-action-on-primary",
+      "type": "COLOR",
+      "light": "#ffffff",
+      "dark": "#0e0e12"
+    },
+    {
+      "name": "color/action/danger",
+      "token": "color.action.danger",
+      "cssVar": "--rd-color-action-danger",
+      "type": "COLOR",
+      "light": "#dc2626",
+      "dark": "#f87171"
+    },
+    {
+      "name": "color/action/danger-hover",
+      "token": "color.action.danger-hover",
+      "cssVar": "--rd-color-action-danger-hover",
+      "type": "COLOR",
+      "light": "#b91c1c",
+      "dark": "#fca5a5"
+    },
+    {
+      "name": "color/surface/default",
+      "token": "color.surface.default",
+      "cssVar": "--rd-color-surface-default",
+      "type": "COLOR",
+      "light": "#ffffff",
+      "dark": "#0e0e12"
+    },
+    {
+      "name": "color/surface/subtle",
+      "token": "color.surface.subtle",
+      "cssVar": "--rd-color-surface-subtle",
+      "type": "COLOR",
+      "light": "#eeeef1",
+      "dark": "#2a2a33"
+    },
+    {
+      "name": "color/surface/raised",
+      "token": "color.surface.raised",
+      "cssVar": "--rd-color-surface-raised",
+      "type": "COLOR",
+      "light": "#ffffff",
+      "dark": "#18181d"
+    },
+    {
+      "name": "color/surface/selected",
+      "token": "color.surface.selected",
+      "cssVar": "--rd-color-surface-selected",
+      "type": "COLOR",
+      "light": "#eef0ff",
+      "dark": "#1f1d4d"
+    },
+    {
+      "name": "color/border/default",
+      "token": "color.border.default",
+      "cssVar": "--rd-color-border-default",
+      "type": "COLOR",
+      "light": "#dcdce2",
+      "dark": "#2a2a33"
+    },
+    {
+      "name": "color/border/strong",
+      "token": "color.border.strong",
+      "cssVar": "--rd-color-border-strong",
+      "type": "COLOR",
+      "light": "#8a8a97",
+      "dark": "#8a8a97"
+    },
+    {
+      "name": "color/feedback/danger",
+      "token": "color.feedback.danger",
+      "cssVar": "--rd-color-feedback-danger",
+      "type": "COLOR",
+      "light": "#dc2626",
+      "dark": "#f87171"
+    },
+    {
+      "name": "color/feedback/success",
+      "token": "color.feedback.success",
+      "cssVar": "--rd-color-feedback-success",
+      "type": "COLOR",
+      "light": "#16a34a",
+      "dark": "#4ade80"
+    },
+    {
+      "name": "color/overlay/backdrop",
+      "token": "color.overlay.backdrop",
+      "cssVar": "--rd-color-overlay-backdrop",
+      "type": "COLOR",
+      "light": "rgb(14 14 18 / 0.5)",
+      "dark": "rgb(0 0 0 / 0.6)"
+    },
+    {
+      "name": "color/text/default",
+      "token": "color.text.default",
+      "cssVar": "--rd-color-text-default",
+      "type": "COLOR",
+      "light": "#18181d",
+      "dark": "#f7f7f8"
+    },
+    {
+      "name": "color/text/muted",
+      "token": "color.text.muted",
+      "cssVar": "--rd-color-text-muted",
+      "type": "COLOR",
+      "light": "#5b5b68",
+      "dark": "#9696a3"
+    },
+    {
+      "name": "color/focus/ring",
+      "token": "color.focus.ring",
+      "cssVar": "--rd-color-focus-ring",
+      "type": "COLOR",
+      "light": "#6366f1",
+      "dark": "#a5a8ff"
+    },
+    {
+      "name": "radius/control",
+      "token": "radius.control",
+      "cssVar": "--rd-radius-control",
+      "type": "FLOAT",
+      "light": "8px",
+      "dark": "8px"
+    },
+    {
+      "name": "radius/overlay",
+      "token": "radius.overlay",
+      "cssVar": "--rd-radius-overlay",
+      "type": "FLOAT",
+      "light": "12px",
+      "dark": "12px"
+    },
+    {
+      "name": "space/control-x",
+      "token": "space.control-x",
+      "cssVar": "--rd-space-control-x",
+      "type": "FLOAT",
+      "light": "16px",
+      "dark": "16px"
+    }
+  ],
+  "components": [
+    {
+      "name": "Accordion",
+      "id": "accordion",
+      "version": "0.1.0",
+      "description": "A stack of sections whose content expands and collapses under a heading, like an FAQ. Use with AccordionItem.",
+      "properties": [
+        {
+          "prop": "allowsMultipleExpanded",
+          "name": "Multiple",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
+      "name": "Button",
+      "id": "button",
+      "version": "0.1.0",
+      "description": "Triggers an action or event, such as submitting a form or opening a dialog.",
+      "properties": [
+        {
+          "prop": "variant",
+          "name": "Variant",
+          "values": [
+            "primary",
+            "secondary",
+            "ghost",
+            "danger"
+          ],
+          "default": "primary"
+        },
+        {
+          "prop": "size",
+          "name": "Size",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "default": "md"
+        },
+        {
+          "prop": "isDisabled",
+          "name": "Disabled",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
+      "name": "Calendar",
+      "id": "calendar",
+      "version": "0.1.1",
+      "description": "Month grid for picking a date. RangeCalendar picks a start and end. Used inside DatePicker and DateRangePicker.",
+      "properties": [
+        {
+          "prop": "isDisabled",
+          "name": "Disabled",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
+      "name": "Checkbox",
+      "id": "checkbox",
+      "version": "0.1.1",
+      "description": "Lets the user turn a single option on or off, with an optional indeterminate state.",
+      "properties": [
+        {
+          "prop": "isIndeterminate",
+          "name": "Indeterminate",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        },
+        {
+          "prop": "isDisabled",
+          "name": "Disabled",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        },
+        {
+          "prop": "isInvalid",
+          "name": "Invalid",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
+      "name": "Combobox",
+      "id": "combobox",
+      "version": "0.1.2",
+      "description": "Text input that filters a list of options as you type. Supports multi-select tags, async loading and long, virtualized lists.",
+      "properties": [
+        {
+          "prop": "size",
+          "name": "Size",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "default": "md"
+        },
+        {
+          "prop": "selectionMode",
+          "name": "Mode",
+          "values": [
+            "single",
+            "multiple"
+          ],
+          "default": "single"
+        },
+        {
+          "prop": "isDisabled",
+          "name": "Disabled",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        },
+        {
+          "prop": "isInvalid",
+          "name": "Invalid",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
+      "name": "DataGrid",
+      "id": "data-grid",
+      "version": "0.5.0",
+      "description": "Accessible, virtualized data grid for large datasets: sorting, filtering, row selection, resizable and pinned columns, row grouping with totals, tree data and expandable detail rows. Columns are TanStack Table column definitions.",
+      "properties": [
+        {
+          "prop": "density",
+          "name": "Density",
+          "values": [
+            "compact",
+            "standard",
+            "comfortable"
+          ],
+          "default": "standard"
+        },
+        {
+          "prop": "selectionMode",
+          "name": "Selection",
+          "values": [
+            "none",
+            "single",
+            "multiple"
+          ],
+          "default": "none"
+        }
+      ]
+    },
+    {
+      "name": "DatePicker",
+      "id": "date-picker",
+      "version": "0.1.1",
+      "description": "Date field with a calendar popover. Typing and picking both work, in the user's locale.",
+      "properties": [
+        {
+          "prop": "size",
+          "name": "Size",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "default": "md"
+        },
+        {
+          "prop": "isDisabled",
+          "name": "Disabled",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        },
+        {
+          "prop": "isInvalid",
+          "name": "Invalid",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
+      "name": "DateRangePicker",
+      "id": "date-range-picker",
+      "version": "0.1.1",
+      "description": "Start and end date fields with a two-month calendar and optional presets like 'Last 7 days'.",
+      "properties": [
+        {
+          "prop": "size",
+          "name": "Size",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "default": "md"
+        },
+        {
+          "prop": "isDisabled",
+          "name": "Disabled",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        },
+        {
+          "prop": "isInvalid",
+          "name": "Invalid",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
+      "name": "Dialog",
+      "id": "dialog",
+      "version": "0.1.0",
+      "description": "Modal window that asks for focus, such as a confirmation or a short form. Open it with DialogTrigger.",
+      "properties": [
+        {
+          "prop": "size",
+          "name": "Size",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "default": "md"
+        },
+        {
+          "prop": "role",
+          "name": "Role",
+          "values": [
+            "dialog",
+            "alertdialog"
+          ],
+          "default": "dialog"
+        }
+      ]
+    },
+    {
+      "name": "Menu",
+      "id": "menu",
+      "version": "0.1.0",
+      "description": "A list of actions or options that opens from a button, like a More (…) or Account menu. Use with MenuTrigger and MenuItem.",
+      "properties": [
+        {
+          "prop": "selectionMode",
+          "name": "Selection",
+          "values": [
+            "none",
+            "single",
+            "multiple"
+          ],
+          "default": "none"
+        }
+      ]
+    },
+    {
+      "name": "Popover",
+      "id": "popover",
+      "version": "0.1.0",
+      "description": "Non-modal panel anchored to a trigger, for extra controls or details. Open it with DialogTrigger.",
+      "properties": [
+        {
+          "prop": "placement",
+          "name": "Placement",
+          "values": [
+            "top",
+            "bottom",
+            "start",
+            "end"
+          ],
+          "default": "bottom"
+        },
+        {
+          "prop": "showArrow",
+          "name": "Arrow",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
+      "name": "RadioGroup",
+      "id": "radio-group",
+      "version": "0.1.1",
+      "description": "Lets the user pick exactly one option from a small, visible set. Use with Radio children.",
+      "properties": [
+        {
+          "prop": "orientation",
+          "name": "Orientation",
+          "values": [
+            "vertical",
+            "horizontal"
+          ],
+          "default": "vertical"
+        },
+        {
+          "prop": "isDisabled",
+          "name": "Disabled",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        },
+        {
+          "prop": "isInvalid",
+          "name": "Invalid",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
+      "name": "Select",
+      "id": "select",
+      "version": "0.1.1",
+      "description": "Picks one option from a list shown in a popover. Use with SelectItem children.",
+      "properties": [
+        {
+          "prop": "size",
+          "name": "Size",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "default": "md"
+        },
+        {
+          "prop": "isDisabled",
+          "name": "Disabled",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        },
+        {
+          "prop": "isInvalid",
+          "name": "Invalid",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
+      "name": "Sheet",
+      "id": "sheet",
+      "version": "0.1.0",
+      "description": "A modal panel that slides in from the edge of the screen, for filters, details or navigation on small screens. Open it with DialogTrigger.",
+      "properties": [
+        {
+          "prop": "side",
+          "name": "Side",
+          "values": [
+            "end",
+            "start",
+            "bottom"
+          ],
+          "default": "end"
+        },
+        {
+          "prop": "size",
+          "name": "Size",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "default": "md"
+        }
+      ]
+    },
+    {
+      "name": "Slider",
+      "id": "slider",
+      "version": "0.1.0",
+      "description": "Picks a number, or a range with two thumbs, by dragging along a track. Shows the formatted value.",
+      "properties": [
+        {
+          "prop": "isDisabled",
+          "name": "Disabled",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
+      "name": "Switch",
+      "id": "switch",
+      "version": "0.1.0",
+      "description": "Turns a setting on or off, taking effect immediately.",
+      "properties": [
+        {
+          "prop": "size",
+          "name": "Size",
+          "values": [
+            "sm",
+            "md"
+          ],
+          "default": "md"
+        },
+        {
+          "prop": "isDisabled",
+          "name": "Disabled",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
+      "name": "Tabs",
+      "id": "tabs",
+      "version": "0.1.0",
+      "description": "Switches between related panels of content in the same place. Use with TabList, Tab and TabPanel.",
+      "properties": [
+        {
+          "prop": "variant",
+          "name": "Variant",
+          "values": [
+            "underline",
+            "pill"
+          ],
+          "default": "underline"
+        },
+        {
+          "prop": "orientation",
+          "name": "Orientation",
+          "values": [
+            "horizontal",
+            "vertical"
+          ],
+          "default": "horizontal"
+        }
+      ]
+    },
+    {
+      "name": "TextField",
+      "id": "text-field",
+      "version": "0.1.1",
+      "description": "Single-line or multi-line text input with a label, help text and error message.",
+      "properties": [
+        {
+          "prop": "size",
+          "name": "Size",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "default": "md"
+        },
+        {
+          "prop": "multiline",
+          "name": "Multiline",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        },
+        {
+          "prop": "isDisabled",
+          "name": "Disabled",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        },
+        {
+          "prop": "isInvalid",
+          "name": "Invalid",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
+      "name": "Toast",
+      "id": "toast",
+      "version": "0.1.0",
+      "description": "Brief, non-blocking message about the result of an action. Render ToastRegion once and call toast().",
+      "properties": [
+        {
+          "prop": "variant",
+          "name": "Variant",
+          "values": [
+            "neutral",
+            "success",
+            "danger"
+          ],
+          "default": "neutral"
+        }
+      ]
+    },
+    {
+      "name": "Tooltip",
+      "id": "tooltip",
+      "version": "0.1.0",
+      "description": "Short text label shown on hover or keyboard focus. Wrap the trigger and tooltip in TooltipTrigger.",
+      "properties": [
+        {
+          "prop": "placement",
+          "name": "Placement",
+          "values": [
+            "top",
+            "bottom",
+            "start",
+            "end"
+          ],
+          "default": "top"
+        },
+        {
+          "prop": "showArrow",
+          "name": "Arrow",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "true"
+        }
+      ]
+    }
+  ]
+}

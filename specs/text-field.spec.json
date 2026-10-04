@@ -1,0 +1,61 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "TextField",
+  "version": "0.1.1",
+  "category": "input",
+  "status": "experimental",
+  "description": "Single-line or multi-line text input with a label, help text and error message.",
+  "props": {
+    "label": { "type": "string", "required": true, "description": "Visible label. Required so the field is always named." },
+    "description": { "type": "string", "description": "Help text shown under the input." },
+    "errorMessage": { "type": "string", "description": "Shown when the field is invalid." },
+    "placeholder": { "type": "string", "description": "Example value. Never a replacement for the label." },
+    "size": { "type": "enum", "values": ["sm", "md", "lg"], "default": "md", "description": "Height and font size." },
+    "multiline": { "type": "boolean", "default": false, "description": "Renders a textarea instead of an input." },
+    "isDisabled": { "type": "boolean", "default": false, "description": "Prevents editing and dims the field." },
+    "isInvalid": { "type": "boolean", "default": false, "description": "Marks the value as invalid and shows errorMessage." },
+    "isRequired": { "type": "boolean", "default": false, "description": "Marks the field as required for form submission." },
+    "value": { "type": "string", "description": "Controlled value." },
+    "defaultValue": { "type": "string", "description": "Initial value when uncontrolled." },
+    "onChange": { "type": "callback", "tsType": "(value: string) => void", "description": "Called with the new value on every edit." }
+  },
+  "variants": ["size", "multiline", "isDisabled", "isInvalid"],
+  "states": ["default", "hover", "focus", "disabled", "invalid", "readonly"],
+  "slots": ["label", "input", "description", "error"],
+  "tokens": [
+    "color.surface.default",
+    "color.border.default",
+    "color.border.strong",
+    "color.text.default",
+    "color.text.muted",
+    "color.feedback.danger",
+    "color.focus.ring",
+    "radius.control"
+  ],
+  "a11y": {
+    "role": "textbox",
+    "keyboard": ["Tab moves focus in and out"],
+    "requirements": [
+      "Label is always rendered and linked to the input",
+      "Description and error are linked with aria-describedby",
+      "Invalid state is exposed with aria-invalid"
+    ],
+    "screenReader": [
+      "On focus: the label, then the field type (edit text), then the description",
+      "Required fields are announced as required",
+      "Invalid: announced as invalid, and the error message is read",
+      "Multiline fields are announced as multi-line"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["Collecting free-form text such as names, emails or notes"],
+    "avoid_when": ["Picking from a known list: use Select or Combobox", "Dates: use DatePicker"],
+    "anti_patterns": ["Placeholder used as the only label", "Showing errors before the user has finished typing", "Passing isInvalid for required or format checks (even isInvalid={false}): any defined value takes over validity and hides the built-in errors. Use isRequired and validate; pass isInvalid only for errors the app finds itself, such as from the server"]
+  },
+  "examples": ["basic", "with-description", "invalid", "multiline", "sizes"],
+  "figma": {
+    "componentKey": null,
+    "variantMap": { "size": "Size", "multiline": "Multiline", "isDisabled": "Disabled", "isInvalid": "Invalid" }
+  }
+}

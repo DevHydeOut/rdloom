@@ -1,0 +1,65 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Select",
+  "version": "0.1.1",
+  "category": "input",
+  "status": "experimental",
+  "description": "Picks one option from a list shown in a popover. Use with SelectItem children.",
+  "props": {
+    "label": { "type": "string", "required": true, "description": "Visible label." },
+    "description": { "type": "string", "description": "Help text shown under the trigger." },
+    "errorMessage": { "type": "string", "description": "Shown when the field is invalid." },
+    "placeholder": { "type": "string", "default": "Select an option", "description": "Shown when nothing is selected." },
+    "size": { "type": "enum", "values": ["sm", "md", "lg"], "default": "md", "description": "Trigger height and font size." },
+    "selectedKey": { "type": "custom", "tsType": "import(\"react-aria-components\").Key | null", "description": "Controlled selected key." },
+    "defaultSelectedKey": { "type": "custom", "tsType": "import(\"react-aria-components\").Key", "description": "Initial key when uncontrolled." },
+    "isDisabled": { "type": "boolean", "default": false, "description": "Prevents opening and dims the field." },
+    "isInvalid": { "type": "boolean", "default": false, "description": "Marks the field as invalid and shows errorMessage." },
+    "isRequired": { "type": "boolean", "default": false, "description": "Requires a selection for form submission." },
+    "children": { "type": "node", "required": true, "description": "SelectItem options." },
+    "onSelectionChange": { "type": "callback", "tsType": "(key: import(\"react-aria-components\").Key | null) => void", "description": "Called with the newly selected key." }
+  },
+  "variants": ["size", "isDisabled", "isInvalid"],
+  "states": ["default", "hover", "focus", "open", "disabled", "invalid"],
+  "slots": ["label", "trigger", "value", "popover", "listbox", "description", "error"],
+  "tokens": [
+    "color.surface.default",
+    "color.surface.raised",
+    "color.surface.subtle",
+    "color.border.default",
+    "color.border.strong",
+    "color.text.default",
+    "color.text.muted",
+    "color.action.primary",
+    "color.feedback.danger",
+    "color.focus.ring",
+    "radius.control",
+    "radius.overlay"
+  ],
+  "a11y": {
+    "role": "button",
+    "keyboard": [
+      "Enter, Space or Arrow Down opens the list",
+      "Arrow keys move through options",
+      "Typing jumps to matching options",
+      "Esc closes without changing the value"
+    ],
+    "requirements": ["Label is linked to the trigger", "Selected value is announced"],
+    "screenReader": [
+      "On focus: the label, the current value and that it opens a list (pop-up button, collapsed)",
+      "Opening announces the list and the focused option with its position",
+      "After choosing, the new value is announced and focus is back on the field"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["Choosing one of roughly 5 to 15 known options"],
+    "avoid_when": ["Few options that should be visible: use RadioGroup", "Long or searchable lists: use Combobox"],
+    "anti_patterns": ["Using a Select for yes/no", "Placeholder that looks like a real value", "Passing isInvalid for required or format checks (even isInvalid={false}): any defined value takes over validity and hides the built-in errors. Use isRequired and validate; pass isInvalid only for errors the app finds itself, such as from the server"]
+  },
+  "examples": ["basic", "controlled", "invalid", "sizes"],
+  "figma": {
+    "componentKey": null,
+    "variantMap": { "size": "Size", "isDisabled": "Disabled", "isInvalid": "Invalid" }
+  }
+}

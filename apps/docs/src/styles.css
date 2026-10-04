@@ -1,0 +1,67 @@
+@import "tailwindcss";
+@import "@rdloom/tokens/tokens.css";
+
+/* Tailwind only generates classes it finds: include the components and examples. */
+@source "../../../packages/react/src";
+@source "../../../examples/components";
+
+/*
+ * The site's own chrome: a quiet neutral palette, so the components on each
+ * page stand out. The components themselves keep the rdloom tokens.
+ * Contrast (text on bg): fg 19.8:1, muted 4.8:1 light / 7.8:1 dark.
+ */
+:root {
+  --site-bg: #ffffff;
+  --site-fg: #09090b;
+  --site-muted: #71717a;
+  --site-subtle: #f4f4f5;
+  --site-border: #e4e4e7;
+  --site-border-strong: #a1a1aa;
+  --site-primary: #18181b;
+  --site-primary-hover: #3f3f46;
+  --site-on-primary: #fafafa;
+  --site-radius: 8px;
+  --site-radius-lg: 12px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --site-bg: #09090b;
+    --site-fg: #fafafa;
+    --site-muted: #a1a1aa;
+    --site-subtle: #18181b;
+    --site-border: #27272a;
+    --site-border-strong: #52525b;
+    --site-primary: #fafafa;
+    --site-primary-hover: #d4d4d8;
+    --site-on-primary: #18181b;
+  }
+}
+
+:root[data-theme="dark"] {
+  --site-bg: #09090b;
+  --site-fg: #fafafa;
+  --site-muted: #a1a1aa;
+  --site-subtle: #18181b;
+  --site-border: #27272a;
+  --site-border-strong: #52525b;
+  --site-primary: #fafafa;
+  --site-primary-hover: #d4d4d8;
+  --site-on-primary: #18181b;
+}
+
+body {
+  background: var(--site-bg);
+  color: var(--site-fg);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+code,
+pre {
+  font-family: ui-monospace, "Cascadia Code", Menlo, monospace;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--site-fg) 15%, transparent);
+}

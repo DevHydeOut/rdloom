@@ -1,0 +1,11 @@
+@import "tailwindcss";
+@import "@rdloom/tokens/tokens.css";
+
+/* Tailwind only generates classes it finds; point it at the component source. */
+@source "../../../packages/react/src";
+
+body {
+  background: var(--rd-color-surface-default);
+  color: var(--rd-color-text-default);
+  font-family: ui-sans-serif, system-ui, sans-serif;
+}

@@ -1,0 +1,114 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "DataGrid",
+  "version": "0.5.0",
+  "category": "data",
+  "status": "experimental",
+  "description": "Accessible, virtualized data grid for large datasets: sorting, filtering, row selection, resizable and pinned columns, row grouping with totals, tree data and expandable detail rows. Columns are TanStack Table column definitions.",
+  "props": {
+    "label": { "type": "string", "required": true, "description": "Accessible name of the grid, e.g. 'Orders'." },
+    "data": { "type": "custom", "tsType": "readonly unknown[]", "description": "Rows to show. Keep the array reference stable between renders." },
+    "columns": {
+      "type": "custom",
+      "tsType": "import(\"@tanstack/react-table\").ColumnDef<any, any>[]",
+      "description": "TanStack Table column definitions. Give each column an id or accessorKey."
+    },
+    "getRowId": { "type": "callback", "tsType": "(row: any, index: number) => string", "description": "Stable id per row. Needed for selection to survive sorting and filtering." },
+    "density": { "type": "enum", "values": ["compact", "standard", "comfortable"], "default": "standard", "description": "Row height: 32, 40 or 48px." },
+    "height": { "type": "number", "default": 480, "description": "Height of the scrolling area in px." },
+    "virtualized": { "type": "boolean", "default": true, "description": "Renders only visible rows. Keeps 100k rows fast." },
+    "sortable": { "type": "boolean", "default": true, "description": "Lets users sort by clicking or pressing Enter on a header. Shift adds a secondary sort." },
+    "selectionMode": { "type": "enum", "values": ["none", "single", "multiple"], "default": "none", "description": "Adds a checkbox column and Space-to-select." },
+    "selectedRowIds": { "type": "custom", "tsType": "readonly string[]", "description": "Controlled selection, by row id." },
+    "defaultSelectedRowIds": { "type": "custom", "tsType": "readonly string[]", "description": "Initial selection when uncontrolled." },
+    "onSelectionChange": { "type": "callback", "tsType": "(ids: string[]) => void", "description": "Called with the selected row ids." },
+    "globalFilter": { "type": "string", "description": "Shows only rows where some cell contains this text (case-insensitive)." },
+    "resizableColumns": { "type": "boolean", "default": true, "description": "Drag a header edge, or press Alt+Left/Right on a header, to resize." },
+    "pinnedColumns": { "type": "custom", "tsType": "readonly string[]", "description": "Column ids kept visible on the left while scrolling sideways." },
+    "showColumnFilters": { "type": "boolean", "default": false, "description": "Adds a filter row under the header. Set meta.filter on a column to 'text', 'select' or false." },
+    "pageSize": { "type": "number", "description": "Rows per page. When set, a pager is shown; when not, all rows scroll (virtualized)." },
+    "onCellEdit": {
+      "type": "callback",
+      "tsType": "(edit: import(\"../data-grid/types\").DataGridCellEdit<any>) => void",
+      "description": "Called when the user saves an edit in a column with meta.editable. Update your data to apply it."
+    },
+    "isLoading": { "type": "boolean", "default": false, "description": "Marks the grid busy and shows a loading message." },
+    "emptyMessage": { "type": "string", "default": "No rows", "description": "Shown when there are no rows to display." },
+    "onRowAction": { "type": "callback", "tsType": "(row: any) => void", "description": "Called on Enter or double-click on a row, e.g. to open details." },
+    "onFilteredDataChange": { "type": "callback", "tsType": "(rows: any[]) => void", "description": "Called with the rows that match the search and column filters, in display order, whenever they change. Use it for counts and totals." },
+    "groupBy": { "type": "custom", "tsType": "readonly string[]", "description": "Column ids to group rows by, outermost first. Group rows show the value, a row count, and a total in each column that sets aggregationFn ('sum', 'mean', 'min', 'max', 'count', 'uniqueCount' or a function)." },
+    "defaultExpanded": { "type": "boolean", "default": false, "description": "Start with every group, tree row and detail panel open." },
+    "getSubRows": { "type": "callback", "tsType": "(row: any) => readonly any[] | undefined", "description": "Tree data: returns a row's children. Rows with children get an expand toggle and are indented by depth. Search keeps a parent when a child matches." },
+    "renderDetail": { "type": "callback", "tsType": "(row: any) => import(\"react\").ReactNode", "description": "Master-detail: content shown in a panel under a row when it's expanded." },
+    "detailHeight": { "type": "number", "default": 200, "description": "Height of each detail panel in px; the panel scrolls if its content is taller." }
+  },
+  "variants": ["density", "selectionMode"],
+  "states": ["default", "hover", "focus", "selected", "loading"],
+  "slots": ["scroller", "header-row", "column-header", "sort-indicator", "resizer", "filter-row", "filter", "row", "cell", "editor", "select-cell", "empty", "loading", "pager"],
+  "tokens": [
+    "color.surface.default",
+    "color.surface.subtle",
+    "color.surface.selected",
+    "color.border.default",
+    "color.border.strong",
+    "color.text.default",
+    "color.text.muted",
+    "color.action.primary",
+    "color.focus.ring",
+    "radius.overlay"
+  ],
+  "a11y": {
+    "role": "grid",
+    "keyboard": [
+      "Tab moves into the grid, to the last focused cell; Tab again leaves it",
+      "Arrow keys move between cells, including the header row",
+      "Home/End move to the first/last cell in the row",
+      "Ctrl+Home/Ctrl+End move to the first/last cell in the grid",
+      "PageUp/PageDown move by one screen of rows",
+      "Enter or Space on a header sorts; with Shift it adds a secondary sort",
+      "Alt+Left/Right on a header resizes the column",
+      "Space on a row toggles its selection; Ctrl+A selects all (multiple mode)",
+      "Enter on a row calls onRowAction",
+      "Enter or F2 on an editable cell starts editing; typing a character starts editing with it, including the first key of an IME (Japanese, Chinese, Korean input)",
+      "While editing, Enter saves and Escape cancels; focus returns to the cell",
+      "Enter or typing on a filter cell moves into its filter; Escape returns to the grid",
+      "On a group, tree or detail row, Right arrow in the toggle cell expands it and Left arrow collapses it; Enter on a group row (or on the toggle cell, when it isn't editable) toggles it",
+      "Space on a group row selects or clears all its rows (multiple mode)"
+    ],
+    "requirements": [
+      "On touch screens, tapping the selected editable cell again opens its editor, so the phone keyboard appears",
+      "Grid has an accessible name",
+      "aria-rowcount and aria-rowindex reflect the full dataset, even when virtualized",
+      "Sorted columns expose aria-sort",
+      "Selected rows expose aria-selected",
+      "Only one cell is in the tab order at a time (roving tabindex)",
+      "Filter inputs and editors are labelled with their column name",
+      "Pager announces the visible row range",
+      "With grouping, tree data or detail rows the role is treegrid; rows expose aria-level and, when they can open, aria-expanded",
+      "Group rows show their row count; only columns with an aggregationFn show a total, never the first row's value",
+      "The expand toggle is a labelled button (Expand / Collapse) that isn't a separate tab stop"
+    ],
+    "screenReader": [
+      "Entering the grid announces its name and size (rows and columns)",
+      "Moving across announces each column header; moving down announces row numbers from the full dataset (row 50,000 of 100,001), even though rows are virtualized",
+      "Sorting with Enter announces the new sort direction on that header",
+      "Selected rows are announced as selected",
+      "Filter cells: Enter or typing moves into an input announced as Filter <column>",
+      "Editing: Enter opens an edit field announced as Edit <column>; after Enter, the saved value is read",
+      "The pager's range (Rows 11–20 of 237) is announced after changing page",
+      "Group and tree rows announce their level and whether they are expanded or collapsed",
+      "With NVDA, table navigation (Ctrl+Alt+Arrow keys) works in browse mode"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["Scanning, sorting and acting on many records, like orders, users or logs"],
+    "avoid_when": ["A few items with rich layout: use a list or cards", "Pure layout: never use a grid for layout"],
+    "anti_patterns": ["Buttons in every cell instead of a row action", "Horizontal scrolling without pinning the identifying column", "Formatting numbers or dates in a custom cell renderer: search and filters won't find the text users see. Use meta.format (e.g. a currency formatter) instead"]
+  },
+  "examples": ["basic", "selection", "large-dataset", "pinned", "filter", "column-filters", "editing", "pagination", "grouping", "tree-data", "master-detail"],
+  "figma": {
+    "componentKey": null,
+    "variantMap": { "density": "Density", "selectionMode": "Selection" }
+  }
+}

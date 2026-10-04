@@ -1,0 +1,82 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Button",
+  "version": "0.1.0",
+  "category": "action",
+  "status": "experimental",
+  "description": "Triggers an action or event, such as submitting a form or opening a dialog.",
+  "props": {
+    "variant": {
+      "type": "enum",
+      "values": ["primary", "secondary", "ghost", "danger"],
+      "default": "primary",
+      "description": "Visual emphasis of the button."
+    },
+    "size": {
+      "type": "enum",
+      "values": ["sm", "md", "lg"],
+      "default": "md",
+      "description": "Height, padding and font size."
+    },
+    "isDisabled": {
+      "type": "boolean",
+      "default": false,
+      "description": "Prevents interaction and dims the button."
+    },
+    "isLoading": {
+      "type": "boolean",
+      "default": false,
+      "description": "Shows a spinner and blocks presses. The button stays focusable, is marked aria-disabled, and the pending state is announced."
+    },
+    "children": {
+      "type": "node",
+      "required": true,
+      "description": "Button label. Icon-only buttons must pass aria-label instead."
+    },
+    "onPress": {
+      "type": "callback",
+      "tsType": "() => void",
+      "description": "Called when the button is pressed by mouse, touch or keyboard."
+    }
+  },
+  "variants": ["variant", "size", "isDisabled"],
+  "states": ["default", "hover", "focus", "pressed", "disabled", "loading"],
+  "slots": ["icon-start", "label", "icon-end"],
+  "tokens": [
+    "color.action.primary",
+    "color.action.primary-hover",
+    "color.action.on-primary",
+    "color.action.danger",
+    "color.surface.subtle",
+    "color.border.default",
+    "color.text.default",
+    "color.focus.ring",
+    "radius.control",
+    "space.control-x"
+  ],
+  "a11y": {
+    "role": "button",
+    "keyboard": ["Enter activates", "Space activates"],
+    "requirements": [
+      "Must have visible text or an aria-label",
+      "Focus ring must meet 3:1 contrast against its background"
+    ],
+    "screenReader": [
+      "Announced as a button with its visible label",
+      "An icon-only button (the ⚙ in the playground) announces its aria-label, not the icon",
+      "Disabled: announced as unavailable or dimmed",
+      "Loading: announced as unavailable, and the busy state is spoken when loading starts"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["Performing an action on the current page", "Submitting a form"],
+    "avoid_when": ["Navigating to another page: use Link"],
+    "anti_patterns": ["More than one primary button in the same area", "Vague labels like 'Click here'"]
+  },
+  "examples": ["variants", "sizes", "loading", "disabled", "with-icon"],
+  "figma": {
+    "componentKey": null,
+    "variantMap": { "variant": "Variant", "size": "Size", "isDisabled": "Disabled" }
+  }
+}

@@ -1,0 +1,45 @@
+<style>
+  body { font: 12px/1.5 Inter, system-ui, sans-serif; margin: 0; padding: 16px; color: var(--figma-color-text); background: var(--figma-color-bg); }
+  h1 { font-size: 13px; margin: 0 0 4px; }
+  p { margin: 0 0 12px; color: var(--figma-color-text-secondary); }
+  .row { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+  button { font: inherit; padding: 6px 12px; border-radius: 6px; border: 1px solid var(--figma-color-border); background: var(--figma-color-bg); color: var(--figma-color-text); cursor: pointer; }
+  button.primary { background: var(--figma-color-bg-brand); color: var(--figma-color-text-onbrand); border-color: transparent; }
+  button:disabled { opacity: .5; cursor: default; }
+  pre { white-space: pre-wrap; margin: 0 0 8px; }
+  .error { color: var(--figma-color-text-danger); }
+  textarea { width: 100%; box-sizing: border-box; height: 120px; font: 11px ui-monospace, monospace; background: var(--figma-color-bg-secondary); color: var(--figma-color-text); border: 1px solid var(--figma-color-border); border-radius: 6px; }
+  [hidden] { display: none; }
+</style>
+<h1>rdloom</h1>
+<p>Creates the design tokens as variables (Light and Dark modes) and a component set per spec. Safe to re-run: it updates values and adds missing variants, and never deletes or restyles your work.</p>
+<div class="row">
+  <button class="primary" data-cmd="all">Sync everything</button>
+  <button data-cmd="variables">Variables only</button>
+  <button data-cmd="components">Components only</button>
+</div>
+<pre id="out" role="status"></pre>
+<div id="keys" hidden>
+  <p>Component set keys. Paste each into its spec's <code>figma.componentKey</code>:</p>
+  <textarea id="keysText" readonly aria-label="Component set keys"></textarea>
+</div>
+<script>
+  const buttons = document.querySelectorAll("button");
+  const out = document.getElementById("out");
+  buttons.forEach((b) => b.addEventListener("click", () => {
+    buttons.forEach((x) => (x.disabled = true));
+    out.className = "";
+    out.textContent = "Working…";
+    parent.postMessage({ pluginMessage: { type: b.dataset.cmd } }, "*");
+  }));
+  onmessage = (e) => {
+    const msg = e.data.pluginMessage;
+    buttons.forEach((x) => (x.disabled = false));
+    out.className = msg.type === "error" ? "error" : "";
+    out.textContent = msg.text;
+    if (msg.keys) {
+      document.getElementById("keys").hidden = false;
+      document.getElementById("keysText").value = JSON.stringify(msg.keys, null, 2);
+    }
+  };
+</script>

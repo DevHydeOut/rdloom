@@ -1,0 +1,30 @@
+{
+  "name": "@rdloom/mcp",
+  "version": "0.1.0",
+  "license": "MIT",
+  "type": "module",
+  "description": "MCP server that gives AI coding agents the rdloom specs: props, usage rules, accessibility requirements, tokens and source.",
+  "bin": {
+    "rdloom-mcp": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "context.json"
+  ],
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.31.0",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "vitest": "^3.2.7"
+  },
+  "scripts": {
+    "prepack": "node ../../scripts/build-bins.mjs"
+  },
+  "homepage": "https://rdloom.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DevHydeOut/rdloom.git",
+    "directory": "packages/mcp"
+  }
+}

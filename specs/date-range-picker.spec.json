@@ -1,0 +1,77 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "DateRangePicker",
+  "version": "0.1.1",
+  "category": "input",
+  "status": "experimental",
+  "description": "Start and end date fields with a two-month calendar and optional presets like 'Last 7 days'.",
+  "props": {
+    "label": { "type": "string", "required": true, "description": "Visible label." },
+    "description": { "type": "string", "description": "Help text under the field." },
+    "errorMessage": { "type": "string", "description": "Shown when the range is invalid." },
+    "size": { "type": "enum", "values": ["sm", "md", "lg"], "default": "md", "description": "Field height and font size." },
+    "presets": {
+      "type": "custom",
+      "tsType": "import(\"../date-range-picker/presets\").DateRangePreset[]",
+      "description": "Quick ranges shown beside the calendar. Pass defaultDateRangePresets or your own."
+    },
+    "timeZone": { "type": "string", "description": "IANA time zone that presets use for 'today'. Defaults to the user's local zone." },
+    "visibleMonths": { "type": "number", "default": 2, "description": "Months shown in the popover." },
+    "value": { "type": "custom", "tsType": "import(\"react-aria-components\").DateRange | null", "description": "Controlled range." },
+    "defaultValue": { "type": "custom", "tsType": "import(\"react-aria-components\").DateRange", "description": "Initial range when uncontrolled." },
+    "minValue": { "type": "custom", "tsType": "import(\"react-aria-components\").DateValue", "description": "Earliest allowed date." },
+    "maxValue": { "type": "custom", "tsType": "import(\"react-aria-components\").DateValue", "description": "Latest allowed date." },
+    "isDisabled": { "type": "boolean", "default": false, "description": "Prevents editing and dims the field." },
+    "isInvalid": { "type": "boolean", "default": false, "description": "Marks the range invalid and shows errorMessage." },
+    "isRequired": { "type": "boolean", "default": false, "description": "Requires a range for form submission." },
+    "onChange": { "type": "callback", "tsType": "(value: import(\"react-aria-components\").DateRange | null) => void", "description": "Called when the range changes, including from a preset." }
+  },
+  "variants": ["size", "isDisabled", "isInvalid"],
+  "states": ["default", "hover", "focus", "open", "disabled", "invalid"],
+  "slots": ["label", "field", "start", "separator", "end", "button", "popover", "presets", "calendar", "description", "error"],
+  "tokens": [
+    "color.surface.default",
+    "color.surface.raised",
+    "color.surface.subtle",
+    "color.border.default",
+    "color.border.strong",
+    "color.text.default",
+    "color.text.muted",
+    "color.action.primary",
+    "color.feedback.danger",
+    "color.focus.ring",
+    "radius.control",
+    "radius.overlay"
+  ],
+  "a11y": {
+    "role": "group",
+    "keyboard": [
+      "Tab moves between start and end segments",
+      "Up/Down arrows change the focused segment",
+      "Alt+Down opens the calendar, Esc closes it",
+      "Presets are buttons reachable with Tab"
+    ],
+    "requirements": [
+      "Start and end fields are labelled as such",
+      "Choosing a preset announces the new range and returns focus to the field",
+      "Presets outside minValue/maxValue are disabled"
+    ],
+    "screenReader": [
+      "Start and end segments are distinguishable (start date / end date)",
+      "Presets are announced as buttons; the one matching the current range as pressed",
+      "Presets outside min/max are announced as unavailable",
+      "After choosing a preset, focus returns to the field and the new range can be read"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["Filtering reports or analytics by period", "Booking a stay"],
+    "avoid_when": ["A single date: use DatePicker"],
+    "anti_patterns": ["Hiding presets on mobile", "Presets that ignore the user's time zone", "Passing isInvalid for required or format checks (even isInvalid={false}): any defined value takes over validity and hides the built-in errors. Use isRequired and validate; pass isInvalid only for errors the app finds itself, such as from the server"]
+  },
+  "examples": ["basic", "with-presets", "time-zone", "min-max"],
+  "figma": {
+    "componentKey": null,
+    "variantMap": { "size": "Size", "isDisabled": "Disabled", "isInvalid": "Invalid" }
+  }
+}

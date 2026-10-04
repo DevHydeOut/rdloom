@@ -1,0 +1,80 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Combobox",
+  "version": "0.1.2",
+  "category": "input",
+  "status": "experimental",
+  "description": "Text input that filters a list of options as you type. Supports multi-select tags, async loading and long, virtualized lists.",
+  "props": {
+    "label": { "type": "string", "required": true, "description": "Visible label." },
+    "description": { "type": "string", "description": "Help text under the field." },
+    "errorMessage": { "type": "string", "description": "Shown when the field is invalid." },
+    "placeholder": { "type": "string", "description": "Hint shown in the empty input." },
+    "size": { "type": "enum", "values": ["sm", "md", "lg"], "default": "md", "description": "Field height and font size." },
+    "selectionMode": { "type": "enum", "values": ["single", "multiple"], "default": "single", "description": "multiple shows the chosen options as removable tags." },
+    "value": {
+      "type": "custom",
+      "tsType": "import(\"react-aria-components\").Key | null | readonly import(\"react-aria-components\").Key[]",
+      "description": "Controlled selection: one key (or null) in single mode, an array of keys in multiple mode."
+    },
+    "allowsCustomValue": { "type": "boolean", "default": false, "description": "Lets the user keep text that doesn't match an option (single mode)." },
+    "menuTrigger": { "type": "enum", "values": ["input", "focus", "manual"], "default": "input", "description": "What opens the list: typing, focusing, or only the button and arrow keys." },
+    "isLoading": { "type": "boolean", "default": false, "description": "Shows a spinner in the field, e.g. while an async search runs." },
+    "virtualized": { "type": "boolean", "default": false, "description": "Renders only visible options. Turn on for lists of more than a few hundred items." },
+    "emptyMessage": { "type": "string", "default": "No results", "description": "Shown when nothing matches the input." },
+    "isDisabled": { "type": "boolean", "default": false, "description": "Prevents interaction and dims the field." },
+    "isInvalid": { "type": "boolean", "default": false, "description": "Marks the field invalid and shows errorMessage." },
+    "isRequired": { "type": "boolean", "default": false, "description": "Requires a selection for form submission." },
+    "onLoadMore": { "type": "callback", "tsType": "() => void", "description": "Called when the user scrolls near the end of the list, for infinite loading." }
+  },
+  "variants": ["size", "selectionMode", "isDisabled", "isInvalid"],
+  "states": ["default", "hover", "focus", "open", "loading", "disabled", "invalid"],
+  "slots": ["label", "field", "tags", "input", "spinner", "button", "popover", "listbox", "empty", "description", "error"],
+  "tokens": [
+    "color.surface.default",
+    "color.surface.raised",
+    "color.surface.subtle",
+    "color.border.default",
+    "color.border.strong",
+    "color.text.default",
+    "color.text.muted",
+    "color.action.primary",
+    "color.feedback.danger",
+    "color.focus.ring",
+    "radius.control",
+    "radius.overlay"
+  ],
+  "a11y": {
+    "role": "combobox",
+    "keyboard": [
+      "Typing filters the list",
+      "Down arrow opens the list; Up/Down arrows move through options",
+      "Enter selects, Esc closes and restores the input",
+      "Backspace in an empty input removes the last tag (multiple mode)"
+    ],
+    "requirements": [
+      "Input is labelled and announces the number of results",
+      "Each tag has a remove button named 'Remove <option>'",
+      "Loading state is announced"
+    ],
+    "screenReader": [
+      "On focus: the label, combo box, and collapsed or expanded",
+      "Typing announces the number of results or the focused option",
+      "Moving through options announces each option and its position; in the 5,000-item list, positions like 4,999 of 5,000",
+      "No matches: No results is announced",
+      "Async: Loading is announced while results load",
+      "Multiple: each tag's button is announced as Remove <option>; removing one with Backspace makes its removal clear"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["Choosing from a long or searchable list, like countries, users or products", "Tagging with several values"],
+    "avoid_when": ["Fewer than about 7 options: use Select or RadioGroup"],
+    "anti_patterns": ["Async search without a loading state", "Rendering thousands of options without virtualized", "Passing isInvalid for required or format checks (even isInvalid={false}): any defined value takes over validity and hides the built-in errors. Use isRequired and validate; pass isInvalid only for errors the app finds itself, such as from the server"]
+  },
+  "examples": ["basic", "multiple", "async", "custom-value", "virtualized"],
+  "figma": {
+    "componentKey": null,
+    "variantMap": { "size": "Size", "selectionMode": "Mode", "isDisabled": "Disabled", "isInvalid": "Invalid" }
+  }
+}

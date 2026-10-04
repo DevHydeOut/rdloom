@@ -1,0 +1,43 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Accordion",
+  "version": "0.1.0",
+  "category": "layout",
+  "status": "experimental",
+  "description": "A stack of sections whose content expands and collapses under a heading, like an FAQ. Use with AccordionItem.",
+  "props": {
+    "allowsMultipleExpanded": { "type": "boolean", "default": false, "description": "Lets several sections be open at once. Otherwise opening one closes the others." },
+    "defaultExpandedKeys": { "type": "custom", "tsType": "Iterable<import(\"react-aria-components\").Key>", "description": "Sections open at first, by id, when uncontrolled." },
+    "expandedKeys": { "type": "custom", "tsType": "Iterable<import(\"react-aria-components\").Key>", "description": "Controlled open sections, by id." },
+    "isDisabled": { "type": "boolean", "default": false, "description": "Disables every section." },
+    "onExpandedChange": { "type": "callback", "tsType": "(keys: Set<import(\"react-aria-components\").Key>) => void", "description": "Called with the ids of the open sections." },
+    "children": { "type": "node", "required": true, "description": "AccordionItem elements." }
+  },
+  "variants": ["allowsMultipleExpanded"],
+  "states": ["default", "open", "disabled"],
+  "slots": ["item", "heading", "trigger", "chevron", "panel"],
+  "tokens": ["color.border.default", "color.text.default", "color.text.muted", "color.surface.subtle", "color.focus.ring", "radius.control"],
+  "a11y": {
+    "role": "group",
+    "keyboard": ["Tab moves between section headings", "Enter or Space opens or closes the focused section"],
+    "requirements": [
+      "Each heading is a real heading (h3 by default) with a button inside, exposing aria-expanded",
+      "The button controls its panel (aria-controls), and the panel is labelled by the button",
+      "Collapsed content is removed from the tab order and hidden from screen readers",
+      "Expanding respects reduced motion"
+    ],
+    "screenReader": [
+      "Each section is announced as a heading and a button, collapsed or expanded",
+      "Opening a section announces it as expanded; its content follows in reading order",
+      "Headings appear in the screen reader's headings list, for quick navigation"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["FAQs and long help pages", "Settings grouped into sections people rarely need all at once"],
+    "avoid_when": ["Content everyone needs: show it", "Switching between views of the same thing: use Tabs"],
+    "anti_patterns": ["Nesting accordions inside accordions", "Putting the only important information in a collapsed section"]
+  },
+  "examples": ["basic", "multiple", "disabled-item"],
+  "figma": { "componentKey": null, "variantMap": { "allowsMultipleExpanded": "Multiple" } }
+}

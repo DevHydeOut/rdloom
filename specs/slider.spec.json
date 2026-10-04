@@ -1,0 +1,64 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Slider",
+  "version": "0.1.0",
+  "category": "input",
+  "status": "experimental",
+  "description": "Picks a number, or a range with two thumbs, by dragging along a track. Shows the formatted value.",
+  "props": {
+    "label": { "type": "string", "required": true, "description": "Visible label, also the accessible name." },
+    "minValue": { "type": "number", "default": 0, "description": "Lowest value." },
+    "maxValue": { "type": "number", "default": 100, "description": "Highest value." },
+    "step": { "type": "number", "default": 1, "description": "Amount each arrow key press changes the value by." },
+    "value": { "type": "custom", "tsType": "number | number[]", "description": "Controlled value. An array of two numbers makes a range slider." },
+    "defaultValue": { "type": "custom", "tsType": "number | number[]", "description": "Initial value when uncontrolled. An array of two numbers makes a range slider." },
+    "formatOptions": { "type": "custom", "tsType": "Intl.NumberFormatOptions", "description": "How the value is shown and announced, e.g. { style: 'currency', currency: 'USD' }." },
+    "showValue": { "type": "boolean", "default": true, "description": "Shows the formatted value next to the label." },
+    "isDisabled": { "type": "boolean", "default": false, "description": "Prevents interaction and dims the slider." },
+    "onChange": { "type": "callback", "tsType": "(value: number | number[]) => void", "description": "Called continuously while the value changes." },
+    "onChangeEnd": { "type": "callback", "tsType": "(value: number | number[]) => void", "description": "Called once when the user finishes, e.g. to run a search." }
+  },
+  "variants": ["isDisabled"],
+  "states": ["default", "hover", "focus", "pressed", "disabled"],
+  "slots": ["label", "output", "track", "fill", "thumb"],
+  "tokens": [
+    "color.action.primary",
+    "color.surface.subtle",
+    "color.surface.raised",
+    "color.border.strong",
+    "color.text.default",
+    "color.text.muted",
+    "color.focus.ring"
+  ],
+  "a11y": {
+    "role": "slider",
+    "keyboard": [
+      "Tab moves to each thumb",
+      "Left/Down Arrow decreases by one step; Right/Up Arrow increases",
+      "Page Up/Page Down change by a larger step",
+      "Home and End jump to the minimum and maximum"
+    ],
+    "requirements": [
+      "Each thumb is a native range input, labelled by the slider's label (range thumbs say minimum or maximum)",
+      "The value text uses formatOptions, so screen readers hear $250, not 250",
+      "Range thumbs can't cross each other",
+      "The thumb is at least 24px, for touch"
+    ],
+    "screenReader": [
+      "Each thumb is announced as a slider with the label and formatted value",
+      "Arrow keys announce each new value",
+      "In a range, thumbs are announced as the minimum and maximum of the label"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "An approximate value in a known range, like price or volume",
+      "Filters where the exact number matters less than the feel"
+    ],
+    "avoid_when": ["Exact values: use a number TextField", "Very large ranges where a step is meaningless"],
+    "anti_patterns": ["Hiding the value: show it, so users know where they are", "A slider as the only way to enter a precise number"]
+  },
+  "examples": ["basic", "range", "currency", "disabled"],
+  "figma": { "componentKey": null, "variantMap": { "isDisabled": "Disabled" } }
+}

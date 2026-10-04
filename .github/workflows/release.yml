@@ -1,0 +1,79 @@
+name: Release
+
+# Publishes rdloom and @rdloom/mcp to npm when a version tag is pushed:
+#   git tag v0.1.0 && git push origin v0.1.0
+#
+# Run it from the Actions tab with "dry run" first to see exactly what would
+# ship without publishing anything. npm publishes are permanent.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      dry-run:
+        description: "Pack and check only; publish nothing"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    name: Publish to npm
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      # Lets npm record provenance: a signed link from the package back to the
+      # commit and workflow that built it, shown on the npm page.
+      id-token: write
+    environment: npm
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          registry-url: https://registry.npmjs.org
+
+      - name: Install
+        run: npm ci
+
+      - name: Generate (registry, types, MCP context)
+        run: npm run gen
+
+      - name: Generated files are committed
+        run: npm run check:generated
+
+      - name: Tests
+        run: npm run test:unit
+
+      - name: The tag matches the package versions
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          for dir in cli mcp; do
+            version=$(node -p "require('./packages/$dir/package.json').version")
+            [ "$version" = "$tag" ] || { echo "::error::packages/$dir is $version but the tag says $tag"; exit 1; }
+          done
+
+      - name: Pack both packages
+        run: npm pack -w rdloom -w @rdloom/mcp --pack-destination ./.packs
+
+      - name: What would be published
+        run: |
+          for tgz in ./.packs/*.tgz; do
+            echo "::group::$tgz"
+            tar -tzf "$tgz" | sort
+            echo "::endgroup::"
+          done
+
+      - name: Install from the tarballs and smoke test
+        run: bash scripts/sample-app.sh
+
+      - name: Publish
+        if: startsWith(github.ref, 'refs/tags/') && inputs.dry-run != true
+        run: npm publish -w rdloom -w @rdloom/mcp --access public --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

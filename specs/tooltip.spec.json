@@ -1,0 +1,41 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Tooltip",
+  "version": "0.1.0",
+  "category": "overlay",
+  "status": "experimental",
+  "description": "Short text label shown on hover or keyboard focus. Wrap the trigger and tooltip in TooltipTrigger.",
+  "props": {
+    "children": { "type": "node", "required": true, "description": "Tooltip text. Keep it short and non-interactive." },
+    "placement": { "type": "enum", "values": ["top", "bottom", "start", "end"], "default": "top", "description": "Preferred side of the trigger." },
+    "showArrow": { "type": "boolean", "default": true, "description": "Shows an arrow pointing at the trigger." }
+  },
+  "variants": ["placement", "showArrow"],
+  "states": ["open"],
+  "slots": ["panel", "arrow"],
+  "tokens": ["color.text.default", "color.surface.default", "radius.control"],
+  "a11y": {
+    "role": "tooltip",
+    "keyboard": ["Shows on focus", "Esc hides"],
+    "requirements": [
+      "Trigger must be focusable",
+      "Never the only way to reach important information",
+      "Content has no interactive elements"
+    ],
+    "screenReader": [
+      "Focusing the trigger reads the tooltip text as a description after the trigger's name",
+      "The tooltip is not announced as a separate thing to navigate to"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["Naming icon-only buttons", "Brief hints about a control"],
+    "avoid_when": ["Interactive content: use Popover", "Essential instructions: show them inline"],
+    "anti_patterns": ["Tooltips on disabled controls", "Paragraphs of text"]
+  },
+  "examples": ["icon-button", "placements"],
+  "figma": {
+    "componentKey": null,
+    "variantMap": { "placement": "Placement", "showArrow": "Arrow" }
+  }
+}

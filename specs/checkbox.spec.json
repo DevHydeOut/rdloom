@@ -1,0 +1,52 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Checkbox",
+  "version": "0.1.1",
+  "category": "input",
+  "status": "experimental",
+  "description": "Lets the user turn a single option on or off, with an optional indeterminate state.",
+  "props": {
+    "children": { "type": "node", "required": true, "description": "Visible label." },
+    "isSelected": { "type": "boolean", "description": "Controlled checked state." },
+    "defaultSelected": { "type": "boolean", "default": false, "description": "Initial checked state when uncontrolled." },
+    "isIndeterminate": { "type": "boolean", "default": false, "description": "Shows a dash for a partially selected group, e.g. 'select all'." },
+    "isDisabled": { "type": "boolean", "default": false, "description": "Prevents interaction and dims the checkbox." },
+    "isInvalid": { "type": "boolean", "default": false, "description": "Marks the checkbox as invalid, e.g. an unaccepted required agreement." },
+    "onChange": { "type": "callback", "tsType": "(isSelected: boolean) => void", "description": "Called with the new checked state." }
+  },
+  "variants": ["isIndeterminate", "isDisabled", "isInvalid"],
+  "states": ["default", "hover", "focus", "pressed", "selected", "disabled", "invalid"],
+  "slots": ["box", "label"],
+  "tokens": [
+    "color.action.primary",
+    "color.action.on-primary",
+    "color.border.strong",
+    "color.surface.default",
+    "color.text.default",
+    "color.feedback.danger",
+    "color.focus.ring",
+    "radius.control"
+  ],
+  "a11y": {
+    "role": "checkbox",
+    "keyboard": ["Space toggles"],
+    "requirements": ["Label is part of the click target", "Indeterminate is exposed as aria-checked=mixed"],
+    "screenReader": [
+      "Announced as a checkbox with its label and checked or not checked",
+      "Indeterminate is announced as half checked or mixed",
+      "Toggling announces the new state",
+      "Invalid is announced as invalid"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["Independent on/off options in a form", "Accepting terms", "Selecting rows"],
+    "avoid_when": ["A setting that takes effect immediately: use Switch", "Exactly one choice from a set: use RadioGroup"],
+    "anti_patterns": ["Negative labels like 'Don't send emails'", "Passing isInvalid for required or format checks (even isInvalid={false}): any defined value takes over validity and hides the built-in errors. Use isRequired and validate; pass isInvalid only for errors the app finds itself, such as from the server"]
+  },
+  "examples": ["basic", "indeterminate", "invalid", "disabled"],
+  "figma": {
+    "componentKey": null,
+    "variantMap": { "isIndeterminate": "Indeterminate", "isDisabled": "Disabled", "isInvalid": "Invalid" }
+  }
+}

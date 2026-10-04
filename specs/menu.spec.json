@@ -1,0 +1,80 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Menu",
+  "version": "0.1.0",
+  "category": "action",
+  "status": "experimental",
+  "description": "A list of actions or options that opens from a button, like a More (…) or Account menu. Use with MenuTrigger and MenuItem.",
+  "props": {
+    "placement": {
+      "type": "enum",
+      "values": ["bottom start", "bottom end", "top start", "top end"],
+      "default": "bottom start",
+      "description": "Where the menu opens relative to its button. It flips when there isn't room."
+    },
+    "selectionMode": {
+      "type": "enum",
+      "values": ["none", "single", "multiple"],
+      "default": "none",
+      "description": "none for actions; single or multiple for options that stay checked, like view settings."
+    },
+    "onAction": { "type": "callback", "tsType": "(key: import(\"react-aria-components\").Key) => void", "description": "Called with the id of the item chosen." },
+    "children": { "type": "node", "required": true, "description": "MenuItem, MenuSection and MenuSeparator elements." }
+  },
+  "variants": ["selectionMode"],
+  "states": ["default", "open"],
+  "slots": ["trigger", "popover", "item", "section", "separator", "shortcut"],
+  "tokens": [
+    "color.surface.raised",
+    "color.surface.subtle",
+    "color.border.default",
+    "color.text.default",
+    "color.text.muted",
+    "color.feedback.danger",
+    "color.focus.ring",
+    "radius.overlay",
+    "radius.control"
+  ],
+  "a11y": {
+    "role": "menu",
+    "keyboard": [
+      "Enter, Space or Down Arrow on the button opens the menu and focuses the first item; Up Arrow focuses the last",
+      "Up and Down Arrow move between items, wrapping at the ends; Home and End jump to the first and last",
+      "Typing a letter moves to the next item starting with it",
+      "Enter or Space chooses the item and closes the menu (in a selectable menu, toggles it)",
+      "Esc closes the menu and returns focus to the button"
+    ],
+    "requirements": [
+      "The button has aria-haspopup and aria-expanded, and the menu is labelled by it",
+      "Focus returns to the button when the menu closes",
+      "Destructive items say what they do in their text, not only in red"
+    ],
+    "screenReader": [
+      "The button is announced as a menu button, collapsed or expanded",
+      "Opening announces a menu and its first item, with its position (1 of 4)",
+      "Section headings are read when you move into a section",
+      "In selectable menus, items are announced as checked or not checked",
+      "Closing announces the menu button again"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "Several actions on one thing, like Edit, Duplicate, Delete on a row",
+      "Account or overflow (…) menus",
+      "View settings a user toggles, like density or visible columns"
+    ],
+    "avoid_when": [
+      "Picking a value in a form: use Select or Combobox",
+      "Navigation between pages: use links",
+      "One or two actions: show them as buttons"
+    ],
+    "anti_patterns": [
+      "Putting form fields inside a menu",
+      "A menu button without a visible label or aria-label",
+      "Destructive actions without a confirmation Dialog"
+    ]
+  },
+  "examples": ["basic", "sections", "selectable", "icon-button"],
+  "figma": { "componentKey": null, "variantMap": { "selectionMode": "Selection" } }
+}

@@ -1,0 +1,57 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Dialog",
+  "version": "0.1.0",
+  "category": "overlay",
+  "status": "experimental",
+  "description": "Modal window that asks for focus, such as a confirmation or a short form. Open it with DialogTrigger.",
+  "props": {
+    "title": { "type": "string", "required": true, "description": "Heading, also used as the dialog's accessible name." },
+    "description": { "type": "string", "description": "Short supporting text under the title." },
+    "size": { "type": "enum", "values": ["sm", "md", "lg"], "default": "md", "description": "Maximum width." },
+    "role": { "type": "enum", "values": ["dialog", "alertdialog"], "default": "dialog", "description": "Use alertdialog for destructive or urgent confirmations." },
+    "isDismissable": { "type": "boolean", "default": true, "description": "Closes on backdrop click. Esc always closes." },
+    "children": {
+      "type": "custom",
+      "tsType": "ReactNode | ((opts: { close: () => void }) => ReactNode)",
+      "description": "Body and actions. A function receives close()."
+    }
+  },
+  "variants": ["size", "role"],
+  "states": ["open"],
+  "slots": ["backdrop", "panel", "title", "description", "body"],
+  "tokens": [
+    "color.overlay.backdrop",
+    "color.surface.raised",
+    "color.border.default",
+    "color.text.default",
+    "color.text.muted",
+    "radius.overlay"
+  ],
+  "a11y": {
+    "role": "dialog",
+    "keyboard": ["Esc closes", "Tab and Shift+Tab stay inside the dialog"],
+    "requirements": [
+      "Focus moves into the dialog on open and returns to the trigger on close",
+      "Content behind the dialog is hidden from assistive technology",
+      "Page scroll is locked while open"
+    ],
+    "screenReader": [
+      "Opening moves focus into the dialog and announces it as a dialog (alert dialog for Delete project) with its title",
+      "The description is read after the title",
+      "Browse/virtual cursor mode can't wander into the page behind the dialog",
+      "Closing announces the button that opened it (focus is back there)"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["Confirming a destructive action", "A short task that must finish before continuing"],
+    "avoid_when": ["Non-blocking info: use Toast", "Long or complex flows: use a page"],
+    "anti_patterns": ["Dialogs opening other dialogs", "Vague buttons like 'OK' for destructive actions"]
+  },
+  "examples": ["confirm", "form", "alert"],
+  "figma": {
+    "componentKey": null,
+    "variantMap": { "size": "Size", "role": "Role" }
+  }
+}

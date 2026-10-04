@@ -1,0 +1,50 @@
+{
+  "color": {
+    "$type": "color",
+    "neutral": {
+      "0":   { "$value": "#ffffff" },
+      "50":  { "$value": "#f7f7f8" },
+      "100": { "$value": "#eeeef1" },
+      "200": { "$value": "#dcdce2" },
+      "400": { "$value": "#9696a3" },
+      "500": { "$value": "#8a8a97" },
+      "600": { "$value": "#5b5b68" },
+      "800": { "$value": "#2a2a33" },
+      "900": { "$value": "#18181d" },
+      "950": { "$value": "#0e0e12" }
+    },
+    "indigo": {
+      "50":  { "$value": "#eef0ff" },
+      "300": { "$value": "#a5a8ff" },
+      "400": { "$value": "#8386f7" },
+      "500": { "$value": "#6366f1" },
+      "600": { "$value": "#4f46e5" },
+      "700": { "$value": "#4338ca" },
+      "950": { "$value": "#1f1d4d" }
+    },
+    "green": {
+      "400": { "$value": "#4ade80" },
+      "600": { "$value": "#16a34a" }
+    },
+    "red": {
+      "300": { "$value": "#fca5a5" },
+      "400": { "$value": "#f87171" },
+      "600": { "$value": "#dc2626" },
+      "700": { "$value": "#b91c1c" }
+    }
+  },
+  "radius": {
+    "$type": "dimension",
+    "sm": { "$value": "4px" },
+    "md": { "$value": "8px" },
+    "lg": { "$value": "12px" }
+  },
+  "space": {
+    "$type": "dimension",
+    "1": { "$value": "4px" },
+    "2": { "$value": "8px" },
+    "3": { "$value": "12px" },
+    "4": { "$value": "16px" },
+    "5": { "$value": "20px" }
+  }
+}

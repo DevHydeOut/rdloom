@@ -1,0 +1,5 @@
+{
+  "name": "rdloom",
+  "homepage": "https://rdloom.com",
+  "output": "packages/cli/registry"
+}

@@ -1,0 +1,45 @@
+{
+  "color": {
+    "$type": "color",
+    "action": {
+      "primary":       { "$value": "{color.indigo.600}" },
+      "primary-hover": { "$value": "{color.indigo.700}" },
+      "on-primary":    { "$value": "{color.neutral.0}" },
+      "danger":        { "$value": "{color.red.600}" },
+      "danger-hover":  { "$value": "{color.red.700}" }
+    },
+    "surface": {
+      "default": { "$value": "{color.neutral.0}" },
+      "subtle":  { "$value": "{color.neutral.100}" },
+      "raised":  { "$value": "{color.neutral.0}" },
+      "selected": { "$value": "{color.indigo.50}" }
+    },
+    "border": {
+      "default": { "$value": "{color.neutral.200}" },
+      "strong":  { "$value": "{color.neutral.500}" }
+    },
+    "feedback": {
+      "danger": { "$value": "{color.red.600}" },
+      "success": { "$value": "{color.green.600}" }
+    },
+    "overlay": {
+      "backdrop": { "$value": "rgb(14 14 18 / 0.5)" }
+    },
+    "text": {
+      "default": { "$value": "{color.neutral.900}" },
+      "muted":   { "$value": "{color.neutral.600}" }
+    },
+    "focus": {
+      "ring": { "$value": "{color.indigo.500}" }
+    }
+  },
+  "radius": {
+    "$type": "dimension",
+    "control": { "$value": "{radius.md}" },
+    "overlay": { "$value": "{radius.lg}" }
+  },
+  "space": {
+    "$type": "dimension",
+    "control-x": { "$value": "{space.4}" }
+  }
+}

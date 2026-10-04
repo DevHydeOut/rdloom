@@ -1,0 +1,65 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "DatePicker",
+  "version": "0.1.1",
+  "category": "input",
+  "status": "experimental",
+  "description": "Date field with a calendar popover. Typing and picking both work, in the user's locale.",
+  "props": {
+    "label": { "type": "string", "required": true, "description": "Visible label." },
+    "description": { "type": "string", "description": "Help text under the field." },
+    "errorMessage": { "type": "string", "description": "Shown when the field is invalid." },
+    "size": { "type": "enum", "values": ["sm", "md", "lg"], "default": "md", "description": "Field height and font size." },
+    "granularity": { "type": "enum", "values": ["day", "hour", "minute"], "default": "day", "description": "Smallest editable unit. hour/minute add time segments." },
+    "value": { "type": "custom", "tsType": "import(\"react-aria-components\").DateValue | null", "description": "Controlled value." },
+    "defaultValue": { "type": "custom", "tsType": "import(\"react-aria-components\").DateValue", "description": "Initial value when uncontrolled." },
+    "minValue": { "type": "custom", "tsType": "import(\"react-aria-components\").DateValue", "description": "Earliest allowed date." },
+    "maxValue": { "type": "custom", "tsType": "import(\"react-aria-components\").DateValue", "description": "Latest allowed date." },
+    "isDisabled": { "type": "boolean", "default": false, "description": "Prevents editing and dims the field." },
+    "isInvalid": { "type": "boolean", "default": false, "description": "Marks the value invalid and shows errorMessage." },
+    "isRequired": { "type": "boolean", "default": false, "description": "Requires a date for form submission." },
+    "onChange": { "type": "callback", "tsType": "(value: import(\"react-aria-components\").DateValue | null) => void", "description": "Called when the date changes." }
+  },
+  "variants": ["size", "isDisabled", "isInvalid"],
+  "states": ["default", "hover", "focus", "open", "disabled", "invalid"],
+  "slots": ["label", "field", "segment", "button", "popover", "calendar", "description", "error"],
+  "tokens": [
+    "color.surface.default",
+    "color.surface.raised",
+    "color.border.default",
+    "color.border.strong",
+    "color.text.default",
+    "color.text.muted",
+    "color.feedback.danger",
+    "color.focus.ring",
+    "radius.control",
+    "radius.overlay"
+  ],
+  "a11y": {
+    "role": "group",
+    "keyboard": [
+      "Tab moves between date segments",
+      "Up/Down arrows change the focused segment",
+      "Typing numbers fills segments",
+      "Alt+Down opens the calendar, Esc closes it"
+    ],
+    "requirements": ["Label names the group and each segment", "Segment order follows the user's locale"],
+    "screenReader": [
+      "The group is announced with its label; each segment with its name and value (month, 3) or as empty",
+      "Up/Down arrows announce each new value",
+      "The calendar button is announced as Calendar",
+      "After picking a date in the calendar, the new date is announced and focus is back in the field"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["Entering a single date, like a due date or birthday"],
+    "avoid_when": ["A start and end date: use DateRangePicker"],
+    "anti_patterns": ["A plain text input with a format hint like DD/MM/YYYY", "Forcing calendar clicks for far-away dates like birthdays", "Passing isInvalid for required or format checks (even isInvalid={false}): any defined value takes over validity and hides the built-in errors. Use isRequired and validate; pass isInvalid only for errors the app finds itself, such as from the server"]
+  },
+  "examples": ["basic", "with-time", "min-max", "invalid"],
+  "figma": {
+    "componentKey": null,
+    "variantMap": { "size": "Size", "isDisabled": "Disabled", "isInvalid": "Invalid" }
+  }
+}

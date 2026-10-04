@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rdloom.dev/schema/component.v1.json",
+  "title": "rdloom component spec v1",
+  "description": "Single source of truth for a component. Code types, docs, Figma variants and AI context are generated from it.",
+  "type": "object",
+  "required": ["name", "version", "category", "description", "props", "a11y", "usage"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "name": { "type": "string", "pattern": "^[A-Z][A-Za-z0-9]*$" },
+    "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+    "category": { "enum": ["action", "input", "overlay", "navigation", "feedback", "layout", "data", "display"] },
+    "status": { "enum": ["experimental", "beta", "stable", "deprecated"], "default": "experimental" },
+    "description": { "type": "string", "minLength": 10 },
+    "props": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/prop" }
+    },
+    "variants": {
+      "description": "Props that become Figma variant properties. Keys must be enum or boolean props.",
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "states": {
+      "type": "array",
+      "items": { "enum": ["default", "hover", "focus", "pressed", "open", "selected", "disabled", "invalid", "loading", "readonly"] }
+    },
+    "slots": { "type": "array", "items": { "type": "string" } },
+    "tokens": {
+      "description": "Semantic tokens this component consumes.",
+      "type": "array",
+      "items": { "type": "string", "pattern": "^[a-z]+(\\.[a-z0-9-]+)+$" }
+    },
+    "a11y": {
+      "type": "object",
+      "required": ["role", "keyboard", "wcag"],
+      "additionalProperties": false,
+      "properties": {
+        "role": { "type": "string" },
+        "keyboard": { "type": "array", "items": { "type": "string" } },
+        "requirements": { "type": "array", "items": { "type": "string" } },
+        "screenReader": {
+          "description": "What a screen reader user should hear or be able to do. Checked by hand in the audit (docs/accessibility-audit.md); automated tests can't hear speech.",
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "wcag": { "enum": ["2.1 AA", "2.2 AA", "2.2 AAA"] }
+      }
+    },
+    "usage": {
+      "type": "object",
+      "required": ["use_when", "avoid_when"],
+      "additionalProperties": false,
+      "properties": {
+        "use_when": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+        "avoid_when": { "type": "array", "items": { "type": "string" } },
+        "anti_patterns": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "examples": { "type": "array", "items": { "type": "string" } },
+    "figma": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "componentKey": { "type": ["string", "null"] },
+        "variantMap": { "type": "object", "additionalProperties": { "type": "string" } }
+      }
+    }
+  },
+  "$defs": {
+    "prop": {
+      "type": "object",
+      "required": ["type", "description"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "enum": ["string", "number", "boolean", "enum", "node", "callback", "custom"] },
+        "description": { "type": "string" },
+        "values": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+        "default": {},
+        "required": { "type": "boolean", "default": false },
+        "tsType": { "type": "string", "description": "Exact TypeScript type for callback/custom props." }
+      },
+      "allOf": [
+        { "if": { "properties": { "type": { "const": "enum" } } }, "then": { "required": ["values"] } },
+        { "if": { "properties": { "type": { "enum": ["callback", "custom"] } } }, "then": { "required": ["tsType"] } }
+      ]
+    }
+  }
+}

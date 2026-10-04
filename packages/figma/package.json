@@ -1,0 +1,16 @@
+{
+  "name": "@rdloom/figma",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Figma plugin: design tokens as variables and spec variants as component sets.",
+  "scripts": {
+    "build": "node build.mjs",
+    "typecheck": "tsc -p ."
+  },
+  "devDependencies": {
+    "@figma/plugin-typings": "^1.139.0",
+    "esbuild": "^0.28.2",
+    "vitest": "^3.2.7"
+  }
+}

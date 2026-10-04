@@ -1,0 +1,64 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Sheet",
+  "version": "0.1.0",
+  "category": "overlay",
+  "status": "experimental",
+  "description": "A modal panel that slides in from the edge of the screen, for filters, details or navigation on small screens. Open it with DialogTrigger.",
+  "props": {
+    "title": { "type": "string", "required": true, "description": "Heading, also used as the sheet's accessible name." },
+    "description": { "type": "string", "description": "Short supporting text under the title." },
+    "side": { "type": "enum", "values": ["end", "start", "bottom"], "default": "end", "description": "The edge it slides in from. end is the right in left-to-right languages." },
+    "size": { "type": "enum", "values": ["sm", "md", "lg"], "default": "md", "description": "Width (or height for bottom sheets)." },
+    "isDismissable": { "type": "boolean", "default": true, "description": "Closes on backdrop click. Esc always closes." },
+    "children": {
+      "type": "custom",
+      "tsType": "ReactNode | ((opts: { close: () => void }) => ReactNode)",
+      "description": "Body and actions. A function receives close()."
+    }
+  },
+  "variants": ["side", "size"],
+  "states": ["open"],
+  "slots": ["backdrop", "panel", "header", "title", "description", "close", "body"],
+  "tokens": [
+    "color.overlay.backdrop",
+    "color.surface.raised",
+    "color.border.default",
+    "color.text.default",
+    "color.text.muted",
+    "color.surface.subtle",
+    "color.focus.ring",
+    "radius.overlay"
+  ],
+  "a11y": {
+    "role": "dialog",
+    "keyboard": ["Esc closes", "Tab and Shift+Tab stay inside the sheet", "The close button is reachable with Tab"],
+    "requirements": [
+      "Focus moves into the sheet on open and returns to the trigger on close",
+      "Content behind the sheet is hidden from assistive technology",
+      "Page scroll is locked while open",
+      "The slide animation is turned off when the user prefers reduced motion"
+    ],
+    "screenReader": [
+      "Opening announces a dialog with the sheet's title",
+      "The description is read after the title",
+      "The close button is announced as Close",
+      "Closing announces the button that opened it (focus is back there)"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "Filters or settings next to the content they affect",
+      "Details of a row without leaving the list",
+      "Navigation on phones"
+    ],
+    "avoid_when": [
+      "A short confirmation: use Dialog",
+      "Content people need side by side with the page: use a layout panel"
+    ],
+    "anti_patterns": ["Sheets opening other sheets", "Hiding the only way to close it: keep the close button"]
+  },
+  "examples": ["filters", "navigation", "bottom"],
+  "figma": { "componentKey": null, "variantMap": { "side": "Side", "size": "Size" } }
+}

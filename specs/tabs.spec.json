@@ -1,0 +1,50 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Tabs",
+  "version": "0.1.0",
+  "category": "navigation",
+  "status": "experimental",
+  "description": "Switches between related panels of content in the same place. Use with TabList, Tab and TabPanel.",
+  "props": {
+    "variant": { "type": "enum", "values": ["underline", "pill"], "default": "underline", "description": "Visual style of the tab list." },
+    "orientation": { "type": "enum", "values": ["horizontal", "vertical"], "default": "horizontal", "description": "Direction of the tab list." },
+    "selectedKey": { "type": "custom", "tsType": "import(\"react-aria-components\").Key", "description": "Controlled selected tab." },
+    "defaultSelectedKey": { "type": "custom", "tsType": "import(\"react-aria-components\").Key", "description": "Initial tab when uncontrolled." },
+    "isDisabled": { "type": "boolean", "default": false, "description": "Disables every tab." },
+    "children": { "type": "node", "required": true, "description": "A TabList followed by TabPanels." },
+    "onSelectionChange": { "type": "callback", "tsType": "(key: import(\"react-aria-components\").Key) => void", "description": "Called with the newly selected tab key." }
+  },
+  "variants": ["variant", "orientation"],
+  "states": ["default", "hover", "focus", "selected", "disabled"],
+  "slots": ["list", "tab", "indicator", "panel"],
+  "tokens": [
+    "color.action.primary",
+    "color.border.default",
+    "color.surface.subtle",
+    "color.surface.raised",
+    "color.text.default",
+    "color.text.muted",
+    "color.focus.ring",
+    "radius.control"
+  ],
+  "a11y": {
+    "role": "tablist",
+    "keyboard": ["Arrow keys move between tabs", "Home/End jump to first/last tab", "Tab moves into the panel"],
+    "requirements": ["Each tab controls exactly one panel", "Tab list has an aria-label when there's no visible heading"],
+    "screenReader": [
+      "Each tab: tab, its name, selected state and position (1 of 3)",
+      "Switching tabs announces the new tab; the panel's content is reachable next"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["Grouping related views of the same object, like Overview / Activity / Settings"],
+    "avoid_when": ["Sequential steps: use a Stepper", "Page navigation: use links"],
+    "anti_patterns": ["More than about 7 tabs", "Tabs whose content depends on another tab's input"]
+  },
+  "examples": ["underline", "pill", "vertical", "controlled"],
+  "figma": {
+    "componentKey": null,
+    "variantMap": { "variant": "Variant", "orientation": "Orientation" }
+  }
+}

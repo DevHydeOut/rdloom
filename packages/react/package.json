@@ -1,0 +1,40 @@
+{
+  "name": "@rdloom/react",
+  "version": "0.1.0",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "description": "Styled React components. This is the source the CLI copies into user projects.",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "peerDependencies": {
+    "react": ">=19",
+    "react-dom": ">=19"
+  },
+  "dependencies": {
+    "@rdloom/tokens": "*",
+    "@internationalized/date": "^3.12.4",
+    "@tanstack/react-table": "^8.21.3",
+    "@tanstack/react-virtual": "^3.14.13",
+    "react-aria-components": "^1.21.1"
+  },
+  "devDependencies": {
+    "@testing-library/dom": "^10.4.2",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.7",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "axe-core": "^4.13.0",
+    "jsdom": "^26.1.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "vitest": "^3.2.7"
+  },
+  "homepage": "https://rdloom.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DevHydeOut/rdloom.git",
+    "directory": "packages/react"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "@rdloom/codegen",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Validates component specs and generates tokens, types and (later) Figma and AI context.",
+  "bin": {
+    "rdloom-codegen": "./src/cli.ts"
+  },
+  "dependencies": {
+    "ajv": "^8.17.0"
+  }
+}
