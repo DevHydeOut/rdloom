@@ -9,7 +9,15 @@ import { PageTitle } from "./ui";
 // Every page with its title and search-result description. The browser app
 // and the prerender step (prerender.mjs) both read this list.
 
-export const siteUrl = "https://rdloom.com";
+/**
+ * Where the built docs site will be served from, e.g. https://docs.example.com.
+ * Set SITE_URL when building; empty means "not hosted yet", which skips the
+ * sitemap, robots.txt and canonical links rather than inventing a domain.
+ */
+export const siteUrl = (import.meta.env?.VITE_SITE_URL ?? "").replace(/\/$/, "");
+
+/** What to show in install commands: the real address, or a clear stand-in. */
+export const registryBase = siteUrl || "<your-docs-url>";
 
 export const guides = [
   { href: "/docs/getting-started", title: "Getting started", description: "Add rdloom to a React 19 and Tailwind CSS v4 app: init, tokens, and your first components.", Page: GettingStarted },

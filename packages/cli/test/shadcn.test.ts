@@ -18,7 +18,7 @@ describe("shadcn registry", () => {
     const button = toShadcn(items.find((i) => i.name === "button")!);
     expect(button.$schema).toBe("https://ui.shadcn.com/schema/registry-item.json");
     expect(button.files.map((f) => f.target)).toEqual(["@components/rdloom/button/button.tsx", "@components/rdloom/generated/button.types.ts"]);
-    expect(button.registryDependencies).toEqual(["https://rdloom.com/r/tokens.json", "https://rdloom.com/r/utils.json"]);
+    expect(button.registryDependencies).toEqual(["SITE_URL/r/tokens.json", "SITE_URL/r/utils.json"]);
   });
 
   it("points every dependency at an item we publish", () => {

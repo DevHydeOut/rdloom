@@ -244,22 +244,26 @@ describe("DataGrid keyboard", () => {
     await user.tab();
     await user.tab(); // into the grid: first body cell
     const cell = () => document.activeElement!;
-    expect(cell()).toHaveTextContent("Ada");
+    // Focus lands in an effect after the move renders, which with virtualization
+    // can take a render or two; waitFor keeps this from flaking under load.
+    const focused = (text: string) => waitFor(() => expect(cell()).toHaveTextContent(text));
+
+    await focused("Ada");
     expect(within(grid()).getAllByRole("gridcell").filter((c) => c.tabIndex === 0)).toHaveLength(1);
 
     await user.keyboard("{ArrowRight}");
-    expect(cell()).toHaveTextContent("London");
+    await focused("London");
     await user.keyboard("{ArrowDown}");
-    expect(cell()).toHaveTextContent("New York");
+    await focused("New York");
     await user.keyboard("{End}");
-    expect(cell()).toHaveTextContent("45");
+    await focused("45");
     await user.keyboard("{Home}");
-    expect(cell()).toHaveTextContent("Grace");
+    await focused("Grace");
     await user.keyboard("{Control>}{End}{/Control}");
-    expect(cell()).toHaveTextContent("52");
+    await focused("52");
     await user.keyboard("{Control>}{Home}{/Control}");
+    await focused("Name");
     expect(cell()).toHaveAttribute("role", "columnheader");
-    expect(cell()).toHaveTextContent("Name");
   });
 
   it("returns to the last focused cell when tabbing back in", async () => {

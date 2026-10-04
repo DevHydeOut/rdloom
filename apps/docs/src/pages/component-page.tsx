@@ -1,8 +1,8 @@
-import { Suspense, useContext } from "react";
+﻿import { Suspense, useContext } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "@rdloom/react";
 import { EagerExamples, repoUrl, semanticTokens, type DocComponent, type Example, type PropSpec } from "../data";
 import { Link } from "../router";
-import { siteUrl } from "../routes";
+import { registryBase } from "../routes";
 import { Badge, CodeBlock, H2, List, PageTitle } from "../ui";
 
 const title = (name: string) => name.replace(/-/g, " ").replace(/^./, (c) => c.toUpperCase());
@@ -111,7 +111,7 @@ export function ComponentPage({ component }: { component: DocComponent }) {
         Copies the source into your project. Edit it freely: <code>npx rdloom upgrade</code> merges later changes into your edits.
         {component.dependencies.length > 0 && <> Needs {component.dependencies.map((d) => d.replace(/@\^.*$/, "")).join(", ")}; add <code>--install</code> to install them.</>}
       </p>
-      <CodeBlock code={`npx shadcn@latest add ${siteUrl}/r/${id}.json`} label="Install with the shadcn CLI" />
+      <CodeBlock code={`npx shadcn@latest add ${registryBase}/r/${id}.json`} label="Install with the shadcn CLI" />
       <p className="pt-2 text-sm text-[var(--site-muted)]">
         Also supported, <Link href="/docs/cli#shadcn">without upgrade tracking</Link>.
       </p>

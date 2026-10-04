@@ -6,7 +6,7 @@
 
 Every component is defined once, as a JSON spec. That spec generates the TypeScript types, the design tokens, the Figma library, the documentation and the AI-agent context, so design, code and AI tools never drift apart.
 
-> Status: 20 components built and tested, including DateRangePicker, Combobox and DataGrid. Not yet published to npm. Docs: [rdloom.com](https://rdloom.com).
+> Status: 20 components built and tested, including DateRangePicker, Combobox and DataGrid. Not yet published to npm; the docs site is not hosted yet.
 
 ## How it works
 
@@ -35,7 +35,7 @@ tokens/*.tokens.json ┴─► codegen ─┬─► packages/react/src/generated
 | `packages/figma` | Figma plugin: tokens as variables, spec variants as component sets |
 | `packages/mcp` | MCP server that gives AI coding agents the specs, tokens and source |
 | `examples/admin-demo` | Sample app that uses the packed CLI like a real user ([README](examples/admin-demo/README.md)) |
-| `apps/docs` | The docs site for rdloom.com, generated from specs, examples and tokens |
+| `apps/docs` | The docs site, generated from specs, examples and tokens |
 | `apps/playground` | Vite + Tailwind v4 page showing every component, with a theme toggle |
 
 ## Development
@@ -131,8 +131,8 @@ Run a command at a root that has no config and rdloom names the workspaces that 
 `npm run gen` also writes every item in the shadcn registry format to `apps/docs/public/r/` (gitignored), which the docs site serves:
 
 ```bash
-npx shadcn@latest add https://rdloom.com/r/data-grid.json
-# or with "registries": { "@rdloom": "https://rdloom.com/r/{name}.json" } in components.json
+npx shadcn@latest add $SITE_URL/r/data-grid.json
+# or with "registries": { "@rdloom": "$SITE_URL/r/{name}.json" } in components.json
 npx shadcn@latest add @rdloom/data-grid
 ```
 
@@ -229,11 +229,11 @@ Other clients take the same command in their MCP config (`"command": "node", "ar
 To run it: `npm run gen && npm run build:figma`, then in the Figma desktop app choose **Plugins → Development → Import plugin from manifest…** and pick `packages/figma/manifest.json`. It needs the Inter font, and it makes no network requests.
 
 ### Docs site
-`apps/docs` builds the site for rdloom.com from the same sources as the code: component pages come from the specs (props, usage rules, accessibility, tokens) and the tested examples, so they can't drift from the components. `npm run build:docs` writes a static site to `apps/docs/dist`.
+`apps/docs` builds the site from the same sources as the code: component pages come from the specs (props, usage rules, accessibility, tokens) and the tested examples, so they can't drift from the components. `npm run build:docs` writes a static site to `apps/docs/dist`.
 
 For search engines, every page is prerendered to its own HTML file (`apps/docs/prerender.mjs`), with the full content, including the examples, plus its own title, description, canonical URL and Open Graph tags. The build also writes `sitemap.xml`, `robots.txt`, `llms.txt` (an index for AI tools) and a `404.html`. In the browser the page hydrates into the app, so navigation stays instant.
 
-To host it, point any static host at `apps/docs/dist`: Cloudflare Pages, Netlify and GitHub Pages all serve `/components/data-grid` from `components/data-grid.html` and use `404.html` for unknown paths, with no configuration. Then add `rdloom.com` as the custom domain, create the CNAME record your host gives you, and submit `https://rdloom.com/sitemap.xml` in Google Search Console.
+To host it, point any static host at `apps/docs/dist`: Cloudflare Pages, Netlify and GitHub Pages all serve `/components/data-grid` from `components/data-grid.html` and use `404.html` for unknown paths, with no configuration. Build with `SITE_URL` set to the public address (`SITE_URL=https://example.com npm run build:docs`) so the canonical links, `sitemap.xml`, `robots.txt` and the shadcn registry URLs point at it. Without it those are left out rather than guessed.
 
 ### Examples
 Every name in a spec's `examples` list is a file: `examples/components/<id>/<name>.tsx`, default-exporting a small component. The validator fails if one is missing or unlisted. They're shown on the docs site, served by the MCP server's `get_example`, and `packages/react/test/examples.test.tsx` renders each one with axe.

@@ -1,6 +1,6 @@
-import { repoUrl, semanticTokens } from "../data";
+﻿import { repoUrl, semanticTokens } from "../data";
 import { Link } from "../router";
-import { siteUrl } from "../routes";
+import { registryBase } from "../routes";
 import { CodeBlock, H2, PageTitle, Prose } from "../ui";
 
 export function GettingStarted() {
@@ -107,10 +107,10 @@ npx rdloom init --components-dir packages/ui/src/rdloom --tokens-css packages/ui
         </p>
         <CodeBlock
           label="shadcn commands"
-          code={`npx shadcn@latest add ${siteUrl}/r/data-grid.json
+          code={`npx shadcn@latest add ${registryBase}/r/data-grid.json
 
 # or add a namespace to components.json once:
-#   "registries": { "@rdloom": "${siteUrl}/r/{name}.json" }
+#   "registries": { "@rdloom": "${registryBase}/r/{name}.json" }
 npx shadcn@latest add @rdloom/data-grid`}
         />
         <p>

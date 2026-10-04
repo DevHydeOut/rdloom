@@ -31,7 +31,7 @@
     "react-dom": "^19.0.0",
     "vitest": "^3.2.7"
   },
-  "homepage": "https://rdloom.com",
+  "homepage": "https://github.com/DevHydeOut/rdloom",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/DevHydeOut/rdloom.git",

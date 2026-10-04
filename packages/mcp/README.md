@@ -48,4 +48,4 @@ Component APIs change, and a model's training data doesn't. This server reads fr
 
 ---
 
-Docs: [rdloom.com](https://rdloom.com) · Source: [github.com/DevHydeOut/rdloom](https://github.com/DevHydeOut/rdloom) · MIT
+[github.com/DevHydeOut/rdloom](https://github.com/DevHydeOut/rdloom) · MIT

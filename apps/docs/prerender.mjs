@@ -1,4 +1,4 @@
-// Builds the site as static HTML, one file per page, so search engines and
+﻿// Builds the site as static HTML, one file per page, so search engines and
 // AI crawlers read real content without running JavaScript. The browser then
 // hydrates the page into the normal app.
 //
@@ -21,13 +21,14 @@ const template = fs.readFileSync(path.join(dist, "index.html"), "utf8");
 const esc = (s) => s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
 
 function page(html, { title, description }, url, extraHead = "", renderedPath = "") {
+  // Absolute URLs only make sense once the site has an address: without
+  // SITE_URL, canonical and og:url are left out rather than pointing nowhere.
   const head = [
-    `<link rel="canonical" href="${url}" />`,
+    ...(siteUrl ? [`<link rel="canonical" href="${url}" />`, `<meta property="og:url" content="${url}" />`] : []),
     `<meta property="og:type" content="website" />`,
     `<meta property="og:site_name" content="rdloom" />`,
     `<meta property="og:title" content="${esc(title)}" />`,
     `<meta property="og:description" content="${esc(description)}" />`,
-    `<meta property="og:url" content="${url}" />`,
     `<meta name="twitter:card" content="summary" />`,
     extraHead,
   ].join("\n    ");
@@ -45,7 +46,7 @@ const jsonLd = (description) =>
     "@type": "SoftwareSourceCode",
     name: "rdloom",
     description,
-    url: siteUrl,
+    ...(siteUrl ? { url: siteUrl } : {}),
     codeRepository: "https://github.com/DevHydeOut/rdloom",
     programmingLanguage: ["TypeScript", "React"],
   })}</script>`;
@@ -66,17 +67,24 @@ for (const p of allPaths) {
 const missing = await render("/404");
 fs.writeFileSync(path.join(dist, "404.html"), page(missing.html, missing, `${siteUrl}/404`, '<meta name="robots" content="noindex" />', "*"));
 
-const today = new Date().toISOString().slice(0, 10);
+// A sitemap lists absolute URLs, so it needs SITE_URL. robots.txt is written
+// either way; it only names the sitemap once there is one.
+if (siteUrl) {
+  const today = new Date().toISOString().slice(0, 10);
+  fs.writeFileSync(
+    path.join(dist, "sitemap.xml"),
+    `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${pages
+      .map((p) => `  <url><loc>${p.url}</loc><lastmod>${today}</lastmod></url>`)
+      .join("\n")}\n</urlset>\n`,
+  );
+}
 fs.writeFileSync(
-  path.join(dist, "sitemap.xml"),
-  `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${pages
-    .map((p) => `  <url><loc>${p.url}</loc><lastmod>${today}</lastmod></url>`)
-    .join("\n")}\n</urlset>\n`,
+  path.join(dist, "robots.txt"),
+  `User-agent: *\nAllow: /\nDisallow: /visual/\n${siteUrl ? `\nSitemap: ${siteUrl}/sitemap.xml\n` : ""}`,
 );
-fs.writeFileSync(path.join(dist, "robots.txt"), `User-agent: *\nAllow: /\nDisallow: /visual/\n\nSitemap: ${siteUrl}/sitemap.xml\n`);
 
 // llms.txt (llmstxt.org): a plain index of the docs for AI tools.
-const section = (title, list) => `## ${title}\n\n${list.map((p) => `- [${p.title.replace(/ · rdloom$/, "")}](${p.url}): ${p.description}`).join("\n")}\n`;
+const section = (title, list) => `## ${title}\n\n${list.map((p) => `- [${p.title.replace(/ Â· rdloom$/, "")}](${p.url}): ${p.description}`).join("\n")}\n`;
 fs.writeFileSync(
   path.join(dist, "llms.txt"),
   `# rdloom\n\n> ${pages[0].description}\n\nFor AI coding agents, the MCP server (npx rdloom-mcp) serves the same specs with tested example code.\n\n${section(
@@ -89,4 +97,8 @@ fs.writeFileSync(
 );
 
 fs.rmSync(serverOut, { recursive: true, force: true });
-console.log(`prerendered ${pages.length} pages + 404, sitemap.xml, robots.txt, llms.txt`);
+console.log(
+  `prerendered ${pages.length} pages + 404, robots.txt, llms.txt${
+    siteUrl ? `, sitemap.xml (site: ${siteUrl})` : " (no SITE_URL: no sitemap or canonical links)"
+  }`,
+);

@@ -67,11 +67,11 @@ With the shared layout a single `rdloom upgrade` updates every app at once.
 ## Also works with the shadcn CLI
 
 ```bash
-npx shadcn@latest add https://rdloom.com/r/data-grid.json
+npx shadcn@latest add <your-docs-url>/r/data-grid.json
 ```
 
 Upgrades need `rdloom add`, since the shadcn CLI doesn't track what it installed.
 
 ---
 
-Docs: [rdloom.com](https://rdloom.com) · Source: [github.com/DevHydeOut/rdloom](https://github.com/DevHydeOut/rdloom) · MIT
+[github.com/DevHydeOut/rdloom](https://github.com/DevHydeOut/rdloom) · MIT

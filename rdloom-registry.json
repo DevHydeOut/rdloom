@@ -1,5 +1,5 @@
 {
   "name": "rdloom",
-  "homepage": "https://rdloom.com",
+  "homepage": "https://github.com/DevHydeOut/rdloom",
   "output": "packages/cli/registry"
 }

@@ -11,7 +11,7 @@
     "./tokens.css": "./dist/tokens.css",
     "./tokens.json": "./dist/tokens.json"
   },
-  "homepage": "https://rdloom.com",
+  "homepage": "https://github.com/DevHydeOut/rdloom",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/DevHydeOut/rdloom.git",

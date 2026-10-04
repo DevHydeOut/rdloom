@@ -1,16 +1,19 @@
 import fs from "node:fs";
 import path from "node:path";
-import { brand } from "./brand.ts";
+import { brand, siteUrl } from "./brand.ts";
 import { root } from "./paths.ts";
 import type { RegistryItem } from "./registry.ts";
 
 // The same items in the shadcn registry format, served by the docs site at
-// /r/<name>.json, so shadcn projects (and v0) can install rdloom components:
+// /r/<name>.json, so shadcn projects can install rdloom components:
 //
-//   npx shadcn@latest add https://rdloom.com/r/button.json
+//   npx shadcn@latest add <site>/r/button.json
 //
-// or, with "registries": { "@rdloom": "https://rdloom.com/r/{name}.json" }
-// in components.json, `npx shadcn@latest add @rdloom/button`.
+// or, with "registries": { "@rdloom": "<site>/r/{name}.json" } in
+// components.json, `npx shadcn@latest add @rdloom/button`.
+//
+// <site> comes from SITE_URL at build time. Until the docs are hosted it is
+// empty, and the generated files carry a placeholder rather than a real URL.
 //
 // Differences from our own registry:
 // - Files land under the project's components alias (`@components/rdloom/...`)
@@ -22,9 +25,10 @@ import type { RegistryItem } from "./registry.ts";
 export const shadcnDir = path.join(root, "apps", "docs", "public", "r");
 const SCHEMA = "https://ui.shadcn.com/schema/registry-item.json";
 
-/** RDLOOM_SITE_URL points dependencies at another host, e.g. a local docs server for testing. */
-const siteUrl = () => process.env.RDLOOM_SITE_URL ?? brand.siteUrl;
-const itemUrl = (name: string) => `${siteUrl()}/r/${name}.json`;
+/** Stands in for the docs URL until the site is hosted, so no real domain is implied. */
+export const SITE_PLACEHOLDER = "SITE_URL";
+const base = () => siteUrl || SITE_PLACEHOLDER;
+const itemUrl = (name: string) => `${base()}/r/${name}.json`;
 
 /** `--rd-x: 1px;` declarations inside the first block that `selector` opens. */
 function declarations(css: string, selector: string): Record<string, string> {
@@ -91,7 +95,7 @@ export function buildShadcnRegistry(items: RegistryItem[]): string[] {
   const index = {
     $schema: "https://ui.shadcn.com/schema/registry.json",
     name: brand.name,
-    homepage: siteUrl(),
+    homepage: siteUrl || brand.repoUrl,
     items: items.map((item) => {
       const { $schema: _, ...full } = toShadcn(item);
       return { ...full, files: full.files.map(({ content: _c, ...f }) => f) };
