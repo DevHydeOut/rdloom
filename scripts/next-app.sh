@@ -49,6 +49,7 @@ EOF
 echo "const config = { plugins: { '@tailwindcss/postcss': {} } }; export default config;" > postcss.config.mjs
 cat > app/layout.tsx <<'EOF'
 import "./globals.css";
+export const metadata = { title: "rdloom in Next.js" };
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return <html lang="en"><body>{children}</body></html>;
 }
