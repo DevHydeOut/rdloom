@@ -58,6 +58,23 @@ jobs:
             [ "$version" = "$tag" ] || { echo "::error::packages/$dir is $version but the tag says $tag"; exit 1; }
           done
 
+      # A dry run would otherwise never touch the token, so a bad or
+      # wrongly-scoped one would only surface during the real publish.
+      - name: The npm token works and can publish these names
+        run: |
+          echo "authenticated as: $(npm whoami)"
+          for pkg in rdloom @rdloom/mcp; do
+            owner=$(npm owner ls "$pkg" 2>/dev/null || true)
+            if [ -z "$owner" ]; then
+              echo "$pkg: unpublished, the name is still free"
+            else
+              echo "$pkg current owners:"; echo "$owner"
+            fi
+          done
+          npm access list packages @rdloom 2>/dev/null || echo "(no packages in the @rdloom scope yet)"
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
       - name: Pack both packages
         # --pack-destination writes into the directory but will not create it.
         run: |
