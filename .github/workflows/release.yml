@@ -71,7 +71,11 @@ jobs:
               echo "$pkg current owners:"; echo "$owner"
             fi
           done
-          npm access list packages @rdloom 2>/dev/null || echo "(no packages in the @rdloom scope yet)"
+          # @rdloom/mcp publishes into the org, so this account must be a member
+          # of it. rdloom is unscoped: it lands under this account and is
+          # transferred to the org afterwards.
+          echo "members of the rdloom org:"
+          npm org ls rdloom
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
