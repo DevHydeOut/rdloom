@@ -1,3 +1,5 @@
+"use client";
+
 import { forwardRef } from "react";
 import { Switch as AriaSwitch, type SwitchProps as AriaSwitchProps } from "react-aria-components";
 import { switchDefaults, type SwitchSpecProps } from "../generated/switch.types";

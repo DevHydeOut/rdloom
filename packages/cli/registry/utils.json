@@ -11,7 +11,7 @@
     {
       "path": "utils/arrow.tsx",
       "type": "registry:lib",
-      "content": "import { OverlayArrow } from \"react-aria-components\";\nimport { cx } from \"./cx\";\n\n/** Arrow for Popover and Tooltip. It rotates to face the trigger. */\nexport function Arrow({ className }: { className?: string }) {\n  return (\n    <OverlayArrow>\n      <svg\n        width={12}\n        height={12}\n        viewBox=\"0 0 12 12\"\n        aria-hidden=\"true\"\n        className={cx(\n          \"block [[data-placement=bottom]>&]:rotate-180 [[data-placement=left]>&]:-rotate-90 [[data-placement=right]>&]:rotate-90\",\n          className,\n        )}\n      >\n        <path d=\"M0 0 L6 6 L12 0\" />\n      </svg>\n    </OverlayArrow>\n  );\n}\n"
+      "content": "\"use client\";\n\nimport { OverlayArrow } from \"react-aria-components\";\nimport { cx } from \"./cx\";\n\n/** Arrow for Popover and Tooltip. It rotates to face the trigger. */\nexport function Arrow({ className }: { className?: string }) {\n  return (\n    <OverlayArrow>\n      <svg\n        width={12}\n        height={12}\n        viewBox=\"0 0 12 12\"\n        aria-hidden=\"true\"\n        className={cx(\n          \"block [[data-placement=bottom]>&]:rotate-180 [[data-placement=left]>&]:-rotate-90 [[data-placement=right]>&]:rotate-90\",\n          className,\n        )}\n      >\n        <path d=\"M0 0 L6 6 L12 0\" />\n      </svg>\n    </OverlayArrow>\n  );\n}\n"
     },
     {
       "path": "utils/cx.ts",
@@ -31,7 +31,7 @@
     {
       "path": "utils/use-media-query.ts",
       "type": "registry:lib",
-      "content": "import { useSyncExternalStore } from \"react\";\n\n/**\n * True while `query` matches. On the server (and during hydration) it\n * returns `serverValue`, so pick the value your mobile-first layout expects.\n */\nexport function useMediaQuery(query: string, serverValue = false): boolean {\n  return useSyncExternalStore(\n    (onChange) => {\n      const list = window.matchMedia(query);\n      list.addEventListener(\"change\", onChange);\n      return () => list.removeEventListener(\"change\", onChange);\n    },\n    () => window.matchMedia(query).matches,\n    () => serverValue,\n  );\n}\n"
+      "content": "\"use client\";\n\nimport { useSyncExternalStore } from \"react\";\n\n/**\n * True while `query` matches. On the server (and during hydration) it\n * returns `serverValue`, so pick the value your mobile-first layout expects.\n */\nexport function useMediaQuery(query: string, serverValue = false): boolean {\n  return useSyncExternalStore(\n    (onChange) => {\n      const list = window.matchMedia(query);\n      list.addEventListener(\"change\", onChange);\n      return () => list.removeEventListener(\"change\", onChange);\n    },\n    () => window.matchMedia(query).matches,\n    () => serverValue,\n  );\n}\n"
     }
   ]
 }

@@ -1,3 +1,5 @@
+"use client";
+
 import { OverlayArrow } from "react-aria-components";
 import { cx } from "./cx";
 

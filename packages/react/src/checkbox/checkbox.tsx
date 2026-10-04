@@ -1,3 +1,5 @@
+"use client";
+
 import { forwardRef } from "react";
 import { Checkbox as AriaCheckbox, type CheckboxProps as AriaCheckboxProps } from "react-aria-components";
 import { checkboxDefaults, type CheckboxSpecProps } from "../generated/checkbox.types";

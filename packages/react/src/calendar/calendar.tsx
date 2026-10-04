@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Button,
   Calendar as AriaCalendar,

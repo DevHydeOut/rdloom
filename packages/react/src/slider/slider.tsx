@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Label,
   Slider as AriaSlider,
