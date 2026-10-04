@@ -101,3 +101,17 @@ jobs:
         run: npm publish -w rdloom -w @rdloom/mcp --access public --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      # @rdloom/mcp belongs to the org already, because the scope is the org.
+      # rdloom is unscoped, so it lands under whoever published it; adding the
+      # org as an owner means it outlives any one account. Already an owner on
+      # later releases, which is fine.
+      - name: The rdloom org owns the unscoped package too
+        if: startsWith(github.ref, 'refs/tags/') && inputs.dry-run != true
+        continue-on-error: true # the release itself already succeeded
+        run: |
+          npm owner add rdloom rdloom
+          echo "owners of rdloom:"; npm owner ls rdloom
+          echo "owners of @rdloom/mcp:"; npm owner ls @rdloom/mcp
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
