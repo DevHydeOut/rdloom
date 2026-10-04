@@ -7,6 +7,21 @@
   "bin": {
     "rdloom": "./dist/index.js"
   },
+  "keywords": [
+    "react",
+    "components",
+    "ui",
+    "design-system",
+    "accessibility",
+    "react-aria",
+    "tailwindcss",
+    "data-grid",
+    "registry",
+    "cli"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
   "files": [
     "dist",
     "registry"

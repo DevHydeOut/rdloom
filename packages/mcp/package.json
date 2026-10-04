@@ -7,6 +7,19 @@
   "bin": {
     "rdloom-mcp": "./dist/index.js"
   },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "mcp-server",
+    "ai",
+    "react",
+    "components",
+    "design-system",
+    "accessibility"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
   "files": [
     "dist",
     "context.json"
