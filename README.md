@@ -114,12 +114,16 @@ Verified by building a real app against the packed tarball for each row:
 
 | | Supported | Notes |
 |---|---|---|
-| React | 18.3 and 19 | Tested on both |
+| React | 18.3 and 19 | Both build and run |
 | Tailwind CSS | v3.4 and v4 | v4: `@source "./components/rdloom"`. v3: add that folder to `content` in `tailwind.config.js` |
-| Next.js | 15, App Router | See below |
-| Vite | 7 | `scripts/sample-app.sh` |
+| Next.js | 15, App Router | Server Components; see below |
+| React Router | 7, SSR | Server-rendered and hydrated |
+| Astro | 5 | React islands (`client:load`) |
+| Vite | 6 and 7 | |
 | Node (for the CLI) | 22+ | |
 | Package managers | npm, pnpm, yarn, bun | Detected from the lockfile |
+
+Each framework was checked by installing the packed tarball into a fresh app and building it. For the server-rendered ones the built app was then loaded in Chromium to confirm the markup comes from the server, the browser console is free of hydration warnings, and the components still respond to the keyboard afterwards.
 
 ### React Server Components (Next.js App Router)
 
