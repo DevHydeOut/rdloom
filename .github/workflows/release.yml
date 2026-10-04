@@ -96,22 +96,21 @@ jobs:
       - name: Install from the tarballs and smoke test
         run: bash scripts/sample-app.sh
 
-      - name: Publish
+      # Staged, not published outright: CI submits the version and a maintainer
+      # promotes it with their own 2FA. A leaked CI token therefore cannot put
+      # anything on the registry. npm is removing direct publishing through
+      # 2FA-bypass tokens in January 2027, so this is also where it is heading.
+      - name: Stage both packages for release
         if: startsWith(github.ref, 'refs/tags/') && inputs.dry-run != true
-        run: npm publish -w rdloom -w @rdloom/mcp --access public --provenance
+        run: npm stage publish -w rdloom -w @rdloom/mcp --access public --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      # @rdloom/mcp belongs to the org already, because the scope is the org.
-      # rdloom is unscoped, so it lands under whoever published it; adding the
-      # org as an owner means it outlives any one account. Already an owner on
-      # later releases, which is fine.
-      - name: The rdloom org owns the unscoped package too
+      - name: What to do next
         if: startsWith(github.ref, 'refs/tags/') && inputs.dry-run != true
-        continue-on-error: true # the release itself already succeeded
         run: |
-          npm owner add rdloom rdloom
-          echo "owners of rdloom:"; npm owner ls rdloom
-          echo "owners of @rdloom/mcp:"; npm owner ls @rdloom/mcp
+          echo "::notice::Staged ${GITHUB_REF_NAME}. Promote it at https://www.npmjs.com/settings/$(npm whoami)/staged-packages (needs your 2FA)."
+          echo "After the first promotion, give the org the unscoped package once:"
+          echo "  npm owner add rdloom rdloom --otp=<code>"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
