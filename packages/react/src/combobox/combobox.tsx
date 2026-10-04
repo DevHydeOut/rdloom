@@ -1,6 +1,6 @@
 "use client";
 
-import { useContext, useLayoutEffect, useRef, useState, type ReactNode, type RefObject } from "react";
+import { useContext, useLayoutEffect, useRef, useState, type ComponentProps, type ReactNode, type RefObject } from "react";
 import {
   Button,
   Collection,
@@ -62,7 +62,8 @@ function useElementWidth(ref: RefObject<HTMLElement | null>): number | undefined
 }
 
 interface FieldProps {
-  fieldRef: RefObject<HTMLDivElement | null>;
+  /** Whatever the installed React calls a div's ref: the shape changed in 19. */
+  fieldRef: ComponentProps<"div">["ref"];
   size: FieldSize;
   isMultiple: boolean;
   isLoading: boolean;

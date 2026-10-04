@@ -31,7 +31,7 @@
     "node-diff3": "^3.2.1"
   },
   "devDependencies": {
-    "vitest": "^3.2.7"
+    "vitest": "^5.0.3"
   },
   "scripts": {
     "prepack": "node ../../scripts/build-bins.mjs"

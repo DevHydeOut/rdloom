@@ -28,6 +28,10 @@ Components built on [React Aria](https://react-spectrum.adobe.com/react-aria/) a
 
 Plus Button, Dialog, Sheet, Menu, Select, Tabs, Toast, Accordion, Slider and more.
 
+## Requirements
+
+React 18.3 or 19, Tailwind CSS v3.4 or v4, and Node 22+ for the CLI. Works with Vite and with Next.js App Router — every component ships with `"use client"`, so a Server Component can render one directly.
+
 ## Commands
 
 ```bash

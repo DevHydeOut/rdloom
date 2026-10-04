@@ -104,7 +104,7 @@
   "usage": {
     "use_when": ["Scanning, sorting and acting on many records, like orders, users or logs"],
     "avoid_when": ["A few items with rich layout: use a list or cards", "Pure layout: never use a grid for layout"],
-    "anti_patterns": ["Buttons in every cell instead of a row action", "Horizontal scrolling without pinning the identifying column", "Formatting numbers or dates in a custom cell renderer: search and filters won't find the text users see. Use meta.format (e.g. a currency formatter) instead"]
+    "anti_patterns": ["Buttons in every cell instead of a row action", "Horizontal scrolling without pinning the identifying column", "Formatting numbers or dates in a custom cell renderer: search and filters won't find the text users see. Use meta.format (e.g. a currency formatter) instead", "Rendering the grid straight from a React Server Component: getRowId, onCellEdit and the other callbacks are functions, which cannot cross the server boundary. Put the grid in your own component marked \"use client\""]
   },
   "examples": ["basic", "selection", "large-dataset", "pinned", "filter", "column-filters", "editing", "pagination", "grouping", "tree-data", "master-detail"],
   "figma": {

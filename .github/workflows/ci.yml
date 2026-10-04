@@ -65,6 +65,11 @@ jobs:
       - name: Sample app from packed tarballs
         run: bash scripts/sample-app.sh
 
+      # Server Components are the strictest consumer: this fails if a component
+      # reaches react-aria-components or a hook without "use client".
+      - name: Next.js App Router app from the packed tarball
+        run: bash scripts/next-app.sh
+
   visual:
     name: Visual regression (Linux)
     # Pinned: baselines depend on the runner's fonts. When the image changes,
@@ -135,3 +140,9 @@ jobs:
 
       - name: MCP server smoke test
         run: npm run smoke:mcp
+
+      # Windows quotes and resolves paths differently, so the install a user
+      # actually performs is worth running here too, not only on Linux.
+      - name: Sample app from packed tarballs
+        shell: bash
+        run: bash scripts/sample-app.sh

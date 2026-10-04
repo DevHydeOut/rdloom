@@ -108,6 +108,33 @@ Built for AI agents too:
 - The CLI never prompts, so `-y`/`--yes` is accepted and does nothing.
 - Names can be written as in code (`rdloom add DataGrid`), and mistakes name the fix: `"buton" is not in the registry. Did you mean "button"?`, `unknown option --force. Did you mean --overwrite?`, `rdloom install` → `Did you mean rdloom add?`.
 
+### What the components need
+
+Verified by building a real app against the packed tarball for each row:
+
+| | Supported | Notes |
+|---|---|---|
+| React | 18.3 and 19 | Tested on both |
+| Tailwind CSS | v3.4 and v4 | v4: `@source "./components/rdloom"`. v3: add that folder to `content` in `tailwind.config.js` |
+| Next.js | 15, App Router | See below |
+| Vite | 7 | `scripts/sample-app.sh` |
+| Node (for the CLI) | 22+ | |
+| Package managers | npm, pnpm, yarn, bun | Detected from the lockfile |
+
+### React Server Components (Next.js App Router)
+
+Every component that uses a hook or React Aria ships with `"use client"`, so a Server Component can import and render one directly. A test asserts the directive on each such file, and `scripts/next-app.sh` builds a real Next.js App Router app against the packed tarball in CI.
+
+React itself still can't send a function across the server boundary, so props like `getRowId`, `onCellEdit` or `onPress` have to come from client code:
+
+```tsx
+// app/people.tsx
+"use client";
+export function People() {
+  return <DataGrid label="People" data={rows} columns={columns} getRowId={(p) => p.id} />;
+}
+```
+
 ### Monorepos
 
 Commands work from any directory: rdloom looks for `rdloom.json` in the working directory and then upwards, so `rdloom add` inside `apps/web/src/features/` finds the project at `apps/web`. The lock file and `.rdloom/base` always sit next to that config.
