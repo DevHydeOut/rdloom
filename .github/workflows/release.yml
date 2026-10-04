@@ -59,7 +59,10 @@ jobs:
           done
 
       - name: Pack both packages
-        run: npm pack -w rdloom -w @rdloom/mcp --pack-destination ./.packs
+        # --pack-destination writes into the directory but will not create it.
+        run: |
+          mkdir -p ./.packs
+          npm pack -w rdloom -w @rdloom/mcp --pack-destination ./.packs
 
       - name: What would be published
         run: |
