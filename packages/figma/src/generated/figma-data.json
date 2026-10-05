@@ -6,16 +6,16 @@
       "token": "color.action.primary",
       "cssVar": "--rd-color-action-primary",
       "type": "COLOR",
-      "light": "#4f46e5",
-      "dark": "#8386f7"
+      "light": "#c2410c",
+      "dark": "#fb923c"
     },
     {
       "name": "color/action/primary-hover",
       "token": "color.action.primary-hover",
       "cssVar": "--rd-color-action-primary-hover",
       "type": "COLOR",
-      "light": "#4338ca",
-      "dark": "#a5a8ff"
+      "light": "#9a3412",
+      "dark": "#fdba74"
     },
     {
       "name": "color/action/on-primary",
@@ -23,7 +23,7 @@
       "cssVar": "--rd-color-action-on-primary",
       "type": "COLOR",
       "light": "#ffffff",
-      "dark": "#0e0e12"
+      "dark": "#12100e"
     },
     {
       "name": "color/action/danger",
@@ -47,15 +47,15 @@
       "cssVar": "--rd-color-surface-default",
       "type": "COLOR",
       "light": "#ffffff",
-      "dark": "#0e0e12"
+      "dark": "#12100e"
     },
     {
       "name": "color/surface/subtle",
       "token": "color.surface.subtle",
       "cssVar": "--rd-color-surface-subtle",
       "type": "COLOR",
-      "light": "#eeeef1",
-      "dark": "#2a2a33"
+      "light": "#f2efe9",
+      "dark": "#2c2925"
     },
     {
       "name": "color/surface/raised",
@@ -63,31 +63,31 @@
       "cssVar": "--rd-color-surface-raised",
       "type": "COLOR",
       "light": "#ffffff",
-      "dark": "#18181d"
+      "dark": "#1c1a17"
     },
     {
       "name": "color/surface/selected",
       "token": "color.surface.selected",
       "cssVar": "--rd-color-surface-selected",
       "type": "COLOR",
-      "light": "#eef0ff",
-      "dark": "#1f1d4d"
+      "light": "#fff4ec",
+      "dark": "#431407"
     },
     {
       "name": "color/border/default",
       "token": "color.border.default",
       "cssVar": "--rd-color-border-default",
       "type": "COLOR",
-      "light": "#dcdce2",
-      "dark": "#2a2a33"
+      "light": "#e4e0d8",
+      "dark": "#2c2925"
     },
     {
       "name": "color/border/strong",
       "token": "color.border.strong",
       "cssVar": "--rd-color-border-strong",
       "type": "COLOR",
-      "light": "#8a8a97",
-      "dark": "#8a8a97"
+      "light": "#857f75",
+      "dark": "#857f75"
     },
     {
       "name": "color/feedback/danger",
@@ -166,24 +166,24 @@
       "token": "color.text.default",
       "cssVar": "--rd-color-text-default",
       "type": "COLOR",
-      "light": "#18181d",
-      "dark": "#f7f7f8"
+      "light": "#1c1a17",
+      "dark": "#faf8f5"
     },
     {
       "name": "color/text/muted",
       "token": "color.text.muted",
       "cssVar": "--rd-color-text-muted",
       "type": "COLOR",
-      "light": "#5b5b68",
-      "dark": "#9696a3"
+      "light": "#5c574f",
+      "dark": "#a39e94"
     },
     {
       "name": "color/focus/ring",
       "token": "color.focus.ring",
       "cssVar": "--rd-color-focus-ring",
       "type": "COLOR",
-      "light": "#6366f1",
-      "dark": "#a5a8ff"
+      "light": "#ea580c",
+      "dark": "#fdba74"
     },
     {
       "name": "radius/control",

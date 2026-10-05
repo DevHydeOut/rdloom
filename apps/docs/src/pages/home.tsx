@@ -43,24 +43,24 @@ function Showcase({ id, example }: { id: string; example: string }) {
 export function Home() {
   return (
     <div className="flex flex-col gap-14">
-      <section className="flex flex-col items-center gap-5 pt-6 text-center">
+      <section className="loom-grid loom-grid-wide flex flex-col items-center gap-6 pt-10 pb-4 text-center">
         <Link
           href="/components/data-grid"
-          className="rounded-full border border-[var(--site-border)] px-3 py-1 text-sm text-[var(--site-muted)] hover:text-[var(--site-fg)]"
+          className="rounded-full border border-[var(--site-border)] bg-[var(--site-bg)] px-3.5 py-1 text-sm text-[var(--site-muted)] transition-colors hover:border-[var(--site-accent)] hover:text-[var(--site-fg)]"
         >
           New: DataGrid search matches formatted values →
         </Link>
-        <h1 id="page-title" tabIndex={-1} className="max-w-3xl text-4xl font-semibold tracking-tight text-balance outline-none sm:text-6xl">
+        <h1 id="page-title" tabIndex={-1} className="font-display max-w-4xl text-[52px] leading-[1] tracking-[-0.02em] text-balance outline-none sm:text-[88px]">
           Accessible React components you own, that keep getting better.
         </h1>
-        <p className="max-w-2xl text-lg text-balance text-[var(--site-muted)]">
+        <p className="max-w-2xl text-[19px] leading-8 text-balance text-[var(--site-muted)]">
           rdloom is a spec-driven component library. Copy the code into your project, change anything, and still take upgrades.
         </p>
         <div className="flex flex-wrap justify-center gap-3">
-          <Link href="/docs/getting-started" className="rounded-[var(--site-radius)] bg-[var(--site-primary)] px-4 py-2 font-medium text-[var(--site-on-primary)] hover:bg-[var(--site-primary-hover)]">
+          <Link href="/docs/getting-started" className="rounded-lg bg-[var(--site-accent)] px-5 py-2.5 font-medium text-[var(--site-on-accent)] transition-opacity hover:opacity-90">
             Get started
           </Link>
-          <Link href="/components/data-grid" className="rounded-[var(--site-radius)] border border-[var(--site-border)] px-4 py-2 font-medium hover:bg-[var(--site-subtle)]">
+          <Link href="/components/data-grid" className="rounded-lg border border-[var(--site-border-strong)] px-5 py-2.5 font-medium transition-colors hover:bg-[var(--site-subtle)]">
             See the DataGrid
           </Link>
         </div>
@@ -70,7 +70,7 @@ export function Home() {
       </section>
 
       <section aria-labelledby="live" className="flex flex-col gap-4">
-        <h2 id="live" className="text-xl font-semibold">
+        <h2 id="live" className="font-display text-[34px] leading-10 tracking-[-0.01em]">
           The hard ones, live
         </h2>
         {/* grid-cols-1 and min-w-0: without them the DataGrid's width stretches the card past a phone screen. */}
@@ -92,7 +92,7 @@ export function Home() {
       </section>
 
       <section aria-labelledby="why" className="flex flex-col gap-4">
-        <h2 id="why" className="text-xl font-semibold">
+        <h2 id="why" className="font-display text-[34px] leading-10 tracking-[-0.01em]">
           Why rdloom
         </h2>
         <ul className="grid gap-4 sm:grid-cols-2">
@@ -106,7 +106,7 @@ export function Home() {
       </section>
 
       <section aria-labelledby="all" className="flex flex-col gap-4">
-        <h2 id="all" className="text-xl font-semibold">
+        <h2 id="all" className="font-display text-[34px] leading-10 tracking-[-0.01em]">
           {components.length} components
         </h2>
         <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">

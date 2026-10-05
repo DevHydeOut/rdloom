@@ -13,6 +13,7 @@ import {
   type PropSpec,
   type RegistryFile,
 } from "../data";
+import { ArrowLeftIcon, ArrowRightIcon } from "../icons";
 import { Link } from "../router";
 import { registryBase } from "../routes";
 import { addCommand, Badge, CodeBlock, CommandBlock, CopyButton, DocTabs, H2, H3, List, Muted, PageHeader, Preview, runCommand } from "../ui";
@@ -269,16 +270,12 @@ function PageActions({ component }: { component: DocComponent }) {
       </span>
       {previous ? (
         <Link href={`/components/${previous.id}`} aria-label={`Previous: ${displayName(previous.spec.name)}`} className={arrow}>
-          <svg aria-hidden="true" viewBox="0 0 16 16" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M13 8H3M7 4L3 8l4 4" />
-          </svg>
+          <ArrowLeftIcon size={15} />
         </Link>
       ) : null}
       {next ? (
         <Link href={`/components/${next.id}`} aria-label={`Next: ${displayName(next.spec.name)}`} className={arrow}>
-          <svg aria-hidden="true" viewBox="0 0 16 16" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M3 8h10M9 4l4 4-4 4" />
-          </svg>
+          <ArrowRightIcon size={15} />
         </Link>
       ) : null}
     </>

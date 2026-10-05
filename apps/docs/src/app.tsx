@@ -4,18 +4,19 @@ import { components, displayName, repoUrl } from "./data";
 import { VisualPage } from "./pages/visual";
 import { guides, routeFor, searchEntries } from "./routes";
 import { Link, navigate, RouterProvider, usePath } from "./router";
+import { ArrowRightIcon, MenuIcon, MoonIcon, SearchIcon, SunIcon } from "./icons";
 import { ManagerProvider } from "./ui";
 
 const sideLink =
-  "block rounded-md px-2.5 py-1.5 text-[13px] leading-5 text-[var(--site-muted)] outline-none transition-colors " +
-  "hover:bg-[var(--site-subtle)] hover:text-[var(--site-fg)] focus-visible:ring-2 focus-visible:ring-[var(--rd-color-focus-ring)] " +
-  "aria-[current=page]:bg-[var(--site-subtle)] aria-[current=page]:font-medium aria-[current=page]:text-[var(--site-fg)]";
+  "-ms-px block border-s border-transparent py-1.5 ps-3.5 pe-2 text-[13.5px] leading-5 text-[var(--site-muted)] outline-none transition-colors " +
+  "hover:border-[var(--site-border-strong)] hover:text-[var(--site-fg)] focus-visible:text-[var(--site-fg)] focus-visible:underline " +
+  "aria-[current=page]:border-[var(--site-accent)] aria-[current=page]:font-medium aria-[current=page]:text-[var(--site-fg)]";
 
 function Group({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <p className="px-2.5 pb-1.5 text-xs font-medium text-[var(--site-muted)]">{label}</p>
-      <ul className="flex flex-col gap-px">{children}</ul>
+      <p className="pb-2.5 font-mono text-[11px] font-medium tracking-[0.09em] text-[var(--site-muted)] uppercase">{label}</p>
+      <ul className="flex flex-col border-s border-[var(--site-border)]">{children}</ul>
     </div>
   );
 }
@@ -74,14 +75,14 @@ function Toc({ path }: { path: string }) {
     // The <nav>s are the landmarks; their wrappers are plain divs so screen
     // readers don't list two unnamed "complementary" regions too.
     <nav aria-label="On this page" className="text-[13px]">
-      <p className="pb-3 text-xs font-medium">On This Page</p>
-      <ul className="flex flex-col gap-2.5">
+      <p className="pb-2.5 font-mono text-[11px] font-medium tracking-[0.09em] text-[var(--site-muted)] uppercase">On this page</p>
+      <ul className="flex flex-col border-s border-[var(--site-border)]">
         {items.map((i) => (
           <li key={i.id}>
             <a
               href={`#${i.id}`}
               aria-current={active === i.id ? "location" : undefined}
-              className="block text-[var(--site-muted)] transition-colors hover:text-[var(--site-fg)] aria-[current=location]:font-medium aria-[current=location]:text-[var(--site-fg)]"
+              className="-ms-px block border-s border-transparent py-1 ps-3.5 text-[13px] leading-5 text-[var(--site-muted)] transition-colors hover:text-[var(--site-fg)] aria-[current=location]:border-[var(--site-accent)] aria-[current=location]:font-medium aria-[current=location]:text-[var(--site-fg)]"
             >
               {i.text}
             </a>
@@ -99,13 +100,14 @@ function SearchButton({ onOpen, className = "" }: { onOpen: () => void; classNam
       onClick={onOpen}
       aria-keyshortcuts="Control+K Meta+K"
       className={
-        "flex h-9 w-full items-center justify-between gap-6 rounded-lg border border-transparent bg-[var(--site-subtle)] px-3 text-sm text-[var(--site-muted)] outline-none " +
-        "transition-colors hover:border-[var(--site-border)] focus-visible:ring-2 focus-visible:ring-[var(--rd-color-focus-ring)] " +
+        "flex h-9 w-full items-center gap-2.5 rounded-lg border border-[var(--site-border)] bg-[var(--site-bg)] px-3 text-sm text-[var(--site-muted)] outline-none " +
+        "transition-colors hover:border-[var(--site-border-strong)] focus-visible:ring-2 focus-visible:ring-[var(--rd-color-focus-ring)] " +
         className
       }
     >
-      <span>Search documentation…</span>
-      <kbd className="hidden rounded border border-[var(--site-border)] bg-[var(--site-bg)] px-1.5 font-sans text-[11px] sm:inline">Ctrl K</kbd>
+      <SearchIcon size={15} />
+      <span className="flex-1 text-start">Search the docs</span>
+      <kbd className="hidden rounded border border-[var(--site-border)] bg-[var(--site-subtle)] px-1.5 text-[10.5px] sm:inline">Ctrl K</kbd>
     </button>
   );
 }
@@ -167,11 +169,8 @@ function ThemeToggle() {
       }}
       className={iconButton}
     >
-      <svg aria-hidden="true" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="12" r="9" />
-        <path d="M12 3v18" />
-        <path d="M12 3a9 9 0 0 1 0 18" fill="currentColor" />
-      </svg>
+      <SunIcon size={17} />
+      <MoonIcon size={17} />
     </button>
   );
 }
@@ -220,7 +219,7 @@ function Shell() {
       >
         Skip to content
       </a>
-      <header className="sticky top-0 z-20 bg-[var(--site-bg)]/85 backdrop-blur-md">
+      <header className="sticky top-0 z-20 border-b border-[var(--site-border)]/70 bg-[var(--site-bg)]/85 backdrop-blur-md">
         <div className="mx-auto flex h-14 max-w-[88rem] items-center gap-6 px-4 sm:px-6">
           <button
             type="button"
@@ -230,16 +229,14 @@ function Shell() {
             aria-controls="mobile-nav"
             onClick={() => setMenuOpen((o) => !o)}
           >
-            <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-              <path d="M4 7h16M4 12h16M4 17h16" />
-            </svg>
+            <MenuIcon size={18} />
           </button>
-          <Link href="/" className="flex items-center gap-2 text-[15px] font-semibold tracking-tight">
-            <img src="/favicon.svg" alt="" width="22" height="22" />
-            rdloom
+          <Link href="/" className="flex items-center gap-2.5">
+            <img src="/favicon.svg" alt="" width="24" height="24" />
+            <span className="font-display text-[26px] leading-none tracking-[-0.01em]">rdloom</span>
           </Link>
           <nav aria-label="Main" className="hidden md:block">
-            <ul className="flex items-center gap-6 text-sm font-medium">
+            <ul className="flex items-center gap-6 text-sm">
               {topLinks.map((l) => (
                 <li key={l.label}>
                   <Link
@@ -257,10 +254,9 @@ function Shell() {
             <div className="hidden w-64 sm:block lg:w-72">
               <SearchButton onOpen={() => setSearchOpen(true)} />
             </div>
-            <a href={repoUrl} aria-label="GitHub repository" className={iconButton}>
-              <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
-                <path d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.03 1.76 2.7 1.25 3.36.96.1-.75.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.28 1.18-3.09-.12-.29-.51-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.62 1.59.23 2.76.11 3.05.74.81 1.18 1.83 1.18 3.09 0 4.42-2.7 5.4-5.27 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5z" />
-              </svg>
+            <a href={repoUrl} className="hidden h-8 items-center gap-1 rounded-lg px-2.5 text-sm text-[var(--site-muted)] outline-none transition-colors hover:text-[var(--site-fg)] focus-visible:ring-2 focus-visible:ring-[var(--rd-color-focus-ring)] sm:flex">
+              GitHub
+              <ArrowRightIcon size={13} className="-rotate-45" />
             </a>
             <ThemeToggle />
           </div>
@@ -290,7 +286,7 @@ function Shell() {
             <Nav />
           </div>
           <main id="main" className="min-w-0 flex-1 py-10 pb-24">
-            <div className="mx-auto max-w-[44rem]">{route.page}</div>
+            <div className="thread mx-auto max-w-[44rem]">{route.page}</div>
           </main>
           <div className="sticky top-14 hidden h-[calc(100vh-3.5rem)] w-52 shrink-0 overflow-y-auto py-10 xl:block">
             <Toc path={path} />

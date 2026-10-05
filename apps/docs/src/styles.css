@@ -1,55 +1,68 @@
 @import "tailwindcss";
 @import "@rdloom/tokens/tokens.css";
-@import "@fontsource-variable/geist";
-@import "@fontsource-variable/geist-mono";
+@import "@fontsource/instrument-serif/latin-400.css";
+@import "@fontsource/instrument-serif/latin-400-italic.css";
+@import "@fontsource-variable/instrument-sans";
+@import "@fontsource/ibm-plex-mono/latin-400.css";
+@import "@fontsource/ibm-plex-mono/latin-500.css";
 
 /* Tailwind only generates classes it finds: include the components and examples. */
 @source "../../../packages/react/src";
 @source "../../../examples/components";
 
 /*
- * The site's own chrome: a quiet neutral palette, so the components on each
- * page stand out. The components themselves keep the rdloom tokens.
- * Contrast (text on bg): fg 19.8:1, muted 4.8:1 light / 7.8:1 dark.
+ * The site's own chrome. rdloom's look is "loom": paper and ink, with one ember
+ * thread running through it (links, focus, the current page). The components on
+ * each page keep the rdloom tokens, so they sit on the page as they would in an app.
+ * Contrast (text on paper): fg 16:1, muted 5.6:1 light / 6.9:1 dark; accent text 5.3:1 / 8.1:1.
  */
 :root {
-  --site-bg: #ffffff;
-  --site-fg: #09090b;
-  --site-muted: #71717a;
-  --site-subtle: #f4f4f5;
-  --site-border: #e4e4e7;
-  --site-border-strong: #a1a1aa;
-  --site-primary: #18181b;
-  --site-primary-hover: #3f3f46;
-  --site-on-primary: #fafafa;
+  --site-bg: #faf8f5;
+  --site-fg: #1c1a17;
+  --site-muted: #6a645b;
+  --site-subtle: #f2efe9;
+  --site-border: #e4e0d8;
+  --site-border-strong: #a39e94;
+  --site-primary: #1c1a17;
+  --site-primary-hover: #3a3631;
+  --site-on-primary: #faf8f5;
+  --site-accent: #c2410c;
+  --site-accent-soft: #fff4ec;
+  --site-on-accent: #ffffff;
   --site-radius: 8px;
-  --site-radius-lg: 12px;
+  --site-radius-lg: 14px;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --site-bg: #09090b;
-    --site-fg: #fafafa;
-    --site-muted: #a1a1aa;
-    --site-subtle: #18181b;
-    --site-border: #27272a;
-    --site-border-strong: #52525b;
-    --site-primary: #fafafa;
-    --site-primary-hover: #d4d4d8;
-    --site-on-primary: #18181b;
+    --site-bg: #12100e;
+    --site-fg: #f3f0ea;
+    --site-muted: #a39e94;
+    --site-subtle: #1c1a17;
+    --site-border: #2c2925;
+    --site-border-strong: #5c574f;
+    --site-primary: #f3f0ea;
+    --site-primary-hover: #d8d3ca;
+    --site-on-primary: #12100e;
+    --site-accent: #fb923c;
+    --site-accent-soft: #2a1608;
+    --site-on-accent: #12100e;
   }
 }
 
 :root[data-theme="dark"] {
-  --site-bg: #09090b;
-  --site-fg: #fafafa;
-  --site-muted: #a1a1aa;
-  --site-subtle: #18181b;
-  --site-border: #27272a;
-  --site-border-strong: #52525b;
-  --site-primary: #fafafa;
-  --site-primary-hover: #d4d4d8;
-  --site-on-primary: #18181b;
+  --site-bg: #12100e;
+  --site-fg: #f3f0ea;
+  --site-muted: #a39e94;
+  --site-subtle: #1c1a17;
+  --site-border: #2c2925;
+  --site-border-strong: #5c574f;
+  --site-primary: #f3f0ea;
+  --site-primary-hover: #d8d3ca;
+  --site-on-primary: #12100e;
+  --site-accent: #fb923c;
+  --site-accent-soft: #2a1608;
+  --site-on-accent: #12100e;
 }
 
 body {
@@ -65,16 +78,18 @@ pre {
 }
 
 ::selection {
-  background: color-mix(in srgb, var(--site-fg) 15%, transparent);
+  background: color-mix(in srgb, var(--site-accent) 28%, transparent);
 }
 
 /*
  * The docs' reading typography. It is scoped to .docs (the site shell) so the
  * /visual pages that the screenshot tests use keep the components' own font.
+ * Titles are set in a serif; everything you read or click is in the sans.
  */
 .docs {
-  font-family: "Geist Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-  font-feature-settings: "cv11", "ss01";
+  /* Decoration that reaches past the viewport (the hero grid) must never add a sideways scrollbar. clip, unlike hidden, leaves sticky positioning alone. */
+  overflow-x: clip;
+  font-family: "Instrument Sans Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   font-optical-sizing: auto;
 }
 
@@ -82,16 +97,22 @@ pre {
 .docs pre,
 .docs kbd,
 .docs samp {
-  font-family: "Geist Mono Variable", ui-monospace, "Cascadia Code", Menlo, monospace;
+  font-family: "IBM Plex Mono", ui-monospace, "Cascadia Code", Menlo, monospace;
+}
+
+.font-display {
+  font-family: "Instrument Serif", ui-serif, Georgia, "Times New Roman", serif;
+  font-weight: 400;
+  font-optical-sizing: auto;
 }
 
 /* Inline code in prose, not inside a code block. */
 .docs :not(pre) > code {
   background: var(--site-subtle);
   border: 1px solid var(--site-border);
-  border-radius: 6px;
-  padding: 0.1em 0.35em;
-  font-size: 0.86em;
+  border-radius: 5px;
+  padding: 0.08em 0.34em;
+  font-size: 0.84em;
 }
 
 /* The tabs, buttons and fields of the components keep the page's font. */
@@ -100,43 +121,138 @@ pre {
   font-family: inherit;
 }
 
+/*
+ * The loom motifs.
+ *
+ * .loom-grid: a fine woven grid that fades out, behind page headers and the home hero.
+ * .thread:    a single vertical thread down the left of an article, tied off in a
+ *             small knot at each section heading.
+ */
+.loom-grid {
+  position: relative;
+  isolation: isolate;
+}
+
+.loom-grid::before {
+  content: "";
+  position: absolute;
+  inset: -2.5rem 0 0 0;
+  z-index: -1;
+  background-image: linear-gradient(var(--site-border) 1px, transparent 1px), linear-gradient(90deg, var(--site-border) 1px, transparent 1px);
+  background-size: 28px 28px;
+  background-position: 0 0;
+  opacity: 0.7;
+  -webkit-mask-image: radial-gradient(ellipse 70% 90% at 18% 0%, #000 0%, transparent 72%);
+  mask-image: radial-gradient(ellipse 70% 90% at 18% 0%, #000 0%, transparent 72%);
+}
+
+.loom-grid::after {
+  /* One ember thread crossing the grid, so it reads as woven rather than ruled. */
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 56px;
+  height: 1px;
+  z-index: -1;
+  background: linear-gradient(90deg, transparent 0%, var(--site-accent) 25%, transparent 70%);
+  opacity: 0.45;
+}
+
+/* Beside the thread there is room to let the grid reach a little past the column. */
+@media (min-width: 1024px) {
+  .loom-grid::before {
+    inset: -2.5rem -1.5rem 0 -2rem;
+  }
+
+  .loom-grid::after {
+    left: -2rem;
+  }
+}
+
+/* On the home page the grid spans the whole hero. */
+.loom-grid-wide::before {
+  inset: -3rem -50vw 0 -50vw;
+  -webkit-mask-image: radial-gradient(ellipse 55% 85% at 50% 0%, #000 0%, transparent 72%);
+  mask-image: radial-gradient(ellipse 55% 85% at 50% 0%, #000 0%, transparent 72%);
+}
+
+.loom-grid-wide::after {
+  left: -50vw;
+  right: -50vw;
+  background: linear-gradient(90deg, transparent 0%, var(--site-accent) 50%, transparent 100%);
+}
+
+@media (min-width: 1024px) {
+  .thread {
+    position: relative;
+  }
+
+  .thread::before {
+    content: "";
+    position: absolute;
+    top: 14rem;
+    bottom: 3rem;
+    left: -2rem;
+    width: 1px;
+    background: linear-gradient(var(--site-border-strong), var(--site-border) 12%, var(--site-border) 92%, transparent);
+  }
+
+  .thread h2[id]::before {
+    content: "";
+    position: absolute;
+    top: 3.65rem;
+    left: -2rem;
+    width: 9px;
+    height: 9px;
+    translate: -4px 0;
+    border-radius: 999px;
+    background: var(--site-bg);
+    border: 1.5px solid var(--site-accent);
+  }
+}
+
+.thread h2[id] {
+  position: relative;
+}
+
 /* Syntax colors for code blocks: AA against the code background in both themes. */
 :root {
-  --sh-class: #6639ba;
-  --sh-identifier: #24292f;
-  --sh-sign: #57606a;
-  --sh-property: #0550ae;
-  --sh-entity: #6639ba;
-  --sh-jsxliterals: #0a5aa8;
-  --sh-string: #0a3069;
-  --sh-keyword: #cf222e;
-  --sh-comment: #57606a;
+  --sh-class: #7c3aed;
+  --sh-identifier: #1c1a17;
+  --sh-sign: #6a645b;
+  --sh-property: #9a3412;
+  --sh-entity: #7c3aed;
+  --sh-jsxliterals: #9a3412;
+  --sh-string: #166534;
+  --sh-keyword: #be123c;
+  --sh-comment: #6a645b;
   --sh-space: inherit;
 }
 
 :root[data-theme="dark"] {
-  --sh-class: #d2a8ff;
-  --sh-identifier: #e6edf3;
-  --sh-sign: #9ba6b2;
-  --sh-property: #79c0ff;
-  --sh-entity: #d2a8ff;
-  --sh-jsxliterals: #79c0ff;
-  --sh-string: #a5d6ff;
-  --sh-keyword: #ff7b72;
-  --sh-comment: #9ba6b2;
+  --sh-class: #c4b5fd;
+  --sh-identifier: #f3f0ea;
+  --sh-sign: #a39e94;
+  --sh-property: #fdba74;
+  --sh-entity: #c4b5fd;
+  --sh-jsxliterals: #fdba74;
+  --sh-string: #86efac;
+  --sh-keyword: #fda4af;
+  --sh-comment: #a39e94;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --sh-class: #d2a8ff;
-    --sh-identifier: #e6edf3;
-    --sh-sign: #9ba6b2;
-    --sh-property: #79c0ff;
-    --sh-entity: #d2a8ff;
-    --sh-jsxliterals: #79c0ff;
-    --sh-string: #a5d6ff;
-    --sh-keyword: #ff7b72;
-    --sh-comment: #9ba6b2;
+    --sh-class: #c4b5fd;
+    --sh-identifier: #f3f0ea;
+    --sh-sign: #a39e94;
+    --sh-property: #fdba74;
+    --sh-entity: #c4b5fd;
+    --sh-jsxliterals: #fdba74;
+    --sh-string: #86efac;
+    --sh-keyword: #fda4af;
+    --sh-comment: #a39e94;
   }
 }
 
@@ -148,4 +264,10 @@ html {
   html {
     scroll-behavior: auto;
   }
+}
+
+/* One theme icon at a time. The inline script in index.html sets data-theme before first paint, so the page never flashes the wrong one. */
+:root:not([data-theme="dark"]) .theme-sun,
+:root[data-theme="dark"] .theme-moon {
+  display: none;
 }

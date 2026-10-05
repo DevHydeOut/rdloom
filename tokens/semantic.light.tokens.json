@@ -2,8 +2,8 @@
   "color": {
     "$type": "color",
     "action": {
-      "primary":       { "$value": "{color.indigo.600}" },
-      "primary-hover": { "$value": "{color.indigo.700}" },
+      "primary":       { "$value": "{color.ember.700}" },
+      "primary-hover": { "$value": "{color.ember.800}" },
       "on-primary":    { "$value": "{color.neutral.0}" },
       "danger":        { "$value": "{color.red.600}" },
       "danger-hover":  { "$value": "{color.red.700}" }
@@ -12,7 +12,7 @@
       "default": { "$value": "{color.neutral.0}" },
       "subtle":  { "$value": "{color.neutral.100}" },
       "raised":  { "$value": "{color.neutral.0}" },
-      "selected": { "$value": "{color.indigo.50}" }
+      "selected": { "$value": "{color.ember.50}" }
     },
     "border": {
       "default": { "$value": "{color.neutral.200}" },
@@ -36,7 +36,7 @@
       "muted":   { "$value": "{color.neutral.600}" }
     },
     "focus": {
-      "ring": { "$value": "{color.indigo.500}" }
+      "ring": { "$value": "{color.ember.600}" }
     }
   },
   "radius": {

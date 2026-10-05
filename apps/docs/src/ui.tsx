@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useId, useState, type ReactNode } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "@rdloom/react";
 import { highlight } from "sugar-high";
+import { CheckIcon, CopyIcon, DoIcon, DontIcon, FileIcon } from "./icons";
 
 // The docs' own building blocks: calm, neutral, and the same on every page.
 
@@ -26,16 +27,7 @@ export function CopyButton({ text, label = "Copy", className = "" }: { text: str
           className
         }
       >
-        {copied ? (
-          <svg aria-hidden="true" viewBox="0 0 16 16" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M3.5 8.5l3 3 6-7" />
-          </svg>
-        ) : (
-          <svg aria-hidden="true" viewBox="0 0 16 16" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round">
-            <rect x="5.5" y="5.5" width="8" height="8" rx="1.5" />
-            <path d="M10.5 5.5v-1a1.5 1.5 0 0 0-1.5-1.5H4.5A1.5 1.5 0 0 0 3 4.5V9a1.5 1.5 0 0 0 1.5 1.5h1" />
-          </svg>
-        )}
+        {copied ? <CheckIcon size={15} /> : <CopyIcon size={15} />}
       </button>
       <span role="status" className="sr-only">
         {copied ? "Copied to clipboard" : ""}
@@ -73,10 +65,7 @@ export function CodeBlock({
     >
       {title && (
         <figcaption className="flex items-center gap-2 border-b border-[var(--site-border)] px-4 py-2 font-mono text-xs text-[var(--site-muted)]">
-          <svg aria-hidden="true" viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round">
-            <path d="M4 1.75h4.5L12 5.25v8.5a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1-.5-.5v-11.5a.5.5 0 0 1 .5-.5z" />
-            <path d="M8.5 1.75v3.5H12" />
-          </svg>
+          <FileIcon size={14} />
           {title}
         </figcaption>
       )}
@@ -162,7 +151,7 @@ export function Preview({ children, code, label, tall = false }: { children: Rea
   const id = useId();
   return (
     <div className="overflow-hidden rounded-xl border border-[var(--site-border)]">
-      <div className={`flex ${tall ? "min-h-[22rem]" : "min-h-48"} min-w-0 items-center justify-center overflow-x-auto bg-[var(--site-bg)] p-8`}>
+      <div className={`flex ${tall ? "min-h-[22rem]" : "min-h-48"} min-w-0 items-center justify-center overflow-x-auto bg-[var(--rd-color-surface-default)] p-8`}>
         <div className="flex min-w-0 max-w-full flex-wrap items-center justify-center gap-4">{children}</div>
       </div>
       <div className="relative border-t border-[var(--site-border)] bg-[var(--site-subtle)]">
@@ -224,15 +213,15 @@ export function DocTabs({ label, tabs }: { label: string; tabs: Array<{ id: stri
 
 export function PageHeader({ title, lead, actions, meta }: { title: ReactNode; lead?: ReactNode; actions?: ReactNode; meta?: ReactNode }) {
   return (
-    <div className="flex flex-col gap-2 pb-8">
+    <div className="loom-grid flex flex-col gap-3 pb-9">
       <div className="flex items-start justify-between gap-4">
         {/* Focused on navigation, so screen readers announce the new page. */}
-        <h1 id="page-title" tabIndex={-1} className="text-[30px] leading-9 font-semibold tracking-[-0.025em] outline-none">
+        <h1 id="page-title" tabIndex={-1} className="font-display text-[44px] leading-[1.05] tracking-[-0.015em] outline-none sm:text-[52px]">
           {title}
         </h1>
         {actions && <div className="flex shrink-0 items-center gap-1.5 pt-0.5">{actions}</div>}
       </div>
-      {lead && <p className="max-w-xl text-base leading-7 text-balance text-[var(--site-muted)]">{lead}</p>}
+      {lead && <p className="max-w-xl text-[17px] leading-7 text-balance text-[var(--site-muted)]">{lead}</p>}
       {meta}
     </div>
   );
@@ -248,11 +237,11 @@ export function H2({ id, label, children }: { id: string; /** Text for "On this 
     <h2
       id={id}
       data-label={label ?? (typeof children === "string" ? children : undefined)}
-      className="group scroll-mt-20 pt-12 pb-4 text-xl leading-7 font-semibold tracking-tight"
+      className="font-display group scroll-mt-20 pt-14 pb-4 text-[30px] leading-9 tracking-[-0.01em]"
     >
       <a href={`#${id}`} data-anchor="" className="outline-none focus-visible:underline">
         {children}
-        <span aria-hidden="true" className="ms-2 font-normal text-[var(--site-muted)] opacity-0 transition-opacity group-hover:opacity-100">
+        <span aria-hidden="true" className="ms-2 font-sans text-base text-[var(--site-accent)] opacity-0 transition-opacity group-hover:opacity-100">
           #
         </span>
       </a>
@@ -286,15 +275,7 @@ export function List({ items, tone }: { items: string[]; tone?: "do" | "dont" })
       {items.map((item) => (
         <li key={item} className="flex gap-2.5">
           <span aria-hidden="true" className={`mt-px shrink-0 ${tone === "do" ? "text-[var(--rd-color-feedback-success)]" : tone === "dont" ? "text-[var(--rd-color-feedback-danger)]" : "text-[var(--site-muted)]"}`}>
-            {tone === "do" ? (
-              <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="mt-1">
-                <path d="M3.5 8.5l3 3 6-7" />
-              </svg>
-            ) : tone === "dont" ? (
-              <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" className="mt-1">
-                <path d="M4.5 4.5l7 7M11.5 4.5l-7 7" />
-              </svg>
-            ) : (
+            {tone === "do" ? <DoIcon size={16} className="mt-1" /> : tone === "dont" ? <DontIcon size={16} className="mt-1" /> : (
               "•"
             )}
           </span>
