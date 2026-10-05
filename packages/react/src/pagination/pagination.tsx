@@ -38,12 +38,16 @@ export function paginationRange(page: number, pageCount: number, siblingCount = 
 
 const sizes: Record<NonNullable<PaginationSpecProps["size"]>, string> = { sm: "h-8 min-w-8 px-2 text-sm", md: "h-10 min-w-10 px-3 text-sm" };
 
-const button =
+const shape =
   "inline-flex items-center justify-center rounded-[var(--rd-radius-control)] border font-medium tabular-nums select-none outline-none transition-colors " +
-  "border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-default)] text-[var(--rd-color-text-default)] " +
-  "data-[hovered]:bg-[var(--rd-color-surface-subtle)] " +
   "data-[focus-visible]:ring-2 data-[focus-visible]:ring-offset-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)] " +
   "data-[disabled]:opacity-50 data-[disabled]:cursor-not-allowed";
+
+// The colors are one set or the other, never both: two competing background
+// utilities on one element are decided by stylesheet order, not by the order written.
+const idle =
+  "border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-default)] text-[var(--rd-color-text-default)] " +
+  "data-[hovered]:bg-[var(--rd-color-surface-subtle)]";
 
 const current =
   "border-transparent bg-[var(--rd-color-action-primary)] text-[var(--rd-color-action-on-primary)] font-semibold " +
@@ -86,7 +90,7 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(function Pagi
     <nav ref={ref} aria-label={label} className={className}>
       <ul className="flex flex-wrap items-center gap-1">
         <li>
-          <Button aria-label="Previous page" isDisabled={isDisabled || active <= 1} onPress={() => go(active - 1)} className={cx(button, sizes[size])}>
+          <Button aria-label="Previous page" isDisabled={isDisabled || active <= 1} onPress={() => go(active - 1)} className={cx(shape, idle, sizes[size])}>
             <Chevron direction="left" />
           </Button>
         </li>
@@ -102,7 +106,7 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(function Pagi
                 aria-current={item === active ? "page" : undefined}
                 isDisabled={isDisabled}
                 onPress={() => go(item)}
-                className={cx(button, sizes[size], item === active && current)}
+                className={cx(shape, item === active ? current : idle, sizes[size])}
               >
                 {item}
               </Button>
@@ -110,7 +114,7 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(function Pagi
           ),
         )}
         <li>
-          <Button aria-label="Next page" isDisabled={isDisabled || active >= count} onPress={() => go(active + 1)} className={cx(button, sizes[size])}>
+          <Button aria-label="Next page" isDisabled={isDisabled || active >= count} onPress={() => go(active + 1)} className={cx(shape, idle, sizes[size])}>
             <Chevron direction="right" />
           </Button>
         </li>

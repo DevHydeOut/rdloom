@@ -124,6 +124,18 @@ describe("Pagination", () => {
     expect(within(nav).getByRole("button", { name: "Page 3" })).not.toHaveAttribute("aria-current");
   });
 
+  it("gives the current page its own colors, not the idle ones as well", () => {
+    // Two background utilities on one element are settled by stylesheet order, not the order written,
+    // so the current page once rendered with no fill. It must carry one set or the other.
+    render(<Pagination pageCount={5} defaultPage={2} />);
+    const current = screen.getByRole("button", { name: "Page 2" }).className;
+    const idle = screen.getByRole("button", { name: "Page 3" }).className;
+    expect(current).toContain("bg-[var(--rd-color-action-primary)]");
+    expect(current).not.toContain("bg-[var(--rd-color-surface-default)]");
+    expect(idle).toContain("bg-[var(--rd-color-surface-default)]");
+    expect(idle).not.toContain("bg-[var(--rd-color-action-primary)]");
+  });
+
   it("goes to a page and tells you, when uncontrolled", async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
