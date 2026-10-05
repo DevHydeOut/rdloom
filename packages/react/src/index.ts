@@ -9,6 +9,7 @@ export {
   type DataGridCellEdit,
   type DataGridColumnMeta,
   type DataGridExportOptions,
+  type DataGridQuery,
   type DataGridProps,
 } from "./data-grid/data-grid";
 export { DatePicker, type DatePickerProps } from "./date-picker/date-picker";

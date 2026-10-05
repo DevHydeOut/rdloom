@@ -26,6 +26,7 @@
     "docs": "npm run gen && npm run dev -w @rdloom/docs",
     "build:docs": "npm run build -w @rdloom/docs",
     "test:visual": "playwright test",
+    "bench:grid": "node scripts/bench-grid.mjs",
     "test:visual:update": "playwright test --update-snapshots"
   },
   "devDependencies": {

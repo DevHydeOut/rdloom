@@ -14,6 +14,25 @@ export interface DataGridColumnMeta {
    * text filters match it as well as the raw value, so "$1,901" finds 1901.74.
    */
   format?: (value: any) => string;
+  /**
+   * The values a "select" filter offers. Without it the grid lists the
+   * column's distinct values in the rows it has, which with serverSide is only
+   * the current page: pass the full list from your server instead.
+   */
+  filterOptions?: readonly string[];
+}
+
+/** What the user asked for, sent to onQueryChange when serverSide is on. */
+export interface DataGridQuery {
+  /** Sort order, first entry first. */
+  sorting: { id: string; desc: boolean }[];
+  /** Column filters: the text typed in a "text" filter, or the value chosen in a "select" one. */
+  filters: { id: string; value: string }[];
+  /** The grid's search text (globalFilter). */
+  search: string;
+  /** Zero-based page. */
+  pageIndex: number;
+  pageSize: number;
 }
 
 export interface DataGridExportOptions {

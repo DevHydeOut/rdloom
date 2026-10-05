@@ -78,8 +78,12 @@ export function EditableGridDemo() {
   );
 }
 
+// ?rows=1000000 loads that many rows, for `npm run bench:grid`.
+const rowsParam = Number(new URLSearchParams(typeof location === "undefined" ? "" : location.search).get("rows"));
+const ROW_COUNT = Number.isInteger(rowsParam) && rowsParam > 0 && rowsParam <= 5_000_000 ? rowsParam : 100_000;
+
 export function DataGridDemo() {
-  const orders = useMemo(() => makeOrders(100_000), []);
+  const orders = useMemo(() => makeOrders(ROW_COUNT), []);
   const [filter, setFilter] = useState("");
   const [density, setDensity] = useState<"compact" | "standard" | "comfortable">("standard");
   const [selected, setSelected] = useState<string[]>([]);
@@ -88,7 +92,7 @@ export function DataGridDemo() {
   return (
     <div className="flex w-full flex-col gap-3">
       <div className="flex flex-wrap items-end gap-3">
-        <TextField className="w-64" label="Search 100,000 orders" value={filter} onChange={setFilter} placeholder="e.g. Tokyo or Refunded" />
+        <TextField className="w-64" label={`Search ${ROW_COUNT.toLocaleString("en-US")} orders`} value={filter} onChange={setFilter} placeholder="e.g. Tokyo or Refunded" />
         <Select
           className="w-44"
           label="Density"
@@ -119,5 +123,53 @@ export function DataGridDemo() {
         defaultSorting={[{ id: "placed", desc: true }]}
       />
     </div>
+  );
+}
+
+// ?server=1000000: the same orders, but held "on a server" that answers at once
+// with one page. Used by `npm run bench:grid` to time the grid alone.
+const serverParam = Number(new URLSearchParams(typeof location === "undefined" ? "" : location.search).get("server"));
+export const SERVER_ROWS = Number.isInteger(serverParam) && serverParam > 0 ? serverParam : 0;
+
+/** Row i, computed from its index alone, so a "server" needs no 1M-row array. */
+function orderAt(i: number): Order {
+  const hash = (n: number) => {
+    let x = (i + 1) * 2654435761 + n * 40503;
+    x = Math.imul(x ^ (x >>> 15), 2246822507);
+    x = Math.imul(x ^ (x >>> 13), 3266489909);
+    return ((x ^ (x >>> 16)) >>> 0) / 4294967296;
+  };
+  return {
+    id: `ORD-${String(i + 1).padStart(6, "0")}`,
+    customer: customers[Math.floor(hash(1) * customers.length)],
+    city: cities[Math.floor(hash(2) * cities.length)],
+    status: statuses[Math.floor(hash(3) * statuses.length)],
+    items: 1 + Math.floor(hash(4) * 12),
+    total: Math.round(hash(5) * 250000) / 100,
+    placed: new Date(Date.UTC(2026, 0, 1) + Math.floor(hash(6) * 270) * 86400000).toISOString().slice(0, 10),
+  };
+}
+
+export function ServerGridDemo() {
+  const [state, setState] = useState<{ rows: Order[]; loading: boolean }>({ rows: [], loading: true });
+  return (
+    <DataGrid
+      label="Server orders"
+      serverSide
+      data={state.rows}
+      rowCount={SERVER_ROWS}
+      isLoading={state.loading}
+      columns={columns}
+      getRowId={(o) => o.id}
+      pageSize={25}
+      height={420}
+      showColumnFilters
+      onQueryChange={(q) => {
+        const desc = q.sorting[0]?.desc ?? false;
+        const start = q.pageIndex * q.pageSize;
+        const all = Array.from({ length: Math.max(0, Math.min(q.pageSize, SERVER_ROWS - start)) }, (_, i) => orderAt(start + i));
+        setState({ rows: desc ? [...all].reverse() : all, loading: false });
+      }}
+    />
   );
 }

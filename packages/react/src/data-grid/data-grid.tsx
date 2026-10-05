@@ -25,9 +25,9 @@ import { cx } from "../utils/cx";
 import { Spinner } from "../utils/icons";
 import { columnFilter, filteredRowModel, searchFilter, sortedRowModel } from "./hierarchy";
 import { download, parseTsv, toCsv, toTsv, toXlsx, type ExportValue } from "./tabular";
-import type { DataGridApi, DataGridCellEdit, DataGridColumnMeta, DataGridExportOptions } from "./types";
+import type { DataGridApi, DataGridCellEdit, DataGridColumnMeta, DataGridExportOptions, DataGridQuery } from "./types";
 
-export type { DataGridApi, DataGridCellEdit, DataGridColumnMeta, DataGridExportOptions } from "./types";
+export type { DataGridApi, DataGridCellEdit, DataGridColumnMeta, DataGridExportOptions, DataGridQuery } from "./types";
 
 export interface DataGridProps<T>
   extends Omit<
@@ -165,6 +165,10 @@ export function DataGrid<T>({
   onCellsEdit,
   rangeSelection = dataGridDefaults.rangeSelection,
   apiRef,
+  serverSide = dataGridDefaults.serverSide,
+  rowCount,
+  onQueryChange,
+  queryDelay = dataGridDefaults.queryDelay,
   isLoading = dataGridDefaults.isLoading,
   emptyMessage = dataGridDefaults.emptyMessage,
   onRowAction,
@@ -178,8 +182,9 @@ export function DataGrid<T>({
 }: DataGridProps<T>) {
   const [sorting, setSorting] = useState<SortingState>(defaultSorting ?? []);
   const [expanded, setExpanded] = useState<ExpandedState>(defaultExpanded ? true : {});
-  const grouping = useMemo(() => [...(groupBy ?? [])], [groupBy]);
-  const isTree = !!getSubRows;
+  // The server can't group or nest rows for us, so those stay off in serverSide.
+  const grouping = useMemo(() => (serverSide ? [] : [...(groupBy ?? [])]), [groupBy, serverSide]);
+  const isTree = !!getSubRows && !serverSide;
   const isHierarchical = isTree || grouping.length > 0 || !!renderDetail;
   const [columnSizing, setColumnSizing] = useState<ColumnSizingState>({});
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -196,6 +201,38 @@ export function DataGrid<T>({
 
   // New filters or a new sort order start again from page 1.
   useEffect(() => setPageIndex(0), [globalFilter, columnFilters, sorting]);
+
+  // serverSide: tell the app what to fetch. Sort and page changes go out at
+  // once; filter and search typing waits, so one keystroke isn't one request.
+  const onQuery = useRef(onQueryChange);
+  onQuery.current = onQueryChange;
+  const sortKey = JSON.stringify(sorting);
+  const filterKey = JSON.stringify([columnFilters, globalFilter ?? ""]);
+  const previous = useRef({ sortKey, filterKey });
+  useEffect(() => {
+    if (!serverSide) return;
+    const changed = previous.current;
+    const filtersMoved = changed.filterKey !== filterKey;
+    previous.current = { sortKey, filterKey };
+    // A new sort or filter starts at page 1: the reset above re-renders and sends it then.
+    if ((filtersMoved || changed.sortKey !== sortKey) && pageIndex !== 0) return;
+    const send = () => {
+      onQuery.current?.({
+        sorting: sorting.map(({ id, desc }) => ({ id, desc })),
+        filters: columnFilters.map(({ id, value }) => ({ id, value: String(value ?? "") })),
+        search: globalFilter ?? "",
+        pageIndex,
+        pageSize: pageSize ?? 0,
+      });
+    };
+    if (!filtersMoved || queryDelay <= 0) {
+      send(); // not `return send()`: an async handler returns a promise, which React would call as cleanup
+      return;
+    }
+    const timer = setTimeout(send, queryDelay);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- sorting and columnFilters are covered by their keys
+  }, [serverSide, sortKey, filterKey, pageIndex, pageSize, queryDelay]);
 
   const allColumns = useMemo<ColumnDef<T, any>[]>(() => {
     // meta.format renders the cell text unless the column brings its own cell.
@@ -224,7 +261,7 @@ export function DataGrid<T>({
     data: data as T[],
     columns: allColumns,
     getRowId,
-    getSubRows: getSubRows as ((row: T) => T[] | undefined) | undefined,
+    getSubRows: (serverSide ? undefined : getSubRows) as ((row: T) => T[] | undefined) | undefined,
     state: {
       sorting,
       grouping,
@@ -242,8 +279,9 @@ export function DataGrid<T>({
     onPaginationChange: (updater) => setPageIndex(resolve(updater, { pageIndex, pageSize: pageSize ?? 0 }).pageIndex),
     onRowSelectionChange: (updater) => {
       // Selecting a group row selects its rows; the group's own id isn't data, so leave it out.
+      // With serverSide the other pages' rows aren't loaded, but their selection stays.
       const byId = table.getCoreRowModel().rowsById;
-      const next = Object.fromEntries(Object.entries(resolve(updater, rowSelection)).filter(([id]) => id in byId));
+      const next = Object.fromEntries(Object.entries(resolve(updater, rowSelection)).filter(([id]) => serverSide || id in byId));
       if (!selectedRowIds) setInnerSelection(next);
       onSelectionChange?.(selectedIds(next));
     },
@@ -266,11 +304,16 @@ export function DataGrid<T>({
     // TanStack's "auto" would add up every number column, ages included.
     defaultColumn: { size: 160, minSize: 60, maxSize: 800, filterFn: columnFilter, aggregationFn: undefined as never },
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: filteredRowModel<T>(),
     getGroupedRowModel: getGroupedRowModel(),
-    getSortedRowModel: sortedRowModel<T>(),
     getExpandedRowModel: getExpandedRowModel(),
-    ...(isPaged ? { getPaginationRowModel: getPaginationRowModel() } : {}),
+    // serverSide: the rows arrive already filtered, sorted and cut to a page.
+    ...(serverSide
+      ? { manualFiltering: true, manualSorting: true, manualPagination: true, pageCount: isPaged ? Math.max(1, Math.ceil((rowCount ?? data.length) / pageSize)) : 1 }
+      : {
+          getFilteredRowModel: filteredRowModel<T>(),
+          getSortedRowModel: sortedRowModel<T>(),
+          ...(isPaged ? { getPaginationRowModel: getPaginationRowModel() } : {}),
+        }),
   });
 
   const rows = table.getRowModel().rows; // this page (or everything when not paged), expanded rows included
@@ -306,7 +349,7 @@ export function DataGrid<T>({
   useEffect(() => {
     onFilteredData.current?.(dataRows.map((r) => r.original));
   }, [dataRows]);
-  const total = filteredRows.length;
+  const total = serverSide ? Math.max(rowCount ?? data.length, 0) : filteredRows.length;
   const pageCount = isPaged ? Math.max(1, Math.ceil(total / pageSize)) : 1;
   const rowOffset = isPaged ? pageIndex * pageSize : 0;
   const headers = table.getHeaderGroups()[0].headers;
@@ -347,6 +390,11 @@ export function DataGrid<T>({
     if (!showColumnFilters) return out;
     for (const column of leafColumns) {
       if (metaOf(column).filter !== "select") continue;
+      const given = metaOf(column).filterOptions;
+      if (given) {
+        out[column.id] = [...given];
+        continue;
+      }
       const seen = new Set<string>();
       for (const r of preFiltered) {
         const v = r.getValue(column.id);

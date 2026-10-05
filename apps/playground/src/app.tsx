@@ -27,7 +27,7 @@ import {
   TooltipTrigger,
 } from "@rdloom/react";
 import { ComboboxDemo } from "./combobox-demo";
-import { DataGridDemo, EditableGridDemo } from "./data-grid-demo";
+import { DataGridDemo, EditableGridDemo, SERVER_ROWS, ServerGridDemo } from "./data-grid-demo";
 
 type Theme = "light" | "dark";
 
@@ -111,7 +111,7 @@ export function App() {
       </Section>
 
       <Section title="Data grid">
-        <DataGridDemo />
+        {SERVER_ROWS ? <ServerGridDemo /> : <DataGridDemo />}
       </Section>
 
       <Section title="Data grid: editing and pagination">

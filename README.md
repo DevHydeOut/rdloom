@@ -276,15 +276,27 @@ Every name in a spec's `examples` list is a file: `examples/components/<id>/<nam
 
 ## Data Grid performance
 
-Measured on the playground's 100,000-row demo (7 columns, sorted by a date column), production build, as main-thread blocking time:
+Reproduce with `npm run bench:grid` (builds the playground, drives it in headless Chromium). Each figure is how long the page takes to paint the result of one action, the median of five runs, in a production build on one Windows machine. About 33 ms is the floor of the method (two animation frames at 60 Hz), so a 33 ms row means no measurable blocking.
 
-| Action | Time |
+| | 100,000 rows | 1,000,000 rows |
+|---|---|---|
+| Rows in the DOM | 19 | 19 |
+| First render, data included | ~1.1 s | ~10–15 s |
+| JS heap | ~330 MB | ~3.1 GB |
+| Sort: numbers / text / ISO dates | ~100 ms | ~1.0–1.3 s |
+| Search or column filter | ~33 ms | ~230–350 ms |
+| Arrow key, Ctrl+End, scrolling | 33 ms | 33 ms |
+
+The DOM and keyboard cost don't grow with the dataset: the grid only ever draws the rows in view. Memory and sorting do, because a client-side grid has to hold every row. Up to a few hundred thousand rows that is fine. At a million, pass the data a page at a time with `serverSide` instead:
+
+| `serverSide`, 1,000,000 rows on the server | |
 |---|---|
-| Rows in the DOM | ~20, whatever the dataset size |
-| Search or column filter, any query | ~20–80 ms |
-| Change the sort: numbers / text / ISO dates | ~75 / ~110 / ~130–260 ms |
-| Ctrl+End to the last row | ~60 ms |
-| Arrow-key move | ~7–18 ms |
+| First render | ~340 ms |
+| Rows in the DOM / JS heap | 19 / ~28 MB |
+| `aria-rowcount` | 1,000,002 (the full size, so assistive technology reports the real dataset) |
+| Change the sort, next page, jump to the last page | 33 ms each |
+
+That row measures the grid alone: the demo "server" answers instantly, so your own latency comes on top.
 
 How:
 - **Sorting** (`data-grid/sorting.ts`) sorts all rows once per sort change, reading each value once and sorting indexes. Filtering then keeps that order in one O(n) pass instead of re-sorting. TanStack's default "alphanumeric" sort took ~1.3 s on 100k date strings.
@@ -294,6 +306,12 @@ These are single-machine numbers; treat them as orders of magnitude. Search matc
 
 ### Data Grid editing notes
 Edits are reported through `onCellEdit`; the grid never changes your data. Enter, F2, double-click and typing start an edit. With an IME (Japanese, Chinese, Korean input), the first key opens an empty editor and the composition continues in it. On phones, where a cell can't bring up the keyboard, a second tap on the selected cell opens the editor (like a spreadsheet); double-tap works too. Touch is tested in Chromium with touch emulation (`tests/visual/interactions.spec.ts`).
+
+### Data Grid server-side data
+Set `serverSide`, `pageSize`, `rowCount` (the server's total) and `onQueryChange`. The grid sends `{ sorting, filters, search, pageIndex, pageSize }` on mount and on every change, and shows the rows you give it back as they are: it does no sorting, filtering or paging of its own. Sort and page changes go out at once; typing in a filter or search waits `queryDelay` ms (default 250). A new sort or filter asks for page 1, once. Pass `isLoading` while you fetch, and ignore a response that a newer request has overtaken (the example keeps a request counter). Things to know:
+- A "select" filter normally lists the values in the loaded rows, which is one page here; give the full list with `meta.filterOptions`.
+- Selection is kept by row id across pages. "Select all" and the CSV/Excel export cover the rows that are loaded, so export from the server when you need everything.
+- `groupBy` and `getSubRows` need the whole dataset and are ignored. `renderDetail`, editing, ranges and copy/paste work as usual on the loaded page.
 
 ### Data Grid ranges, clipboard and export
 - **Ranges.** Shift+arrows, Shift+click or a mouse drag select a block of cells; Escape clears it. Turn it off with `rangeSelection={false}`.
