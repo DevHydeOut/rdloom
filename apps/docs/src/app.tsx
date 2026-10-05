@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { CommandGroup, CommandItem, CommandPalette, ToastRegion } from "@rdloom/react";
-import { components, displayName, repoUrl } from "./data";
+import { componentGroups, displayName, groupIdOf, repoUrl, type ComponentGroup } from "./data";
 import { VisualPage } from "./pages/visual";
 import { guides, routeFor, searchEntries } from "./routes";
 import { Link, navigate, RouterProvider, usePath } from "./router";
-import { ArrowRightIcon, MenuIcon, MoonIcon, SearchIcon, SunIcon } from "./icons";
+import { ArrowRightIcon, ChevronRightIcon, MenuIcon, MoonIcon, SearchIcon, SunIcon } from "./icons";
 import { ManagerProvider } from "./ui";
 
 const sideLink =
@@ -21,7 +21,54 @@ function Group({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
+function GroupToggle({ group, open, onToggle, onNavigate, path }: { group: ComponentGroup; open: boolean; onToggle: () => void; onNavigate?: () => void; path: string }) {
+  const listId = `side-${group.id}`;
+  const here = group.items.some((c) => path === `/components/${c.id}`);
+  return (
+    <li>
+      <button
+        type="button"
+        aria-expanded={open}
+        aria-controls={listId}
+        onClick={onToggle}
+        className="group/toggle flex w-full items-center gap-2 rounded-md py-1.5 ps-1 pe-2 text-start text-[13.5px] leading-5 font-medium text-[var(--site-fg)] outline-none transition-colors hover:bg-[var(--site-subtle)] focus-visible:ring-2 focus-visible:ring-[var(--rd-color-focus-ring)]"
+      >
+        <ChevronRightIcon size={13} className={"shrink-0 text-[var(--site-muted)] transition-transform motion-reduce:transition-none " + (open ? "rotate-90" : "")} />
+        <span className="flex-1">{group.label}</span>
+        {/* A dot says "you are in here" while the group is closed. */}
+        {here && !open && <span aria-hidden="true" className="size-1.5 rounded-full bg-[var(--site-accent)]" />}
+        <span className="text-xs font-normal text-[var(--site-muted)] tabular-nums">{group.items.length}</span>
+      </button>
+      {/* Closed groups stay in the page (hidden), so the links are still in the HTML. */}
+      <ul id={listId} hidden={!open} className="mb-1 ms-[0.9rem] flex flex-col border-s border-[var(--site-border)]">
+        {group.items.map((c) => (
+          <li key={c.id}>
+            <Link href={`/components/${c.id}`} className={sideLink} onClick={onNavigate}>
+              {displayName(c.spec.name)}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </li>
+  );
+}
+
 function Nav({ onNavigate }: { onNavigate?: () => void }) {
+  const path = usePath();
+  const current = path.startsWith("/components/") ? groupIdOf(path.slice("/components/".length).split("/")[0]) : undefined;
+  const [open, setOpen] = useState<Set<string>>(() => new Set(current ? [current] : []));
+  // Going to a component opens its group; the others stay as you left them.
+  useEffect(() => {
+    if (current) setOpen((s) => (s.has(current) ? s : new Set(s).add(current)));
+  }, [current]);
+  const toggle = (id: string) =>
+    setOpen((s) => {
+      const next = new Set(s);
+      if (!next.delete(id)) next.add(id);
+      return next;
+    });
+  const allOpen = componentGroups.every((g) => open.has(g.id));
+
   return (
     <nav aria-label="Docs" className="flex flex-col gap-7">
       <Group label="Get started">
@@ -33,20 +80,26 @@ function Nav({ onNavigate }: { onNavigate?: () => void }) {
           </li>
         ))}
       </Group>
-      <Group label="Components">
-        <li>
-          <Link href="/components" className={sideLink} onClick={onNavigate}>
-            All components
-          </Link>
-        </li>
-        {components.map((c) => (
-          <li key={c.id}>
-            <Link href={`/components/${c.id}`} className={sideLink} onClick={onNavigate}>
-              {displayName(c.spec.name)}
-            </Link>
-          </li>
-        ))}
-      </Group>
+      <div>
+        <div className="flex items-center justify-between pb-2.5">
+          <p className="font-mono text-[11px] font-medium tracking-[0.09em] text-[var(--site-muted)] uppercase">Components</p>
+          <button
+            type="button"
+            onClick={() => setOpen(allOpen ? new Set(current ? [current] : []) : new Set(componentGroups.map((g) => g.id)))}
+            className="rounded px-1 text-xs text-[var(--site-muted)] outline-none hover:text-[var(--site-fg)] focus-visible:ring-2 focus-visible:ring-[var(--rd-color-focus-ring)]"
+          >
+            {allOpen ? "Collapse all" : "Expand all"}
+          </button>
+        </div>
+        <Link href="/components" className={sideLink + " mb-1 ms-1 rounded-md border-s-0 ps-0.5"} onClick={onNavigate}>
+          All components
+        </Link>
+        <ul className="flex flex-col">
+          {componentGroups.map((g) => (
+            <GroupToggle key={g.id} group={g} open={open.has(g.id)} onToggle={() => toggle(g.id)} onNavigate={onNavigate} path={path} />
+          ))}
+        </ul>
+      </div>
     </nav>
   );
 }
@@ -282,13 +335,13 @@ function Shell() {
         </main>
       ) : (
         <div className="mx-auto flex max-w-[88rem] gap-8 px-4 sm:px-6 lg:gap-12">
-          <div className="sticky top-14 hidden h-[calc(100vh-3.5rem)] w-56 shrink-0 overflow-y-auto py-8 pe-2 md:block">
+          <div className="sticky top-14 hidden h-[calc(100vh-3.5rem)] w-60 shrink-0 overflow-y-auto py-8 pe-2 md:block thin-scroll">
             <Nav />
           </div>
           <main id="main" className="min-w-0 flex-1 py-10 pb-24">
             <div className="thread mx-auto max-w-[44rem]">{route.page}</div>
           </main>
-          <div className="sticky top-14 hidden h-[calc(100vh-3.5rem)] w-52 shrink-0 overflow-y-auto py-10 xl:block">
+          <div className="sticky top-14 hidden h-[calc(100vh-3.5rem)] w-52 shrink-0 overflow-y-auto py-10 xl:block thin-scroll">
             <Toc path={path} />
           </div>
         </div>

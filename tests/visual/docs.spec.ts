@@ -21,9 +21,9 @@ test.describe("component page", () => {
     await page.goto("/components/alert");
     await page.getByRole("tab", { name: "pnpm" }).first().click();
     await expect(page.getByLabel("Add command for pnpm")).toContainText("pnpm dlx rdloom add alert");
-    await page.getByRole("link", { name: "Avatar", exact: true }).first().click();
-    await expect(page.getByRole("heading", { level: 1, name: "Avatar" })).toBeVisible();
-    await expect(page.getByLabel("Add command for pnpm")).toContainText("pnpm dlx rdloom add avatar");
+    await page.getByRole("link", { name: "Next: Approval Box" }).click();
+    await expect(page.getByRole("heading", { level: 1, name: "Approval Box" })).toBeVisible();
+    await expect(page.getByLabel("Add command for pnpm")).toContainText("pnpm dlx rdloom add approval-box");
   });
 
   test("folds the code until you ask for it", async ({ page }) => {
@@ -130,12 +130,36 @@ test.describe("finding things", () => {
     await expect(page.getByText("Nothing matches")).toBeVisible();
   });
 
-  test("the sidebar lists components alphabetically with readable names", async ({ page }) => {
-    await page.goto("/components/button");
-    const names = await page.getByRole("navigation", { name: "Docs" }).getByRole("link").allInnerTexts();
-    const components = names.slice(names.indexOf("All components") + 1);
-    expect(components).toContain("Data Grid");
-    expect(components).toEqual([...components].sort((a, b) => a.localeCompare(b)));
+  test("the sidebar groups components by purpose, opens the group you are in, and every component has a group", async ({ page }) => {
+    await page.goto("/components/shimmer-button");
+    await page.waitForLoadState("networkidle");
+    const nav = page.getByRole("navigation", { name: "Docs" });
+    // Your own group is open; the others are closed but can be opened.
+    await expect(nav.getByRole("button", { name: /^Buttons/ })).toHaveAttribute("aria-expanded", "true");
+    await expect(nav.getByRole("link", { name: "Shimmer Button" })).toBeVisible();
+    await expect(nav.getByRole("button", { name: /^Search and commands/ })).toHaveAttribute("aria-expanded", "false");
+    await expect(nav.getByRole("link", { name: "Command Palette" })).toBeHidden();
+    await nav.getByRole("button", { name: /^Search and commands/ }).click();
+    await expect(nav.getByRole("link", { name: "Command Palette" })).toBeVisible();
+    await expect(nav.getByRole("link", { name: "Combobox" })).toBeVisible();
+
+    // Nothing is left in the catch-all group.
+    await expect(nav.getByRole("button", { name: /^More/ })).toHaveCount(0);
+
+    await nav.getByRole("button", { name: "Expand all" }).click();
+    const names = await nav.getByRole("link").allInnerTexts();
+    expect(names).toContain("Data Grid");
+    expect(names).toContain("Prompt Input");
+    await nav.getByRole("button", { name: "Collapse all" }).click();
+    await expect(nav.getByRole("link", { name: "Command Palette" })).toBeHidden();
+  });
+
+  test("the components page lists the same groups", async ({ page }) => {
+    await page.goto("/components");
+    const main = page.getByRole("main");
+    for (const label of ["Buttons", "Search and commands", "Tables and data", "AI chat and agents", "Motion and effects"]) {
+      await expect(main.getByRole("heading", { level: 2, name: label })).toBeVisible();
+    }
   });
 });
 
@@ -145,7 +169,9 @@ test.describe("small screens", () => {
   test("opens the menu, with no sideways scrolling", async ({ page }) => {
     await page.goto("/components/table");
     await page.getByRole("button", { name: "Menu" }).click();
-    await expect(page.getByRole("navigation", { name: "Docs" }).getByRole("link", { name: "Accordion" })).toBeVisible();
+    const nav = page.getByRole("navigation", { name: "Docs" });
+    await nav.getByRole("button", { name: /^Content and layout/ }).click();
+    await expect(nav.getByRole("link", { name: "Accordion" })).toBeVisible();
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
     expect(overflow).toBeLessThanOrEqual(0);
   });

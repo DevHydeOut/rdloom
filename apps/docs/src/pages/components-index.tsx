@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { categories, categoryLabel, components, displayName } from "../data";
+import { componentGroups, components, displayName } from "../data";
 import { Link } from "../router";
 import { H2, Muted, PageHeader } from "../ui";
 
@@ -34,12 +34,12 @@ export function ComponentsIndex() {
 
       {shown.length === 0 && <Muted className="py-10 text-center">Nothing matches “{query}”.</Muted>}
 
-      {categories.map((category) => {
-        const list = shown.filter((c) => c.spec.category === category);
+      {componentGroups.map((group) => {
+        const list = group.items.filter((c) => shown.includes(c));
         if (list.length === 0) return null;
         return (
-          <section key={category}>
-            <H2 id={category}>{categoryLabel(category)}</H2>
+          <section key={group.id}>
+            <H2 id={group.id}>{group.label}</H2>
             <ul className="grid gap-3 sm:grid-cols-2">
               {list.map((c) => (
                 <li key={c.id}>
