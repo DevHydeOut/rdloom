@@ -1,44 +1,51 @@
 import { useEffect, useRef, useState } from "react";
-import { Combobox, ComboboxItem, Dialog, ToastRegion } from "@rdloom/react";
-import { categories, components, repoUrl } from "./data";
+import { CommandGroup, CommandItem, CommandPalette, ToastRegion } from "@rdloom/react";
+import { components, displayName, repoUrl } from "./data";
 import { VisualPage } from "./pages/visual";
 import { guides, routeFor, searchEntries } from "./routes";
 import { Link, navigate, RouterProvider, usePath } from "./router";
+import { ManagerProvider } from "./ui";
 
-const navLink =
-  "block rounded-md px-2 py-1 text-sm text-[var(--site-muted)] hover:text-[var(--site-fg)] aria-[current=page]:font-medium aria-[current=page]:text-[var(--site-fg)]";
+const sideLink =
+  "block rounded-md px-2.5 py-1.5 text-[13px] leading-5 text-[var(--site-muted)] outline-none transition-colors " +
+  "hover:bg-[var(--site-subtle)] hover:text-[var(--site-fg)] focus-visible:ring-2 focus-visible:ring-[var(--rd-color-focus-ring)] " +
+  "aria-[current=page]:bg-[var(--site-subtle)] aria-[current=page]:font-medium aria-[current=page]:text-[var(--site-fg)]";
+
+function Group({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <p className="px-2.5 pb-1.5 text-xs font-medium text-[var(--site-muted)]">{label}</p>
+      <ul className="flex flex-col gap-px">{children}</ul>
+    </div>
+  );
+}
 
 function Nav({ onNavigate }: { onNavigate?: () => void }) {
   return (
-    <nav aria-label="Docs" className="flex flex-col gap-6">
-      <div>
-        <p className="px-2 pb-1 text-sm font-medium">Getting started</p>
-        <ul>
-          {guides.map((g) => (
-            <li key={g.href}>
-              <Link href={g.href} className={navLink} onClick={onNavigate}>
-                {g.title}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </div>
-      {categories.map((cat) => (
-        <div key={cat}>
-          <p className="px-2 pb-1 text-sm font-medium">{cat[0].toUpperCase() + cat.slice(1)}</p>
-          <ul>
-            {components
-              .filter((c) => c.spec.category === cat)
-              .map((c) => (
-                <li key={c.id}>
-                  <Link href={`/components/${c.id}`} className={navLink} onClick={onNavigate}>
-                    {c.spec.name}
-                  </Link>
-                </li>
-              ))}
-          </ul>
-        </div>
-      ))}
+    <nav aria-label="Docs" className="flex flex-col gap-7">
+      <Group label="Get started">
+        {guides.map((g) => (
+          <li key={g.href}>
+            <Link href={g.href} className={sideLink} onClick={onNavigate}>
+              {g.title}
+            </Link>
+          </li>
+        ))}
+      </Group>
+      <Group label="Components">
+        <li>
+          <Link href="/components" className={sideLink} onClick={onNavigate}>
+            All components
+          </Link>
+        </li>
+        {components.map((c) => (
+          <li key={c.id}>
+            <Link href={`/components/${c.id}`} className={sideLink} onClick={onNavigate}>
+              {displayName(c.spec.name)}
+            </Link>
+          </li>
+        ))}
+      </Group>
     </nav>
   );
 }
@@ -50,7 +57,7 @@ function Toc({ path }: { path: string }) {
 
   useEffect(() => {
     const heads = [...document.querySelectorAll<HTMLElement>("main h2[id]")];
-    setItems(heads.map((h) => ({ id: h.id, text: h.textContent ?? "" })));
+    setItems(heads.map((h) => ({ id: h.id, text: h.dataset.label ?? h.textContent?.replace(/#$/, "") ?? "" })));
     const seen = new IntersectionObserver(
       (entries) => {
         const top = entries.filter((e) => e.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
@@ -66,15 +73,15 @@ function Toc({ path }: { path: string }) {
   return (
     // The <nav>s are the landmarks; their wrappers are plain divs so screen
     // readers don't list two unnamed "complementary" regions too.
-    <nav aria-label="On this page" className="text-sm">
-      <p className="pb-2 font-medium">On this page</p>
-      <ul className="flex flex-col gap-1.5">
+    <nav aria-label="On this page" className="text-[13px]">
+      <p className="pb-3 text-xs font-medium">On This Page</p>
+      <ul className="flex flex-col gap-2.5">
         {items.map((i) => (
           <li key={i.id}>
             <a
               href={`#${i.id}`}
               aria-current={active === i.id ? "location" : undefined}
-              className="text-[var(--site-muted)] hover:text-[var(--site-fg)] aria-[current=location]:text-[var(--site-fg)]"
+              className="block text-[var(--site-muted)] transition-colors hover:text-[var(--site-fg)] aria-[current=location]:font-medium aria-[current=location]:text-[var(--site-fg)]"
             >
               {i.text}
             </a>
@@ -85,56 +92,59 @@ function Toc({ path }: { path: string }) {
   );
 }
 
-function SearchButton() {
-  const [open, setOpen] = useState(false);
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if ((e.key === "k" || e.key === "K") && (e.metaKey || e.ctrlKey)) {
-        e.preventDefault();
-        setOpen(true);
-      }
-    };
-    addEventListener("keydown", onKey);
-    return () => removeEventListener("keydown", onKey);
-  }, []);
-
+function SearchButton({ onOpen, className = "" }: { onOpen: () => void; className?: string }) {
   return (
-    <>
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        aria-keyshortcuts="Control+K Meta+K"
-        className="flex h-8 w-full items-center justify-between gap-6 rounded-[var(--site-radius)] border border-[var(--site-border)] bg-[var(--site-bg)] px-3 text-sm text-[var(--site-muted)] hover:bg-[var(--site-subtle)] hover:text-[var(--site-fg)] sm:w-56"
-      >
-        <span>Search docs…</span>
-        <kbd className="hidden rounded border border-[var(--site-border)] bg-[var(--site-bg)] px-1.5 font-sans text-[11px] sm:inline">Ctrl K</kbd>
-      </button>
-      <Dialog title="Search" isOpen={open} onOpenChange={setOpen} isDismissable size="sm">
-        <Combobox
-          label="Pages and components"
-          placeholder="Type a component or guide"
-          defaultItems={searchEntries}
-          menuTrigger="focus"
-          autoFocus
-          onSelectionChange={(key) => {
-            if (key == null) return;
-            setOpen(false);
-            navigate(String(key));
-          }}
-        >
-          {(e) => (
-            <ComboboxItem id={e.id} textValue={e.name}>
-              <span className="flex w-full justify-between gap-4">
-                {e.name}
-                <span className="text-xs text-[var(--site-muted)]">{e.group}</span>
-              </span>
-            </ComboboxItem>
-          )}
-        </Combobox>
-      </Dialog>
-    </>
+    <button
+      type="button"
+      onClick={onOpen}
+      aria-keyshortcuts="Control+K Meta+K"
+      className={
+        "flex h-9 w-full items-center justify-between gap-6 rounded-lg border border-transparent bg-[var(--site-subtle)] px-3 text-sm text-[var(--site-muted)] outline-none " +
+        "transition-colors hover:border-[var(--site-border)] focus-visible:ring-2 focus-visible:ring-[var(--rd-color-focus-ring)] " +
+        className
+      }
+    >
+      <span>Search documentation…</span>
+      <kbd className="hidden rounded border border-[var(--site-border)] bg-[var(--site-bg)] px-1.5 font-sans text-[11px] sm:inline">Ctrl K</kbd>
+    </button>
   );
 }
+
+/** The site's search is the command palette component: the docs use what they document. */
+function Search({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
+  return (
+    <CommandPalette
+      label="Search the docs"
+      placeholder="Search documentation…"
+      emptyMessage="No pages found."
+      isOpen={open}
+      onOpenChange={onOpenChange}
+      onAction={(key) => navigate(String(key))}
+    >
+      <CommandGroup title="Guides">
+        {searchEntries
+          .filter((e) => e.group === "Guides")
+          .map((e) => (
+            <CommandItem key={e.id} id={e.id}>
+              {e.name}
+            </CommandItem>
+          ))}
+      </CommandGroup>
+      <CommandGroup title="Components">
+        {searchEntries
+          .filter((e) => e.group === "Components")
+          .map((e) => (
+            <CommandItem key={e.id} id={e.id} keywords={"category" in e ? String(e.category) : undefined}>
+              {e.name}
+            </CommandItem>
+          ))}
+      </CommandGroup>
+    </CommandPalette>
+  );
+}
+
+const iconButton =
+  "flex size-8 items-center justify-center rounded-lg text-[var(--site-fg)] outline-none transition-colors hover:bg-[var(--site-subtle)] focus-visible:ring-2 focus-visible:ring-[var(--rd-color-focus-ring)]";
 
 function ThemeToggle() {
   // The inline script in index.html applies the theme before first paint;
@@ -155,11 +165,12 @@ function ThemeToggle() {
           localStorage.setItem("rdloom-theme", next ? "dark" : "light");
         } catch {}
       }}
-      className="flex size-8 items-center justify-center rounded-[var(--site-radius)] hover:bg-[var(--site-subtle)]"
+      className={iconButton}
     >
-      <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-        <circle cx="12" cy="12" r="4.5" />
-        <path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
+      <svg aria-hidden="true" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="9" />
+        <path d="M12 3v18" />
+        <path d="M12 3a9 9 0 0 1 0 18" fill="currentColor" />
       </svg>
     </button>
   );
@@ -169,6 +180,7 @@ function Shell() {
   const path = usePath();
   const route = routeFor(path);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const first = useRef(true);
 
   // On navigation: new title and description, back to the top, and focus the
@@ -180,8 +192,9 @@ function Shell() {
       first.current = false;
       return;
     }
-    scrollTo(0, 0);
-    const focusTitle = () => document.getElementById("page-title")?.focus();
+    // A link to #something stays on the page: let the browser scroll to it.
+    if (!location.hash) scrollTo(0, 0);
+    const focusTitle = () => document.getElementById("page-title")?.focus({ preventScroll: true });
     focusTitle();
     // A closing dialog (search) restores focus after its exit animation, to
     // wherever focus was before it opened, often the page body. Take it back.
@@ -191,26 +204,27 @@ function Shell() {
     return () => clearTimeout(retry);
   }, [path, route.title, route.description]);
 
+  const inComponents = path === "/components" || path.startsWith("/components/");
   const topLinks = [
-    { href: "/docs/getting-started", label: "Docs" },
-    { href: "/components/button", label: "Components" },
-    { href: "/docs/mcp", label: "AI agents" },
-    { href: "/docs/figma", label: "Figma" },
+    { href: "/docs/getting-started", label: "Docs", current: path.startsWith("/docs/") && !path.startsWith("/docs/mcp") && !path.startsWith("/docs/figma") },
+    { href: "/components", label: "Components", current: inComponents },
+    { href: "/docs/mcp", label: "AI agents", current: path.startsWith("/docs/mcp") },
+    { href: "/docs/figma", label: "Figma", current: path.startsWith("/docs/figma") },
   ];
 
   return (
-    <>
+    <div className="docs min-h-screen">
       <a
         href="#main"
         className="sr-only focus:not-sr-only focus:fixed focus:start-2 focus:top-2 focus:z-50 focus:rounded-md focus:bg-[var(--site-bg)] focus:px-3 focus:py-2"
       >
         Skip to content
       </a>
-      <header className="sticky top-0 z-20 border-b border-[var(--site-border)] bg-[var(--site-bg)]/80 backdrop-blur">
-        <div className="mx-auto flex h-14 max-w-screen-2xl items-center gap-4 px-4 sm:px-6">
+      <header className="sticky top-0 z-20 bg-[var(--site-bg)]/85 backdrop-blur-md">
+        <div className="mx-auto flex h-14 max-w-[88rem] items-center gap-6 px-4 sm:px-6">
           <button
             type="button"
-            className="flex size-8 items-center justify-center rounded-[var(--site-radius)] hover:bg-[var(--site-subtle)] md:hidden"
+            className={`${iconButton} md:hidden`}
             aria-label="Menu"
             aria-expanded={menuOpen}
             aria-controls="mobile-nav"
@@ -220,17 +234,18 @@ function Shell() {
               <path d="M4 7h16M4 12h16M4 17h16" />
             </svg>
           </button>
-          <Link href="/" className="flex items-center gap-2 font-semibold">
+          <Link href="/" className="flex items-center gap-2 text-[15px] font-semibold tracking-tight">
             <img src="/favicon.svg" alt="" width="22" height="22" />
             rdloom
           </Link>
           <nav aria-label="Main" className="hidden md:block">
-            <ul className="flex items-center gap-5 text-sm">
+            <ul className="flex items-center gap-6 text-sm font-medium">
               {topLinks.map((l) => (
                 <li key={l.label}>
                   <Link
                     href={l.href}
-                    className="text-[var(--site-muted)] hover:text-[var(--site-fg)] aria-[current=page]:text-[var(--site-fg)]"
+                    aria-current={l.current ? "page" : undefined}
+                    className="text-[var(--site-muted)] transition-colors hover:text-[var(--site-fg)] aria-[current=page]:text-[var(--site-fg)]"
                   >
                     {l.label}
                   </Link>
@@ -238,15 +253,14 @@ function Shell() {
               ))}
             </ul>
           </nav>
-          <div className="ms-auto flex items-center gap-2">
-            <div className="hidden sm:block">
-              <SearchButton />
+          <div className="ms-auto flex items-center gap-1.5">
+            <div className="hidden w-64 sm:block lg:w-72">
+              <SearchButton onOpen={() => setSearchOpen(true)} />
             </div>
-            <a
-              href={repoUrl}
-              className="flex h-8 items-center rounded-[var(--site-radius)] px-2 text-sm text-[var(--site-muted)] hover:bg-[var(--site-subtle)] hover:text-[var(--site-fg)]"
-            >
-              GitHub
+            <a href={repoUrl} aria-label="GitHub repository" className={iconButton}>
+              <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                <path d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.03 1.76 2.7 1.25 3.36.96.1-.75.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.28 1.18-3.09-.12-.29-.51-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.62 1.59.23 2.76.11 3.05.74.81 1.18 1.83 1.18 3.09 0 4.42-2.7 5.4-5.27 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5z" />
+              </svg>
             </a>
             <ThemeToggle />
           </div>
@@ -254,7 +268,12 @@ function Shell() {
         {menuOpen && (
           <div id="mobile-nav" className="max-h-[75vh] overflow-y-auto border-t border-[var(--site-border)] p-4 md:hidden">
             <div className="pb-4 sm:hidden">
-              <SearchButton />
+              <SearchButton
+                onOpen={() => {
+                  setMenuOpen(false);
+                  setSearchOpen(true);
+                }}
+              />
             </div>
             <Nav onNavigate={() => setMenuOpen(false)} />
           </div>
@@ -266,20 +285,20 @@ function Shell() {
           {route.page}
         </main>
       ) : (
-        <div className="mx-auto flex max-w-screen-2xl gap-10 px-4 sm:px-6">
-          <div className="sticky top-14 hidden h-[calc(100vh-3.5rem)] w-52 shrink-0 overflow-y-auto border-e border-[var(--site-border)] py-8 pe-4 md:block">
+        <div className="mx-auto flex max-w-[88rem] gap-8 px-4 sm:px-6 lg:gap-12">
+          <div className="sticky top-14 hidden h-[calc(100vh-3.5rem)] w-56 shrink-0 overflow-y-auto py-8 pe-2 md:block">
             <Nav />
           </div>
           <main id="main" className="min-w-0 flex-1 py-10 pb-24">
-            <div className="mx-auto max-w-3xl">{route.page}</div>
+            <div className="mx-auto max-w-[44rem]">{route.page}</div>
           </main>
-          <div className="sticky top-14 hidden h-[calc(100vh-3.5rem)] w-48 shrink-0 overflow-y-auto py-10 xl:block">
+          <div className="sticky top-14 hidden h-[calc(100vh-3.5rem)] w-52 shrink-0 overflow-y-auto py-10 xl:block">
             <Toc path={path} />
           </div>
         </div>
       )}
       <footer className="border-t border-[var(--site-border)] py-6">
-        <p className="mx-auto max-w-screen-2xl px-4 text-sm text-[var(--site-muted)] sm:px-6">
+        <p className="mx-auto max-w-[88rem] px-4 text-sm text-[var(--site-muted)] sm:px-6">
           Built by the rdloom team. Every page is generated from the component specs. The source is on{" "}
           <a href={repoUrl} className="underline underline-offset-4">
             GitHub
@@ -287,8 +306,9 @@ function Shell() {
           .
         </p>
       </footer>
+      <Search open={searchOpen} onOpenChange={setSearchOpen} />
       <ToastRegion />
-    </>
+    </div>
   );
 }
 
@@ -300,8 +320,10 @@ function Root() {
 
 export function App({ path }: { path?: string }) {
   return (
-    <RouterProvider initialPath={path}>
-      <Root />
-    </RouterProvider>
+    <ManagerProvider>
+      <RouterProvider initialPath={path}>
+        <Root />
+      </RouterProvider>
+    </ManagerProvider>
   );
 }

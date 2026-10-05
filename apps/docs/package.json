@@ -9,13 +9,16 @@
     "build": "node prerender.mjs"
   },
   "dependencies": {
+    "@fontsource-variable/geist": "^5.3.0",
+    "@fontsource-variable/geist-mono": "^5.3.0",
     "@internationalized/date": "^3.12.4",
     "@rdloom/react": "*",
     "@rdloom/tokens": "*",
     "@tanstack/react-table": "^8.21.3",
     "react": "^19.0.0",
     "react-aria-components": "^1.21.1",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "sugar-high": "^2.5.1"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.0.0",

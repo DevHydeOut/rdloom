@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
-import { components } from "./data";
+import { components, displayName } from "./data";
 import { ComponentPage } from "./pages/component-page";
+import { ComponentsIndex } from "./pages/components-index";
 import { CliGuide, FigmaGuide, GettingStarted, McpGuide, TokensGuide } from "./pages/guides";
 import { Home } from "./pages/home";
 import { Link } from "./router";
@@ -48,6 +49,15 @@ export function routeFor(rawPath: string): Route {
   const path = rawPath.replace(/\/+$/, "") || "/";
   if (path === "/") return { ...home, page: <Home />, wide: true };
 
+  if (path === "/components") {
+    return {
+      path,
+      title: `${components.length} accessible React components · rdloom`,
+      description: "Every rdloom component with live examples, props, keyboard and screen reader behaviour, and source you own.",
+      page: <ComponentsIndex />,
+    };
+  }
+
   const guide = guides.find((g) => g.href === path);
   if (guide) return { path, title: `${guide.title} · rdloom`, description: guide.description, page: <guide.Page /> };
 
@@ -56,7 +66,7 @@ export function routeFor(rawPath: string): Route {
     const { spec } = component;
     return {
       path,
-      title: `${spec.name}: accessible React ${spec.name === "DataGrid" ? "data grid" : "component"} · rdloom`,
+      title: `${displayName(spec.name)}: accessible React ${spec.name === "DataGrid" ? "data grid" : "component"} · rdloom`,
       description: `${spec.description} Keyboard and screen reader support, ${component.examples.length} tested examples, and source you own.`,
       page: <ComponentPage key={component.id} component={component} />,
     };
@@ -86,10 +96,11 @@ export function routeFor(rawPath: string): Route {
 }
 
 /** Every real page, for prerendering and the sitemap. */
-export const allPaths = ["/", ...guides.map((g) => g.href), ...components.map((c) => `/components/${c.id}`)];
+export const allPaths = ["/", "/components", ...guides.map((g) => g.href), ...components.map((c) => `/components/${c.id}`)];
 
 /** For search in the header: every page with a group label. */
 export const searchEntries = [
   ...guides.map((g) => ({ id: g.href, name: g.title, group: "Guides" })),
-  ...components.map((c) => ({ id: `/components/${c.id}`, name: c.spec.name, group: "Components" })),
+  { id: "/components", name: "All components", group: "Components" },
+  ...components.map((c) => ({ id: `/components/${c.id}`, name: displayName(c.spec.name), group: "Components", category: c.spec.category })),
 ];

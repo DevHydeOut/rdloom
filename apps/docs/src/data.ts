@@ -34,16 +34,28 @@ export interface Example {
   code: string;
 }
 
+export interface RegistryFile {
+  path: string;
+  content: string;
+}
+
 export interface DocComponent {
   id: string;
   spec: Spec;
   examples: Example[];
+  /** npm packages the component needs, e.g. "react-aria-components@^1.21.1". */
   dependencies: string[];
+  /** Other rdloom parts it builds on, e.g. "button", "utils", "tokens". */
+  registryDependencies: string[];
+  /** The source files the CLI copies. Loaded on demand: they are the bulk of the registry. */
+  loadFiles: () => Promise<RegistryFile[]>;
 }
 
 const specs = import.meta.glob<Spec>("../../../specs/*.spec.json", { eager: true, import: "default" });
-// Only the dependency list: the registry items also hold every file's source.
+// Only the dependency lists up front: the registry items also hold every file's source.
 const registry = import.meta.glob<string[]>(["../../../packages/cli/registry/*.json", "!**/index.json"], { eager: true, import: "dependencies" });
+const registryParts = import.meta.glob<string[]>(["../../../packages/cli/registry/*.json", "!**/index.json"], { eager: true, import: "registryDependencies" });
+const registrySources = import.meta.glob<RegistryFile[]>(["../../../packages/cli/registry/*.json", "!**/index.json"], { import: "files" });
 // Example components load with their page; their source text is small enough to bundle.
 const modules = import.meta.glob<ComponentType>("../../../examples/components/*/*.tsx", { import: "default" });
 const sources = import.meta.glob<string>("../../../examples/components/*/*.tsx", { eager: true, query: "?raw", import: "default" });
@@ -59,6 +71,8 @@ export const components: DocComponent[] = Object.values(specs)
       spec,
       examples: (spec.examples ?? []).map((name) => ({ name, Component: lazy(() => modules[file(name)]().then((c) => ({ default: c }))), code: sources[file(name)] })),
       dependencies: registry[`../../../packages/cli/registry/${id}.json`] ?? [],
+      registryDependencies: registryParts[`../../../packages/cli/registry/${id}.json`] ?? [],
+      loadFiles: () => registrySources[`../../../packages/cli/registry/${id}.json`]?.() ?? Promise.resolve([]),
     };
   })
   .sort((a, b) => a.spec.name.localeCompare(b.spec.name));
@@ -92,3 +106,17 @@ export const semanticTokens: TokenRow[] = Object.entries(light).map(([path, t]) 
 }));
 
 export const repoUrl = "https://github.com/DevHydeOut/rdloom";
+
+/** The folder the CLI copies into by default. */
+export const defaultComponentsDir = "src/components/rdloom";
+
+/** The component before and after this one in the sidebar's order. */
+export function neighbours(id: string) {
+  const i = components.findIndex((c) => c.id === id);
+  return { previous: i > 0 ? components[i - 1] : undefined, next: i >= 0 && i < components.length - 1 ? components[i + 1] : undefined };
+}
+
+/** "DataGrid" -> "Data Grid": the name people read, while code keeps the real one. */
+export const displayName = (name: string) => name.replace(/([a-z0-9])([A-Z])/g, "$1 $2");
+
+export const categoryLabel = (category: string) => category[0].toUpperCase() + category.slice(1);

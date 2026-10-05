@@ -4,7 +4,7 @@
   "version": "0.9.0",
   "category": "data",
   "status": "experimental",
-  "description": "Accessible, virtualized data grid for large datasets: sorting, filtering, row selection, resizable and pinned columns, row grouping with totals, tree data, expandable detail rows, cell range selection with copy and paste, CSV and Excel export, server-side sorting, filtering and paging, a column menu, set filters, row reordering and a fill handle. Columns are TanStack Table column definitions.",
+  "description": "A fast, accessible data grid for thousands of rows: sorting, filtering, grouping, editing, copy and paste, export and server-side data. Columns are TanStack Table column definitions.",
   "props": {
     "label": { "type": "string", "required": true, "description": "Accessible name of the grid, e.g. 'Orders'." },
     "data": { "type": "custom", "tsType": "readonly unknown[]", "description": "Rows to show. Keep the array reference stable between renders." },

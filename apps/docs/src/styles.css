@@ -1,5 +1,7 @@
 @import "tailwindcss";
 @import "@rdloom/tokens/tokens.css";
+@import "@fontsource-variable/geist";
+@import "@fontsource-variable/geist-mono";
 
 /* Tailwind only generates classes it finds: include the components and examples. */
 @source "../../../packages/react/src";
@@ -64,4 +66,86 @@ pre {
 
 ::selection {
   background: color-mix(in srgb, var(--site-fg) 15%, transparent);
+}
+
+/*
+ * The docs' reading typography. It is scoped to .docs (the site shell) so the
+ * /visual pages that the screenshot tests use keep the components' own font.
+ */
+.docs {
+  font-family: "Geist Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-feature-settings: "cv11", "ss01";
+  font-optical-sizing: auto;
+}
+
+.docs code,
+.docs pre,
+.docs kbd,
+.docs samp {
+  font-family: "Geist Mono Variable", ui-monospace, "Cascadia Code", Menlo, monospace;
+}
+
+/* Inline code in prose, not inside a code block. */
+.docs :not(pre) > code {
+  background: var(--site-subtle);
+  border: 1px solid var(--site-border);
+  border-radius: 6px;
+  padding: 0.1em 0.35em;
+  font-size: 0.86em;
+}
+
+/* The tabs, buttons and fields of the components keep the page's font. */
+.docs button,
+.docs input {
+  font-family: inherit;
+}
+
+/* Syntax colors for code blocks: AA against the code background in both themes. */
+:root {
+  --sh-class: #6639ba;
+  --sh-identifier: #24292f;
+  --sh-sign: #57606a;
+  --sh-property: #0550ae;
+  --sh-entity: #6639ba;
+  --sh-jsxliterals: #0a5aa8;
+  --sh-string: #0a3069;
+  --sh-keyword: #cf222e;
+  --sh-comment: #57606a;
+  --sh-space: inherit;
+}
+
+:root[data-theme="dark"] {
+  --sh-class: #d2a8ff;
+  --sh-identifier: #e6edf3;
+  --sh-sign: #9ba6b2;
+  --sh-property: #79c0ff;
+  --sh-entity: #d2a8ff;
+  --sh-jsxliterals: #79c0ff;
+  --sh-string: #a5d6ff;
+  --sh-keyword: #ff7b72;
+  --sh-comment: #9ba6b2;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --sh-class: #d2a8ff;
+    --sh-identifier: #e6edf3;
+    --sh-sign: #9ba6b2;
+    --sh-property: #79c0ff;
+    --sh-entity: #d2a8ff;
+    --sh-jsxliterals: #79c0ff;
+    --sh-string: #a5d6ff;
+    --sh-keyword: #ff7b72;
+    --sh-comment: #9ba6b2;
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }

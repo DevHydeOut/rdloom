@@ -1,76 +1,302 @@
-import { useState, type ReactNode } from "react";
-import { Button } from "@rdloom/react";
+import { createContext, useContext, useEffect, useId, useState, type ReactNode } from "react";
+import { Tab, TabList, TabPanel, Tabs } from "@rdloom/react";
+import { highlight } from "sugar-high";
 
-export function CodeBlock({ code, label = "Code" }: { code: string; label?: string }) {
+// The docs' own building blocks: calm, neutral, and the same on every page.
+
+// --- Copy ------------------------------------------------------------------
+
+export function CopyButton({ text, label = "Copy", className = "" }: { text: string; label?: string; className?: string }) {
   const [copied, setCopied] = useState(false);
   return (
-    <div className="relative">
-      <pre
-        tabIndex={0}
+    <>
+      <button
+        type="button"
         aria-label={label}
-        className="overflow-x-auto rounded-[var(--site-radius)] border border-[var(--site-border)] bg-[var(--site-subtle)] p-4 pe-20 text-[13px] leading-relaxed"
-      >
-        <code>{code.trimEnd()}</code>
-      </pre>
-      <div className="absolute end-2 top-2">
-        <Button
-          size="sm"
-          variant="ghost"
-          aria-label={copied ? "Copied" : `Copy ${label.toLowerCase()}`}
-          onPress={async () => {
-            await navigator.clipboard?.writeText(code.trimEnd());
+        onClick={async () => {
+          try {
+            await navigator.clipboard?.writeText(text);
             setCopied(true);
-            setTimeout(() => setCopied(false), 1500);
-          }}
-        >
-          {copied ? "Copied" : "Copy"}
-        </Button>
+            setTimeout(() => setCopied(false), 1600);
+          } catch {}
+        }}
+        className={
+          "inline-flex size-7 items-center justify-center rounded-md text-[var(--site-muted)] outline-none transition-colors " +
+          "hover:bg-[var(--site-border)]/60 hover:text-[var(--site-fg)] focus-visible:ring-2 focus-visible:ring-[var(--rd-color-focus-ring)] " +
+          className
+        }
+      >
+        {copied ? (
+          <svg aria-hidden="true" viewBox="0 0 16 16" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M3.5 8.5l3 3 6-7" />
+          </svg>
+        ) : (
+          <svg aria-hidden="true" viewBox="0 0 16 16" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round">
+            <rect x="5.5" y="5.5" width="8" height="8" rx="1.5" />
+            <path d="M10.5 5.5v-1a1.5 1.5 0 0 0-1.5-1.5H4.5A1.5 1.5 0 0 0 3 4.5V9a1.5 1.5 0 0 0 1.5 1.5h1" />
+          </svg>
+        )}
+      </button>
+      <span role="status" className="sr-only">
+        {copied ? "Copied to clipboard" : ""}
+      </span>
+    </>
+  );
+}
+
+// --- Code ------------------------------------------------------------------
+
+export function CodeBlock({
+  code,
+  label = "Code",
+  lang = "tsx",
+  title,
+  bare = false,
+  className = "",
+}: {
+  code: string;
+  label?: string;
+  lang?: "tsx" | "shell" | "text";
+  /** A file name shown above the code. */
+  title?: string;
+  /** No border or background: for inside another frame. */
+  bare?: boolean;
+  className?: string;
+}) {
+  const text = code.trimEnd();
+  const colored = lang === "tsx" ? highlight(text) : null;
+  return (
+    <figure
+      className={
+        (bare ? "" : "overflow-hidden rounded-xl border border-[var(--site-border)] bg-[var(--site-subtle)] ") + "group relative text-[13px] " + className
+      }
+    >
+      {title && (
+        <figcaption className="flex items-center gap-2 border-b border-[var(--site-border)] px-4 py-2 font-mono text-xs text-[var(--site-muted)]">
+          <svg aria-hidden="true" viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round">
+            <path d="M4 1.75h4.5L12 5.25v8.5a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1-.5-.5v-11.5a.5.5 0 0 1 .5-.5z" />
+            <path d="M8.5 1.75v3.5H12" />
+          </svg>
+          {title}
+        </figcaption>
+      )}
+      <pre tabIndex={0} aria-label={label} className="overflow-x-auto p-4 pe-12 leading-6 outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--rd-color-focus-ring)]">
+        {colored ? <code dangerouslySetInnerHTML={{ __html: colored }} /> : <code>{text}</code>}
+      </pre>
+      <CopyButton text={text} label={`Copy ${label.toLowerCase()}`} className={`absolute end-2 ${title ? "top-11" : "top-2"} opacity-0 group-focus-within:opacity-100 group-hover:opacity-100 max-sm:opacity-100`} />
+    </figure>
+  );
+}
+
+// --- Commands, with the package manager remembered across the site ----------------
+
+type Manager = "npm" | "pnpm" | "yarn" | "bun";
+const managers: Manager[] = ["npm", "pnpm", "yarn", "bun"];
+const ManagerContext = createContext<{ manager: Manager; setManager: (m: Manager) => void }>({ manager: "npm", setManager: () => {} });
+
+export function ManagerProvider({ children }: { children: ReactNode }) {
+  const [manager, set] = useState<Manager>("npm");
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("rdloom-pm") as Manager | null;
+      if (saved && managers.includes(saved)) set(saved);
+    } catch {}
+  }, []);
+  const setManager = (m: Manager) => {
+    set(m);
+    try {
+      localStorage.setItem("rdloom-pm", m);
+    } catch {}
+  };
+  return <ManagerContext.Provider value={{ manager, setManager }}>{children}</ManagerContext.Provider>;
+}
+
+/** Run a package: `rdloom add alert` becomes npx, pnpm dlx, yarn dlx or bunx. */
+export const runCommand = (args: string): Record<Manager, string> => ({
+  npm: `npx ${args}`,
+  pnpm: `pnpm dlx ${args}`,
+  yarn: `yarn dlx ${args}`,
+  bun: `bunx ${args}`,
+});
+
+/** Add packages: `react-aria-components` becomes npm install, pnpm add, yarn add or bun add. */
+export const addCommand = (packages: string): Record<Manager, string> => ({
+  npm: `npm install ${packages}`,
+  pnpm: `pnpm add ${packages}`,
+  yarn: `yarn add ${packages}`,
+  bun: `bun add ${packages}`,
+});
+
+export function CommandBlock({ commands, label = "Command" }: { commands: Record<Manager, string>; label?: string }) {
+  const { manager, setManager } = useContext(ManagerContext);
+  return (
+    <div className="overflow-hidden rounded-xl border border-[var(--site-border)] bg-[var(--site-subtle)]">
+      <Tabs variant="pill" selectedKey={manager} onSelectionChange={(k) => setManager(k as Manager)} className="gap-0">
+        <div className="flex items-center justify-between gap-2 border-b border-[var(--site-border)] px-3 py-2">
+          <TabList aria-label={`${label}: package manager`}>
+            {managers.map((m) => (
+              <Tab key={m} id={m}>
+                {m}
+              </Tab>
+            ))}
+          </TabList>
+          <CopyButton text={commands[manager]} label={`Copy ${label.toLowerCase()}`} />
+        </div>
+        {managers.map((m) => (
+          <TabPanel key={m} id={m} className="outline-none">
+            <pre tabIndex={0} aria-label={`${label} for ${m}`} className="overflow-x-auto px-4 py-3.5 text-[13px] leading-6 outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--rd-color-focus-ring)]">
+              <code>{commands[m]}</code>
+            </pre>
+          </TabPanel>
+        ))}
+      </Tabs>
+    </div>
+  );
+}
+
+// --- Previews ----------------------------------------------------------------
+
+/** A live example in a card, with its code folded underneath until asked for. */
+export function Preview({ children, code, label, tall = false }: { children: ReactNode; code: string; label: string; tall?: boolean }) {
+  const [open, setOpen] = useState(false);
+  const id = useId();
+  return (
+    <div className="overflow-hidden rounded-xl border border-[var(--site-border)]">
+      <div className={`flex ${tall ? "min-h-[22rem]" : "min-h-48"} min-w-0 items-center justify-center overflow-x-auto bg-[var(--site-bg)] p-8`}>
+        <div className="flex min-w-0 max-w-full flex-wrap items-center justify-center gap-4">{children}</div>
+      </div>
+      <div className="relative border-t border-[var(--site-border)] bg-[var(--site-subtle)]">
+        <div id={id} className={open ? "" : "max-h-[8.5rem] overflow-hidden"} inert={!open}>
+          <CodeBlock bare code={code} label={label} />
+        </div>
+        {!open && (
+          <div className="absolute inset-x-0 bottom-0 flex justify-center bg-gradient-to-t from-[var(--site-subtle)] via-[var(--site-subtle)]/70 to-transparent pt-16 pb-4">
+            <button
+              type="button"
+              aria-expanded={false}
+              aria-controls={id}
+              onClick={() => setOpen(true)}
+              className="h-8 rounded-lg border border-[var(--site-border)] bg-[var(--site-bg)] px-3 text-sm font-medium shadow-sm outline-none hover:bg-[var(--site-subtle)] focus-visible:ring-2 focus-visible:ring-[var(--rd-color-focus-ring)]"
+            >
+              View Code
+            </button>
+          </div>
+        )}
+        {open && (
+          <div className="flex justify-center border-t border-[var(--site-border)] py-2">
+            <button
+              type="button"
+              aria-expanded
+              aria-controls={id}
+              onClick={() => setOpen(false)}
+              className="h-7 rounded-md px-2.5 text-xs text-[var(--site-muted)] outline-none hover:bg-[var(--site-border)]/60 hover:text-[var(--site-fg)] focus-visible:ring-2 focus-visible:ring-[var(--rd-color-focus-ring)]"
+            >
+              Hide code
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
 }
 
-export function PageTitle({ children, lead }: { children: ReactNode; lead?: ReactNode }) {
+/** Underline tabs, like the rest of the docs: CLI / Manual. */
+export function DocTabs({ label, tabs }: { label: string; tabs: Array<{ id: string; title: string; content: ReactNode }> }) {
   return (
-    <div className="flex flex-col gap-3 pb-8">
-      {/* Focused on navigation, so screen readers announce the new page. */}
-      <h1 id="page-title" tabIndex={-1} className="text-3xl font-semibold tracking-tight outline-none">
-        {children}
-      </h1>
-      {lead && <p className="max-w-2xl text-lg text-[var(--site-muted)]">{lead}</p>}
+    <Tabs variant="underline" defaultSelectedKey={tabs[0].id} className="gap-5">
+      <TabList aria-label={label}>
+        {tabs.map((t) => (
+          <Tab key={t.id} id={t.id}>
+            {t.title}
+          </Tab>
+        ))}
+      </TabList>
+      {tabs.map((t) => (
+        <TabPanel key={t.id} id={t.id} className="outline-none">
+          {t.content}
+        </TabPanel>
+      ))}
+    </Tabs>
+  );
+}
+
+// --- Page furniture ------------------------------------------------------------
+
+export function PageHeader({ title, lead, actions, meta }: { title: ReactNode; lead?: ReactNode; actions?: ReactNode; meta?: ReactNode }) {
+  return (
+    <div className="flex flex-col gap-2 pb-8">
+      <div className="flex items-start justify-between gap-4">
+        {/* Focused on navigation, so screen readers announce the new page. */}
+        <h1 id="page-title" tabIndex={-1} className="text-[30px] leading-9 font-semibold tracking-[-0.025em] outline-none">
+          {title}
+        </h1>
+        {actions && <div className="flex shrink-0 items-center gap-1.5 pt-0.5">{actions}</div>}
+      </div>
+      {lead && <p className="max-w-xl text-base leading-7 text-balance text-[var(--site-muted)]">{lead}</p>}
+      {meta}
     </div>
   );
 }
 
-export function H2({ id, children }: { id: string; children: ReactNode }) {
+/** Kept for the guides and the 404 page. */
+export function PageTitle({ children, lead }: { children: ReactNode; lead?: ReactNode }) {
+  return <PageHeader title={children} lead={lead} />;
+}
+
+export function H2({ id, label, children }: { id: string; /** Text for "On this page" when the heading isn't plain text. */ label?: string; children: ReactNode }) {
   return (
-    <h2 id={id} className="scroll-mt-20 pt-10 pb-3 text-xl font-semibold">
-      {children}
+    <h2
+      id={id}
+      data-label={label ?? (typeof children === "string" ? children : undefined)}
+      className="group scroll-mt-20 pt-12 pb-4 text-xl leading-7 font-semibold tracking-tight"
+    >
+      <a href={`#${id}`} data-anchor="" className="outline-none focus-visible:underline">
+        {children}
+        <span aria-hidden="true" className="ms-2 font-normal text-[var(--site-muted)] opacity-0 transition-opacity group-hover:opacity-100">
+          #
+        </span>
+      </a>
     </h2>
   );
 }
 
+export function H3({ children }: { children: ReactNode }) {
+  return <h3 className="pb-2 text-base font-semibold tracking-tight">{children}</h3>;
+}
+
 export function Prose({ children }: { children: ReactNode }) {
-  return <div className="flex max-w-3xl flex-col gap-4 leading-relaxed [&_a]:underline [&_code]:text-[0.9em]">{children}</div>;
+  return <div className="flex flex-col gap-4 text-[15px] leading-7 [&_a:not([data-anchor])]:font-medium [&_a:not([data-anchor])]:underline [&_a:not([data-anchor])]:underline-offset-4">{children}</div>;
+}
+
+export function Muted({ children, className = "" }: { children: ReactNode; className?: string }) {
+  return <p className={`text-sm leading-6 text-[var(--site-muted)] ${className}`}>{children}</p>;
 }
 
 export function Badge({ children }: { children: ReactNode }) {
   return (
-    <span className="rounded-full border border-[var(--site-border)] px-2 py-0.5 text-xs text-[var(--site-muted)]">
+    <span className="inline-flex h-6 items-center rounded-md border border-[var(--site-border)] bg-[var(--site-subtle)] px-2 text-xs font-medium text-[var(--site-muted)]">
       {children}
     </span>
   );
 }
 
 export function List({ items, tone }: { items: string[]; tone?: "do" | "dont" }) {
-  const mark = tone === "do" ? "✓" : tone === "dont" ? "✕" : "•";
-  const color = tone === "do" ? "text-[var(--rd-color-feedback-success)]" : tone === "dont" ? "text-[var(--rd-color-feedback-danger)]" : "";
   return (
-    <ul className="flex flex-col gap-2">
+    <ul className="flex flex-col gap-2.5 text-sm leading-6">
       {items.map((item) => (
-        <li key={item} className="flex gap-2">
-          <span aria-hidden="true" className={color}>
-            {mark}
+        <li key={item} className="flex gap-2.5">
+          <span aria-hidden="true" className={`mt-px shrink-0 ${tone === "do" ? "text-[var(--rd-color-feedback-success)]" : tone === "dont" ? "text-[var(--rd-color-feedback-danger)]" : "text-[var(--site-muted)]"}`}>
+            {tone === "do" ? (
+              <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="mt-1">
+                <path d="M3.5 8.5l3 3 6-7" />
+              </svg>
+            ) : tone === "dont" ? (
+              <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" className="mt-1">
+                <path d="M4.5 4.5l7 7M11.5 4.5l-7 7" />
+              </svg>
+            ) : (
+              "•"
+            )}
           </span>
           <span>{item}</span>
         </li>

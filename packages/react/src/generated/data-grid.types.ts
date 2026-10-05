@@ -6,7 +6,7 @@ import type { ReactNode } from "react";
 export const dataGridDensityValues = ["compact", "standard", "comfortable"] as const;
 export const dataGridSelectionModeValues = ["none", "single", "multiple"] as const;
 
-/** Accessible, virtualized data grid for large datasets: sorting, filtering, row selection, resizable and pinned columns, row grouping with totals, tree data, expandable detail rows, cell range selection with copy and paste, CSV and Excel export, server-side sorting, filtering and paging, a column menu, set filters, row reordering and a fill handle. Columns are TanStack Table column definitions. */
+/** A fast, accessible data grid for thousands of rows: sorting, filtering, grouping, editing, copy and paste, export and server-side data. Columns are TanStack Table column definitions. */
 export interface DataGridSpecProps {
   /**
    * Accessible name of the grid, e.g. 'Orders'.

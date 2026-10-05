@@ -34,7 +34,7 @@ export function Link({ href, onClick, ...rest }: AnchorHTMLAttributes<HTMLAnchor
     <a
       {...rest}
       href={href}
-      aria-current={internal && path === href ? "page" : undefined}
+      aria-current={rest["aria-current"] ?? (internal && path === href ? "page" : undefined)}
       onClick={(e: MouseEvent<HTMLAnchorElement>) => {
         onClick?.(e);
         // Let the browser handle new tabs, downloads and external links.
