@@ -1,0 +1,63 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Table",
+  "version": "0.1.0",
+  "category": "data",
+  "status": "experimental",
+  "description": "A simple, accessible table for a small number of rows: optional sorting and row selection. Build it from TableHeader, TableColumn, TableBody, TableRow and TableCell. For thousands of rows, filtering, editing or grouping, use DataGrid.",
+  "props": {
+    "label": { "type": "string", "required": true, "description": "Accessible name of the table, e.g. 'Invoices'." },
+    "children": { "type": "node", "required": true, "description": "A TableHeader and a TableBody." },
+    "density": { "type": "enum", "values": ["compact", "standard", "comfortable"], "default": "standard", "description": "Row height." },
+    "selectionMode": { "type": "enum", "values": ["none", "single", "multiple"], "default": "none", "description": "Adds a checkbox column. Selecting changes aria-selected on the row." },
+    "selectedKeys": { "type": "custom", "tsType": "\"all\" | Iterable<import(\"react-aria-components\").Key>", "description": "Controlled selection, by row id." },
+    "defaultSelectedKeys": { "type": "custom", "tsType": "\"all\" | Iterable<import(\"react-aria-components\").Key>", "description": "Initial selection when uncontrolled." },
+    "onSelectionChange": { "type": "callback", "tsType": "(keys: \"all\" | Set<import(\"react-aria-components\").Key>) => void", "description": "Called with the selected row ids." },
+    "sortDescriptor": { "type": "custom", "tsType": "import(\"react-aria-components\").SortDescriptor", "description": "Controlled sort: the column id and direction. You sort the rows yourself." },
+    "onSortChange": { "type": "callback", "tsType": "(descriptor: import(\"react-aria-components\").SortDescriptor) => void", "description": "Called when the user sorts by a column with allowsSorting. Sort your data and pass it back." }
+  },
+  "variants": ["density", "selectionMode"],
+  "states": ["default", "hover", "focus", "selected"],
+  "slots": ["table", "header", "column", "sort-indicator", "body", "row", "cell", "select-cell"],
+  "tokens": [
+    "color.surface.default",
+    "color.surface.subtle",
+    "color.surface.selected",
+    "color.border.default",
+    "color.text.default",
+    "color.text.muted",
+    "color.action.primary",
+    "color.focus.ring"
+  ],
+  "a11y": {
+    "role": "grid",
+    "keyboard": [
+      "Tab moves into the table, then out",
+      "Arrow keys move between cells",
+      "Enter or Space on a sortable column header sorts it",
+      "Space on a row toggles its selection when selection is on"
+    ],
+    "requirements": [
+      "A named table with column headers and one row-header column (isRowHeader) so each cell is announced with its row",
+      "Sortable columns expose aria-sort and say so in the header, not only with an arrow",
+      "Selected rows expose aria-selected, with a labelled checkbox in each row and a select-all in the header",
+      "Rows keep the order of your data: sorting is done by you, then announced by the header"
+    ],
+    "screenReader": [
+      "Announced as a table with its name, row and column counts",
+      "Moving across a row announces each column header with the cell; the row header names the row",
+      "Sorting announces the new sort direction on the header"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["A short list of records, up to a few dozen rows", "Tabular data that needs to read well for screen reader users", "Lightweight sorting or row selection"],
+    "avoid_when": ["Thousands of rows, column filters, editing, grouping or export: use DataGrid", "Page layout: never use a table for layout", "A few items with rich content: use cards or a list"],
+    "anti_patterns": ["No row header column (set isRowHeader on the column that names the row)", "Sorting the data without passing the new sortDescriptor back", "Using a table for layout"]
+  },
+  "examples": ["basic", "sortable", "selectable"],
+  "figma": {
+    "componentKey": null,
+    "variantMap": { "density": "Density", "selectionMode": "Selection" }
+  }
+}

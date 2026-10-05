@@ -38,6 +38,12 @@
       "description": "A small label that states a status or category, like Paid, Overdue or Beta. Not interactive."
     },
     {
+      "name": "breadcrumbs",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "The path from the top of the site to the current page, as links. Use BreadcrumbItem for each step; the last one is the current page."
+    },
+    {
       "name": "button",
       "type": "registry:ui",
       "version": "0.1.0",
@@ -98,6 +104,18 @@
       "description": "A list of actions or options that opens from a button, like a More (…) or Account menu. Use with MenuTrigger and MenuItem."
     },
     {
+      "name": "number-field",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A text field for numbers, with increment and decrement buttons, keyboard stepping, and locale-aware formatting for decimals, currency, units and percentages."
+    },
+    {
+      "name": "pagination",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "Page numbers with previous and next buttons, for content split across pages. Long ranges collapse to the first page, the last page, and the pages around the current one."
+    },
+    {
       "name": "popover",
       "type": "registry:ui",
       "version": "0.1.0",
@@ -114,6 +132,12 @@
       "type": "registry:ui",
       "version": "0.1.1",
       "description": "Lets the user pick exactly one option from a small, visible set. Use with Radio children."
+    },
+    {
+      "name": "segmented-control",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A row of connected buttons where exactly one option is chosen, for switching a view or a setting with two to five choices. Use SegmentedControlItem for each option."
     },
     {
       "name": "select",
@@ -144,6 +168,12 @@
       "type": "registry:ui",
       "version": "0.1.0",
       "description": "Turns a setting on or off, taking effect immediately."
+    },
+    {
+      "name": "table",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A simple, accessible table for a small number of rows: optional sorting and row selection. Build it from TableHeader, TableColumn, TableBody, TableRow and TableCell. For thousands of rows, filtering, editing or grouping, use DataGrid."
     },
     {
       "name": "tabs",

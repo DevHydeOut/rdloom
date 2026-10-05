@@ -1,0 +1,59 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "SegmentedControl",
+  "version": "0.1.0",
+  "category": "input",
+  "status": "experimental",
+  "description": "A row of connected buttons where exactly one option is chosen, for switching a view or a setting with two to five choices. Use SegmentedControlItem for each option.",
+  "props": {
+    "label": { "type": "string", "required": true, "description": "What the control chooses, e.g. 'View'. It is the accessible name of the group." },
+    "children": { "type": "node", "required": true, "description": "SegmentedControlItem elements, each with an id." },
+    "selectedKey": { "type": "custom", "tsType": "import(\"react-aria-components\").Key", "description": "Controlled selected item id." },
+    "defaultSelectedKey": { "type": "custom", "tsType": "import(\"react-aria-components\").Key", "description": "Initial selected item id when uncontrolled." },
+    "onChange": { "type": "callback", "tsType": "(key: import(\"react-aria-components\").Key) => void", "description": "Called with the id of the chosen item." },
+    "size": { "type": "enum", "values": ["sm", "md"], "default": "md", "description": "Control height." },
+    "isDisabled": { "type": "boolean", "default": false, "description": "Disables every option." }
+  },
+  "variants": ["size", "isDisabled"],
+  "states": ["default", "hover", "focus", "selected", "disabled"],
+  "slots": ["group", "item"],
+  "tokens": [
+    "color.surface.default",
+    "color.surface.subtle",
+    "color.border.default",
+    "color.action.primary",
+    "color.action.on-primary",
+    "color.text.default",
+    "color.focus.ring",
+    "radius.control"
+  ],
+  "a11y": {
+    "role": "radiogroup",
+    "keyboard": [
+      "Tab enters the group, on the chosen option",
+      "Arrow keys move to and choose the next or previous option",
+      "Space chooses the focused option"
+    ],
+    "requirements": [
+      "A radio group named by label, with each option a radio",
+      "The chosen option is marked by fill and weight and by aria-checked, not only by color",
+      "Exactly one option is always chosen",
+      "Selected text meets 4.5:1 against its background"
+    ],
+    "screenReader": [
+      "Announced as a radio group with the label, then each option as \"radio button, N of M, checked or not checked\"",
+      "Moving with arrow keys announces the newly chosen option"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["Switching between views of the same data: List, Board, Calendar", "A setting with two to five short options, like Monthly or Yearly"],
+    "avoid_when": ["More than five options or long labels: use Select or RadioGroup", "Choosing several at once: use checkboxes", "Navigating to different pages: use Tabs or links"],
+    "anti_patterns": ["Using it as page navigation", "Options that are not mutually exclusive", "Icon-only options without a text label"]
+  },
+  "examples": ["basic", "controlled", "sizes"],
+  "figma": {
+    "componentKey": null,
+    "variantMap": { "size": "Size", "isDisabled": "Disabled" }
+  }
+}

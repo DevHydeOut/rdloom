@@ -1,0 +1,58 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Pagination",
+  "version": "0.1.0",
+  "category": "navigation",
+  "status": "experimental",
+  "description": "Page numbers with previous and next buttons, for content split across pages. Long ranges collapse to the first page, the last page, and the pages around the current one.",
+  "props": {
+    "pageCount": { "type": "number", "required": true, "description": "Total number of pages." },
+    "page": { "type": "number", "description": "Controlled current page, starting at 1." },
+    "defaultPage": { "type": "number", "default": 1, "description": "Initial page when uncontrolled." },
+    "onChange": { "type": "callback", "tsType": "(page: number) => void", "description": "Called with the page the user chose." },
+    "siblingCount": { "type": "number", "default": 1, "description": "How many page numbers to show on each side of the current page before collapsing the rest to an ellipsis." },
+    "label": { "type": "string", "default": "Pagination", "description": "Accessible name of the navigation landmark. Translate it for other languages." },
+    "size": { "type": "enum", "values": ["sm", "md"], "default": "md", "description": "Button size." },
+    "isDisabled": { "type": "boolean", "default": false, "description": "Disables every button." }
+  },
+  "variants": ["size", "isDisabled"],
+  "states": ["default", "hover", "focus", "pressed", "selected", "disabled"],
+  "slots": ["list", "page", "previous", "next", "ellipsis"],
+  "tokens": [
+    "color.action.primary",
+    "color.action.on-primary",
+    "color.surface.subtle",
+    "color.border.default",
+    "color.text.default",
+    "color.text.muted",
+    "color.focus.ring",
+    "radius.control"
+  ],
+  "a11y": {
+    "role": "navigation",
+    "keyboard": ["Tab moves between the buttons", "Enter or Space goes to that page"],
+    "requirements": [
+      "A navigation landmark with an accessible name, containing a list of buttons",
+      "The current page has aria-current=\"page\" and is also marked by shape and weight, not just color",
+      "Each page button is named Page N; previous and next are named Previous page and Next page and are disabled at the ends",
+      "Ellipses are decorative (aria-hidden)",
+      "After the page changes, move focus or announce the new content: the component only tells you the page"
+    ],
+    "screenReader": [
+      "Announced as a navigation landmark named Pagination, with a list of items",
+      "The current page is announced as the current page, e.g. \"Page 3, current page\"",
+      "A disabled previous button on page 1 is announced as dimmed or unavailable"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["Lists or search results split into pages", "When people need to jump to a specific page or know how far they are"],
+    "avoid_when": ["Endless feeds: use a Load more button", "A data grid: it has its own pager"],
+    "anti_patterns": ["Changing the content without telling screen readers (move focus to the results heading or announce it)", "Hiding the current page number"]
+  },
+  "examples": ["basic", "many-pages", "controlled"],
+  "figma": {
+    "componentKey": null,
+    "variantMap": { "size": "Size", "isDisabled": "Disabled" }
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Breadcrumbs",
+  "version": "0.1.0",
+  "category": "navigation",
+  "status": "experimental",
+  "description": "The path from the top of the site to the current page, as links. Use BreadcrumbItem for each step; the last one is the current page.",
+  "props": {
+    "children": { "type": "node", "required": true, "description": "BreadcrumbItem elements, from the top level down to the current page." },
+    "label": { "type": "string", "default": "Breadcrumbs", "description": "Accessible name of the navigation landmark. Translate it for other languages." },
+    "isDisabled": { "type": "boolean", "default": false, "description": "Disables every link in the trail." }
+  },
+  "variants": [],
+  "states": ["default", "hover", "focus", "disabled"],
+  "slots": ["list", "item", "link", "separator"],
+  "tokens": ["color.text.default", "color.text.muted", "color.focus.ring", "radius.control"],
+  "a11y": {
+    "role": "navigation",
+    "keyboard": ["Tab moves between the links", "Enter follows a link"],
+    "requirements": [
+      "A navigation landmark with an accessible name, containing an ordered list of links",
+      "The last item is the current page: aria-current=\"page\", and it cannot be followed (it has no href and is aria-disabled)",
+      "Separators are decorative (aria-hidden), so they are not read out",
+      "Links have a visible focus ring"
+    ],
+    "screenReader": [
+      "Announced as a navigation landmark named Breadcrumbs, with a list of N items",
+      "The final item is announced as the current page"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["Sites or apps with more than two levels of hierarchy", "Telling people where they are and how to go back up"],
+    "avoid_when": ["A flat site with one level: no trail is needed", "Showing the steps someone has taken: use a stepper"],
+    "anti_patterns": ["Making the current page a link to itself", "Using breadcrumbs instead of the main navigation", "Hiding the trail from screen readers with aria-hidden"]
+  },
+  "examples": ["basic", "long-trail"],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {}
+  }
+}

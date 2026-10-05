@@ -1,0 +1,70 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "NumberField",
+  "version": "0.1.0",
+  "category": "input",
+  "status": "experimental",
+  "description": "A text field for numbers, with increment and decrement buttons, keyboard stepping, and locale-aware formatting for decimals, currency, units and percentages.",
+  "props": {
+    "label": { "type": "string", "required": true, "description": "Visible label, also the accessible name." },
+    "description": { "type": "string", "description": "Help text under the field." },
+    "errorMessage": { "type": "string", "description": "Shown when the value is invalid. Leave out to use the browser's built-in message." },
+    "value": { "type": "number", "description": "Controlled value. NaN means empty." },
+    "defaultValue": { "type": "number", "description": "Initial value when uncontrolled." },
+    "onChange": { "type": "callback", "tsType": "(value: number) => void", "description": "Called with the number, or NaN when the field is emptied." },
+    "minValue": { "type": "number", "description": "Smallest allowed value. Typing below it is corrected on blur." },
+    "maxValue": { "type": "number", "description": "Largest allowed value." },
+    "step": { "type": "number", "default": 1, "description": "How much the buttons and the arrow keys change the value. Values snap to multiples of the step, counted from minValue (or from 0 when there is none)." },
+    "formatOptions": { "type": "custom", "tsType": "Intl.NumberFormatOptions", "description": "How the number is shown and parsed, e.g. { style: 'currency', currency: 'USD' } or { style: 'percent' }. Follows the user's locale." },
+    "showStepper": { "type": "boolean", "default": true, "description": "Shows the − and + buttons. Arrow keys and the mouse wheel stay available." },
+    "size": { "type": "enum", "values": ["sm", "md", "lg"], "default": "md", "description": "Field height and text size." },
+    "isDisabled": { "type": "boolean", "default": false, "description": "Prevents interaction and dims the field." },
+    "isInvalid": { "type": "boolean", "description": "Marks the field invalid. Leave undefined to let validation decide." },
+    "isRequired": { "type": "boolean", "default": false, "description": "Marks the field required and adds an asterisk." }
+  },
+  "variants": ["size", "isDisabled", "isInvalid"],
+  "states": ["default", "hover", "focus", "disabled", "invalid"],
+  "slots": ["label", "group", "input", "decrement", "increment", "description", "error"],
+  "tokens": [
+    "color.surface.default",
+    "color.surface.subtle",
+    "color.border.default",
+    "color.border.strong",
+    "color.text.default",
+    "color.text.muted",
+    "color.feedback.danger",
+    "color.focus.ring",
+    "radius.control"
+  ],
+  "a11y": {
+    "role": "spinbutton",
+    "keyboard": [
+      "Up and Down arrows change the value by one step",
+      "Page Up and Page Down change it by ten steps",
+      "Home and End jump to the minimum and maximum, when set",
+      "Typing a number is always possible; the buttons are a convenience"
+    ],
+    "requirements": [
+      "A labelled spinbutton exposing aria-valuenow, aria-valuemin and aria-valuemax when set",
+      "The − and + buttons have accessible names and are not tab stops, so the keyboard doesn't get slower",
+      "Invalid state and the error message are linked to the input",
+      "Formatting follows the user's locale for decimal and grouping separators"
+    ],
+    "screenReader": [
+      "Announced as a spin button with its label, current value, and the allowed range if set",
+      "Changing the value with the arrow keys announces the new value",
+      "An error is read with the field"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["Quantities, amounts, percentages and other numeric input people may type or nudge", "Values with a sensible range or step"],
+    "avoid_when": ["Identifiers that merely look like numbers (phone, postcode, card number): use TextField", "Picking from a wide continuous range: use Slider"],
+    "anti_patterns": ["Using it for phone numbers or IDs", "Hiding the unit instead of using formatOptions", "A min and max that make the typed value surprising with no error message"]
+  },
+  "examples": ["basic", "currency", "stepper-off"],
+  "figma": {
+    "componentKey": null,
+    "variantMap": { "size": "Size", "isDisabled": "Disabled", "isInvalid": "Invalid" }
+  }
+}

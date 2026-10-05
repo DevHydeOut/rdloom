@@ -567,6 +567,124 @@
       ]
     },
     {
+      "id": "breadcrumbs",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "Breadcrumbs",
+        "version": "0.1.0",
+        "category": "navigation",
+        "status": "experimental",
+        "description": "The path from the top of the site to the current page, as links. Use BreadcrumbItem for each step; the last one is the current page.",
+        "props": {
+          "children": {
+            "type": "node",
+            "required": true,
+            "description": "BreadcrumbItem elements, from the top level down to the current page."
+          },
+          "label": {
+            "type": "string",
+            "default": "Breadcrumbs",
+            "description": "Accessible name of the navigation landmark. Translate it for other languages."
+          },
+          "isDisabled": {
+            "type": "boolean",
+            "default": false,
+            "description": "Disables every link in the trail."
+          }
+        },
+        "variants": [],
+        "states": [
+          "default",
+          "hover",
+          "focus",
+          "disabled"
+        ],
+        "slots": [
+          "list",
+          "item",
+          "link",
+          "separator"
+        ],
+        "tokens": [
+          "color.text.default",
+          "color.text.muted",
+          "color.focus.ring",
+          "radius.control"
+        ],
+        "a11y": {
+          "role": "navigation",
+          "keyboard": [
+            "Tab moves between the links",
+            "Enter follows a link"
+          ],
+          "requirements": [
+            "A navigation landmark with an accessible name, containing an ordered list of links",
+            "The last item is the current page: aria-current=\"page\", and it cannot be followed (it has no href and is aria-disabled)",
+            "Separators are decorative (aria-hidden), so they are not read out",
+            "Links have a visible focus ring"
+          ],
+          "screenReader": [
+            "Announced as a navigation landmark named Breadcrumbs, with a list of N items",
+            "The final item is announced as the current page"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "Sites or apps with more than two levels of hierarchy",
+            "Telling people where they are and how to go back up"
+          ],
+          "avoid_when": [
+            "A flat site with one level: no trail is needed",
+            "Showing the steps someone has taken: use a stepper"
+          ],
+          "anti_patterns": [
+            "Making the current page a link to itself",
+            "Using breadcrumbs instead of the main navigation",
+            "Hiding the trail from screen readers with aria-hidden"
+          ]
+        },
+        "examples": [
+          "basic",
+          "long-trail"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {}
+        }
+      },
+      "install": {
+        "command": "npx rdloom add breadcrumbs",
+        "dependencies": [
+          "react-aria-components@^1.21.1"
+        ],
+        "registryDependencies": [
+          "tokens",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import { BreadcrumbItem, Breadcrumbs } from \"@rdloom/react\";\n\n// The last item has no href: it is the current page.\nexport default function BreadcrumbsBasicExample() {\n  return (\n    <Breadcrumbs>\n      <BreadcrumbItem href=\"/\">Home</BreadcrumbItem>\n      <BreadcrumbItem href=\"/projects\">Projects</BreadcrumbItem>\n      <BreadcrumbItem>Website redesign</BreadcrumbItem>\n    </Breadcrumbs>\n  );\n}\n"
+        },
+        {
+          "name": "long-trail",
+          "code": "import { BreadcrumbItem, Breadcrumbs } from \"@rdloom/react\";\n\n// A long trail wraps onto the next line instead of overflowing.\nexport default function BreadcrumbsLongTrailExample() {\n  return (\n    <div className=\"w-72\">\n      <Breadcrumbs label=\"You are here\">\n        <BreadcrumbItem href=\"/\">Home</BreadcrumbItem>\n        <BreadcrumbItem href=\"/docs\">Documentation</BreadcrumbItem>\n        <BreadcrumbItem href=\"/docs/components\">Components</BreadcrumbItem>\n        <BreadcrumbItem href=\"/docs/components/forms\">Forms</BreadcrumbItem>\n        <BreadcrumbItem href=\"/docs/components/forms/inputs\">Inputs</BreadcrumbItem>\n        <BreadcrumbItem>Number field</BreadcrumbItem>\n      </Breadcrumbs>\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "breadcrumbs/breadcrumbs.tsx",
+          "content": "\"use client\";\n\nimport { forwardRef, type ReactNode } from \"react\";\nimport { Breadcrumb, Breadcrumbs as AriaBreadcrumbs, Link } from \"react-aria-components\";\nimport { breadcrumbsDefaults, type BreadcrumbsSpecProps } from \"../generated/breadcrumbs.types\";\nimport { cx } from \"../utils/cx\";\n\nexport interface BreadcrumbsProps extends BreadcrumbsSpecProps {\n  className?: string;\n}\n\nexport const Breadcrumbs = forwardRef<HTMLElement, BreadcrumbsProps>(function Breadcrumbs(\n  { children, label = breadcrumbsDefaults.label, isDisabled = breadcrumbsDefaults.isDisabled, className },\n  ref,\n) {\n  // React Aria renders the ordered list; the navigation landmark around it is ours.\n  return (\n    <nav ref={ref} aria-label={label} className={className}>\n      <AriaBreadcrumbs isDisabled={isDisabled} className=\"flex flex-wrap items-center gap-1.5 text-sm\">\n        {children}\n      </AriaBreadcrumbs>\n    </nav>\n  );\n});\n\nexport interface BreadcrumbItemProps {\n  /** Where this step goes. Leave it out on the last item: that is the current page, which is not a link. */\n  href?: string;\n  children: ReactNode;\n  className?: string;\n}\n\nexport function BreadcrumbItem({ href, children, className }: BreadcrumbItemProps) {\n  return (\n    <Breadcrumb className={cx(\"group flex items-center gap-1.5\", className)}>\n      <Link\n        href={href}\n        className={\n          \"rounded-[var(--rd-radius-control)] outline-none \" +\n          \"text-[var(--rd-color-text-muted)] underline-offset-2 data-[hovered]:text-[var(--rd-color-text-default)] data-[hovered]:underline \" +\n          \"data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)] \" +\n          \"data-[current]:font-medium data-[current]:text-[var(--rd-color-text-default)] data-[current]:no-underline\"\n        }\n      >\n        {children}\n      </Link>\n      {/* Decorative: the list already says there are several items. The last one has none. */}\n      <svg\n        aria-hidden=\"true\"\n        viewBox=\"0 0 16 16\"\n        className=\"size-3.5 shrink-0 text-[var(--rd-color-text-muted)] group-data-[current]:hidden rtl:-scale-x-100\"\n        fill=\"none\"\n      >\n        <path d=\"M6 3.5l4.5 4.5L6 12.5\" stroke=\"currentColor\" strokeWidth=\"1.5\" strokeLinecap=\"round\" strokeLinejoin=\"round\" />\n      </svg>\n    </Breadcrumb>\n  );\n}\n"
+        },
+        {
+          "path": "generated/breadcrumbs.types.ts",
+          "content": "// Generated by rdloom codegen from specs/breadcrumbs.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nimport type { ReactNode } from \"react\";\n\n/** The path from the top of the site to the current page, as links. Use BreadcrumbItem for each step; the last one is the current page. */\nexport interface BreadcrumbsSpecProps {\n  /**\n   * BreadcrumbItem elements, from the top level down to the current page.\n   */\n  children: ReactNode;\n  /**\n   * Accessible name of the navigation landmark. Translate it for other languages.\n   * @default \"Breadcrumbs\"\n   */\n  label?: string;\n  /**\n   * Disables every link in the trail.\n   * @default false\n   */\n  isDisabled?: boolean;\n}\n\nexport const breadcrumbsDefaults = {\n  label: \"Breadcrumbs\",\n  isDisabled: false,\n} as const;\n\nexport const breadcrumbsMeta = {\n  \"name\": \"Breadcrumbs\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"navigation\"\n} as const;\n"
+        }
+      ]
+    },
+    {
       "id": "button",
       "spec": {
         "$schema": "./schema/component.schema.json",
@@ -2649,6 +2767,372 @@
       ]
     },
     {
+      "id": "number-field",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "NumberField",
+        "version": "0.1.0",
+        "category": "input",
+        "status": "experimental",
+        "description": "A text field for numbers, with increment and decrement buttons, keyboard stepping, and locale-aware formatting for decimals, currency, units and percentages.",
+        "props": {
+          "label": {
+            "type": "string",
+            "required": true,
+            "description": "Visible label, also the accessible name."
+          },
+          "description": {
+            "type": "string",
+            "description": "Help text under the field."
+          },
+          "errorMessage": {
+            "type": "string",
+            "description": "Shown when the value is invalid. Leave out to use the browser's built-in message."
+          },
+          "value": {
+            "type": "number",
+            "description": "Controlled value. NaN means empty."
+          },
+          "defaultValue": {
+            "type": "number",
+            "description": "Initial value when uncontrolled."
+          },
+          "onChange": {
+            "type": "callback",
+            "tsType": "(value: number) => void",
+            "description": "Called with the number, or NaN when the field is emptied."
+          },
+          "minValue": {
+            "type": "number",
+            "description": "Smallest allowed value. Typing below it is corrected on blur."
+          },
+          "maxValue": {
+            "type": "number",
+            "description": "Largest allowed value."
+          },
+          "step": {
+            "type": "number",
+            "default": 1,
+            "description": "How much the buttons and the arrow keys change the value. Values snap to multiples of the step, counted from minValue (or from 0 when there is none)."
+          },
+          "formatOptions": {
+            "type": "custom",
+            "tsType": "Intl.NumberFormatOptions",
+            "description": "How the number is shown and parsed, e.g. { style: 'currency', currency: 'USD' } or { style: 'percent' }. Follows the user's locale."
+          },
+          "showStepper": {
+            "type": "boolean",
+            "default": true,
+            "description": "Shows the − and + buttons. Arrow keys and the mouse wheel stay available."
+          },
+          "size": {
+            "type": "enum",
+            "values": [
+              "sm",
+              "md",
+              "lg"
+            ],
+            "default": "md",
+            "description": "Field height and text size."
+          },
+          "isDisabled": {
+            "type": "boolean",
+            "default": false,
+            "description": "Prevents interaction and dims the field."
+          },
+          "isInvalid": {
+            "type": "boolean",
+            "description": "Marks the field invalid. Leave undefined to let validation decide."
+          },
+          "isRequired": {
+            "type": "boolean",
+            "default": false,
+            "description": "Marks the field required and adds an asterisk."
+          }
+        },
+        "variants": [
+          "size",
+          "isDisabled",
+          "isInvalid"
+        ],
+        "states": [
+          "default",
+          "hover",
+          "focus",
+          "disabled",
+          "invalid"
+        ],
+        "slots": [
+          "label",
+          "group",
+          "input",
+          "decrement",
+          "increment",
+          "description",
+          "error"
+        ],
+        "tokens": [
+          "color.surface.default",
+          "color.surface.subtle",
+          "color.border.default",
+          "color.border.strong",
+          "color.text.default",
+          "color.text.muted",
+          "color.feedback.danger",
+          "color.focus.ring",
+          "radius.control"
+        ],
+        "a11y": {
+          "role": "spinbutton",
+          "keyboard": [
+            "Up and Down arrows change the value by one step",
+            "Page Up and Page Down change it by ten steps",
+            "Home and End jump to the minimum and maximum, when set",
+            "Typing a number is always possible; the buttons are a convenience"
+          ],
+          "requirements": [
+            "A labelled spinbutton exposing aria-valuenow, aria-valuemin and aria-valuemax when set",
+            "The − and + buttons have accessible names and are not tab stops, so the keyboard doesn't get slower",
+            "Invalid state and the error message are linked to the input",
+            "Formatting follows the user's locale for decimal and grouping separators"
+          ],
+          "screenReader": [
+            "Announced as a spin button with its label, current value, and the allowed range if set",
+            "Changing the value with the arrow keys announces the new value",
+            "An error is read with the field"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "Quantities, amounts, percentages and other numeric input people may type or nudge",
+            "Values with a sensible range or step"
+          ],
+          "avoid_when": [
+            "Identifiers that merely look like numbers (phone, postcode, card number): use TextField",
+            "Picking from a wide continuous range: use Slider"
+          ],
+          "anti_patterns": [
+            "Using it for phone numbers or IDs",
+            "Hiding the unit instead of using formatOptions",
+            "A min and max that make the typed value surprising with no error message"
+          ]
+        },
+        "examples": [
+          "basic",
+          "currency",
+          "stepper-off"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {
+            "size": "Size",
+            "isDisabled": "Disabled",
+            "isInvalid": "Invalid"
+          }
+        }
+      },
+      "install": {
+        "command": "npx rdloom add number-field",
+        "dependencies": [
+          "react-aria-components@^1.21.1"
+        ],
+        "registryDependencies": [
+          "tokens",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import { NumberField } from \"@rdloom/react\";\n\nexport default function NumberFieldBasicExample() {\n  return (\n    <div className=\"w-48\">\n      <NumberField label=\"Quantity\" defaultValue={1} minValue={1} maxValue={99} description=\"Between 1 and 99.\" />\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "currency",
+          "code": "import { NumberField } from \"@rdloom/react\";\n\n// formatOptions follows the visitor's locale for symbols and separators.\nexport default function NumberFieldCurrencyExample() {\n  return (\n    <div className=\"w-56\">\n      <NumberField\n        label=\"Budget\"\n        defaultValue={1500}\n        step={50}\n        minValue={0}\n        formatOptions={{ style: \"currency\", currency: \"USD\", maximumFractionDigits: 0 }}\n      />\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "stepper-off",
+          "code": "import { NumberField } from \"@rdloom/react\";\n\n// Without the buttons it is a plain numeric field; the arrow keys still step it.\nexport default function NumberFieldStepperOffExample() {\n  return (\n    <div className=\"w-48\">\n      <NumberField label=\"Age\" showStepper={false} minValue={0} maxValue={130} isRequired />\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "number-field/number-field.tsx",
+          "content": "\"use client\";\n\nimport { forwardRef } from \"react\";\nimport {\n  Button,\n  FieldError,\n  Group,\n  Input,\n  Label,\n  NumberField as AriaNumberField,\n  Text,\n  type NumberFieldProps as AriaNumberFieldProps,\n} from \"react-aria-components\";\nimport { numberFieldDefaults, type NumberFieldSpecProps } from \"../generated/number-field.types\";\nimport { cx } from \"../utils/cx\";\nimport { fieldGroup, fieldGroupSizes } from \"../utils/field\";\n\nexport interface NumberFieldProps\n  extends NumberFieldSpecProps,\n    Omit<AriaNumberFieldProps, keyof NumberFieldSpecProps | \"className\" | \"children\"> {\n  className?: string;\n}\n\nconst stepper =\n  \"flex size-7 shrink-0 items-center justify-center rounded-[var(--rd-radius-control)] text-[var(--rd-color-text-muted)] outline-none \" +\n  \"data-[hovered]:bg-[var(--rd-color-surface-subtle)] data-[hovered]:text-[var(--rd-color-text-default)] data-[pressed]:bg-[var(--rd-color-surface-subtle)] \" +\n  \"data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed \" +\n  \"data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)]\";\n\nexport const NumberField = forwardRef<HTMLDivElement, NumberFieldProps>(function NumberField(\n  {\n    label,\n    description,\n    errorMessage,\n    showStepper = numberFieldDefaults.showStepper,\n    size = numberFieldDefaults.size,\n    isDisabled = numberFieldDefaults.isDisabled,\n    // Left undefined unless passed: React Aria treats any defined isInvalid as\n    // controlled and would hide its own validation (min, max, required).\n    isInvalid,\n    isRequired = numberFieldDefaults.isRequired,\n    step = numberFieldDefaults.step,\n    className,\n    ...rest\n  },\n  ref,\n) {\n  return (\n    <AriaNumberField\n      {...rest}\n      ref={ref}\n      step={step}\n      isDisabled={isDisabled}\n      isInvalid={isInvalid}\n      isRequired={isRequired}\n      className={cx(\"flex flex-col gap-1.5\", className)}\n    >\n      <Label className=\"text-sm font-medium text-[var(--rd-color-text-default)]\">\n        {label}\n        {isRequired && <span aria-hidden=\"true\" className=\"text-[var(--rd-color-feedback-danger)]\"> *</span>}\n      </Label>\n      <Group className={cx(fieldGroup, fieldGroupSizes[size], showStepper && \"pe-1\")}>\n        <Input className=\"min-w-0 flex-1 bg-transparent tabular-nums outline-none\" />\n        {showStepper && (\n          <>\n            <Button slot=\"decrement\" className={stepper}>\n              <svg aria-hidden=\"true\" viewBox=\"0 0 16 16\" className=\"size-4\" fill=\"none\">\n                <path d=\"M3.5 8h9\" stroke=\"currentColor\" strokeWidth=\"1.75\" strokeLinecap=\"round\" />\n              </svg>\n            </Button>\n            <Button slot=\"increment\" className={stepper}>\n              <svg aria-hidden=\"true\" viewBox=\"0 0 16 16\" className=\"size-4\" fill=\"none\">\n                <path d=\"M3.5 8h9M8 3.5v9\" stroke=\"currentColor\" strokeWidth=\"1.75\" strokeLinecap=\"round\" />\n              </svg>\n            </Button>\n          </>\n        )}\n      </Group>\n      {description && (\n        <Text slot=\"description\" className=\"text-xs text-[var(--rd-color-text-muted)]\">\n          {description}\n        </Text>\n      )}\n      <FieldError className=\"text-xs text-[var(--rd-color-feedback-danger)]\">{errorMessage}</FieldError>\n    </AriaNumberField>\n  );\n});\n"
+        },
+        {
+          "path": "generated/number-field.types.ts",
+          "content": "// Generated by rdloom codegen from specs/number-field.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nexport const numberFieldSizeValues = [\"sm\", \"md\", \"lg\"] as const;\n\n/** A text field for numbers, with increment and decrement buttons, keyboard stepping, and locale-aware formatting for decimals, currency, units and percentages. */\nexport interface NumberFieldSpecProps {\n  /**\n   * Visible label, also the accessible name.\n   */\n  label: string;\n  /**\n   * Help text under the field.\n   */\n  description?: string;\n  /**\n   * Shown when the value is invalid. Leave out to use the browser's built-in message.\n   */\n  errorMessage?: string;\n  /**\n   * Controlled value. NaN means empty.\n   */\n  value?: number;\n  /**\n   * Initial value when uncontrolled.\n   */\n  defaultValue?: number;\n  /**\n   * Called with the number, or NaN when the field is emptied.\n   */\n  onChange?: (value: number) => void;\n  /**\n   * Smallest allowed value. Typing below it is corrected on blur.\n   */\n  minValue?: number;\n  /**\n   * Largest allowed value.\n   */\n  maxValue?: number;\n  /**\n   * How much the buttons and the arrow keys change the value. Values snap to multiples of the step, counted from minValue (or from 0 when there is none).\n   * @default 1\n   */\n  step?: number;\n  /**\n   * How the number is shown and parsed, e.g. { style: 'currency', currency: 'USD' } or { style: 'percent' }. Follows the user's locale.\n   */\n  formatOptions?: Intl.NumberFormatOptions;\n  /**\n   * Shows the − and + buttons. Arrow keys and the mouse wheel stay available.\n   * @default true\n   */\n  showStepper?: boolean;\n  /**\n   * Field height and text size.\n   * @default \"md\"\n   */\n  size?: \"sm\" | \"md\" | \"lg\";\n  /**\n   * Prevents interaction and dims the field.\n   * @default false\n   */\n  isDisabled?: boolean;\n  /**\n   * Marks the field invalid. Leave undefined to let validation decide.\n   */\n  isInvalid?: boolean;\n  /**\n   * Marks the field required and adds an asterisk.\n   * @default false\n   */\n  isRequired?: boolean;\n}\n\nexport const numberFieldDefaults = {\n  step: 1,\n  showStepper: true,\n  size: \"md\",\n  isDisabled: false,\n  isRequired: false,\n} as const;\n\nexport const numberFieldMeta = {\n  \"name\": \"NumberField\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"spinbutton\"\n} as const;\n"
+        }
+      ]
+    },
+    {
+      "id": "pagination",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "Pagination",
+        "version": "0.1.0",
+        "category": "navigation",
+        "status": "experimental",
+        "description": "Page numbers with previous and next buttons, for content split across pages. Long ranges collapse to the first page, the last page, and the pages around the current one.",
+        "props": {
+          "pageCount": {
+            "type": "number",
+            "required": true,
+            "description": "Total number of pages."
+          },
+          "page": {
+            "type": "number",
+            "description": "Controlled current page, starting at 1."
+          },
+          "defaultPage": {
+            "type": "number",
+            "default": 1,
+            "description": "Initial page when uncontrolled."
+          },
+          "onChange": {
+            "type": "callback",
+            "tsType": "(page: number) => void",
+            "description": "Called with the page the user chose."
+          },
+          "siblingCount": {
+            "type": "number",
+            "default": 1,
+            "description": "How many page numbers to show on each side of the current page before collapsing the rest to an ellipsis."
+          },
+          "label": {
+            "type": "string",
+            "default": "Pagination",
+            "description": "Accessible name of the navigation landmark. Translate it for other languages."
+          },
+          "size": {
+            "type": "enum",
+            "values": [
+              "sm",
+              "md"
+            ],
+            "default": "md",
+            "description": "Button size."
+          },
+          "isDisabled": {
+            "type": "boolean",
+            "default": false,
+            "description": "Disables every button."
+          }
+        },
+        "variants": [
+          "size",
+          "isDisabled"
+        ],
+        "states": [
+          "default",
+          "hover",
+          "focus",
+          "pressed",
+          "selected",
+          "disabled"
+        ],
+        "slots": [
+          "list",
+          "page",
+          "previous",
+          "next",
+          "ellipsis"
+        ],
+        "tokens": [
+          "color.action.primary",
+          "color.action.on-primary",
+          "color.surface.subtle",
+          "color.border.default",
+          "color.text.default",
+          "color.text.muted",
+          "color.focus.ring",
+          "radius.control"
+        ],
+        "a11y": {
+          "role": "navigation",
+          "keyboard": [
+            "Tab moves between the buttons",
+            "Enter or Space goes to that page"
+          ],
+          "requirements": [
+            "A navigation landmark with an accessible name, containing a list of buttons",
+            "The current page has aria-current=\"page\" and is also marked by shape and weight, not just color",
+            "Each page button is named Page N; previous and next are named Previous page and Next page and are disabled at the ends",
+            "Ellipses are decorative (aria-hidden)",
+            "After the page changes, move focus or announce the new content: the component only tells you the page"
+          ],
+          "screenReader": [
+            "Announced as a navigation landmark named Pagination, with a list of items",
+            "The current page is announced as the current page, e.g. \"Page 3, current page\"",
+            "A disabled previous button on page 1 is announced as dimmed or unavailable"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "Lists or search results split into pages",
+            "When people need to jump to a specific page or know how far they are"
+          ],
+          "avoid_when": [
+            "Endless feeds: use a Load more button",
+            "A data grid: it has its own pager"
+          ],
+          "anti_patterns": [
+            "Changing the content without telling screen readers (move focus to the results heading or announce it)",
+            "Hiding the current page number"
+          ]
+        },
+        "examples": [
+          "basic",
+          "many-pages",
+          "controlled"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {
+            "size": "Size",
+            "isDisabled": "Disabled"
+          }
+        }
+      },
+      "install": {
+        "command": "npx rdloom add pagination",
+        "dependencies": [
+          "react-aria-components@^1.21.1"
+        ],
+        "registryDependencies": [
+          "tokens",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import { Pagination } from \"@rdloom/react\";\n\nexport default function PaginationBasicExample() {\n  return <Pagination pageCount={10} />;\n}\n"
+        },
+        {
+          "name": "many-pages",
+          "code": "import { Pagination } from \"@rdloom/react\";\n\n// Far from the ends, both sides collapse to an ellipsis.\nexport default function PaginationManyPagesExample() {\n  return <Pagination pageCount={200} defaultPage={100} siblingCount={1} />;\n}\n"
+        },
+        {
+          "name": "controlled",
+          "code": "import { useState } from \"react\";\nimport { Pagination } from \"@rdloom/react\";\n\n// After the page changes, tell people what changed: here a polite live region.\nexport default function PaginationControlledExample() {\n  const [page, setPage] = useState(3);\n  const pageCount = 12;\n  return (\n    <div className=\"flex flex-col items-start gap-3\">\n      <p aria-live=\"polite\" className=\"text-sm\">\n        Showing results {(page - 1) * 10 + 1} to {page * 10}\n      </p>\n      <Pagination pageCount={pageCount} page={page} onChange={setPage} size=\"sm\" />\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "pagination/pagination.tsx",
+          "content": "\"use client\";\n\nimport { forwardRef, useState } from \"react\";\nimport { Button } from \"react-aria-components\";\nimport { paginationDefaults, type PaginationSpecProps } from \"../generated/pagination.types\";\nimport { cx } from \"../utils/cx\";\n\nexport interface PaginationProps extends PaginationSpecProps {\n  className?: string;\n}\n\nexport type PaginationItem = number | \"start-ellipsis\" | \"end-ellipsis\";\n\n/**\n * The buttons to show: every page when they fit, otherwise the first, the last,\n * the current page with `siblingCount` on each side, and an ellipsis for each gap.\n * It always returns the same number of items for a given count, so the control\n * doesn't change width as you move through the pages.\n */\nexport function paginationRange(page: number, pageCount: number, siblingCount = 1): PaginationItem[] {\n  const total = Math.max(0, Math.floor(pageCount));\n  const sibling = Math.max(0, Math.floor(siblingCount));\n  const all = (from: number, to: number) => Array.from({ length: Math.max(0, to - from + 1) }, (_, i) => from + i);\n  const slots = sibling * 2 + 5; // first, last, current, two ellipses, and the siblings\n  if (total <= slots) return all(1, total);\n\n  const current = Math.min(Math.max(1, Math.floor(page)), total);\n  const left = Math.max(current - sibling, 1);\n  const right = Math.min(current + sibling, total);\n  const gapLeft = left > 2;\n  const gapRight = right < total - 1;\n  const edge = 3 + sibling * 2; // pages shown next to the one ellipsis\n\n  if (!gapLeft && gapRight) return [...all(1, edge), \"end-ellipsis\", total];\n  if (gapLeft && !gapRight) return [1, \"start-ellipsis\", ...all(total - edge + 1, total)];\n  return [1, \"start-ellipsis\", ...all(left, right), \"end-ellipsis\", total];\n}\n\nconst sizes: Record<NonNullable<PaginationSpecProps[\"size\"]>, string> = { sm: \"h-8 min-w-8 px-2 text-sm\", md: \"h-10 min-w-10 px-3 text-sm\" };\n\nconst button =\n  \"inline-flex items-center justify-center rounded-[var(--rd-radius-control)] border font-medium tabular-nums select-none outline-none transition-colors \" +\n  \"border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-default)] text-[var(--rd-color-text-default)] \" +\n  \"data-[hovered]:bg-[var(--rd-color-surface-subtle)] \" +\n  \"data-[focus-visible]:ring-2 data-[focus-visible]:ring-offset-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)] \" +\n  \"data-[disabled]:opacity-50 data-[disabled]:cursor-not-allowed\";\n\nconst current =\n  \"border-transparent bg-[var(--rd-color-action-primary)] text-[var(--rd-color-action-on-primary)] font-semibold \" +\n  \"data-[hovered]:bg-[var(--rd-color-action-primary-hover)]\";\n\nfunction Chevron({ direction }: { direction: \"left\" | \"right\" }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 16 16\" className={cx(\"size-4 rtl:-scale-x-100\", direction === \"left\" && \"-scale-x-100 rtl:scale-x-100\")} fill=\"none\">\n      <path d=\"M6 3.5l4.5 4.5L6 12.5\" stroke=\"currentColor\" strokeWidth=\"1.75\" strokeLinecap=\"round\" strokeLinejoin=\"round\" />\n    </svg>\n  );\n}\n\nexport const Pagination = forwardRef<HTMLElement, PaginationProps>(function Pagination(\n  {\n    pageCount,\n    page,\n    defaultPage = paginationDefaults.defaultPage,\n    onChange,\n    siblingCount = paginationDefaults.siblingCount,\n    label = paginationDefaults.label,\n    size = paginationDefaults.size,\n    isDisabled = paginationDefaults.isDisabled,\n    className,\n  },\n  ref,\n) {\n  const [inner, setInner] = useState(defaultPage);\n  const count = Math.max(1, Math.floor(pageCount));\n  const active = Math.min(Math.max(1, Math.floor(page ?? inner)), count);\n\n  const go = (next: number) => {\n    const target = Math.min(Math.max(1, next), count);\n    if (target === active) return;\n    if (page === undefined) setInner(target);\n    onChange?.(target);\n  };\n\n  return (\n    <nav ref={ref} aria-label={label} className={className}>\n      <ul className=\"flex flex-wrap items-center gap-1\">\n        <li>\n          <Button aria-label=\"Previous page\" isDisabled={isDisabled || active <= 1} onPress={() => go(active - 1)} className={cx(button, sizes[size])}>\n            <Chevron direction=\"left\" />\n          </Button>\n        </li>\n        {paginationRange(active, count, siblingCount).map((item) =>\n          typeof item === \"string\" ? (\n            <li key={item} aria-hidden=\"true\" className=\"px-1 text-[var(--rd-color-text-muted)] select-none\">\n              …\n            </li>\n          ) : (\n            <li key={item}>\n              <Button\n                aria-label={`Page ${item}`}\n                aria-current={item === active ? \"page\" : undefined}\n                isDisabled={isDisabled}\n                onPress={() => go(item)}\n                className={cx(button, sizes[size], item === active && current)}\n              >\n                {item}\n              </Button>\n            </li>\n          ),\n        )}\n        <li>\n          <Button aria-label=\"Next page\" isDisabled={isDisabled || active >= count} onPress={() => go(active + 1)} className={cx(button, sizes[size])}>\n            <Chevron direction=\"right\" />\n          </Button>\n        </li>\n      </ul>\n    </nav>\n  );\n});\n"
+        },
+        {
+          "path": "generated/pagination.types.ts",
+          "content": "// Generated by rdloom codegen from specs/pagination.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nexport const paginationSizeValues = [\"sm\", \"md\"] as const;\n\n/** Page numbers with previous and next buttons, for content split across pages. Long ranges collapse to the first page, the last page, and the pages around the current one. */\nexport interface PaginationSpecProps {\n  /**\n   * Total number of pages.\n   */\n  pageCount: number;\n  /**\n   * Controlled current page, starting at 1.\n   */\n  page?: number;\n  /**\n   * Initial page when uncontrolled.\n   * @default 1\n   */\n  defaultPage?: number;\n  /**\n   * Called with the page the user chose.\n   */\n  onChange?: (page: number) => void;\n  /**\n   * How many page numbers to show on each side of the current page before collapsing the rest to an ellipsis.\n   * @default 1\n   */\n  siblingCount?: number;\n  /**\n   * Accessible name of the navigation landmark. Translate it for other languages.\n   * @default \"Pagination\"\n   */\n  label?: string;\n  /**\n   * Button size.\n   * @default \"md\"\n   */\n  size?: \"sm\" | \"md\";\n  /**\n   * Disables every button.\n   * @default false\n   */\n  isDisabled?: boolean;\n}\n\nexport const paginationDefaults = {\n  defaultPage: 1,\n  siblingCount: 1,\n  label: \"Pagination\",\n  size: \"md\",\n  isDisabled: false,\n} as const;\n\nexport const paginationMeta = {\n  \"name\": \"Pagination\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"navigation\"\n} as const;\n"
+        }
+      ]
+    },
+    {
       "id": "popover",
       "spec": {
         "$schema": "./schema/component.schema.json",
@@ -3121,6 +3605,164 @@
         {
           "path": "generated/radio-group.types.ts",
           "content": "// Generated by rdloom codegen from specs/radio-group.spec.json (v0.1.1).\n// Do not edit. Change the spec and run `npm run gen`.\n\nimport type { ReactNode } from \"react\";\n\nexport const radioGroupOrientationValues = [\"vertical\", \"horizontal\"] as const;\n\n/** Lets the user pick exactly one option from a small, visible set. Use with Radio children. */\nexport interface RadioGroupSpecProps {\n  /**\n   * Visible group label.\n   */\n  label: string;\n  /**\n   * Help text shown under the options.\n   */\n  description?: string;\n  /**\n   * Shown when the group is invalid.\n   */\n  errorMessage?: string;\n  /**\n   * Layout direction of the options.\n   * @default \"vertical\"\n   */\n  orientation?: \"vertical\" | \"horizontal\";\n  /**\n   * Controlled selected value.\n   */\n  value?: string;\n  /**\n   * Initial value when uncontrolled.\n   */\n  defaultValue?: string;\n  /**\n   * Disables every option.\n   * @default false\n   */\n  isDisabled?: boolean;\n  /**\n   * Marks the group as invalid and shows errorMessage.\n   * @default false\n   */\n  isInvalid?: boolean;\n  /**\n   * Requires a selection for form submission.\n   * @default false\n   */\n  isRequired?: boolean;\n  /**\n   * Radio options.\n   */\n  children: ReactNode;\n  /**\n   * Called with the newly selected value.\n   */\n  onChange?: (value: string) => void;\n}\n\nexport const radioGroupDefaults = {\n  orientation: \"vertical\",\n  isDisabled: false,\n  isInvalid: false,\n  isRequired: false,\n} as const;\n\nexport const radioGroupMeta = {\n  \"name\": \"RadioGroup\",\n  \"version\": \"0.1.1\",\n  \"status\": \"experimental\",\n  \"role\": \"radiogroup\"\n} as const;\n"
+        }
+      ]
+    },
+    {
+      "id": "segmented-control",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "SegmentedControl",
+        "version": "0.1.0",
+        "category": "input",
+        "status": "experimental",
+        "description": "A row of connected buttons where exactly one option is chosen, for switching a view or a setting with two to five choices. Use SegmentedControlItem for each option.",
+        "props": {
+          "label": {
+            "type": "string",
+            "required": true,
+            "description": "What the control chooses, e.g. 'View'. It is the accessible name of the group."
+          },
+          "children": {
+            "type": "node",
+            "required": true,
+            "description": "SegmentedControlItem elements, each with an id."
+          },
+          "selectedKey": {
+            "type": "custom",
+            "tsType": "import(\"react-aria-components\").Key",
+            "description": "Controlled selected item id."
+          },
+          "defaultSelectedKey": {
+            "type": "custom",
+            "tsType": "import(\"react-aria-components\").Key",
+            "description": "Initial selected item id when uncontrolled."
+          },
+          "onChange": {
+            "type": "callback",
+            "tsType": "(key: import(\"react-aria-components\").Key) => void",
+            "description": "Called with the id of the chosen item."
+          },
+          "size": {
+            "type": "enum",
+            "values": [
+              "sm",
+              "md"
+            ],
+            "default": "md",
+            "description": "Control height."
+          },
+          "isDisabled": {
+            "type": "boolean",
+            "default": false,
+            "description": "Disables every option."
+          }
+        },
+        "variants": [
+          "size",
+          "isDisabled"
+        ],
+        "states": [
+          "default",
+          "hover",
+          "focus",
+          "selected",
+          "disabled"
+        ],
+        "slots": [
+          "group",
+          "item"
+        ],
+        "tokens": [
+          "color.surface.default",
+          "color.surface.subtle",
+          "color.border.default",
+          "color.action.primary",
+          "color.action.on-primary",
+          "color.text.default",
+          "color.focus.ring",
+          "radius.control"
+        ],
+        "a11y": {
+          "role": "radiogroup",
+          "keyboard": [
+            "Tab enters the group, on the chosen option",
+            "Arrow keys move to and choose the next or previous option",
+            "Space chooses the focused option"
+          ],
+          "requirements": [
+            "A radio group named by label, with each option a radio",
+            "The chosen option is marked by fill and weight and by aria-checked, not only by color",
+            "Exactly one option is always chosen",
+            "Selected text meets 4.5:1 against its background"
+          ],
+          "screenReader": [
+            "Announced as a radio group with the label, then each option as \"radio button, N of M, checked or not checked\"",
+            "Moving with arrow keys announces the newly chosen option"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "Switching between views of the same data: List, Board, Calendar",
+            "A setting with two to five short options, like Monthly or Yearly"
+          ],
+          "avoid_when": [
+            "More than five options or long labels: use Select or RadioGroup",
+            "Choosing several at once: use checkboxes",
+            "Navigating to different pages: use Tabs or links"
+          ],
+          "anti_patterns": [
+            "Using it as page navigation",
+            "Options that are not mutually exclusive",
+            "Icon-only options without a text label"
+          ]
+        },
+        "examples": [
+          "basic",
+          "controlled",
+          "sizes"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {
+            "size": "Size",
+            "isDisabled": "Disabled"
+          }
+        }
+      },
+      "install": {
+        "command": "npx rdloom add segmented-control",
+        "dependencies": [
+          "react-aria-components@^1.21.1"
+        ],
+        "registryDependencies": [
+          "tokens",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import { SegmentedControl, SegmentedControlItem } from \"@rdloom/react\";\n\nexport default function SegmentedControlBasicExample() {\n  return (\n    <SegmentedControl label=\"View\" defaultSelectedKey=\"list\">\n      <SegmentedControlItem id=\"list\">List</SegmentedControlItem>\n      <SegmentedControlItem id=\"board\">Board</SegmentedControlItem>\n      <SegmentedControlItem id=\"calendar\">Calendar</SegmentedControlItem>\n    </SegmentedControl>\n  );\n}\n"
+        },
+        {
+          "name": "controlled",
+          "code": "import { useState } from \"react\";\nimport { SegmentedControl, SegmentedControlItem } from \"@rdloom/react\";\n\nexport default function SegmentedControlControlledExample() {\n  const [billing, setBilling] = useState<string>(\"monthly\");\n  return (\n    <div className=\"flex flex-col items-start gap-3 text-sm\">\n      <SegmentedControl label=\"Billing period\" selectedKey={billing} onChange={(key) => setBilling(String(key))}>\n        <SegmentedControlItem id=\"monthly\">Monthly</SegmentedControlItem>\n        <SegmentedControlItem id=\"yearly\">Yearly</SegmentedControlItem>\n      </SegmentedControl>\n      <p aria-live=\"polite\">{billing === \"yearly\" ? \"$190 a year, two months free.\" : \"$19 a month.\"}</p>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "sizes",
+          "code": "import { SegmentedControl, SegmentedControlItem } from \"@rdloom/react\";\n\nexport default function SegmentedControlSizesExample() {\n  return (\n    <div className=\"flex flex-col items-start gap-3\">\n      <SegmentedControl label=\"Density, small\" size=\"sm\" defaultSelectedKey=\"compact\">\n        <SegmentedControlItem id=\"compact\">Compact</SegmentedControlItem>\n        <SegmentedControlItem id=\"comfortable\">Comfortable</SegmentedControlItem>\n      </SegmentedControl>\n      <SegmentedControl label=\"Density, medium\" size=\"md\" defaultSelectedKey=\"comfortable\">\n        <SegmentedControlItem id=\"compact\">Compact</SegmentedControlItem>\n        <SegmentedControlItem id=\"comfortable\">Comfortable</SegmentedControlItem>\n      </SegmentedControl>\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "segmented-control/segmented-control.tsx",
+          "content": "\"use client\";\n\nimport { createContext, forwardRef, useContext, useState, type ReactNode } from \"react\";\nimport { ToggleButton, ToggleButtonGroup, type Key } from \"react-aria-components\";\nimport { segmentedControlDefaults, type SegmentedControlSpecProps } from \"../generated/segmented-control.types\";\nimport { cx } from \"../utils/cx\";\n\nexport interface SegmentedControlProps extends SegmentedControlSpecProps {\n  className?: string;\n}\n\n/** How an item tells its group it was chosen: by click, Space, or by arriving on it with an arrow key. */\nconst ChooseContext = createContext<(key: Key) => void>(() => {});\n\nexport const SegmentedControl = forwardRef<HTMLDivElement, SegmentedControlProps>(function SegmentedControl(\n  {\n    label,\n    children,\n    selectedKey,\n    defaultSelectedKey,\n    onChange,\n    size = segmentedControlDefaults.size,\n    isDisabled = segmentedControlDefaults.isDisabled,\n    className,\n  },\n  ref,\n) {\n  // Kept here even when uncontrolled, so choosing the option that is already chosen can be told apart from a change.\n  const [inner, setInner] = useState<Key | undefined>(defaultSelectedKey);\n  const current = selectedKey ?? inner;\n  const choose = (key: Key) => {\n    if (key === current) return;\n    if (selectedKey === undefined) setInner(key);\n    onChange?.(key);\n  };\n  return (\n    <ChooseContext.Provider value={choose}>\n      <ToggleButtonGroup\n        ref={ref}\n        aria-label={label}\n        selectionMode=\"single\"\n        disallowEmptySelection\n        isDisabled={isDisabled}\n        selectedKeys={current === undefined ? [] : [current]}\n        onSelectionChange={(keys) => {\n          const next = [...keys][0] as Key | undefined;\n          if (next !== undefined) choose(next);\n        }}\n        // The size reaches the items through this attribute, so each item stays a plain ToggleButton.\n        data-size={size}\n        className={cx(\n          \"group inline-flex gap-0.5 rounded-[var(--rd-radius-control)] border border-[var(--rd-color-border-default)] \" +\n            \"bg-[var(--rd-color-surface-subtle)] p-0.5 data-[disabled]:opacity-50\",\n          className,\n        )}\n      >\n        {children}\n      </ToggleButtonGroup>\n    </ChooseContext.Provider>\n  );\n});\n\nexport interface SegmentedControlItemProps {\n  /** Identifies the option in selectedKey and onChange. */\n  id: Key;\n  children: ReactNode;\n  className?: string;\n}\n\nexport function SegmentedControlItem({ id, children, className }: SegmentedControlItemProps) {\n  const choose = useContext(ChooseContext);\n  return (\n    <ToggleButton\n      id={id}\n      // A radio group chooses as focus moves, so arrow keys pick the next option.\n      onFocus={() => choose(id)}\n      className={cx(\n        \"inline-flex items-center justify-center rounded-[calc(var(--rd-radius-control)-2px)] font-medium whitespace-nowrap select-none outline-none transition-colors\",\n        \"h-9 px-3.5 text-sm group-data-[size=sm]:h-7 group-data-[size=sm]:px-2.5\",\n        \"text-[var(--rd-color-text-default)] data-[hovered]:bg-[var(--rd-color-surface-default)] \" +\n          \"data-[selected]:bg-[var(--rd-color-action-primary)] data-[selected]:text-[var(--rd-color-action-on-primary)] data-[selected]:font-semibold \" +\n          \"data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)] data-[focus-visible]:ring-offset-1 \" +\n          \"data-[disabled]:cursor-not-allowed\",\n        className,\n      )}\n    >\n      {children}\n    </ToggleButton>\n  );\n}\n"
+        },
+        {
+          "path": "generated/segmented-control.types.ts",
+          "content": "// Generated by rdloom codegen from specs/segmented-control.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nimport type { ReactNode } from \"react\";\n\nexport const segmentedControlSizeValues = [\"sm\", \"md\"] as const;\n\n/** A row of connected buttons where exactly one option is chosen, for switching a view or a setting with two to five choices. Use SegmentedControlItem for each option. */\nexport interface SegmentedControlSpecProps {\n  /**\n   * What the control chooses, e.g. 'View'. It is the accessible name of the group.\n   */\n  label: string;\n  /**\n   * SegmentedControlItem elements, each with an id.\n   */\n  children: ReactNode;\n  /**\n   * Controlled selected item id.\n   */\n  selectedKey?: import(\"react-aria-components\").Key;\n  /**\n   * Initial selected item id when uncontrolled.\n   */\n  defaultSelectedKey?: import(\"react-aria-components\").Key;\n  /**\n   * Called with the id of the chosen item.\n   */\n  onChange?: (key: import(\"react-aria-components\").Key) => void;\n  /**\n   * Control height.\n   * @default \"md\"\n   */\n  size?: \"sm\" | \"md\";\n  /**\n   * Disables every option.\n   * @default false\n   */\n  isDisabled?: boolean;\n}\n\nexport const segmentedControlDefaults = {\n  size: \"md\",\n  isDisabled: false,\n} as const;\n\nexport const segmentedControlMeta = {\n  \"name\": \"SegmentedControl\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"radiogroup\"\n} as const;\n"
         }
       ]
     },
@@ -3920,6 +4562,188 @@
         {
           "path": "generated/switch.types.ts",
           "content": "// Generated by rdloom codegen from specs/switch.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nimport type { ReactNode } from \"react\";\n\nexport const switchSizeValues = [\"sm\", \"md\"] as const;\n\n/** Turns a setting on or off, taking effect immediately. */\nexport interface SwitchSpecProps {\n  /**\n   * Visible label describing the setting.\n   */\n  children: ReactNode;\n  /**\n   * Controlled on/off state.\n   */\n  isSelected?: boolean;\n  /**\n   * Initial state when uncontrolled.\n   * @default false\n   */\n  defaultSelected?: boolean;\n  /**\n   * Track and thumb size.\n   * @default \"md\"\n   */\n  size?: \"sm\" | \"md\";\n  /**\n   * Prevents interaction and dims the switch.\n   * @default false\n   */\n  isDisabled?: boolean;\n  /**\n   * Called with the new state.\n   */\n  onChange?: (isSelected: boolean) => void;\n}\n\nexport const switchDefaults = {\n  defaultSelected: false,\n  size: \"md\",\n  isDisabled: false,\n} as const;\n\nexport const switchMeta = {\n  \"name\": \"Switch\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"switch\"\n} as const;\n"
+        }
+      ]
+    },
+    {
+      "id": "table",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "Table",
+        "version": "0.1.0",
+        "category": "data",
+        "status": "experimental",
+        "description": "A simple, accessible table for a small number of rows: optional sorting and row selection. Build it from TableHeader, TableColumn, TableBody, TableRow and TableCell. For thousands of rows, filtering, editing or grouping, use DataGrid.",
+        "props": {
+          "label": {
+            "type": "string",
+            "required": true,
+            "description": "Accessible name of the table, e.g. 'Invoices'."
+          },
+          "children": {
+            "type": "node",
+            "required": true,
+            "description": "A TableHeader and a TableBody."
+          },
+          "density": {
+            "type": "enum",
+            "values": [
+              "compact",
+              "standard",
+              "comfortable"
+            ],
+            "default": "standard",
+            "description": "Row height."
+          },
+          "selectionMode": {
+            "type": "enum",
+            "values": [
+              "none",
+              "single",
+              "multiple"
+            ],
+            "default": "none",
+            "description": "Adds a checkbox column. Selecting changes aria-selected on the row."
+          },
+          "selectedKeys": {
+            "type": "custom",
+            "tsType": "\"all\" | Iterable<import(\"react-aria-components\").Key>",
+            "description": "Controlled selection, by row id."
+          },
+          "defaultSelectedKeys": {
+            "type": "custom",
+            "tsType": "\"all\" | Iterable<import(\"react-aria-components\").Key>",
+            "description": "Initial selection when uncontrolled."
+          },
+          "onSelectionChange": {
+            "type": "callback",
+            "tsType": "(keys: \"all\" | Set<import(\"react-aria-components\").Key>) => void",
+            "description": "Called with the selected row ids."
+          },
+          "sortDescriptor": {
+            "type": "custom",
+            "tsType": "import(\"react-aria-components\").SortDescriptor",
+            "description": "Controlled sort: the column id and direction. You sort the rows yourself."
+          },
+          "onSortChange": {
+            "type": "callback",
+            "tsType": "(descriptor: import(\"react-aria-components\").SortDescriptor) => void",
+            "description": "Called when the user sorts by a column with allowsSorting. Sort your data and pass it back."
+          }
+        },
+        "variants": [
+          "density",
+          "selectionMode"
+        ],
+        "states": [
+          "default",
+          "hover",
+          "focus",
+          "selected"
+        ],
+        "slots": [
+          "table",
+          "header",
+          "column",
+          "sort-indicator",
+          "body",
+          "row",
+          "cell",
+          "select-cell"
+        ],
+        "tokens": [
+          "color.surface.default",
+          "color.surface.subtle",
+          "color.surface.selected",
+          "color.border.default",
+          "color.text.default",
+          "color.text.muted",
+          "color.action.primary",
+          "color.focus.ring"
+        ],
+        "a11y": {
+          "role": "grid",
+          "keyboard": [
+            "Tab moves into the table, then out",
+            "Arrow keys move between cells",
+            "Enter or Space on a sortable column header sorts it",
+            "Space on a row toggles its selection when selection is on"
+          ],
+          "requirements": [
+            "A named table with column headers and one row-header column (isRowHeader) so each cell is announced with its row",
+            "Sortable columns expose aria-sort and say so in the header, not only with an arrow",
+            "Selected rows expose aria-selected, with a labelled checkbox in each row and a select-all in the header",
+            "Rows keep the order of your data: sorting is done by you, then announced by the header"
+          ],
+          "screenReader": [
+            "Announced as a table with its name, row and column counts",
+            "Moving across a row announces each column header with the cell; the row header names the row",
+            "Sorting announces the new sort direction on the header"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "A short list of records, up to a few dozen rows",
+            "Tabular data that needs to read well for screen reader users",
+            "Lightweight sorting or row selection"
+          ],
+          "avoid_when": [
+            "Thousands of rows, column filters, editing, grouping or export: use DataGrid",
+            "Page layout: never use a table for layout",
+            "A few items with rich content: use cards or a list"
+          ],
+          "anti_patterns": [
+            "No row header column (set isRowHeader on the column that names the row)",
+            "Sorting the data without passing the new sortDescriptor back",
+            "Using a table for layout"
+          ]
+        },
+        "examples": [
+          "basic",
+          "sortable",
+          "selectable"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {
+            "density": "Density",
+            "selectionMode": "Selection"
+          }
+        }
+      },
+      "install": {
+        "command": "npx rdloom add table",
+        "dependencies": [
+          "react-aria-components@^1.21.1"
+        ],
+        "registryDependencies": [
+          "tokens",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from \"@rdloom/react\";\n\nconst people = [\n  { id: \"ada\", name: \"Ada Lovelace\", role: \"Mathematician\", city: \"London\" },\n  { id: \"grace\", name: \"Grace Hopper\", role: \"Rear admiral\", city: \"New York\" },\n  { id: \"katherine\", name: \"Katherine Johnson\", role: \"Mathematician\", city: \"Hampton\" },\n];\n\n// isRowHeader marks the column that names each row, so a screen reader can say\n// \"Grace Hopper, Role, Rear admiral\" for a cell.\nexport default function TableBasicExample() {\n  return (\n    <div className=\"w-[34rem] max-w-full\">\n      <Table label=\"People\">\n        <TableHeader>\n          <TableColumn isRowHeader>Name</TableColumn>\n          <TableColumn>Role</TableColumn>\n          <TableColumn>City</TableColumn>\n        </TableHeader>\n        <TableBody>\n          {people.map((p) => (\n            <TableRow key={p.id} id={p.id}>\n              <TableCell>{p.name}</TableCell>\n              <TableCell>{p.role}</TableCell>\n              <TableCell>{p.city}</TableCell>\n            </TableRow>\n          ))}\n        </TableBody>\n      </Table>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "sortable",
+          "code": "import { useMemo, useState } from \"react\";\nimport { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, type SortDescriptor } from \"@rdloom/react\";\n\nconst invoices = [\n  { id: \"inv-1042\", customer: \"Acme\", amount: 1200 },\n  { id: \"inv-1043\", customer: \"Globex\", amount: 340 },\n  { id: \"inv-1044\", customer: \"Initech\", amount: 980 },\n  { id: \"inv-1045\", customer: \"Hooli\", amount: 15 },\n];\n\n// The table reports the sort; you sort your data and pass it back.\nexport default function TableSortableExample() {\n  const [sort, setSort] = useState<SortDescriptor>({ column: \"amount\", direction: \"descending\" });\n  const rows = useMemo(() => {\n    const key = sort.column as \"customer\" | \"amount\";\n    const sorted = [...invoices].sort((a, b) => (a[key] < b[key] ? -1 : a[key] > b[key] ? 1 : 0));\n    return sort.direction === \"descending\" ? sorted.reverse() : sorted;\n  }, [sort]);\n  return (\n    <div className=\"w-[28rem] max-w-full\">\n      <Table label=\"Invoices\" sortDescriptor={sort} onSortChange={setSort}>\n        <TableHeader>\n          <TableColumn id=\"customer\" isRowHeader allowsSorting>\n            Customer\n          </TableColumn>\n          <TableColumn id=\"amount\" allowsSorting>\n            Amount\n          </TableColumn>\n        </TableHeader>\n        <TableBody>\n          {rows.map((r) => (\n            <TableRow key={r.id} id={r.id}>\n              <TableCell>{r.customer}</TableCell>\n              <TableCell>${r.amount.toLocaleString(\"en-US\")}</TableCell>\n            </TableRow>\n          ))}\n        </TableBody>\n      </Table>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "selectable",
+          "code": "import { useState } from \"react\";\nimport { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from \"@rdloom/react\";\n\nconst files = [\n  { id: \"a\", name: \"report.pdf\", size: \"1.2 MB\" },\n  { id: \"b\", name: \"photo.png\", size: \"840 KB\" },\n  { id: \"c\", name: \"notes.txt\", size: \"4 KB\" },\n];\n\nexport default function TableSelectableExample() {\n  const [selected, setSelected] = useState<\"all\" | Set<unknown>>(new Set([\"b\"]));\n  const count = selected === \"all\" ? files.length : selected.size;\n  return (\n    <div className=\"flex w-[28rem] max-w-full flex-col gap-2 text-sm\">\n      <Table label=\"Files\" selectionMode=\"multiple\" selectedKeys={selected as Set<string>} onSelectionChange={(keys) => setSelected(keys)}>\n        <TableHeader>\n          <TableColumn isRowHeader>Name</TableColumn>\n          <TableColumn>Size</TableColumn>\n        </TableHeader>\n        <TableBody>\n          {files.map((f) => (\n            <TableRow key={f.id} id={f.id}>\n              <TableCell>{f.name}</TableCell>\n              <TableCell>{f.size}</TableCell>\n            </TableRow>\n          ))}\n        </TableBody>\n      </Table>\n      <p aria-live=\"polite\">{count} selected</p>\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "table/table.tsx",
+          "content": "\"use client\";\n\nimport { forwardRef, type ReactNode } from \"react\";\nimport {\n  Cell,\n  Checkbox,\n  Column,\n  Row,\n  Table as AriaTable,\n  TableBody as AriaTableBody,\n  TableHeader as AriaTableHeader,\n  useTableOptions,\n  type CellProps,\n  type ColumnProps,\n  type RowProps,\n  type TableBodyProps,\n  type TableHeaderProps,\n  type TableProps as AriaTableProps,\n} from \"react-aria-components\";\nimport { tableDefaults, type TableSpecProps } from \"../generated/table.types\";\nimport { cx } from \"../utils/cx\";\nimport { CheckIcon } from \"../utils/icons\";\n\nexport type { SortDescriptor } from \"react-aria-components\";\n\nexport interface TableProps\n  extends TableSpecProps,\n    Omit<AriaTableProps, keyof TableSpecProps | \"className\" | \"children\" | \"aria-label\"> {\n  className?: string;\n}\n\nexport const Table = forwardRef<HTMLTableElement, TableProps>(function Table(\n  { label, children, density = tableDefaults.density, selectionMode = tableDefaults.selectionMode, className, ...rest },\n  ref,\n) {\n  return (\n    // The wrapper scrolls sideways on a narrow screen instead of squashing the columns.\n    <div\n      data-density={density}\n      className={cx(\n        \"group/table overflow-x-auto rounded-[var(--rd-radius-overlay)] border border-[var(--rd-color-border-default)]\",\n        \"bg-[var(--rd-color-surface-default)]\",\n        className,\n      )}\n    >\n      <AriaTable\n        {...rest}\n        ref={ref}\n        aria-label={label}\n        selectionMode={selectionMode === \"none\" ? undefined : selectionMode}\n        className=\"w-full border-collapse text-start text-sm text-[var(--rd-color-text-default)] outline-none\"\n      >\n        {children}\n      </AriaTable>\n    </div>\n  );\n});\n\nfunction SelectBox() {\n  return (\n    <Checkbox\n      slot=\"selection\"\n      className=\"group/box flex size-4 items-center justify-center rounded-[var(--rd-radius-sm,4px)] border border-[var(--rd-color-border-strong)] outline-none data-[selected]:border-transparent data-[selected]:bg-[var(--rd-color-action-primary)] data-[indeterminate]:border-transparent data-[indeterminate]:bg-[var(--rd-color-action-primary)] data-[focus-visible]:ring-2 data-[focus-visible]:ring-offset-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)]\"\n    >\n      {({ isSelected, isIndeterminate }) =>\n        isIndeterminate ? (\n          <span className=\"h-0.5 w-2 rounded bg-[var(--rd-color-action-on-primary)]\" />\n        ) : isSelected ? (\n          <span className=\"text-[var(--rd-color-action-on-primary)] [&_svg]:text-[var(--rd-color-action-on-primary)]\">\n            <CheckIcon />\n          </span>\n        ) : null\n      }\n    </Checkbox>\n  );\n}\n\nexport function TableHeader({ children, className, ...rest }: Omit<TableHeaderProps<object>, \"className\" | \"children\"> & { className?: string; children: ReactNode }) {\n  const { selectionBehavior, selectionMode } = useTableOptions();\n  return (\n    <AriaTableHeader {...rest} className={cx(\"border-b border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-subtle)]\", className)}>\n      {selectionBehavior === \"toggle\" && selectionMode !== \"none\" && (\n        <Column className=\"w-11 px-3 py-2 text-start\">\n          <SelectBox />\n        </Column>\n      )}\n      {children}\n    </AriaTableHeader>\n  );\n}\n\nexport interface TableColumnProps extends Omit<ColumnProps, \"className\" | \"children\"> {\n  className?: string;\n  children: ReactNode;\n}\n\n/** A column header. Set `isRowHeader` on the column that names each row, and `allowsSorting` to make it sortable. */\nexport function TableColumn({ children, className, ...rest }: TableColumnProps) {\n  return (\n    <Column\n      {...rest}\n      className={cx(\n        \"px-3 py-2 text-start font-medium text-[var(--rd-color-text-muted)] outline-none \" +\n          \"data-[focus-visible]:ring-2 data-[focus-visible]:ring-inset data-[focus-visible]:ring-[var(--rd-color-focus-ring)] \" +\n          \"data-[allows-sorting]:cursor-pointer data-[allows-sorting]:hover:text-[var(--rd-color-text-default)]\",\n        className,\n      )}\n    >\n      {({ allowsSorting, sortDirection }) => (\n        <span className=\"inline-flex items-center gap-1\">\n          {children}\n          {allowsSorting && (\n            <svg aria-hidden=\"true\" viewBox=\"0 0 16 16\" className=\"size-3.5 shrink-0\" fill=\"none\">\n              <path\n                d=\"M8 3v10M4.5 6.5L8 3l3.5 3.5\"\n                stroke=\"currentColor\"\n                strokeWidth=\"1.5\"\n                strokeLinecap=\"round\"\n                strokeLinejoin=\"round\"\n                opacity={sortDirection === \"ascending\" ? 1 : 0.3}\n              />\n              <path\n                d=\"M4.5 9.5L8 13l3.5-3.5\"\n                stroke=\"currentColor\"\n                strokeWidth=\"1.5\"\n                strokeLinecap=\"round\"\n                strokeLinejoin=\"round\"\n                opacity={sortDirection === \"descending\" ? 1 : 0.3}\n              />\n            </svg>\n          )}\n        </span>\n      )}\n    </Column>\n  );\n}\n\nexport function TableBody<T extends object>({ className, ...rest }: Omit<TableBodyProps<T>, \"className\"> & { className?: string }) {\n  return <AriaTableBody<T> {...rest} className={className} />;\n}\n\nexport function TableRow<T extends object>({ children, className, ...rest }: Omit<RowProps<T>, \"className\" | \"children\"> & { className?: string; children: ReactNode }) {\n  const { selectionBehavior, selectionMode } = useTableOptions();\n  return (\n    <Row\n      {...rest}\n      className={cx(\n        \"border-b border-[var(--rd-color-border-default)] last:border-b-0 outline-none \" +\n          \"data-[hovered]:bg-[var(--rd-color-surface-subtle)] data-[selected]:bg-[var(--rd-color-surface-selected)] \" +\n          \"data-[focus-visible]:ring-2 data-[focus-visible]:ring-inset data-[focus-visible]:ring-[var(--rd-color-focus-ring)]\",\n        className,\n      )}\n    >\n      {selectionBehavior === \"toggle\" && selectionMode !== \"none\" && (\n        <Cell className=\"px-3 py-2\">\n          <SelectBox />\n        </Cell>\n      )}\n      {children}\n    </Row>\n  );\n}\n\nexport function TableCell({ className, ...rest }: Omit<CellProps, \"className\"> & { className?: string }) {\n  return (\n    <Cell\n      {...rest}\n      className={cx(\n        \"px-3 text-start outline-none data-[focus-visible]:ring-2 data-[focus-visible]:ring-inset data-[focus-visible]:ring-[var(--rd-color-focus-ring)]\",\n        \"py-2.5 group-data-[density=compact]/table:py-1.5 group-data-[density=comfortable]/table:py-4\",\n        className,\n      )}\n    />\n  );\n}\n"
+        },
+        {
+          "path": "generated/table.types.ts",
+          "content": "// Generated by rdloom codegen from specs/table.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nimport type { ReactNode } from \"react\";\n\nexport const tableDensityValues = [\"compact\", \"standard\", \"comfortable\"] as const;\nexport const tableSelectionModeValues = [\"none\", \"single\", \"multiple\"] as const;\n\n/** A simple, accessible table for a small number of rows: optional sorting and row selection. Build it from TableHeader, TableColumn, TableBody, TableRow and TableCell. For thousands of rows, filtering, editing or grouping, use DataGrid. */\nexport interface TableSpecProps {\n  /**\n   * Accessible name of the table, e.g. 'Invoices'.\n   */\n  label: string;\n  /**\n   * A TableHeader and a TableBody.\n   */\n  children: ReactNode;\n  /**\n   * Row height.\n   * @default \"standard\"\n   */\n  density?: \"compact\" | \"standard\" | \"comfortable\";\n  /**\n   * Adds a checkbox column. Selecting changes aria-selected on the row.\n   * @default \"none\"\n   */\n  selectionMode?: \"none\" | \"single\" | \"multiple\";\n  /**\n   * Controlled selection, by row id.\n   */\n  selectedKeys?: \"all\" | Iterable<import(\"react-aria-components\").Key>;\n  /**\n   * Initial selection when uncontrolled.\n   */\n  defaultSelectedKeys?: \"all\" | Iterable<import(\"react-aria-components\").Key>;\n  /**\n   * Called with the selected row ids.\n   */\n  onSelectionChange?: (keys: \"all\" | Set<import(\"react-aria-components\").Key>) => void;\n  /**\n   * Controlled sort: the column id and direction. You sort the rows yourself.\n   */\n  sortDescriptor?: import(\"react-aria-components\").SortDescriptor;\n  /**\n   * Called when the user sorts by a column with allowsSorting. Sort your data and pass it back.\n   */\n  onSortChange?: (descriptor: import(\"react-aria-components\").SortDescriptor) => void;\n}\n\nexport const tableDefaults = {\n  density: \"standard\",\n  selectionMode: \"none\",\n} as const;\n\nexport const tableMeta = {\n  \"name\": \"Table\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"grid\"\n} as const;\n"
         }
       ]
     },

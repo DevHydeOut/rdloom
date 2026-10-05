@@ -265,6 +265,88 @@ const blueprints: Record<string, Blueprint> = {
     return frame({ name: "skeleton", dir: "row" }, [box(320, 96, { fill: "color.surface.subtle", radius: "radius.control", name: "shape" })]);
   },
 
+  Breadcrumbs: (c) =>
+    frame({ name: "breadcrumbs", dir: "row", gap: 6, cross: "center", opacity: on(c, "isDisabled") ? 0.5 : undefined }, [
+      text("Home", 14, "color.text.muted"),
+      text("›", 14, "color.text.muted"),
+      text("Projects", 14, "color.text.muted"),
+      text("›", 14, "color.text.muted"),
+      text("Current page", 14, "color.text.default", "Medium"),
+    ]),
+
+  Pagination: (c) => {
+    const px = c.size === "sm" ? 32 : 40;
+    const cell = (label: string, current = false) =>
+      frame(
+        {
+          name: current ? "current page" : "page",
+          dir: "row",
+          w: px,
+          h: px,
+          align: "center",
+          cross: "center",
+          fill: current ? "color.action.primary" : "color.surface.default",
+          stroke: current ? undefined : "color.border.default",
+          radius: "radius.control",
+        },
+        [text(label, 14, current ? "color.action.on-primary" : "color.text.default", current ? "Semi Bold" : "Regular")],
+      );
+    return frame({ name: "pagination", dir: "row", gap: 4, cross: "center", opacity: on(c, "isDisabled") ? 0.5 : undefined }, [
+      cell("‹"),
+      cell("1"),
+      cell("2", true),
+      cell("3"),
+      text("…", 14, "color.text.muted"),
+      cell("10"),
+      cell("›"),
+    ]);
+  },
+
+  SegmentedControl: (c) => {
+    const h = c.size === "sm" ? 28 : 36;
+    const item = (label: string, selected: boolean) =>
+      frame(
+        { name: selected ? "selected item" : "item", dir: "row", pad: [0, c.size === "sm" ? 10 : 14], h, align: "center", cross: "center", fill: selected ? "color.action.primary" : undefined, radius: "radius.control" },
+        [text(label, 14, selected ? "color.action.on-primary" : "color.text.default", selected ? "Semi Bold" : "Medium")],
+      );
+    return frame(
+      { name: "segmented control", dir: "row", gap: 2, pad: 2, fill: "color.surface.subtle", stroke: "color.border.default", radius: "radius.control", opacity: on(c, "isDisabled") ? 0.5 : undefined },
+      [item("List", true), item("Board", false), item("Calendar", false)],
+    );
+  },
+
+  Table: (c) => {
+    const h = c.density === "compact" ? 32 : c.density === "comfortable" ? 52 : 40;
+    const selectable = c.selectionMode !== undefined && c.selectionMode !== "none";
+    const row = (cells: string[], opts: { header?: boolean; selected?: boolean } = {}) =>
+      frame(
+        {
+          name: opts.header ? "header row" : "row",
+          dir: "row",
+          pad: [0, 12],
+          h,
+          w: "fill",
+          gap: 12,
+          cross: "center",
+          fill: opts.header ? "color.surface.subtle" : opts.selected ? "color.surface.selected" : undefined,
+        },
+        [
+          ...(selectable ? [box(16, 16, { stroke: "color.border.strong", fill: opts.selected ? "color.action.primary" : undefined, radius: 4, name: "checkbox" })] : []),
+          ...cells.map((t, i) => text(t, 14, opts.header ? "color.text.muted" : "color.text.default", opts.header ? "Medium" : "Regular", i === 0 ? "fill" : undefined)),
+        ],
+      );
+    return frame({ name: "table", dir: "col", w: 440, fill: "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, [
+      row(["Name", "Role", "City"], { header: true }),
+      row(["Ada Lovelace", "Mathematician", "London"], { selected: selectable }),
+      row(["Grace Hopper", "Rear admiral", "New York"]),
+    ]);
+  },
+
+  NumberField: (c) => {
+    const size = c.size ?? "md";
+    return field("Quantity", c, [text("1", FONT[size] ?? 14, "color.text.default", "Regular", "fill"), text("−", 16, "color.text.muted"), text("+", 16, "color.text.muted")]);
+  },
+
   RadioGroup: (c) => {
     const invalid = on(c, "isInvalid");
     const radio = (label: string, selected: boolean) =>

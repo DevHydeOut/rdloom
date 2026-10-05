@@ -2,6 +2,7 @@ export { Alert, type AlertProps } from "./alert/alert";
 export { Avatar, initialsOf, type AvatarProps } from "./avatar/avatar";
 export { Badge, type BadgeProps } from "./badge/badge";
 export { Accordion, AccordionItem, type AccordionItemProps, type AccordionProps } from "./accordion/accordion";
+export { BreadcrumbItem, Breadcrumbs, type BreadcrumbItemProps, type BreadcrumbsProps } from "./breadcrumbs/breadcrumbs";
 export { Button, type ButtonProps } from "./button/button";
 export { Calendar, RangeCalendar, type CalendarProps, type RangeCalendarProps } from "./calendar/calendar";
 export { Card, type CardProps } from "./card/card";
@@ -47,5 +48,24 @@ export { Tab, TabList, TabPanel, Tabs, type TabListProps, type TabPanelProps, ty
 export { TextField, type TextFieldProps } from "./text-field/text-field";
 export { toast, toastQueue, ToastRegion } from "./toast/toast";
 export { Tooltip, TooltipTrigger, type TooltipProps } from "./tooltip/tooltip";
+export { NumberField, type NumberFieldProps } from "./number-field/number-field";
+export { Pagination, paginationRange, type PaginationItem, type PaginationProps } from "./pagination/pagination";
 export { Progress, type ProgressProps } from "./progress/progress";
 export { Skeleton, type SkeletonProps } from "./skeleton/skeleton";
+export {
+  SegmentedControl,
+  SegmentedControlItem,
+  type SegmentedControlItemProps,
+  type SegmentedControlProps,
+} from "./segmented-control/segmented-control";
+export {
+  Table,
+  TableBody,
+  TableCell,
+  TableColumn,
+  TableHeader,
+  TableRow,
+  type SortDescriptor,
+  type TableColumnProps,
+  type TableProps,
+} from "./table/table";

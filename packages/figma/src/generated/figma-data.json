@@ -305,6 +305,13 @@
       ]
     },
     {
+      "name": "Breadcrumbs",
+      "id": "breadcrumbs",
+      "version": "0.1.0",
+      "description": "The path from the top of the site to the current page, as links. Use BreadcrumbItem for each step; the last one is the current page.",
+      "properties": []
+    },
+    {
       "name": "Button",
       "id": "button",
       "version": "0.1.0",
@@ -613,6 +620,68 @@
       ]
     },
     {
+      "name": "NumberField",
+      "id": "number-field",
+      "version": "0.1.0",
+      "description": "A text field for numbers, with increment and decrement buttons, keyboard stepping, and locale-aware formatting for decimals, currency, units and percentages.",
+      "properties": [
+        {
+          "prop": "size",
+          "name": "Size",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "default": "md"
+        },
+        {
+          "prop": "isDisabled",
+          "name": "Disabled",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        },
+        {
+          "prop": "isInvalid",
+          "name": "Invalid",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
+      "name": "Pagination",
+      "id": "pagination",
+      "version": "0.1.0",
+      "description": "Page numbers with previous and next buttons, for content split across pages. Long ranges collapse to the first page, the last page, and the pages around the current one.",
+      "properties": [
+        {
+          "prop": "size",
+          "name": "Size",
+          "values": [
+            "sm",
+            "md"
+          ],
+          "default": "md"
+        },
+        {
+          "prop": "isDisabled",
+          "name": "Disabled",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
       "name": "Popover",
       "id": "popover",
       "version": "0.1.0",
@@ -704,6 +773,32 @@
         {
           "prop": "isInvalid",
           "name": "Invalid",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
+      "name": "SegmentedControl",
+      "id": "segmented-control",
+      "version": "0.1.0",
+      "description": "A row of connected buttons where exactly one option is chosen, for switching a view or a setting with two to five choices. Use SegmentedControlItem for each option.",
+      "properties": [
+        {
+          "prop": "size",
+          "name": "Size",
+          "values": [
+            "sm",
+            "md"
+          ],
+          "default": "md"
+        },
+        {
+          "prop": "isDisabled",
+          "name": "Disabled",
           "values": [
             "false",
             "true"
@@ -834,6 +929,34 @@
             "true"
           ],
           "default": "false"
+        }
+      ]
+    },
+    {
+      "name": "Table",
+      "id": "table",
+      "version": "0.1.0",
+      "description": "A simple, accessible table for a small number of rows: optional sorting and row selection. Build it from TableHeader, TableColumn, TableBody, TableRow and TableCell. For thousands of rows, filtering, editing or grouping, use DataGrid.",
+      "properties": [
+        {
+          "prop": "density",
+          "name": "Density",
+          "values": [
+            "compact",
+            "standard",
+            "comfortable"
+          ],
+          "default": "standard"
+        },
+        {
+          "prop": "selectionMode",
+          "name": "Selection",
+          "values": [
+            "none",
+            "single",
+            "multiple"
+          ],
+          "default": "none"
         }
       ]
     },
