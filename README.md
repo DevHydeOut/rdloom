@@ -318,6 +318,19 @@ Set `serverSide`, `pageSize`, `rowCount` (the server's total) and `onQueryChange
 - **Set filter** (`meta: { filter: "set" }`). A checklist of the column's values, like a spreadsheet's filter: any ticked value matches. It lists the values in the data (up to 200) or `meta.filterOptions` when you give them, and gets a search box once there are more than 8. Enter or typing on its filter cell opens it. With `serverSide`, its value reaches `onQueryChange` as an array of strings.
 - **Row reorder** (`rowReorder`, `onRowReorder`). A handle column lets users drag rows, or move the focused row with Alt+Up and Alt+Down. The grid never changes your data: it calls `onRowReorder({ rowId, fromIndex, toIndex })` and you apply it, usually with the exported `reorderRows(rows, move)`. Every move is announced ("Moved Ada to position 2 of 4"). Reordering is switched off, and the handles say so, whenever the displayed order is no longer your data's order: while sorting, filtering or searching, with `groupBy` or `getSubRows`, and with `serverSide`.
 
+### Data Grid fill handle
+When the grid has focus, a small handle sits on the corner of the selection (or the focused cell). Drag it over adjacent cells to fill them from the selection, as in a spreadsheet; a preview outlines what will change, nothing is written until you let go, and Escape cancels. The grid scrolls when you reach its edge, and a fill follows whichever way you've gone further, down, up, left or right, never two at once.
+
+| Selected | Filled with |
+|---|---|
+| `2`, `4` | `6`, `8`, `10`: a steady step continues |
+| `10` (one number) | `10`, `10`: copied, as in a spreadsheet |
+| `Item 1` or `ORD-0009` | `Item 2`, `Item 3` or `ORD-0010`: text ending in a number counts up, keeping its width |
+| `2026-01-05`, `2026-01-12` | `2026-01-19`, `2026-01-26`: ISO dates step by the gap; a single date counts up a day |
+| anything else, or an uneven run | the selection repeats |
+
+Only editable cells are written (read-only cells and values a number column can't take are skipped and counted in the announcement), through `onCellsEdit` in one batch, or `onCellEdit` once per cell. The handle is a mouse shortcut and is hidden from assistive technology; the keyboard route is **Ctrl+D** (Cmd+D) to copy the top row of a selection down across it, or the cell above when nothing is selected, and **Ctrl+R** to do the same to the right. Both repeat rather than count up, like a spreadsheet's. Turn it all off with `fillHandle={false}`; it also needs `rangeSelection` and an edit handler.
+
 ### Data Grid ranges, clipboard and export
 - **Ranges.** Shift+arrows, Shift+click or a mouse drag select a block of cells; Escape clears it. Turn it off with `rangeSelection={false}`.
 - **Copy** (Ctrl/Cmd+C) puts the block on the clipboard as tab-separated text, the way the cells show it (`$1,200.50`, not `1200.5`), so it pastes straight into Excel or Google Sheets. With no block, it copies the focused cell.

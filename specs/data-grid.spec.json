@@ -1,10 +1,10 @@
 {
   "$schema": "./schema/component.schema.json",
   "name": "DataGrid",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "category": "data",
   "status": "experimental",
-  "description": "Accessible, virtualized data grid for large datasets: sorting, filtering, row selection, resizable and pinned columns, row grouping with totals, tree data, expandable detail rows, cell range selection with copy and paste, CSV and Excel export, server-side sorting, filtering and paging, a column menu, set filters and row reordering. Columns are TanStack Table column definitions.",
+  "description": "Accessible, virtualized data grid for large datasets: sorting, filtering, row selection, resizable and pinned columns, row grouping with totals, tree data, expandable detail rows, cell range selection with copy and paste, CSV and Excel export, server-side sorting, filtering and paging, a column menu, set filters, row reordering and a fill handle. Columns are TanStack Table column definitions.",
   "props": {
     "label": { "type": "string", "required": true, "description": "Accessible name of the grid, e.g. 'Orders'." },
     "data": { "type": "custom", "tsType": "readonly unknown[]", "description": "Rows to show. Keep the array reference stable between renders." },
@@ -51,6 +51,7 @@
       "description": "serverSide: called on mount and whenever the sort, filters, search or page change. Typing in a filter waits queryDelay ms; sorting and paging fire at once. Fetch, then pass the new data, rowCount and isLoading."
     },
     "queryDelay": { "type": "number", "default": 250, "description": "serverSide: milliseconds to wait after the last keystroke in a filter or search before calling onQueryChange." },
+    "fillHandle": { "type": "boolean", "default": true, "description": "A small handle on the corner of the selection: drag it to fill the cells it covers, continuing numbers (2, 4 gives 6, 8), text that ends in a number (Item 1 gives Item 2), ISO dates and otherwise repeating the values. Ctrl+D and Ctrl+R fill down and right from the keyboard. Needs rangeSelection and an edit handler (onCellEdit or onCellsEdit); only editable cells are written." },
     "columnMenu": { "type": "boolean", "default": false, "description": "Adds a menu to every column header: sort, pin, reset width, hide, and show hidden columns again. Alt+Down, Shift+F10 or the Menu key on a header opens it." },
     "rowReorder": { "type": "boolean", "default": false, "description": "Adds a drag handle column. Rows can be dragged, or moved with Alt+Up and Alt+Down. The grid reports the move through onRowReorder; you reorder your data. Off while sorting, filtering, grouping or serverSide is in use, because the rows are no longer in your data's order." },
     "onRowReorder": {
@@ -70,7 +71,7 @@
   },
   "variants": ["density", "selectionMode"],
   "states": ["default", "hover", "focus", "selected", "loading"],
-  "slots": ["column-menu", "set-filter", "reorder-handle", "scroller", "header-row", "column-header", "sort-indicator", "resizer", "filter-row", "filter", "row", "cell", "editor", "select-cell", "empty", "loading", "pager"],
+  "slots": ["fill-handle", "column-menu", "set-filter", "reorder-handle", "scroller", "header-row", "column-header", "sort-indicator", "resizer", "filter-row", "filter", "row", "cell", "editor", "select-cell", "empty", "loading", "pager"],
   "tokens": [
     "color.surface.default",
     "color.surface.subtle",
@@ -103,6 +104,7 @@
       "Shift+arrows, Shift+Home/End and Shift+PageUp/PageDown extend a block of cells from the cell you started on; Escape clears it",
       "Ctrl+C (Cmd+C) copies the block as tab-separated text, the way it is shown; with no block it copies the focused cell",
       "Ctrl+V (Cmd+V) pastes spreadsheet text into editable cells from the focused cell; one copied value fills a selected block",
+      "Ctrl+D (Cmd+D) copies the top row of the selection down across it, or with no selection copies the cell above; Ctrl+R (Cmd+R) does the same to the right. Only editable cells are written",
       "Alt+Down, Shift+F10 or the Menu key on a header opens its column menu; Escape closes it and returns to the header",
       "Enter or typing on a set-filter cell opens its checklist: arrows move, Space ticks a value, Escape closes it",
       "Alt+Up or Alt+Down on a row moves it up or down one place, when rowReorder is on and the grid is not sorted or filtered"
@@ -120,6 +122,7 @@
       "With grouping, tree data or detail rows the role is treegrid; rows expose aria-level and, when they can open, aria-expanded",
       "Group rows show their row count; only columns with an aggregationFn show a total, never the first row's value",
       "The expand toggle is a labelled button (Expand / Collapse) that isn't a separate tab stop",
+      "The fill handle is a mouse shortcut (hidden from assistive technology): everything it does is also available as Ctrl+D and Ctrl+R, and every fill is announced with how many cells were filled and skipped",
       "The column menu button has an accessible name (<column> column menu) and isn't a tab stop; the menu is a real menu with focus returned to the header on close",
       "The set filter's button names the filter and summarises it (All, one value, or N selected); its checklist is a multi-select listbox",
       "Each row's drag handle is labelled with the row and says Alt+Up or Alt+Down moves it, and says so when reordering is off; every move is announced",
@@ -135,6 +138,7 @@
       "The pager's range (Rows 11–20 of 237) is announced after changing page",
       "Group and tree rows announce their level and whether they are expanded or collapsed",
       "Extending a block with Shift+arrows announces the number of cells selected (for example, 6 cells selected)",
+      "Filling announces how many cells were filled and how many were skipped (3 cells filled, 1 skipped)",
       "Moving a row announces its new place (Moved Ada to position 3 of 20); a drag announces the same on drop",
       "Copying announces how many cells were copied; pasting announces how many were changed and how many were skipped",
       "With NVDA, table navigation (Ctrl+Alt+Arrow keys) works in browse mode"
@@ -146,7 +150,7 @@
     "avoid_when": ["A few items with rich layout: use a list or cards", "Pure layout: never use a grid for layout"],
     "anti_patterns": ["Buttons in every cell instead of a row action", "Horizontal scrolling without pinning the identifying column", "Formatting numbers or dates in a custom cell renderer: search and filters won't find the text users see. Use meta.format (e.g. a currency formatter) instead", "Rendering the grid straight from a React Server Component: getRowId, onCellEdit and the other callbacks are functions, which cannot cross the server boundary. Put the grid in your own component marked \"use client\""]
   },
-  "examples": ["basic", "selection", "large-dataset", "pinned", "filter", "column-filters", "editing", "pagination", "grouping", "tree-data", "master-detail", "range-copy-export", "server-side", "column-menu", "row-reorder"],
+  "examples": ["basic", "selection", "large-dataset", "pinned", "filter", "column-filters", "editing", "pagination", "grouping", "tree-data", "master-detail", "range-copy-export", "server-side", "column-menu", "row-reorder", "fill"],
   "figma": {
     "componentKey": null,
     "variantMap": { "density": "Density", "selectionMode": "Selection" }

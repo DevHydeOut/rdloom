@@ -25,6 +25,7 @@ import { cx } from "../utils/cx";
 import { Spinner } from "../utils/icons";
 import { columnFilter, filteredRowModel, searchFilter, sortedRowModel } from "./hierarchy";
 import { ColumnMenu, RowHandle, SetFilter, type ColumnMenuAction } from "./column-ui";
+import { extendValues } from "./fill";
 import { download, parseTsv, toCsv, toTsv, toXlsx, type ExportValue } from "./tabular";
 import type { DataGridApi, DataGridCellEdit, DataGridColumnMeta, DataGridExportOptions, DataGridQuery, DataGridRowMove } from "./types";
 
@@ -59,6 +60,20 @@ const rowHeights = { compact: 32, standard: 40, comfortable: 48 } as const;
 const SELECT_ID = "__select";
 const REORDER_ID = "__reorder";
 /** The columns the grid adds itself: they have no data, so copy, export and the column menu skip them. */
+type Rect = { r0: number; r1: number; c0: number; c1: number };
+
+/**
+ * The block a fill drag covers: the source, grown along one axis towards the
+ * pointer (the axis it has gone further along), never in two directions at once.
+ */
+function fillTarget(source: Rect, row: number, col: number): Rect {
+  const dRow = row > source.r1 ? row - source.r1 : row < source.r0 ? row - source.r0 : 0;
+  const dCol = col > source.c1 ? col - source.c1 : col < source.c0 ? col - source.c0 : 0;
+  if (dRow === 0 && dCol === 0) return source;
+  if (Math.abs(dRow) >= Math.abs(dCol)) return { ...source, r0: dRow < 0 ? row : source.r0, r1: dRow > 0 ? row : source.r1 };
+  return { ...source, c0: dCol < 0 ? col : source.c0, c1: dCol > 0 ? col : source.c1 };
+}
+
 const isSystemColumn = (id: string) => id === SELECT_ID || id === REORDER_ID;
 const RESIZE_STEP = 16;
 const MAX_SELECT_OPTIONS = 200;
@@ -176,6 +191,7 @@ export function DataGrid<T>({
   onQueryChange,
   queryDelay = dataGridDefaults.queryDelay,
   columnMenu = dataGridDefaults.columnMenu,
+  fillHandle = dataGridDefaults.fillHandle,
   rowReorder = dataGridDefaults.rowReorder,
   onRowReorder,
   isLoading = dataGridDefaults.isLoading,
@@ -208,6 +224,8 @@ export function DataGrid<T>({
   const [hidden, setHidden] = useState<string[]>([]);
   const columnVisibility = useMemo(() => Object.fromEntries(hidden.map((id) => [id, false])), [hidden]);
   const [menuCol, setMenuCol] = useState<string | null>(null);
+  const [fill, setFill] = useState<{ source: Rect; target: Rect } | null>(null);
+  const [gridFocused, setGridFocused] = useState(false);
   const [dragId, setDragId] = useState<string | null>(null);
   const [drop, setDrop] = useState<{ id: string; after: boolean } | null>(null);
   const [pageIndex, setPageIndex] = useState(0);
@@ -406,8 +424,8 @@ export function DataGrid<T>({
   const bodyStart = showColumnFilters ? 2 : 1;
   const headerBlock = rowHeight * bodyStart;
 
-  const canEdit = (column: Column<T, unknown>) => !!onCellEdit && !!metaOf(column).editable;
-  const anyEditable = !!onCellEdit && leafColumns.some((c) => metaOf(c).editable);
+  const canEdit = (column: Column<T, unknown>) => (!!onCellEdit || !!onCellsEdit) && !!metaOf(column).editable;
+  const anyEditable = (!!onCellEdit || !!onCellsEdit) && leafColumns.some((c) => metaOf(c).editable);
 
   // "Select all" acts on every row that passes the filters, across pages.
   // Memoized: scanning 100k rows on every keystroke-driven render adds up.
@@ -499,6 +517,14 @@ export function DataGrid<T>({
 
   // --- Focus (roving tabindex) and editing ---------------------------------
   const [active, setActive] = useState({ row: bodyStart, col: 0 });
+  // The cell most recently asked for. A pending focus waits until the rendered
+  // `active` is this one: an effect left over from an earlier render must not
+  // use up the request while the state it was made for is still on its way.
+  const latestActive = useRef(active);
+  const setActiveCell = (cell: { row: number; col: number }) => {
+    latestActive.current = cell;
+    setActive(cell);
+  };
   const [edit, setEdit] = useState<{ row: number; col: number; draft: string; invalid: boolean } | null>(null);
   const focusPending = useRef(false);
   // A block of cells runs from the anchor to the focused cell.
@@ -558,7 +584,7 @@ export function DataGrid<T>({
     const r = Math.max(extending ? bodyStart : 0, Math.min(row, lastRow));
     const c = Math.max(0, Math.min(col, colCount - 1));
     setAnchor(extending ? (anchor ? { row: anchorRow, col: anchorCol } : { row: activeRow, col: activeCol }) : null);
-    setActive({ row: r, col: c });
+    setActiveCell({ row: r, col: c });
     focusPending.current = true;
     if (virtualized && r >= bodyStart) virtualizer.scrollToIndex(r - bodyStart, { align: "auto" });
   };
@@ -566,7 +592,7 @@ export function DataGrid<T>({
   // Focus the active cell once it's rendered; with virtualization that can
   // take a render or two after scrolling. Skipped while an editor is open.
   useEffect(() => {
-    if (!focusPending.current || edit) return;
+    if (!focusPending.current || edit || active !== latestActive.current) return;
     const el = cellEl(activeRow, activeCol);
     if (!el) return;
     el.focus({ preventScroll: virtualized });
@@ -603,7 +629,12 @@ export function DataGrid<T>({
       }
       value = n;
     }
-    if (r) onCellEdit?.({ rowId: r.id, columnId: column.id, value, row: r.original });
+    if (r) {
+      const change = { rowId: r.id, columnId: column.id, value, row: r.original };
+      // One edit goes to onCellEdit; an app that only takes batches gets a batch of one.
+      if (onCellEdit) onCellEdit(change);
+      else onCellsEdit?.([change]);
+    }
     setEdit(null);
     focusPending.current = refocus;
     return true;
@@ -673,6 +704,13 @@ export function DataGrid<T>({
     setStatus(`${numberFormat.format(n)} ${n === 1 ? "cell" : "cells"} copied`);
   };
 
+  /** Hands changed cells to the app: one batch when it takes batches, else one call per cell. */
+  const applyEdits = (edits: DataGridCellEdit<T>[]) => {
+    if (!edits.length) return;
+    if (onCellsEdit) onCellsEdit(edits);
+    else edits.forEach((edit) => onCellEdit?.(edit));
+  };
+
   const onPaste = (e: ClipboardEvent<HTMLDivElement>) => {
     if (!rangeSelection || (!onCellEdit && !onCellsEdit) || !e.currentTarget.contains(e.target as Node) || isWidget(e.target as HTMLElement) || activeRow < bodyStart) return;
     const matrix = parseTsv(e.clipboardData.getData("text/plain"));
@@ -708,10 +746,7 @@ export function DataGrid<T>({
         edits.push({ rowId: r.id, columnId: column.id, value, row: r.original });
       }
     }
-    if (edits.length) {
-      if (onCellsEdit) onCellsEdit(edits);
-      else edits.forEach((edit) => onCellEdit?.(edit));
-    }
+    applyEdits(edits);
     // Show what the paste covered.
     const lastLine = lines[Math.max(0, rowCount - 1)];
     const width = single && rect ? cols.length : Math.min(matrix.reduce((n, m) => Math.max(n, m.length), 0), cols.length);
@@ -719,7 +754,7 @@ export function DataGrid<T>({
     if (rowCount > 1 || width > 1) {
       keepStatus.current = true;
       setAnchor({ row: lines[0], col: cols[0] });
-      setActive({ row: lastLine, col: lastCol });
+      setActiveCell({ row: lastLine, col: lastCol });
     }
     focusPending.current = true;
     setStatus(
@@ -766,6 +801,134 @@ export function DataGrid<T>({
       apiRef.current = null;
     };
   });
+
+  // --- Fill ------------------------------------------------------------------
+  const canFill = fillHandle && rangeSelection && (!!onCellEdit || !!onCellsEdit);
+
+  /**
+   * Writes the cells in `target` that lie outside `source`, continuing the
+   * source's values along the one axis the target grows in. `series` counts
+   * numbers up; without it the source just repeats (Ctrl+D, Ctrl+R).
+   */
+  const applyFill = (source: Rect, target: Rect, series: boolean) => {
+    const down = target.r1 > source.r1;
+    const up = target.r0 < source.r0;
+    const right = target.c1 > source.c1;
+    const left = target.c0 < source.c0;
+    if (!down && !up && !right && !left) return;
+    const edits: DataGridCellEdit<T>[] = [];
+    let skipped = 0;
+    const write = (line: number, col: number, value: unknown) => {
+      const r = rowAt(line)!;
+      const column = leafColumns[col];
+      if (!canEdit(column)) {
+        skipped++;
+        return;
+      }
+      let next = value;
+      if (metaOf(column).editor === "number") {
+        const n = typeof value === "number" ? value : typeof value === "string" && value.trim() !== "" ? Number(value) : NaN;
+        if (!Number.isFinite(n)) {
+          skipped++;
+          return;
+        }
+        next = n;
+      } else next = value === null || value === undefined ? "" : value instanceof Date ? value.toISOString() : String(value);
+      edits.push({ rowId: r.id, columnId: column.id, value: next, row: r.original });
+    };
+    if (down || up) {
+      const sourceLines = dataLinesFrom(source.r0, source.r1);
+      const newLines = down ? dataLinesFrom(source.r1 + 1, target.r1) : dataLinesFrom(target.r0, source.r0 - 1).reverse();
+      for (const c of dataColsFrom(source.c0, source.c1)) {
+        const values = sourceLines.map((g) => rowAt(g)!.getValue(leafColumns[c].id));
+        const next = extendValues(down ? values : values.reverse(), newLines.length, series);
+        newLines.forEach((g, k) => write(g, c, next[k]));
+      }
+    } else {
+      const sourceCols = dataColsFrom(source.c0, source.c1);
+      const newCols = right ? dataColsFrom(source.c1 + 1, target.c1) : dataColsFrom(target.c0, source.c0 - 1).reverse();
+      for (const g of dataLinesFrom(source.r0, source.r1)) {
+        const row = rowAt(g)!;
+        const values = sourceCols.map((c) => row.getValue(leafColumns[c].id));
+        const next = extendValues(right ? values : values.reverse(), newCols.length, series);
+        newCols.forEach((c, k) => write(g, c, next[k]));
+      }
+    }
+    applyEdits(edits);
+    // Select what was filled, and say how it went.
+    keepStatus.current = true;
+    setAnchor({ row: target.r0, col: target.c0 });
+    setActiveCell({ row: target.r1, col: target.c1 });
+    focusPending.current = true;
+    setStatus(
+      `${numberFormat.format(edits.length)} ${edits.length === 1 ? "cell" : "cells"} filled` +
+        (skipped ? `, ${numberFormat.format(skipped)} skipped` : ""),
+    );
+  };
+
+  /** Ctrl+D / Ctrl+R: copy the top row (or the left column) of the selection across it. With no selection, copy from the cell above (or to the left). */
+  const fillCommand = (direction: "down" | "right") => {
+    const r0 = rect ? rect.r0 : direction === "down" ? activeRow - 1 : activeRow;
+    const r1 = rect ? rect.r1 : activeRow;
+    const c0 = rect ? rect.c0 : direction === "right" ? activeCol - 1 : activeCol;
+    const c1 = rect ? rect.c1 : activeCol;
+    if (r0 < bodyStart || c0 < 0) return;
+    if (direction === "down" && r1 > r0) applyFill({ r0, r1: r0, c0, c1 }, { r0, r1, c0, c1 }, false);
+    if (direction === "right" && c1 > c0) applyFill({ r0, r1, c0, c1: c0 }, { r0, r1, c0, c1 }, false);
+  };
+
+  // Dragging the handle: the target follows the pointer; letting go fills.
+  const commitFill = useRef<() => void>(() => {});
+  commitFill.current = () => {
+    const current = fill;
+    setFill(null);
+    if (current) applyFill(current.source, current.target, true);
+  };
+  const filling = fill !== null;
+  useEffect(() => {
+    if (!filling) return;
+    const pointer = { x: 0, y: 0, moved: false };
+    const track = () => {
+      if (!pointer.moved) return;
+      const cell = document.elementFromPoint(pointer.x, pointer.y)?.closest<HTMLElement>("[data-cell]");
+      const at = cell && /^(\d+):(\d+)$/.exec(cell.dataset.cell ?? "");
+      if (!at) return;
+      const row = Math.max(bodyStart, Math.min(Number(at[1]), lastRow));
+      setFill((f) => (f ? { source: f.source, target: fillTarget(f.source, row, Number(at[2])) } : f));
+    };
+    const onMove = (e: MouseEvent) => {
+      pointer.x = e.clientX;
+      pointer.y = e.clientY;
+      pointer.moved = true;
+      track();
+    };
+    const onUp = () => commitFill.current();
+    const onKey = (e: globalThis.KeyboardEvent) => {
+      if (e.key === "Escape") setFill(null);
+    };
+    // Near the edge of the grid, keep scrolling so a long fill can reach its end.
+    const scroller = scrollRef.current;
+    const timer = setInterval(() => {
+      if (!scroller || !pointer.moved) return;
+      const box = scroller.getBoundingClientRect();
+      const edge = 28;
+      if (pointer.y > box.bottom - edge) scroller.scrollTop += 24;
+      else if (pointer.y < box.top + headerBlock + edge) scroller.scrollTop -= 24;
+      if (pointer.x > box.right - edge) scroller.scrollLeft += 24;
+      else if (pointer.x < box.left + edge) scroller.scrollLeft -= 24;
+      track();
+    }, 40);
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+    window.addEventListener("keydown", onKey);
+    return () => {
+      clearInterval(timer);
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+      window.removeEventListener("keydown", onKey);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- runs for the length of one drag
+  }, [filling]);
 
   // --- Column menu and row reorder ------------------------------------------
   const rowName = (row: Row<T>) => {
@@ -880,6 +1043,11 @@ export function DataGrid<T>({
       setMenuCol(column.id);
       return;
     }
+    if (canFill && ctrl && !e.altKey && !e.shiftKey && activeRow >= bodyStart && /^[dr]$/i.test(e.key)) {
+      e.preventDefault(); // Ctrl+D would bookmark the page and Ctrl+R reload it
+      fillCommand(e.key.toLowerCase() === "d" ? "down" : "right");
+      return;
+    }
     if (rowReorder && row && !row.getIsGrouped() && e.altKey && (e.key === "ArrowUp" || e.key === "ArrowDown")) {
       e.preventDefault();
       if (canReorder) moveRow(row, e.key === "ArrowUp" ? -1 : 1);
@@ -950,7 +1118,7 @@ export function DataGrid<T>({
         if (ctrl && rangeSelection && activeRow >= bodyStart) {
           // Without row checkboxes, Ctrl+A takes every cell.
           setAnchor({ row: bodyStart, col: 0 });
-          setActive({ row: lastRow, col: colCount - 1 });
+          setActiveCell({ row: lastRow, col: colCount - 1 });
           focusPending.current = true;
           if (virtualized) virtualizer.scrollToIndex(lastRow - bodyStart, { align: "auto" });
           break;
@@ -997,6 +1165,10 @@ export function DataGrid<T>({
         onKeyDown={onKeyDown}
         onCopy={onCopy}
         onPaste={onPaste}
+        onFocus={() => setGridFocused(true)}
+        onBlur={(e) => {
+          if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setGridFocused(false);
+        }}
       >
         <div ref={scrollRef} className="relative overflow-auto" style={{ height }}>
           <div role="rowgroup" className="sticky top-0 z-[2]" style={{ width: totalWidth, minWidth: "100%" }}>
@@ -1019,7 +1191,7 @@ export function DataGrid<T>({
                     aria-sort={canSort ? (sorted === "asc" ? "ascending" : sorted === "desc" ? "descending" : "none") : undefined}
                     data-cell={`0:${col}`}
                     tabIndex={isTabStop(0, col) ? 0 : -1}
-                    onFocus={() => setActive({ row: 0, col })}
+                    onFocus={() => setActiveCell({ row: 0, col })}
                     onClick={canSort ? column.getToggleSortingHandler() : undefined}
                     className={cx(
                       "relative flex flex-none items-center gap-1 px-3 font-medium text-[var(--rd-color-text-muted)] select-none",
@@ -1100,7 +1272,7 @@ export function DataGrid<T>({
                       aria-colindex={col + 1}
                       data-cell={`1:${col}`}
                       tabIndex={isTabStop(1, col) ? 0 : -1}
-                      onFocus={(e) => e.target === e.currentTarget && setActive({ row: 1, col })}
+                      onFocus={(e) => e.target === e.currentTarget && setActiveCell({ row: 1, col })}
                       className={cx("flex flex-none items-center px-1.5 bg-[var(--rd-color-surface-subtle)]", cellFocus)}
                       style={{ width: column.getSize(), ...pinStyle(column, 3) }}
                     >
@@ -1110,7 +1282,7 @@ export function DataGrid<T>({
                           aria-label={filterLabel}
                           value={value}
                           onChange={(e) => column.setFilterValue(e.target.value || undefined)}
-                          onFocus={() => setActive({ row: 1, col })}
+                          onFocus={() => setActiveCell({ row: 1, col })}
                           className={widgetInput}
                         >
                           <option value="">All</option>
@@ -1135,7 +1307,7 @@ export function DataGrid<T>({
                           placeholder="Filter"
                           value={value}
                           onChange={(e) => column.setFilterValue(e.target.value || undefined)}
-                          onFocus={() => setActive({ row: 1, col })}
+                          onFocus={() => setActiveCell({ row: 1, col })}
                           className={widgetInput}
                         />
                       ) : null}
@@ -1179,7 +1351,7 @@ export function DataGrid<T>({
                       aria-colspan={colCount}
                       data-cell={`${gridRow}:0`}
                       tabIndex={isTabStop(gridRow, 0) ? 0 : -1}
-                      onFocus={(e) => e.target === e.currentTarget && setActive({ row: gridRow, col: activeCol })}
+                      onFocus={(e) => e.target === e.currentTarget && setActiveCell({ row: gridRow, col: activeCol })}
                       // Stays in view while the grid scrolls sideways.
                       className={cx("sticky left-0 overflow-auto p-3", cellFocus)}
                       style={{ width: viewWidth || "100%", height: detailHeight }}
@@ -1243,6 +1415,23 @@ export function DataGrid<T>({
                     const editable = canEdit(column) && !isGroup;
                     const isEditing = edit?.row === gridRow && edit.col === col;
                     const toggle = isToggleCell(row, col);
+                    const inFill =
+                      !!fill &&
+                      gridRow >= fill.target.r0 &&
+                      gridRow <= fill.target.r1 &&
+                      col >= fill.target.c0 &&
+                      col <= fill.target.c1 &&
+                      !(gridRow >= fill.source.r0 && gridRow <= fill.source.r1 && col >= fill.source.c0 && col <= fill.source.c1);
+                    // The handle sits on the bottom-right cell of the selection (or the focused cell).
+                    const showHandle =
+                      canFill &&
+                      gridFocused &&
+                      !fill &&
+                      !edit &&
+                      !isGroup &&
+                      !isSystemColumn(column.id) &&
+                      gridRow === (rect ? rect.r1 : activeRow) &&
+                      col === (rect ? rect.c1 : activeCol);
                     const inRange = !!rect && gridRow >= rect.r0 && gridRow <= rect.r1 && col >= rect.c0 && col <= rect.c1;
                     // Tree rows step in by depth; group rows and their rows line up by column.
                     const indent = isTree && col === expanderCol ? row.depth * 20 + (canExpand ? 0 : 24) : 0;
@@ -1254,9 +1443,10 @@ export function DataGrid<T>({
                         aria-readonly={anyEditable && !editable && column.id !== SELECT_ID ? true : undefined}
                         aria-selected={inRange || undefined}
                         data-range={inRange || undefined}
+                        data-fill={inFill || undefined}
                         data-cell={`${gridRow}:${col}`}
                         tabIndex={isTabStop(gridRow, col) ? 0 : -1}
-                        onFocus={(e) => e.target === e.currentTarget && setActive({ row: gridRow, col })}
+                        onFocus={(e) => e.target === e.currentTarget && setActiveCell({ row: gridRow, col })}
                         onMouseDown={(e) => {
                           if (isEditing) return;
                           if (rangeSelection && e.button === 0 && !isSystemColumn(column.id)) {
@@ -1269,14 +1459,14 @@ export function DataGrid<T>({
                               dragStart.current = { row: gridRow, col };
                             }
                           }
-                          setActive({ row: gridRow, col });
+                          setActiveCell({ row: gridRow, col });
                           focusPending.current = true;
                         }}
                         onMouseEnter={() => {
                           const start = dragStart.current;
                           if (!start || (start.row === gridRow && start.col === col)) return;
                           setAnchor(start);
-                          setActive({ row: gridRow, col });
+                          setActiveCell({ row: gridRow, col });
                           focusPending.current = true;
                         }}
                         // Phones: there's no key to type on a cell and no on-screen
@@ -1303,6 +1493,8 @@ export function DataGrid<T>({
                           editable && "cursor-text",
                           rangeSelection && !isEditing && "select-none",
                           inRange && "bg-[var(--rd-color-surface-selected)]",
+                          inFill && "bg-[var(--rd-color-surface-selected)] shadow-[inset_0_0_0_1px_var(--rd-color-action-primary)]",
+                          showHandle && "relative",
                           pinned &&
                             "bg-[var(--rd-color-surface-default)] group-hover:bg-[var(--rd-color-surface-subtle)] " +
                               "group-data-[selected]:bg-[var(--rd-color-surface-selected)]",
@@ -1311,6 +1503,23 @@ export function DataGrid<T>({
                         )}
                         style={{ width: column.getSize(), paddingInlineStart: indent ? 12 + indent : undefined, ...pinStyle(column) }}
                       >
+                        {showHandle && (
+                          <span
+                            aria-hidden="true"
+                            data-fill-handle=""
+                            onMouseDown={(e) => {
+                              if (e.button !== 0) return;
+                              e.preventDefault(); // keep focus in the grid
+                              e.stopPropagation(); // not the start of a range drag
+                              const source = rect ?? { r0: activeRow, r1: activeRow, c0: activeCol, c1: activeCol };
+                              setFill({ source, target: source });
+                            }}
+                            className={
+                              "absolute bottom-0 end-0 z-[3] size-2.5 cursor-crosshair border border-[var(--rd-color-surface-default)] " +
+                              "bg-[var(--rd-color-action-primary)]"
+                            }
+                          />
+                        )}
                         {toggle && <ExpandToggle expanded={row.getIsExpanded()} onToggle={() => row.toggleExpanded()} />}
                         {column.id === REORDER_ID ? (
                           isGroup ? null : (
