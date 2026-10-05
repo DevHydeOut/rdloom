@@ -305,6 +305,13 @@
       ]
     },
     {
+      "name": "BlurFade",
+      "id": "blur-fade",
+      "version": "0.1.0",
+      "description": "Content that sharpens and slides into place when it first appears or when it scrolls into view. It is visible to start with, so it never hides content from anyone.",
+      "properties": []
+    },
+    {
       "name": "Breadcrumbs",
       "id": "breadcrumbs",
       "version": "0.1.0",
@@ -643,6 +650,52 @@
       ]
     },
     {
+      "name": "GradientButton",
+      "id": "gradient-button",
+      "version": "0.1.0",
+      "description": "A button with a colour that travels around its edge. The label sits on the normal button surface, so its contrast is the plain Button's. Builds on Button.",
+      "properties": [
+        {
+          "prop": "variant",
+          "name": "Variant",
+          "values": [
+            "primary",
+            "secondary",
+            "ghost",
+            "danger"
+          ],
+          "default": "secondary"
+        },
+        {
+          "prop": "size",
+          "name": "Size",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "default": "md"
+        }
+      ]
+    },
+    {
+      "name": "GradientText",
+      "id": "gradient-text",
+      "version": "0.1.0",
+      "description": "Text filled with a gradient that keeps flowing, for a short headline or a highlighted word. The words stay real text.",
+      "properties": [
+        {
+          "prop": "isPaused",
+          "name": "Paused",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
       "name": "Kbd",
       "id": "kbd",
       "version": "0.1.0",
@@ -805,6 +858,35 @@
       ]
     },
     {
+      "name": "PulseButton",
+      "id": "pulse-button",
+      "version": "0.1.0",
+      "description": "A button with a soft ring that keeps radiating out, to draw the eye to the one action that matters now. Builds on Button.",
+      "properties": [
+        {
+          "prop": "variant",
+          "name": "Variant",
+          "values": [
+            "primary",
+            "secondary",
+            "ghost",
+            "danger"
+          ],
+          "default": "primary"
+        },
+        {
+          "prop": "size",
+          "name": "Size",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "default": "md"
+        }
+      ]
+    },
+    {
       "name": "RadioGroup",
       "id": "radio-group",
       "version": "0.1.1",
@@ -831,6 +913,81 @@
         {
           "prop": "isInvalid",
           "name": "Invalid",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
+      "name": "RevealButton",
+      "id": "reveal-button",
+      "version": "0.1.0",
+      "description": "A button that opens an arrow beside its label when you hover or focus it, to suggest \"go\". Only a transition, so there is nothing to pause. Builds on Button.",
+      "properties": [
+        {
+          "prop": "variant",
+          "name": "Variant",
+          "values": [
+            "primary",
+            "secondary",
+            "ghost",
+            "danger"
+          ],
+          "default": "primary"
+        },
+        {
+          "prop": "size",
+          "name": "Size",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "default": "md"
+        }
+      ]
+    },
+    {
+      "name": "RippleButton",
+      "id": "ripple-button",
+      "version": "0.1.0",
+      "description": "A button that sends a ripple out from where you pressed it, or from its centre when pressed with the keyboard. Builds on Button.",
+      "properties": [
+        {
+          "prop": "variant",
+          "name": "Variant",
+          "values": [
+            "primary",
+            "secondary",
+            "ghost",
+            "danger"
+          ],
+          "default": "primary"
+        },
+        {
+          "prop": "size",
+          "name": "Size",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "default": "md"
+        }
+      ]
+    },
+    {
+      "name": "Ripple",
+      "id": "ripple",
+      "version": "0.1.0",
+      "description": "Concentric rings that swell outward from the centre, as a calm backdrop behind a heading or a call to action. Content goes in front of the rings.",
+      "properties": [
+        {
+          "prop": "isPaused",
+          "name": "Paused",
           "values": [
             "false",
             "true"
@@ -926,6 +1083,69 @@
             "lg"
           ],
           "default": "md"
+        }
+      ]
+    },
+    {
+      "name": "ShimmerButton",
+      "id": "shimmer-button",
+      "version": "0.1.0",
+      "description": "A button with a soft band of light that crosses its surface now and then, for one standout action. Builds on Button, so focus, disabled and loading work the same.",
+      "properties": [
+        {
+          "prop": "variant",
+          "name": "Variant",
+          "values": [
+            "primary",
+            "secondary",
+            "ghost",
+            "danger"
+          ],
+          "default": "primary"
+        },
+        {
+          "prop": "size",
+          "name": "Size",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "default": "md"
+        }
+      ]
+    },
+    {
+      "name": "ShineBorder",
+      "id": "shine-border",
+      "version": "0.1.0",
+      "description": "A band of colour that slides steadily along a border, so the edge seems to catch the light. Wrap a card or a field.",
+      "properties": [
+        {
+          "prop": "isPaused",
+          "name": "Paused",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
+      "name": "ShuttleBorder",
+      "id": "shuttle-border",
+      "version": "0.1.0",
+      "description": "A point of light that runs around the edge of whatever is inside, like the shuttle of a loom crossing the threads. Wrap a card, an input or a button; give it your radius and background.",
+      "properties": [
+        {
+          "prop": "isPaused",
+          "name": "Paused",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
         }
       ]
     },
@@ -1124,6 +1344,23 @@
         {
           "prop": "isInvalid",
           "name": "Invalid",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
+      "name": "TextShimmer",
+      "id": "text-shimmer",
+      "version": "0.1.0",
+      "description": "Text with a band of light sweeping across it, for a loading message or a quiet accent. The words stay real text: selectable and read as normal.",
+      "properties": [
+        {
+          "prop": "isPaused",
+          "name": "Paused",
           "values": [
             "false",
             "true"

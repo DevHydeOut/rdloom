@@ -1,0 +1,97 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "ShuttleBorder",
+  "version": "0.1.0",
+  "category": "motion",
+  "status": "experimental",
+  "description": "A point of light that runs around the edge of whatever is inside, like the shuttle of a loom crossing the threads. Wrap a card, an input or a button; give it your radius and background.",
+  "props": {
+    "children": {
+      "type": "node",
+      "description": "The content the light runs around.",
+      "required": true
+    },
+    "color": {
+      "type": "string",
+      "description": "Colour of the light, any CSS colour. Defaults to the action colour."
+    },
+    "duration": {
+      "type": "number",
+      "description": "Seconds for one lap.",
+      "default": 4
+    },
+    "borderWidth": {
+      "type": "number",
+      "description": "Thickness of the light in pixels.",
+      "default": 1.5
+    },
+    "isPaused": {
+      "type": "boolean",
+      "description": "Stops the animation. Moving content that lasts more than five seconds should be stoppable.",
+      "default": false
+    },
+    "className": {
+      "type": "string",
+      "description": "Classes for the wrapper: set its radius, background and border here."
+    }
+  },
+  "variants": [
+    "isPaused"
+  ],
+  "states": [
+    "default"
+  ],
+  "slots": [
+    "root",
+    "light",
+    "content"
+  ],
+  "tokens": [
+    "color.action.primary",
+    "color.feedback.warning",
+    "color.feedback.info",
+    "color.surface.default",
+    "color.border.default",
+    "radius.overlay"
+  ],
+  "a11y": {
+    "role": "none",
+    "keyboard": [],
+    "requirements": [
+      "Decoration only: the animated layers are hidden from assistive technology and never take focus",
+      "Stands still for visitors who ask for less motion (prefers-reduced-motion), and the effect can also be shown still with the rdm-still class",
+      "The light is drawn in a layer that ignores the pointer, so it never blocks clicks or text selection",
+      "The content inside is unchanged: its own contrast and focus apply",
+      "Does not flash: nothing changes more than three times in a second (WCAG 2.3.1)",
+      "Optional: it is a separate component, so projects that do not add it carry none of its code"
+    ],
+    "screenReader": [
+      "Silent: the wrapper adds nothing to what is read"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "Highlighting one card, pricing plan or search field",
+      "Drawing the eye to a featured block"
+    ],
+    "avoid_when": [
+      "Wrapping many items at once",
+      "Content that someone must read for a long time right next to the moving light"
+    ],
+    "anti_patterns": [
+      "Putting it on every card in a grid",
+      "A duration under two seconds"
+    ]
+  },
+  "examples": [
+    "basic",
+    "colors"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {
+      "isPaused": "Paused"
+    }
+  }
+}

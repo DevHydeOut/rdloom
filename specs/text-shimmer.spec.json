@@ -1,0 +1,86 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "TextShimmer",
+  "version": "0.1.0",
+  "category": "motion",
+  "status": "experimental",
+  "description": "Text with a band of light sweeping across it, for a loading message or a quiet accent. The words stay real text: selectable and read as normal.",
+  "props": {
+    "children": {
+      "type": "node",
+      "description": "The text.",
+      "required": true
+    },
+    "duration": {
+      "type": "number",
+      "description": "Seconds for one sweep.",
+      "default": 2.8
+    },
+    "baseColor": {
+      "type": "string",
+      "description": "The resting colour of the text, any CSS colour. Defaults to the muted text colour."
+    },
+    "highlightColor": {
+      "type": "string",
+      "description": "The colour of the passing light, any CSS colour. Defaults to the main text colour."
+    },
+    "isPaused": {
+      "type": "boolean",
+      "description": "Stops the animation. Moving content that lasts more than five seconds should be stoppable.",
+      "default": false
+    }
+  },
+  "variants": [
+    "isPaused"
+  ],
+  "states": [
+    "default"
+  ],
+  "slots": [
+    "root"
+  ],
+  "tokens": [
+    "color.text.default",
+    "color.text.muted"
+  ],
+  "a11y": {
+    "role": "text",
+    "keyboard": [],
+    "requirements": [
+      "Decoration only: the animated layers are hidden from assistive technology and never take focus",
+      "Stands still for visitors who ask for less motion (prefers-reduced-motion), and the effect can also be shown still with the rdm-still class",
+      "Both colours meet 4.5:1 against the page, so the text is readable at every point of the sweep",
+      "In forced-colors (high contrast) mode it is drawn in the system text colour with no effect",
+      "Does not flash: nothing changes more than three times in a second (WCAG 2.3.1)",
+      "Optional: it is a separate component, so projects that do not add it carry none of its code"
+    ],
+    "screenReader": [
+      "Read as ordinary text: the sweep is purely visual"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "\"Thinking…\" and other loading messages",
+      "A short label that should feel alive"
+    ],
+    "avoid_when": [
+      "Paragraphs of body text",
+      "Anything the user must read closely"
+    ],
+    "anti_patterns": [
+      "Choosing two colours that are close in lightness, which makes the sweep invisible",
+      "Long passages"
+    ]
+  },
+  "examples": [
+    "basic",
+    "in-a-heading"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {
+      "isPaused": "Paused"
+    }
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "BlurFade",
+  "version": "0.1.0",
+  "category": "motion",
+  "status": "experimental",
+  "description": "Content that sharpens and slides into place when it first appears or when it scrolls into view. It is visible to start with, so it never hides content from anyone.",
+  "props": {
+    "children": {
+      "type": "node",
+      "description": "The content to reveal.",
+      "required": true
+    },
+    "delay": {
+      "type": "number",
+      "description": "Seconds to wait before revealing. Stagger a list by giving each item a longer delay.",
+      "default": 0
+    },
+    "duration": {
+      "type": "number",
+      "description": "Seconds the reveal takes.",
+      "default": 0.5
+    },
+    "offset": {
+      "type": "number",
+      "description": "How far, in pixels, it starts below its place.",
+      "default": 8
+    },
+    "blur": {
+      "type": "number",
+      "description": "How blurred it starts, in pixels.",
+      "default": 6
+    },
+    "whenInView": {
+      "type": "boolean",
+      "description": "Wait until it scrolls into view. Otherwise it reveals as soon as it mounts.",
+      "default": true
+    }
+  },
+  "variants": [],
+  "states": [
+    "default"
+  ],
+  "slots": [
+    "root"
+  ],
+  "tokens": [],
+  "a11y": {
+    "role": "none",
+    "keyboard": [],
+    "requirements": [
+      "Decoration only: the animated layers are hidden from assistive technology and never take focus",
+      "Stands still for visitors who ask for less motion (prefers-reduced-motion), and the effect can also be shown still with the rdm-still class",
+      "Visible in the server-rendered page and without JavaScript; it is only hidden, before the first paint, once the browser can reveal it again",
+      "With reduced motion it is never hidden: it simply appears",
+      "The content is in the page and readable by assistive technology the whole time (opacity is not display:none)",
+      "Does not flash: nothing changes more than three times in a second (WCAG 2.3.1)",
+      "Optional: it is a separate component, so projects that do not add it carry none of its code"
+    ],
+    "screenReader": [
+      "Silent: the content is read in place as normal"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "Landing page sections, feature lists and cards that arrive as you scroll",
+      "Staggering the entrance of a short list"
+    ],
+    "avoid_when": [
+      "Content people need immediately, such as error messages or the main task of a page",
+      "Long lists: delays add up"
+    ],
+    "anti_patterns": [
+      "Delays over about half a second per item",
+      "Wrapping the whole page, so nothing is readable until it finishes"
+    ]
+  },
+  "examples": [
+    "basic",
+    "in-view"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {}
+  }
+}

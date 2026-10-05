@@ -309,6 +309,19 @@ function NeighbourLinks({ id }: { id: string }) {
 
 // --- The page ----------------------------------------------------------------------------
 
+/** What every motion component promises, said once at the top of its page. */
+function MotionNote() {
+  return (
+    <div className="mb-2 rounded-xl border border-[var(--site-border)] bg-[var(--site-subtle)] p-4 text-sm leading-6">
+      <p className="font-medium">Optional, and kept apart.</p>
+      <p className="text-[var(--site-muted)]">
+        Nothing here is included in a project unless you add it, and the plain component it builds on is unchanged. This effect is decoration: it is hidden from screen readers,
+        stands still for visitors who prefer reduced motion, and can be paused. Use <strong className="font-medium text-[var(--site-fg)]">Still</strong> on a preview to see that version.
+      </p>
+    </div>
+  );
+}
+
 export function ComponentPage({ component }: { component: DocComponent }) {
   const { spec, id } = component;
   const a = spec.a11y;
@@ -334,8 +347,10 @@ export function ComponentPage({ component }: { component: DocComponent }) {
         }
       />
 
+      {spec.category === "motion" && <MotionNote />}
+
       {hero && (
-        <Preview code={hero.code} label={`${title(hero.name)} code`} tall={id === "data-grid" || id === "calendar"}>
+        <Preview code={hero.code} label={`${title(hero.name)} code`} tall={id === "data-grid" || id === "calendar"} motion={spec.category === "motion"}>
           <Live component={component} example={hero} />
         </Preview>
       )}
@@ -351,7 +366,7 @@ export function ComponentPage({ component }: { component: DocComponent }) {
           <H2 id={`example-${e.name}`} label={title(e.name)}>
             {title(e.name)}
           </H2>
-          <Preview code={e.code} label={`${title(e.name)} code`}>
+          <Preview code={e.code} label={`${title(e.name)} code`} motion={spec.category === "motion"}>
             <Live component={component} example={e} />
           </Preview>
         </section>

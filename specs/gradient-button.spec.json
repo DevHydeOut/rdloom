@@ -1,0 +1,136 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "GradientButton",
+  "version": "0.1.0",
+  "category": "motion",
+  "status": "experimental",
+  "description": "A button with a colour that travels around its edge. The label sits on the normal button surface, so its contrast is the plain Button's. Builds on Button.",
+  "props": {
+    "children": {
+      "type": "node",
+      "description": "Button label. Icon-only buttons must pass aria-label instead.",
+      "required": true
+    },
+    "variant": {
+      "type": "enum",
+      "values": [
+        "primary",
+        "secondary",
+        "ghost",
+        "danger"
+      ],
+      "description": "Visual emphasis, as on Button.",
+      "default": "secondary"
+    },
+    "size": {
+      "type": "enum",
+      "values": [
+        "sm",
+        "md",
+        "lg"
+      ],
+      "description": "Height, padding and font size, as on Button.",
+      "default": "md"
+    },
+    "colors": {
+      "type": "custom",
+      "tsType": "readonly string[]",
+      "description": "Colours of the edge, any CSS colours. Two or more."
+    },
+    "duration": {
+      "type": "number",
+      "description": "Seconds for the colour to travel once around.",
+      "default": 3
+    },
+    "borderWidth": {
+      "type": "number",
+      "description": "Thickness of the coloured edge in pixels.",
+      "default": 2
+    },
+    "isPaused": {
+      "type": "boolean",
+      "description": "Stops the animation. Moving content that lasts more than five seconds should be stoppable.",
+      "default": false
+    },
+    "isDisabled": {
+      "type": "boolean",
+      "description": "Prevents interaction and dims the button.",
+      "default": false
+    },
+    "isLoading": {
+      "type": "boolean",
+      "description": "Shows a spinner and blocks presses; the pending state is announced.",
+      "default": false
+    },
+    "onPress": {
+      "type": "callback",
+      "tsType": "() => void",
+      "description": "Called when the button is pressed by mouse, touch or keyboard."
+    }
+  },
+  "variants": [
+    "variant",
+    "size"
+  ],
+  "states": [
+    "default"
+  ],
+  "slots": [
+    "root",
+    "edge",
+    "label"
+  ],
+  "tokens": [
+    "color.action.primary",
+    "color.action.on-primary",
+    "color.action.danger",
+    "color.surface.default",
+    "color.text.default",
+    "color.border.default",
+    "color.focus.ring",
+    "radius.control",
+    "color.feedback.warning",
+    "color.feedback.info"
+  ],
+  "a11y": {
+    "role": "button",
+    "keyboard": [
+      "Tab focuses it",
+      "Enter or Space presses it"
+    ],
+    "requirements": [
+      "Decoration only: the animated layers are hidden from assistive technology and never take focus",
+      "Stands still for visitors who ask for less motion (prefers-reduced-motion), and the effect can also be shown still with the rdm-still class",
+      "Text contrast comes from the button surface; the colours only decorate the edge, which meets 3:1 against the page by default",
+      "A disabled button stops moving",
+      "Does not flash: nothing changes more than three times in a second (WCAG 2.3.1)",
+      "Optional: it is a separate component, so projects that do not add it carry none of its code"
+    ],
+    "screenReader": [
+      "Announced exactly as a Button: its label, as a button; the effect adds nothing to what is read"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "A featured action, such as Upgrade or Try the new editor"
+    ],
+    "avoid_when": [
+      "Forms with several actions side by side"
+    ],
+    "anti_patterns": [
+      "Choosing edge colours that vanish into the page"
+    ]
+  },
+  "examples": [
+    "basic",
+    "colors"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {
+      "variant": "Variant",
+      "size": "Size"
+    }
+  }
+}

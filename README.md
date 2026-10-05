@@ -6,7 +6,7 @@
 
 Every component is defined once, as a JSON spec. That spec generates the TypeScript types, the design tokens, the Figma library, the documentation and the AI-agent context, so design, code and AI tools never drift apart.
 
-> Status: 39 components built and tested, including a 100,000-row DataGrid, a command palette, file upload, DateRangePicker, Combobox and Table. The CLI (`rdloom`) and the MCP server (`@rdloom/mcp`) are on npm; the docs site is not hosted yet.
+> Status: 50 components built and tested, including a 100,000-row DataGrid, a command palette, file upload, DateRangePicker, Combobox and Table. The CLI (`rdloom`) and the MCP server (`@rdloom/mcp`) are on npm; the docs site is not hosted yet.
 
 ## How it works
 
@@ -336,6 +336,20 @@ Only editable cells are written (read-only cells and values a number column can'
 - **Copy** (Ctrl/Cmd+C) puts the block on the clipboard as tab-separated text, the way the cells show it (`$1,200.50`, not `1200.5`), so it pastes straight into Excel or Google Sheets. With no block, it copies the focused cell.
 - **Paste** (Ctrl/Cmd+V) writes spreadsheet text into editable cells from the focused cell; read-only cells and text in a number column are skipped and counted in the announcement. One copied value fills a selected block. Pass `onCellsEdit` to apply a whole paste in a single state update; without it, `onCellEdit` is called once per cell, and applying each with `setRows(rows.map(...))` instead of the functional form would keep only the last.
 - **Export.** Pass `apiRef` (`useRef<DataGridApi>(null)`) and call `getCsv()`, `downloadCsv()` or `downloadExcel()`. They export every row that passes the search and filters, across pages, in display order, with raw values (numbers stay numbers); `{ scope: "selected" }` exports only selected rows. CSV prefixes text starting with `=`, `+`, `-` or `@` with an apostrophe so a spreadsheet can't run it as a formula (`sanitize: false` turns that off). The .xlsx is written in the browser with no extra dependency.
+
+## Motion components (optional)
+Animated extras live in their own category, apart from the plain components. `rdloom add button` is unchanged; `rdloom add shimmer-button` adds one more file that builds on it. Nothing is included unless you add it.
+
+| Buttons | Effects | Text and reveal |
+|---|---|---|
+| `ShimmerButton`, `RippleButton`, `PulseButton`, `GradientButton`, `RevealButton` | `ShuttleBorder` (light that runs round an edge), `ShineBorder`, `Ripple` (rings behind content) | `TextShimmer`, `GradientText`, `BlurFade` |
+
+Every one of them follows the same rules, and tests check them:
+- **Decoration only.** The animated layers are hidden from assistive technology and never take focus, so a button is still named by its label alone.
+- **Still for reduced motion.** With `prefers-reduced-motion: reduce` they stand still, and in high-contrast mode the text effects fall back to plain system colours. The `rdm-still` class on any ancestor forces the still state; the docs use it for the **Still** switch on each preview.
+- **Pausable.** `isPaused` stops an effect, because moving content should be stoppable.
+- **No setup.** Each effect carries its own keyframes, so there is no stylesheet to import. The text effects, borders and `BlurFade` need no npm packages beyond rdloom's own shared helpers, and several render in a React Server Component.
+- **Never hides content.** `BlurFade` is visible in the server HTML and for visitors without JavaScript; it is only hidden, before the first paint, once the browser can reveal it again, and never when reduced motion is on.
 
 ## Renaming the library
 The name is kept in few places on purpose: `packages/codegen/src/brand.ts` (name, CSS prefix, npm scope), the `name` fields in each `package.json`, and this README.

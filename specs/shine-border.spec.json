@@ -1,0 +1,96 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "ShineBorder",
+  "version": "0.1.0",
+  "category": "motion",
+  "status": "experimental",
+  "description": "A band of colour that slides steadily along a border, so the edge seems to catch the light. Wrap a card or a field.",
+  "props": {
+    "children": {
+      "type": "node",
+      "description": "The content the border surrounds.",
+      "required": true
+    },
+    "colors": {
+      "type": "custom",
+      "tsType": "readonly string[]",
+      "description": "Colours of the band, any CSS colours. Two or more."
+    },
+    "duration": {
+      "type": "number",
+      "description": "Seconds for the band to travel its length.",
+      "default": 8
+    },
+    "borderWidth": {
+      "type": "number",
+      "description": "Thickness of the border in pixels.",
+      "default": 1.5
+    },
+    "isPaused": {
+      "type": "boolean",
+      "description": "Stops the animation. Moving content that lasts more than five seconds should be stoppable.",
+      "default": false
+    },
+    "className": {
+      "type": "string",
+      "description": "Classes for the wrapper: set its radius, background and border here."
+    }
+  },
+  "variants": [
+    "isPaused"
+  ],
+  "states": [
+    "default"
+  ],
+  "slots": [
+    "root",
+    "border",
+    "content"
+  ],
+  "tokens": [
+    "color.action.primary",
+    "color.feedback.warning",
+    "color.feedback.info",
+    "color.surface.default",
+    "color.border.default",
+    "radius.overlay"
+  ],
+  "a11y": {
+    "role": "none",
+    "keyboard": [],
+    "requirements": [
+      "Decoration only: the animated layers are hidden from assistive technology and never take focus",
+      "Stands still for visitors who ask for less motion (prefers-reduced-motion), and the effect can also be shown still with the rdm-still class",
+      "The border is a pointer-transparent layer, so clicks and selection reach the content",
+      "The content inside keeps its own contrast and focus",
+      "Does not flash: nothing changes more than three times in a second (WCAG 2.3.1)",
+      "Optional: it is a separate component, so projects that do not add it carry none of its code"
+    ],
+    "screenReader": [
+      "Silent: the wrapper adds nothing to what is read"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "A featured card or plan",
+      "A search or prompt field that should feel alive"
+    ],
+    "avoid_when": [
+      "Large lists or tables"
+    ],
+    "anti_patterns": [
+      "Many shining borders on one page"
+    ]
+  },
+  "examples": [
+    "basic",
+    "colors"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {
+      "isPaused": "Paused"
+    }
+  }
+}

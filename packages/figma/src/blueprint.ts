@@ -95,6 +95,11 @@ function field(label: string, combo: Combo, inner: BpNode[], opts: { h?: number;
   ]);
 }
 
+/** A Button as the motion buttons draw it: same shape, the label differs. */
+function buttonBlueprint(c: Combo, label: string): BpFrame {
+  return button(label, (c.variant as "primary" | "secondary" | "ghost" | "danger") ?? "primary", c.size ?? "md");
+}
+
 const placeholder = (t: string, combo: Combo) => text(t, FONT[combo.size ?? "md"] ?? 14, "color.text.muted", "Regular", "fill");
 const chevron = () => text("⌄", 14, "color.text.muted");
 const calendarIcon = () => box(14, 14, { stroke: "color.text.muted", radius: 3, name: "calendar icon" });
@@ -464,6 +469,44 @@ const blueprints: Record<string, Blueprint> = {
       text("K", sm ? 11 : 12, "color.text.muted", "Medium"),
     ]);
   },
+
+  ShimmerButton: (c) => buttonBlueprint(c, "Start free trial"),
+  RippleButton: (c) => buttonBlueprint(c, "Press me"),
+  PulseButton: (c) => buttonBlueprint(c, "Claim offer"),
+  RevealButton: (c) => buttonBlueprint(c, "Read more →"),
+  GradientButton: (c) =>
+    frame({ name: "gradient edge", dir: "row", pad: 2, fill: "color.action.primary", radius: "radius.control" }, [
+      frame({ name: "button", dir: "row", pad: [0, 16], h: HEIGHTS[c.size ?? "md"] ?? 40, align: "center", cross: "center", fill: "color.surface.default", radius: "radius.control" }, [
+        text("Try the new editor", FONT[c.size ?? "md"] ?? 14, "color.text.default", "Medium"),
+      ]),
+    ]),
+
+  ShuttleBorder: () =>
+    frame({ name: "shuttle border", dir: "col", gap: 4, pad: 20, w: 288, fill: "color.surface.default", stroke: "color.action.primary", radius: "radius.overlay" }, [
+      text("Pro plan", 16, "color.text.default", "Semi Bold"),
+      text("Unlimited projects and priority support.", 14, "color.text.muted"),
+    ]),
+
+  ShineBorder: () =>
+    frame({ name: "shine border", dir: "col", gap: 4, pad: 20, w: 288, fill: "color.surface.default", stroke: "color.feedback.warning", radius: "radius.overlay" }, [
+      text("Team plan", 16, "color.text.default", "Semi Bold"),
+      text("Shared workspaces and single sign-on.", 14, "color.text.muted"),
+    ]),
+
+  TextShimmer: () => frame({ name: "text shimmer", dir: "row" }, [text("Thinking…", 18, "color.text.muted", "Medium")]),
+  GradientText: () => frame({ name: "gradient text", dir: "row" }, [text("Build faster", 28, "color.action.primary", "Semi Bold")]),
+
+  BlurFade: () =>
+    frame({ name: "blur fade", dir: "col", gap: 8 }, [
+      text("Accessible by default", 18),
+      text("Copy it, own it", 18, "color.text.muted"),
+      text("Upgrades that keep your edits", 18, "color.text.muted"),
+    ]),
+
+  Ripple: () =>
+    frame({ name: "ripple", dir: "col", w: 320, h: 200, align: "center", cross: "center", stroke: "color.border.default", radius: "radius.overlay" }, [
+      box(120, 120, { stroke: "color.border.strong", radius: 999, name: "ring" }),
+    ]),
 
   RadioGroup: (c) => {
     const invalid = on(c, "isInvalid");

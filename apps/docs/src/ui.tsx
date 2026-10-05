@@ -146,12 +146,24 @@ export function CommandBlock({ commands, label = "Command" }: { commands: Record
 // --- Previews ----------------------------------------------------------------
 
 /** A live example in a card, with its code folded underneath until asked for. */
-export function Preview({ children, code, label, tall = false }: { children: ReactNode; code: string; label: string; tall?: boolean }) {
+export function Preview({ children, code, label, tall = false, motion = false }: { children: ReactNode; code: string; label: string; tall?: boolean; /** Animated example: offer a Still toggle. */ motion?: boolean }) {
   const [open, setOpen] = useState(false);
+  const [still, setStill] = useState(false);
   const id = useId();
   return (
     <div className="overflow-hidden rounded-xl border border-[var(--site-border)]">
-      <div className={`flex ${tall ? "min-h-[22rem]" : "min-h-48"} min-w-0 items-center justify-center overflow-x-auto bg-[var(--rd-color-surface-default)] p-8`}>
+      <div className={`relative flex ${tall ? "min-h-[22rem]" : "min-h-48"} min-w-0 items-center justify-center overflow-x-auto bg-[var(--rd-color-surface-default)] p-8 ${still ? "rdm-still" : ""}`}>
+        {motion && (
+          // The same switch the components honour for visitors who prefer reduced motion.
+          <button
+            type="button"
+            aria-pressed={still}
+            onClick={() => setStill((s) => !s)}
+            className="absolute end-3 top-3 z-10 h-7 rounded-md border border-[var(--site-border)] bg-[var(--site-bg)] px-2.5 text-xs text-[var(--site-muted)] outline-none transition-colors hover:text-[var(--site-fg)] aria-pressed:border-[var(--site-accent)] aria-pressed:text-[var(--site-fg)] focus-visible:ring-2 focus-visible:ring-[var(--rd-color-focus-ring)]"
+          >
+            {still ? "Still: on" : "Still"}
+          </button>
+        )}
         <div className="flex min-w-0 max-w-full flex-wrap items-center justify-center gap-4">{children}</div>
       </div>
       <div className="relative border-t border-[var(--site-border)] bg-[var(--site-subtle)]">

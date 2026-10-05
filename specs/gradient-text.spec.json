@@ -1,0 +1,82 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "GradientText",
+  "version": "0.1.0",
+  "category": "motion",
+  "status": "experimental",
+  "description": "Text filled with a gradient that keeps flowing, for a short headline or a highlighted word. The words stay real text.",
+  "props": {
+    "children": {
+      "type": "node",
+      "description": "The text.",
+      "required": true
+    },
+    "colors": {
+      "type": "custom",
+      "tsType": "readonly string[]",
+      "description": "Colours of the gradient, any CSS colours. Two or more. Each should be readable on the page by itself."
+    },
+    "duration": {
+      "type": "number",
+      "description": "Seconds for the colours to flow once around.",
+      "default": 6
+    },
+    "isPaused": {
+      "type": "boolean",
+      "description": "Stops the animation. Moving content that lasts more than five seconds should be stoppable.",
+      "default": false
+    }
+  },
+  "variants": [
+    "isPaused"
+  ],
+  "states": [
+    "default"
+  ],
+  "slots": [
+    "root"
+  ],
+  "tokens": [
+    "color.action.primary",
+    "color.feedback.warning",
+    "color.feedback.info"
+  ],
+  "a11y": {
+    "role": "text",
+    "keyboard": [],
+    "requirements": [
+      "Decoration only: the animated layers are hidden from assistive technology and never take focus",
+      "Stands still for visitors who ask for less motion (prefers-reduced-motion), and the effect can also be shown still with the rdm-still class",
+      "The default colours each meet 4.5:1 against the page in light and dark; check your own",
+      "In forced-colors (high contrast) mode it is drawn in the system text colour with no effect",
+      "Does not flash: nothing changes more than three times in a second (WCAG 2.3.1)",
+      "Optional: it is a separate component, so projects that do not add it carry none of its code"
+    ],
+    "screenReader": [
+      "Read as ordinary text"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "A headline or one emphasised word on a marketing page"
+    ],
+    "avoid_when": [
+      "Body text",
+      "Interface labels"
+    ],
+    "anti_patterns": [
+      "Gradients with a very light colour, which disappears on a light page"
+    ]
+  },
+  "examples": [
+    "basic",
+    "headline"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {
+      "isPaused": "Paused"
+    }
+  }
+}

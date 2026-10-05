@@ -567,6 +567,124 @@
       ]
     },
     {
+      "id": "blur-fade",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "BlurFade",
+        "version": "0.1.0",
+        "category": "motion",
+        "status": "experimental",
+        "description": "Content that sharpens and slides into place when it first appears or when it scrolls into view. It is visible to start with, so it never hides content from anyone.",
+        "props": {
+          "children": {
+            "type": "node",
+            "description": "The content to reveal.",
+            "required": true
+          },
+          "delay": {
+            "type": "number",
+            "description": "Seconds to wait before revealing. Stagger a list by giving each item a longer delay.",
+            "default": 0
+          },
+          "duration": {
+            "type": "number",
+            "description": "Seconds the reveal takes.",
+            "default": 0.5
+          },
+          "offset": {
+            "type": "number",
+            "description": "How far, in pixels, it starts below its place.",
+            "default": 8
+          },
+          "blur": {
+            "type": "number",
+            "description": "How blurred it starts, in pixels.",
+            "default": 6
+          },
+          "whenInView": {
+            "type": "boolean",
+            "description": "Wait until it scrolls into view. Otherwise it reveals as soon as it mounts.",
+            "default": true
+          }
+        },
+        "variants": [],
+        "states": [
+          "default"
+        ],
+        "slots": [
+          "root"
+        ],
+        "tokens": [],
+        "a11y": {
+          "role": "none",
+          "keyboard": [],
+          "requirements": [
+            "Decoration only: the animated layers are hidden from assistive technology and never take focus",
+            "Stands still for visitors who ask for less motion (prefers-reduced-motion), and the effect can also be shown still with the rdm-still class",
+            "Visible in the server-rendered page and without JavaScript; it is only hidden, before the first paint, once the browser can reveal it again",
+            "With reduced motion it is never hidden: it simply appears",
+            "The content is in the page and readable by assistive technology the whole time (opacity is not display:none)",
+            "Does not flash: nothing changes more than three times in a second (WCAG 2.3.1)",
+            "Optional: it is a separate component, so projects that do not add it carry none of its code"
+          ],
+          "screenReader": [
+            "Silent: the content is read in place as normal"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "Landing page sections, feature lists and cards that arrive as you scroll",
+            "Staggering the entrance of a short list"
+          ],
+          "avoid_when": [
+            "Content people need immediately, such as error messages or the main task of a page",
+            "Long lists: delays add up"
+          ],
+          "anti_patterns": [
+            "Delays over about half a second per item",
+            "Wrapping the whole page, so nothing is readable until it finishes"
+          ]
+        },
+        "examples": [
+          "basic",
+          "in-view"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {}
+        }
+      },
+      "install": {
+        "command": "npx rdloom add blur-fade",
+        "dependencies": [],
+        "registryDependencies": [
+          "tokens",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import { BlurFade } from \"@rdloom/react\";\n\n// Stagger a short list by giving each item a little more delay.\nexport default function BlurFadeBasicExample() {\n  const items = [\"Accessible by default\", \"Copy it, own it\", \"Upgrades that keep your edits\"];\n  return (\n    <ul className=\"flex flex-col gap-2 text-lg\">\n      {items.map((item, i) => (\n        <li key={item}>\n          <BlurFade delay={i * 0.12} whenInView={false}>\n            {item}\n          </BlurFade>\n        </li>\n      ))}\n    </ul>\n  );\n}\n"
+        },
+        {
+          "name": "in-view",
+          "code": "import { BlurFade } from \"@rdloom/react\";\n\n// Scroll the box: each card reveals as it comes into view.\nexport default function BlurFadeInViewExample() {\n  return (\n    <div className=\"h-56 w-72 overflow-y-auto rounded-lg border border-[var(--rd-color-border-default)] p-3\">\n      <div className=\"flex flex-col gap-3 pb-24\">\n        {Array.from({ length: 6 }, (_, i) => (\n          <BlurFade key={i}>\n            <div className=\"rounded-lg border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-subtle)] p-4 text-sm\">\n              Card {i + 1}\n            </div>\n          </BlurFade>\n        ))}\n      </div>\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "blur-fade/blur-fade.tsx",
+          "content": "\"use client\";\n\nimport { forwardRef, useEffect, useRef, useState, type CSSProperties, type HTMLAttributes } from \"react\";\nimport { blurFadeDefaults, type BlurFadeSpecProps } from \"../generated/blur-fade.types\";\nimport { cx } from \"../utils/cx\";\nimport { prefersReducedMotion, useIsomorphicLayoutEffect } from \"../utils/motion\";\n\nexport interface BlurFadeProps extends BlurFadeSpecProps, Omit<HTMLAttributes<HTMLDivElement>, keyof BlurFadeSpecProps | \"className\"> {\n  className?: string;\n}\n\ntype Phase = \"visible\" | \"hidden\" | \"shown\";\n\n/**\n * Content that sharpens and slides into place when it first appears, or when it scrolls into view.\n *\n * It is visible to start with, in the server HTML and for anyone without JavaScript. Only once it\n * is running in the browser (and the visitor hasn't asked for less motion) is it hidden before the\n * first paint and brought back, so nothing is ever stuck invisible.\n */\nexport const BlurFade = forwardRef<HTMLDivElement, BlurFadeProps>(function BlurFade(\n  {\n    children,\n    delay = blurFadeDefaults.delay,\n    duration = blurFadeDefaults.duration,\n    offset = blurFadeDefaults.offset,\n    blur = blurFadeDefaults.blur,\n    whenInView = blurFadeDefaults.whenInView,\n    className,\n    style,\n    ...rest\n  },\n  forwarded,\n) {\n  const inner = useRef<HTMLDivElement | null>(null);\n  const [phase, setPhase] = useState<Phase>(\"visible\");\n\n  useIsomorphicLayoutEffect(() => {\n    if (prefersReducedMotion()) return;\n    setPhase(\"hidden\");\n  }, []);\n\n  useEffect(() => {\n    if (phase !== \"hidden\") return;\n    const el = inner.current;\n    let timer: ReturnType<typeof setTimeout> | undefined;\n    const reveal = () => {\n      timer = setTimeout(() => setPhase(\"shown\"), delay * 1000);\n    };\n    if (!whenInView || !el || typeof IntersectionObserver === \"undefined\") {\n      reveal();\n      return () => clearTimeout(timer);\n    }\n    const watcher = new IntersectionObserver(\n      ([entry]) => {\n        if (!entry.isIntersecting) return;\n        watcher.disconnect();\n        reveal();\n      },\n      { rootMargin: \"0px 0px -8% 0px\" },\n    );\n    watcher.observe(el);\n    return () => {\n      watcher.disconnect();\n      clearTimeout(timer);\n    };\n  }, [phase, delay, whenInView]);\n\n  const motion: CSSProperties =\n    phase === \"visible\"\n      ? {}\n      : phase === \"hidden\"\n        ? { opacity: 0, filter: `blur(${blur}px)`, transform: `translateY(${offset}px)` }\n        : {\n            opacity: 1,\n            filter: \"blur(0)\",\n            transform: \"none\",\n            transition: `opacity ${duration}s ease-out, filter ${duration}s ease-out, transform ${duration}s ease-out`,\n          };\n\n  return (\n    <div\n      {...rest}\n      ref={(node) => {\n        inner.current = node;\n        if (typeof forwarded === \"function\") forwarded(node);\n        else if (forwarded) forwarded.current = node;\n      }}\n      data-blur-fade={phase}\n      className={cx(className)}\n      style={{ ...motion, ...style }}\n    >\n      {children}\n    </div>\n  );\n});\n"
+        },
+        {
+          "path": "generated/blur-fade.types.ts",
+          "content": "// Generated by rdloom codegen from specs/blur-fade.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nimport type { ReactNode } from \"react\";\n\n/** Content that sharpens and slides into place when it first appears or when it scrolls into view. It is visible to start with, so it never hides content from anyone. */\nexport interface BlurFadeSpecProps {\n  /**\n   * The content to reveal.\n   */\n  children: ReactNode;\n  /**\n   * Seconds to wait before revealing. Stagger a list by giving each item a longer delay.\n   * @default 0\n   */\n  delay?: number;\n  /**\n   * Seconds the reveal takes.\n   * @default 0.5\n   */\n  duration?: number;\n  /**\n   * How far, in pixels, it starts below its place.\n   * @default 8\n   */\n  offset?: number;\n  /**\n   * How blurred it starts, in pixels.\n   * @default 6\n   */\n  blur?: number;\n  /**\n   * Wait until it scrolls into view. Otherwise it reveals as soon as it mounts.\n   * @default true\n   */\n  whenInView?: boolean;\n}\n\nexport const blurFadeDefaults = {\n  delay: 0,\n  duration: 0.5,\n  offset: 8,\n  blur: 6,\n  whenInView: true,\n} as const;\n\nexport const blurFadeMeta = {\n  \"name\": \"BlurFade\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"none\"\n} as const;\n"
+        }
+      ]
+    },
+    {
       "id": "breadcrumbs",
       "spec": {
         "$schema": "./schema/component.schema.json",
@@ -3099,6 +3217,287 @@
       ]
     },
     {
+      "id": "gradient-button",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "GradientButton",
+        "version": "0.1.0",
+        "category": "motion",
+        "status": "experimental",
+        "description": "A button with a colour that travels around its edge. The label sits on the normal button surface, so its contrast is the plain Button's. Builds on Button.",
+        "props": {
+          "children": {
+            "type": "node",
+            "description": "Button label. Icon-only buttons must pass aria-label instead.",
+            "required": true
+          },
+          "variant": {
+            "type": "enum",
+            "values": [
+              "primary",
+              "secondary",
+              "ghost",
+              "danger"
+            ],
+            "description": "Visual emphasis, as on Button.",
+            "default": "secondary"
+          },
+          "size": {
+            "type": "enum",
+            "values": [
+              "sm",
+              "md",
+              "lg"
+            ],
+            "description": "Height, padding and font size, as on Button.",
+            "default": "md"
+          },
+          "colors": {
+            "type": "custom",
+            "tsType": "readonly string[]",
+            "description": "Colours of the edge, any CSS colours. Two or more."
+          },
+          "duration": {
+            "type": "number",
+            "description": "Seconds for the colour to travel once around.",
+            "default": 3
+          },
+          "borderWidth": {
+            "type": "number",
+            "description": "Thickness of the coloured edge in pixels.",
+            "default": 2
+          },
+          "isPaused": {
+            "type": "boolean",
+            "description": "Stops the animation. Moving content that lasts more than five seconds should be stoppable.",
+            "default": false
+          },
+          "isDisabled": {
+            "type": "boolean",
+            "description": "Prevents interaction and dims the button.",
+            "default": false
+          },
+          "isLoading": {
+            "type": "boolean",
+            "description": "Shows a spinner and blocks presses; the pending state is announced.",
+            "default": false
+          },
+          "onPress": {
+            "type": "callback",
+            "tsType": "() => void",
+            "description": "Called when the button is pressed by mouse, touch or keyboard."
+          }
+        },
+        "variants": [
+          "variant",
+          "size"
+        ],
+        "states": [
+          "default"
+        ],
+        "slots": [
+          "root",
+          "edge",
+          "label"
+        ],
+        "tokens": [
+          "color.action.primary",
+          "color.action.on-primary",
+          "color.action.danger",
+          "color.surface.default",
+          "color.text.default",
+          "color.border.default",
+          "color.focus.ring",
+          "radius.control",
+          "color.feedback.warning",
+          "color.feedback.info"
+        ],
+        "a11y": {
+          "role": "button",
+          "keyboard": [
+            "Tab focuses it",
+            "Enter or Space presses it"
+          ],
+          "requirements": [
+            "Decoration only: the animated layers are hidden from assistive technology and never take focus",
+            "Stands still for visitors who ask for less motion (prefers-reduced-motion), and the effect can also be shown still with the rdm-still class",
+            "Text contrast comes from the button surface; the colours only decorate the edge, which meets 3:1 against the page by default",
+            "A disabled button stops moving",
+            "Does not flash: nothing changes more than three times in a second (WCAG 2.3.1)",
+            "Optional: it is a separate component, so projects that do not add it carry none of its code"
+          ],
+          "screenReader": [
+            "Announced exactly as a Button: its label, as a button; the effect adds nothing to what is read"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "A featured action, such as Upgrade or Try the new editor"
+          ],
+          "avoid_when": [
+            "Forms with several actions side by side"
+          ],
+          "anti_patterns": [
+            "Choosing edge colours that vanish into the page"
+          ]
+        },
+        "examples": [
+          "basic",
+          "colors"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {
+            "variant": "Variant",
+            "size": "Size"
+          }
+        }
+      },
+      "install": {
+        "command": "npx rdloom add gradient-button",
+        "dependencies": [],
+        "registryDependencies": [
+          "tokens",
+          "button",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import { GradientButton } from \"@rdloom/react\";\n\nexport default function GradientButtonBasicExample() {\n  return (\n    <GradientButton>Try the new editor</GradientButton>\n  );\n}\n"
+        },
+        {
+          "name": "colors",
+          "code": "import { GradientButton } from \"@rdloom/react\";\n\nexport default function GradientButtonColorsExample() {\n  return (\n    <div className=\"flex flex-wrap items-center gap-4\">\n      <GradientButton colors={[\"#6366f1\", \"#06b6d4\", \"#22c55e\"]}>Cool</GradientButton>\n      <GradientButton colors={[\"#f97316\", \"#ef4444\", \"#a855f7\"]} duration={2}>\n        Warm and quick\n      </GradientButton>\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "gradient-button/gradient-button.tsx",
+          "content": "\"use client\";\n\nimport { forwardRef } from \"react\";\nimport { Button, type ButtonProps } from \"../button/button\";\nimport { gradientButtonDefaults, type GradientButtonSpecProps } from \"../generated/gradient-button.types\";\nimport { cx } from \"../utils/cx\";\nimport { MotionStyle } from \"../utils/motion\";\n\nexport interface GradientButtonProps extends GradientButtonSpecProps, Omit<ButtonProps, keyof GradientButtonSpecProps> {}\n\nconst css = `\n@property --rdm-angle{syntax:\"<angle>\";inherits:false;initial-value:0deg}\n@keyframes rdm-spin{to{--rdm-angle:360deg}}\n.rdm-gradient{animation:rdm-spin var(--rdm-d,3s) linear infinite}\n.rdm-gradient[data-rdm-paused]{animation-play-state:paused}\n`;\n\nconst defaultColors = [\"var(--rd-color-action-primary)\", \"var(--rd-color-feedback-warning)\", \"var(--rd-color-feedback-info)\"];\n\n/**\n * A button with a colour that travels around its edge. The label sits on the normal button\n * surface, so its contrast is the plain Button's, whatever the colours do. Builds on Button.\n */\nexport const GradientButton = forwardRef<HTMLButtonElement, GradientButtonProps>(function GradientButton(\n  {\n    children,\n    colors = defaultColors,\n    duration = gradientButtonDefaults.duration,\n    borderWidth = gradientButtonDefaults.borderWidth,\n    isPaused = gradientButtonDefaults.isPaused,\n    variant = \"secondary\",\n    isDisabled,\n    className,\n    ...rest\n  },\n  ref,\n) {\n  const ring = [...colors, colors[0]].join(\", \");\n  return (\n    <>\n      <MotionStyle css={css} still={{ \".rdm-gradient\": \"animation:none\" }} />\n      <span\n        data-rdm-paused={isPaused || isDisabled || undefined}\n        className={cx(\"rdm-gradient inline-flex rounded-[var(--rd-radius-control)]\", isDisabled && \"opacity-50\")}\n        style={{\n          padding: borderWidth,\n          backgroundImage: `conic-gradient(from var(--rdm-angle), ${ring})`,\n          [\"--rdm-d\" as string]: `${duration}s`,\n        }}\n      >\n        <Button\n          {...rest}\n          ref={ref}\n          variant={variant}\n          isDisabled={isDisabled}\n          className={cx(\"!border-transparent\", className)}\n          style={{ borderRadius: `calc(var(--rd-radius-control) - ${borderWidth}px)` }}\n        >\n          {children}\n        </Button>\n      </span>\n    </>\n  );\n});\n"
+        },
+        {
+          "path": "generated/gradient-button.types.ts",
+          "content": "// Generated by rdloom codegen from specs/gradient-button.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nimport type { ReactNode } from \"react\";\n\nexport const gradientButtonVariantValues = [\"primary\", \"secondary\", \"ghost\", \"danger\"] as const;\nexport const gradientButtonSizeValues = [\"sm\", \"md\", \"lg\"] as const;\n\n/** A button with a colour that travels around its edge. The label sits on the normal button surface, so its contrast is the plain Button's. Builds on Button. */\nexport interface GradientButtonSpecProps {\n  /**\n   * Button label. Icon-only buttons must pass aria-label instead.\n   */\n  children: ReactNode;\n  /**\n   * Visual emphasis, as on Button.\n   * @default \"secondary\"\n   */\n  variant?: \"primary\" | \"secondary\" | \"ghost\" | \"danger\";\n  /**\n   * Height, padding and font size, as on Button.\n   * @default \"md\"\n   */\n  size?: \"sm\" | \"md\" | \"lg\";\n  /**\n   * Colours of the edge, any CSS colours. Two or more.\n   */\n  colors?: readonly string[];\n  /**\n   * Seconds for the colour to travel once around.\n   * @default 3\n   */\n  duration?: number;\n  /**\n   * Thickness of the coloured edge in pixels.\n   * @default 2\n   */\n  borderWidth?: number;\n  /**\n   * Stops the animation. Moving content that lasts more than five seconds should be stoppable.\n   * @default false\n   */\n  isPaused?: boolean;\n  /**\n   * Prevents interaction and dims the button.\n   * @default false\n   */\n  isDisabled?: boolean;\n  /**\n   * Shows a spinner and blocks presses; the pending state is announced.\n   * @default false\n   */\n  isLoading?: boolean;\n  /**\n   * Called when the button is pressed by mouse, touch or keyboard.\n   */\n  onPress?: () => void;\n}\n\nexport const gradientButtonDefaults = {\n  variant: \"secondary\",\n  size: \"md\",\n  duration: 3,\n  borderWidth: 2,\n  isPaused: false,\n  isDisabled: false,\n  isLoading: false,\n} as const;\n\nexport const gradientButtonMeta = {\n  \"name\": \"GradientButton\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"button\"\n} as const;\n"
+        }
+      ]
+    },
+    {
+      "id": "gradient-text",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "GradientText",
+        "version": "0.1.0",
+        "category": "motion",
+        "status": "experimental",
+        "description": "Text filled with a gradient that keeps flowing, for a short headline or a highlighted word. The words stay real text.",
+        "props": {
+          "children": {
+            "type": "node",
+            "description": "The text.",
+            "required": true
+          },
+          "colors": {
+            "type": "custom",
+            "tsType": "readonly string[]",
+            "description": "Colours of the gradient, any CSS colours. Two or more. Each should be readable on the page by itself."
+          },
+          "duration": {
+            "type": "number",
+            "description": "Seconds for the colours to flow once around.",
+            "default": 6
+          },
+          "isPaused": {
+            "type": "boolean",
+            "description": "Stops the animation. Moving content that lasts more than five seconds should be stoppable.",
+            "default": false
+          }
+        },
+        "variants": [
+          "isPaused"
+        ],
+        "states": [
+          "default"
+        ],
+        "slots": [
+          "root"
+        ],
+        "tokens": [
+          "color.action.primary",
+          "color.feedback.warning",
+          "color.feedback.info"
+        ],
+        "a11y": {
+          "role": "text",
+          "keyboard": [],
+          "requirements": [
+            "Decoration only: the animated layers are hidden from assistive technology and never take focus",
+            "Stands still for visitors who ask for less motion (prefers-reduced-motion), and the effect can also be shown still with the rdm-still class",
+            "The default colours each meet 4.5:1 against the page in light and dark; check your own",
+            "In forced-colors (high contrast) mode it is drawn in the system text colour with no effect",
+            "Does not flash: nothing changes more than three times in a second (WCAG 2.3.1)",
+            "Optional: it is a separate component, so projects that do not add it carry none of its code"
+          ],
+          "screenReader": [
+            "Read as ordinary text"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "A headline or one emphasised word on a marketing page"
+          ],
+          "avoid_when": [
+            "Body text",
+            "Interface labels"
+          ],
+          "anti_patterns": [
+            "Gradients with a very light colour, which disappears on a light page"
+          ]
+        },
+        "examples": [
+          "basic",
+          "headline"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {
+            "isPaused": "Paused"
+          }
+        }
+      },
+      "install": {
+        "command": "npx rdloom add gradient-text",
+        "dependencies": [],
+        "registryDependencies": [
+          "tokens",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import { GradientText } from \"@rdloom/react\";\n\nexport default function GradientTextBasicExample() {\n  return (\n    <GradientText className=\"text-3xl font-bold\">Build faster</GradientText>\n  );\n}\n"
+        },
+        {
+          "name": "headline",
+          "code": "import { GradientText } from \"@rdloom/react\";\n\nexport default function GradientTextHeadlineExample() {\n  return (\n    <h3 className=\"max-w-md text-3xl leading-tight font-bold\">\n      Components you own, <GradientText duration={8}>that keep improving</GradientText>\n    </h3>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "gradient-text/gradient-text.tsx",
+          "content": "import { forwardRef, type CSSProperties, type HTMLAttributes } from \"react\";\nimport { gradientTextDefaults, type GradientTextSpecProps } from \"../generated/gradient-text.types\";\nimport { cx } from \"../utils/cx\";\nimport { MotionStyle } from \"../utils/motion\";\n\n// Plain markup with no hooks, so it also works in a React Server Component.\n\nexport interface GradientTextProps\n  extends GradientTextSpecProps,\n    Omit<HTMLAttributes<HTMLSpanElement>, keyof GradientTextSpecProps | \"className\"> {\n  className?: string;\n}\n\nconst css = `\n@keyframes rdm-gradient-text{to{background-position:300% 0}}\n.rdm-gradient-text{color:transparent;-webkit-background-clip:text;background-clip:text;background-size:300% 100%;\n  animation:rdm-gradient-text var(--rdm-d,6s) linear infinite}\n[data-rdm-paused].rdm-gradient-text{animation-play-state:paused}\n@media (forced-colors:active){.rdm-gradient-text{color:CanvasText;background:none;animation:none}}\n`;\n\n// Each default colour is at least 4.5:1 against the page in light and dark, so the text stays readable\n// wherever the gradient is.\nconst defaultColors = [\"var(--rd-color-action-primary)\", \"var(--rd-color-feedback-warning)\", \"var(--rd-color-feedback-info)\"];\n\n/** Text filled with a gradient that keeps flowing. If you choose your own colours, keep each readable on its own. */\nexport const GradientText = forwardRef<HTMLSpanElement, GradientTextProps>(function GradientText(\n  { children, colors = defaultColors, duration = gradientTextDefaults.duration, isPaused = gradientTextDefaults.isPaused, className, style, ...rest },\n  ref,\n) {\n  const stops = [...colors, colors[0]].join(\", \");\n  return (\n    <>\n      <MotionStyle css={css} still={{ \".rdm-gradient-text\": `animation:none;background-image:none;color:${colors[0]}` }} />\n      <span\n        {...rest}\n        ref={ref}\n        data-rdm-paused={isPaused || undefined}\n        className={cx(\"rdm-gradient-text\", className)}\n        style={{ backgroundImage: `linear-gradient(90deg, ${stops})`, ...({ \"--rdm-d\": `${duration}s` } as CSSProperties), ...style }}\n      >\n        {children}\n      </span>\n    </>\n  );\n});\n"
+        },
+        {
+          "path": "generated/gradient-text.types.ts",
+          "content": "// Generated by rdloom codegen from specs/gradient-text.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nimport type { ReactNode } from \"react\";\n\n/** Text filled with a gradient that keeps flowing, for a short headline or a highlighted word. The words stay real text. */\nexport interface GradientTextSpecProps {\n  /**\n   * The text.\n   */\n  children: ReactNode;\n  /**\n   * Colours of the gradient, any CSS colours. Two or more. Each should be readable on the page by itself.\n   */\n  colors?: readonly string[];\n  /**\n   * Seconds for the colours to flow once around.\n   * @default 6\n   */\n  duration?: number;\n  /**\n   * Stops the animation. Moving content that lasts more than five seconds should be stoppable.\n   * @default false\n   */\n  isPaused?: boolean;\n}\n\nexport const gradientTextDefaults = {\n  duration: 6,\n  isPaused: false,\n} as const;\n\nexport const gradientTextMeta = {\n  \"name\": \"GradientText\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"text\"\n} as const;\n"
+        }
+      ]
+    },
+    {
       "id": "kbd",
       "spec": {
         "$schema": "./schema/component.schema.json",
@@ -4036,6 +4435,167 @@
       ]
     },
     {
+      "id": "pulse-button",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "PulseButton",
+        "version": "0.1.0",
+        "category": "motion",
+        "status": "experimental",
+        "description": "A button with a soft ring that keeps radiating out, to draw the eye to the one action that matters now. Builds on Button.",
+        "props": {
+          "children": {
+            "type": "node",
+            "description": "Button label. Icon-only buttons must pass aria-label instead.",
+            "required": true
+          },
+          "variant": {
+            "type": "enum",
+            "values": [
+              "primary",
+              "secondary",
+              "ghost",
+              "danger"
+            ],
+            "description": "Visual emphasis, as on Button.",
+            "default": "primary"
+          },
+          "size": {
+            "type": "enum",
+            "values": [
+              "sm",
+              "md",
+              "lg"
+            ],
+            "description": "Height, padding and font size, as on Button.",
+            "default": "md"
+          },
+          "color": {
+            "type": "string",
+            "description": "Colour of the ring, any CSS colour. Defaults to the action colour."
+          },
+          "duration": {
+            "type": "number",
+            "description": "Seconds for one pulse.",
+            "default": 2
+          },
+          "isPaused": {
+            "type": "boolean",
+            "description": "Stops the animation. Moving content that lasts more than five seconds should be stoppable.",
+            "default": false
+          },
+          "isDisabled": {
+            "type": "boolean",
+            "description": "Prevents interaction and dims the button.",
+            "default": false
+          },
+          "isLoading": {
+            "type": "boolean",
+            "description": "Shows a spinner and blocks presses; the pending state is announced.",
+            "default": false
+          },
+          "onPress": {
+            "type": "callback",
+            "tsType": "() => void",
+            "description": "Called when the button is pressed by mouse, touch or keyboard."
+          }
+        },
+        "variants": [
+          "variant",
+          "size"
+        ],
+        "states": [
+          "default"
+        ],
+        "slots": [
+          "root",
+          "label",
+          "ring"
+        ],
+        "tokens": [
+          "color.action.primary",
+          "color.action.on-primary",
+          "color.action.danger",
+          "color.surface.default",
+          "color.text.default",
+          "color.border.default",
+          "color.focus.ring",
+          "radius.control"
+        ],
+        "a11y": {
+          "role": "button",
+          "keyboard": [
+            "Tab focuses it",
+            "Enter or Space presses it"
+          ],
+          "requirements": [
+            "Decoration only: the animated layers are hidden from assistive technology and never take focus",
+            "Stands still for visitors who ask for less motion (prefers-reduced-motion), and the effect can also be shown still with the rdm-still class",
+            "The pulse is a box shadow outside the button, so it never changes the label's contrast",
+            "A disabled button stops pulsing",
+            "Does not flash: nothing changes more than three times in a second (WCAG 2.3.1)",
+            "Optional: it is a separate component, so projects that do not add it carry none of its code"
+          ],
+          "screenReader": [
+            "Announced exactly as a Button: its label, as a button; the effect adds nothing to what is read"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "A time-limited offer or a step that is waiting on the user"
+          ],
+          "avoid_when": [
+            "Anything that stays on screen for a long time: constant motion becomes noise"
+          ],
+          "anti_patterns": [
+            "Pulsing several buttons at once",
+            "Using it where people are reading"
+          ]
+        },
+        "examples": [
+          "basic",
+          "custom-color"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {
+            "variant": "Variant",
+            "size": "Size"
+          }
+        }
+      },
+      "install": {
+        "command": "npx rdloom add pulse-button",
+        "dependencies": [],
+        "registryDependencies": [
+          "tokens",
+          "button",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import { PulseButton } from \"@rdloom/react\";\n\nexport default function PulseButtonBasicExample() {\n  return (\n    <PulseButton>Claim offer</PulseButton>\n  );\n}\n"
+        },
+        {
+          "name": "custom-color",
+          "code": "import { PulseButton } from \"@rdloom/react\";\n\nexport default function PulseButtonCustomColorExample() {\n  return (\n    <div className=\"flex flex-wrap items-center gap-6\">\n      <PulseButton color=\"var(--rd-color-feedback-success)\" variant=\"secondary\">\n        Go live\n      </PulseButton>\n      <PulseButton color=\"var(--rd-color-feedback-danger)\" variant=\"danger\" duration={1.6}>\n        Stop recording\n      </PulseButton>\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "pulse-button/pulse-button.tsx",
+          "content": "\"use client\";\n\nimport { forwardRef } from \"react\";\nimport { Button, type ButtonProps } from \"../button/button\";\nimport { pulseButtonDefaults, type PulseButtonSpecProps } from \"../generated/pulse-button.types\";\nimport { cx } from \"../utils/cx\";\nimport { MotionStyle, motionVars } from \"../utils/motion\";\n\nexport interface PulseButtonProps extends PulseButtonSpecProps, Omit<ButtonProps, keyof PulseButtonSpecProps> {}\n\nconst css = `\n@keyframes rdm-pulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--rdm-c,var(--rd-color-action-primary)) 55%,transparent)}\n  70%,100%{box-shadow:0 0 0 var(--rdm-r,12px) transparent}}\n.rdm-pulse{animation:rdm-pulse var(--rdm-d,2s) ease-out infinite}\n.rdm-pulse[data-rdm-paused],.rdm-pulse[data-disabled]{animation-play-state:paused}\n`;\n\n/** A button with a soft ring that keeps radiating out, to draw the eye to the one action that matters. Builds on Button. */\nexport const PulseButton = forwardRef<HTMLButtonElement, PulseButtonProps>(function PulseButton(\n  { children, duration = pulseButtonDefaults.duration, color, isPaused = pulseButtonDefaults.isPaused, className, style, ...rest },\n  ref,\n) {\n  return (\n    <>\n      <MotionStyle css={css} still={{ \".rdm-pulse\": \"animation:none\" }} />\n      <Button\n        {...rest}\n        ref={ref}\n        data-rdm-paused={isPaused || undefined}\n        className={cx(\"rdm-pulse\", className)}\n        style={(values) => ({ ...motionVars({ \"--rdm-d\": `${duration}s`, \"--rdm-c\": color }), ...(typeof style === \"function\" ? style(values) : style) })}\n      >\n        {children}\n      </Button>\n    </>\n  );\n});\n"
+        },
+        {
+          "path": "generated/pulse-button.types.ts",
+          "content": "// Generated by rdloom codegen from specs/pulse-button.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nimport type { ReactNode } from \"react\";\n\nexport const pulseButtonVariantValues = [\"primary\", \"secondary\", \"ghost\", \"danger\"] as const;\nexport const pulseButtonSizeValues = [\"sm\", \"md\", \"lg\"] as const;\n\n/** A button with a soft ring that keeps radiating out, to draw the eye to the one action that matters now. Builds on Button. */\nexport interface PulseButtonSpecProps {\n  /**\n   * Button label. Icon-only buttons must pass aria-label instead.\n   */\n  children: ReactNode;\n  /**\n   * Visual emphasis, as on Button.\n   * @default \"primary\"\n   */\n  variant?: \"primary\" | \"secondary\" | \"ghost\" | \"danger\";\n  /**\n   * Height, padding and font size, as on Button.\n   * @default \"md\"\n   */\n  size?: \"sm\" | \"md\" | \"lg\";\n  /**\n   * Colour of the ring, any CSS colour. Defaults to the action colour.\n   */\n  color?: string;\n  /**\n   * Seconds for one pulse.\n   * @default 2\n   */\n  duration?: number;\n  /**\n   * Stops the animation. Moving content that lasts more than five seconds should be stoppable.\n   * @default false\n   */\n  isPaused?: boolean;\n  /**\n   * Prevents interaction and dims the button.\n   * @default false\n   */\n  isDisabled?: boolean;\n  /**\n   * Shows a spinner and blocks presses; the pending state is announced.\n   * @default false\n   */\n  isLoading?: boolean;\n  /**\n   * Called when the button is pressed by mouse, touch or keyboard.\n   */\n  onPress?: () => void;\n}\n\nexport const pulseButtonDefaults = {\n  variant: \"primary\",\n  size: \"md\",\n  duration: 2,\n  isPaused: false,\n  isDisabled: false,\n  isLoading: false,\n} as const;\n\nexport const pulseButtonMeta = {\n  \"name\": \"PulseButton\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"button\"\n} as const;\n"
+        }
+      ]
+    },
+    {
       "id": "radio-group",
       "spec": {
         "$schema": "./schema/component.schema.json",
@@ -4211,6 +4771,432 @@
         {
           "path": "generated/radio-group.types.ts",
           "content": "// Generated by rdloom codegen from specs/radio-group.spec.json (v0.1.1).\n// Do not edit. Change the spec and run `npm run gen`.\n\nimport type { ReactNode } from \"react\";\n\nexport const radioGroupOrientationValues = [\"vertical\", \"horizontal\"] as const;\n\n/** Lets the user pick exactly one option from a small, visible set. Use with Radio children. */\nexport interface RadioGroupSpecProps {\n  /**\n   * Visible group label.\n   */\n  label: string;\n  /**\n   * Help text shown under the options.\n   */\n  description?: string;\n  /**\n   * Shown when the group is invalid.\n   */\n  errorMessage?: string;\n  /**\n   * Layout direction of the options.\n   * @default \"vertical\"\n   */\n  orientation?: \"vertical\" | \"horizontal\";\n  /**\n   * Controlled selected value.\n   */\n  value?: string;\n  /**\n   * Initial value when uncontrolled.\n   */\n  defaultValue?: string;\n  /**\n   * Disables every option.\n   * @default false\n   */\n  isDisabled?: boolean;\n  /**\n   * Marks the group as invalid and shows errorMessage.\n   * @default false\n   */\n  isInvalid?: boolean;\n  /**\n   * Requires a selection for form submission.\n   * @default false\n   */\n  isRequired?: boolean;\n  /**\n   * Radio options.\n   */\n  children: ReactNode;\n  /**\n   * Called with the newly selected value.\n   */\n  onChange?: (value: string) => void;\n}\n\nexport const radioGroupDefaults = {\n  orientation: \"vertical\",\n  isDisabled: false,\n  isInvalid: false,\n  isRequired: false,\n} as const;\n\nexport const radioGroupMeta = {\n  \"name\": \"RadioGroup\",\n  \"version\": \"0.1.1\",\n  \"status\": \"experimental\",\n  \"role\": \"radiogroup\"\n} as const;\n"
+        }
+      ]
+    },
+    {
+      "id": "reveal-button",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "RevealButton",
+        "version": "0.1.0",
+        "category": "motion",
+        "status": "experimental",
+        "description": "A button that opens an arrow beside its label when you hover or focus it, to suggest \"go\". Only a transition, so there is nothing to pause. Builds on Button.",
+        "props": {
+          "children": {
+            "type": "node",
+            "description": "Button label. Icon-only buttons must pass aria-label instead.",
+            "required": true
+          },
+          "variant": {
+            "type": "enum",
+            "values": [
+              "primary",
+              "secondary",
+              "ghost",
+              "danger"
+            ],
+            "description": "Visual emphasis, as on Button.",
+            "default": "primary"
+          },
+          "size": {
+            "type": "enum",
+            "values": [
+              "sm",
+              "md",
+              "lg"
+            ],
+            "description": "Height, padding and font size, as on Button.",
+            "default": "md"
+          },
+          "isDisabled": {
+            "type": "boolean",
+            "description": "Prevents interaction and dims the button.",
+            "default": false
+          },
+          "isLoading": {
+            "type": "boolean",
+            "description": "Shows a spinner and blocks presses; the pending state is announced.",
+            "default": false
+          },
+          "onPress": {
+            "type": "callback",
+            "tsType": "() => void",
+            "description": "Called when the button is pressed by mouse, touch or keyboard."
+          }
+        },
+        "variants": [
+          "variant",
+          "size"
+        ],
+        "states": [
+          "default"
+        ],
+        "slots": [
+          "root",
+          "label",
+          "arrow"
+        ],
+        "tokens": [
+          "color.action.primary",
+          "color.action.on-primary",
+          "color.action.danger",
+          "color.surface.default",
+          "color.text.default",
+          "color.border.default",
+          "color.focus.ring",
+          "radius.control"
+        ],
+        "a11y": {
+          "role": "button",
+          "keyboard": [
+            "Tab focuses it",
+            "Enter or Space presses it"
+          ],
+          "requirements": [
+            "Decoration only: the animated layers are hidden from assistive technology and never take focus",
+            "Stands still for visitors who ask for less motion (prefers-reduced-motion), and the effect can also be shown still with the rdm-still class",
+            "The arrow appears on keyboard focus as well as hover, and is decorative",
+            "The transition is switched off for reduced motion, leaving the arrow in its final state only on hover or focus",
+            "Does not flash: nothing changes more than three times in a second (WCAG 2.3.1)",
+            "Optional: it is a separate component, so projects that do not add it carry none of its code"
+          ],
+          "screenReader": [
+            "Announced exactly as a Button: its label, as a button; the effect adds nothing to what is read"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "Buttons that lead somewhere: Read more, Continue, View all"
+          ],
+          "avoid_when": [
+            "Destructive actions"
+          ],
+          "anti_patterns": [
+            "Relying on the arrow alone to say where it goes"
+          ]
+        },
+        "examples": [
+          "basic",
+          "variants"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {
+            "variant": "Variant",
+            "size": "Size"
+          }
+        }
+      },
+      "install": {
+        "command": "npx rdloom add reveal-button",
+        "dependencies": [],
+        "registryDependencies": [
+          "tokens",
+          "button",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import { RevealButton } from \"@rdloom/react\";\n\nexport default function RevealButtonBasicExample() {\n  return (\n    <RevealButton>Read more</RevealButton>\n  );\n}\n"
+        },
+        {
+          "name": "variants",
+          "code": "import { RevealButton } from \"@rdloom/react\";\n\nexport default function RevealButtonVariantsExample() {\n  return (\n    <div className=\"flex flex-wrap items-center gap-3\">\n      <RevealButton>Continue</RevealButton>\n      <RevealButton variant=\"secondary\">View all</RevealButton>\n      <RevealButton variant=\"ghost\">Next step</RevealButton>\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "reveal-button/reveal-button.tsx",
+          "content": "\"use client\";\n\nimport { forwardRef } from \"react\";\nimport { Button, type ButtonProps } from \"../button/button\";\nimport type { RevealButtonSpecProps } from \"../generated/reveal-button.types\";\nimport { cx } from \"../utils/cx\";\n\nexport interface RevealButtonProps extends RevealButtonSpecProps, Omit<ButtonProps, keyof RevealButtonSpecProps> {}\n\n/**\n * A button that opens an arrow beside its label when you hover or focus it. Only a transition,\n * so there is nothing to pause, and it is switched off for reduced motion. Builds on Button.\n */\nexport const RevealButton = forwardRef<HTMLButtonElement, RevealButtonProps>(function RevealButton(\n  { children, className, ...rest },\n  ref,\n) {\n  return (\n    <Button {...rest} ref={ref} className={cx(\"group\", className)}>\n      <span className=\"inline-flex items-center\">\n        <span className=\"transition-transform duration-300 ease-out group-data-[hovered]:-translate-x-0.5 group-data-[focus-visible]:-translate-x-0.5 motion-reduce:transition-none\">\n          {children}\n        </span>\n        <svg\n          aria-hidden=\"true\"\n          viewBox=\"0 0 16 16\"\n          className=\"ms-0 size-4 w-0 -translate-x-2 opacity-0 transition-all duration-300 ease-out group-data-[hovered]:ms-2 group-data-[hovered]:w-4 group-data-[hovered]:translate-x-0 group-data-[hovered]:opacity-100 group-data-[focus-visible]:ms-2 group-data-[focus-visible]:w-4 group-data-[focus-visible]:translate-x-0 group-data-[focus-visible]:opacity-100 motion-reduce:transition-none\"\n          fill=\"none\"\n        >\n          <path d=\"M3 8h10M9 4l4 4-4 4\" stroke=\"currentColor\" strokeWidth=\"1.75\" strokeLinecap=\"round\" strokeLinejoin=\"round\" />\n        </svg>\n      </span>\n    </Button>\n  );\n});\n"
+        },
+        {
+          "path": "generated/reveal-button.types.ts",
+          "content": "// Generated by rdloom codegen from specs/reveal-button.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nimport type { ReactNode } from \"react\";\n\nexport const revealButtonVariantValues = [\"primary\", \"secondary\", \"ghost\", \"danger\"] as const;\nexport const revealButtonSizeValues = [\"sm\", \"md\", \"lg\"] as const;\n\n/** A button that opens an arrow beside its label when you hover or focus it, to suggest \"go\". Only a transition, so there is nothing to pause. Builds on Button. */\nexport interface RevealButtonSpecProps {\n  /**\n   * Button label. Icon-only buttons must pass aria-label instead.\n   */\n  children: ReactNode;\n  /**\n   * Visual emphasis, as on Button.\n   * @default \"primary\"\n   */\n  variant?: \"primary\" | \"secondary\" | \"ghost\" | \"danger\";\n  /**\n   * Height, padding and font size, as on Button.\n   * @default \"md\"\n   */\n  size?: \"sm\" | \"md\" | \"lg\";\n  /**\n   * Prevents interaction and dims the button.\n   * @default false\n   */\n  isDisabled?: boolean;\n  /**\n   * Shows a spinner and blocks presses; the pending state is announced.\n   * @default false\n   */\n  isLoading?: boolean;\n  /**\n   * Called when the button is pressed by mouse, touch or keyboard.\n   */\n  onPress?: () => void;\n}\n\nexport const revealButtonDefaults = {\n  variant: \"primary\",\n  size: \"md\",\n  isDisabled: false,\n  isLoading: false,\n} as const;\n\nexport const revealButtonMeta = {\n  \"name\": \"RevealButton\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"button\"\n} as const;\n"
+        }
+      ]
+    },
+    {
+      "id": "ripple-button",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "RippleButton",
+        "version": "0.1.0",
+        "category": "motion",
+        "status": "experimental",
+        "description": "A button that sends a ripple out from where you pressed it, or from its centre when pressed with the keyboard. Builds on Button.",
+        "props": {
+          "children": {
+            "type": "node",
+            "description": "Button label. Icon-only buttons must pass aria-label instead.",
+            "required": true
+          },
+          "variant": {
+            "type": "enum",
+            "values": [
+              "primary",
+              "secondary",
+              "ghost",
+              "danger"
+            ],
+            "description": "Visual emphasis, as on Button.",
+            "default": "primary"
+          },
+          "size": {
+            "type": "enum",
+            "values": [
+              "sm",
+              "md",
+              "lg"
+            ],
+            "description": "Height, padding and font size, as on Button.",
+            "default": "md"
+          },
+          "duration": {
+            "type": "number",
+            "description": "Milliseconds the ripple takes to spread and fade.",
+            "default": 600
+          },
+          "isDisabled": {
+            "type": "boolean",
+            "description": "Prevents interaction and dims the button.",
+            "default": false
+          },
+          "isLoading": {
+            "type": "boolean",
+            "description": "Shows a spinner and blocks presses; the pending state is announced.",
+            "default": false
+          },
+          "onPress": {
+            "type": "callback",
+            "tsType": "() => void",
+            "description": "Called when the button is pressed by mouse, touch or keyboard."
+          }
+        },
+        "variants": [
+          "variant",
+          "size"
+        ],
+        "states": [
+          "default"
+        ],
+        "slots": [
+          "root",
+          "label",
+          "ripple"
+        ],
+        "tokens": [
+          "color.action.primary",
+          "color.action.on-primary",
+          "color.action.danger",
+          "color.surface.default",
+          "color.text.default",
+          "color.border.default",
+          "color.focus.ring",
+          "radius.control"
+        ],
+        "a11y": {
+          "role": "button",
+          "keyboard": [
+            "Tab focuses it",
+            "Enter or Space presses it"
+          ],
+          "requirements": [
+            "Decoration only: the animated layers are hidden from assistive technology and never take focus",
+            "Stands still for visitors who ask for less motion (prefers-reduced-motion), and the effect can also be shown still with the rdm-still class",
+            "Each ripple is removed when it finishes, so a button pressed many times does not grow",
+            "Does not flash: nothing changes more than three times in a second (WCAG 2.3.1)",
+            "Optional: it is a separate component, so projects that do not add it carry none of its code"
+          ],
+          "screenReader": [
+            "Announced exactly as a Button: its label, as a button; the effect adds nothing to what is read"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "Touch-first interfaces that want visible press feedback",
+            "Playful or media apps"
+          ],
+          "avoid_when": [
+            "Buttons that are pressed many times a second",
+            "When a plain pressed state is enough"
+          ],
+          "anti_patterns": [
+            "A duration over about a second",
+            "Stacking it with other effects on the same button"
+          ]
+        },
+        "examples": [
+          "basic",
+          "variants"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {
+            "variant": "Variant",
+            "size": "Size"
+          }
+        }
+      },
+      "install": {
+        "command": "npx rdloom add ripple-button",
+        "dependencies": [],
+        "registryDependencies": [
+          "tokens",
+          "button",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import { RippleButton } from \"@rdloom/react\";\n\nexport default function RippleButtonBasicExample() {\n  return (\n    <RippleButton>Press me</RippleButton>\n  );\n}\n"
+        },
+        {
+          "name": "variants",
+          "code": "import { RippleButton } from \"@rdloom/react\";\n\nexport default function RippleButtonVariantsExample() {\n  return (\n    <div className=\"flex flex-wrap items-center gap-3\">\n      <RippleButton>Primary</RippleButton>\n      <RippleButton variant=\"secondary\">Secondary</RippleButton>\n      <RippleButton variant=\"ghost\">Ghost</RippleButton>\n      <RippleButton duration={1000}>Slow ripple</RippleButton>\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "ripple-button/ripple-button.tsx",
+          "content": "\"use client\";\n\nimport { forwardRef, useCallback, useEffect, useRef, useState } from \"react\";\nimport { Button, type ButtonProps } from \"../button/button\";\nimport { rippleButtonDefaults, type RippleButtonSpecProps } from \"../generated/ripple-button.types\";\nimport { cx } from \"../utils/cx\";\nimport { MotionStyle, motionVars } from \"../utils/motion\";\n\nexport interface RippleButtonProps extends RippleButtonSpecProps, Omit<ButtonProps, keyof RippleButtonSpecProps> {}\n\nconst css = `\n@keyframes rdm-ripple{from{transform:translate(-50%,-50%) scale(0);opacity:.34}to{transform:translate(-50%,-50%) scale(1);opacity:0}}\n.rdm-ripple{position:absolute;border-radius:9999px;background:currentColor;pointer-events:none;\n  transform:translate(-50%,-50%) scale(0);animation:rdm-ripple var(--rdm-d,600ms) ease-out forwards}\n`;\n\ninterface Wave {\n  id: number;\n  x: number;\n  y: number;\n  size: number;\n}\n\n/** A button that sends a ripple out from where it was pressed (from the centre for a key press). Builds on Button. */\nexport const RippleButton = forwardRef<HTMLButtonElement, RippleButtonProps>(function RippleButton(\n  { children, duration = rippleButtonDefaults.duration, className, style, onPressStart, ...rest },\n  forwarded,\n) {\n  const element = useRef<HTMLButtonElement | null>(null);\n  const [waves, setWaves] = useState<Wave[]>([]);\n  const next = useRef(0);\n\n  const setRef = useCallback(\n    (node: HTMLButtonElement | null) => {\n      element.current = node;\n      if (typeof forwarded === \"function\") forwarded(node);\n      else if (forwarded) forwarded.current = node;\n    },\n    [forwarded],\n  );\n\n  const send = (x: number, y: number, width: number, height: number) =>\n    // Big enough to reach the farthest corner from where it started.\n    setWaves((w) => [...w, { id: next.current++, x, y, size: Math.hypot(Math.max(x, width - x), Math.max(y, height - y)) * 2 }]);\n\n  // Pointer position is not part of a press event, so read it from the pointer itself.\n  useEffect(() => {\n    const el = element.current;\n    if (!el) return;\n    const onDown = (e: PointerEvent) => {\n      const box = el.getBoundingClientRect();\n      send(e.clientX - box.left, e.clientY - box.top, box.width, box.height);\n    };\n    el.addEventListener(\"pointerdown\", onDown);\n    return () => el.removeEventListener(\"pointerdown\", onDown);\n  }, []);\n\n  return (\n    <>\n      <MotionStyle css={css} still={{ \".rdm-ripple\": \"display:none\" }} />\n      <Button\n        {...rest}\n        ref={setRef}\n        className={cx(\"relative overflow-hidden\", className)}\n        style={(values) => ({ ...motionVars({ \"--rdm-d\": `${duration}ms` }), ...(typeof style === \"function\" ? style(values) : style) })}\n        onPressStart={(e) => {\n          onPressStart?.(e);\n          // A key press has no pointer: ripple from the middle.\n          if ((e.pointerType === \"keyboard\" || e.pointerType === \"virtual\") && element.current) {\n            const { width, height } = element.current.getBoundingClientRect();\n            send(width / 2, height / 2, width, height);\n          }\n        }}\n      >\n        <span className=\"relative z-[1] inline-flex items-center gap-2\">{children}</span>\n        {waves.map((w) => (\n          <span\n            key={w.id}\n            aria-hidden=\"true\"\n            className=\"rdm-ripple\"\n            style={{ left: w.x, top: w.y, width: w.size, height: w.size }}\n            onAnimationEnd={() => setWaves((all) => all.filter((x) => x.id !== w.id))}\n          />\n        ))}\n      </Button>\n    </>\n  );\n});\n"
+        },
+        {
+          "path": "generated/ripple-button.types.ts",
+          "content": "// Generated by rdloom codegen from specs/ripple-button.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nimport type { ReactNode } from \"react\";\n\nexport const rippleButtonVariantValues = [\"primary\", \"secondary\", \"ghost\", \"danger\"] as const;\nexport const rippleButtonSizeValues = [\"sm\", \"md\", \"lg\"] as const;\n\n/** A button that sends a ripple out from where you pressed it, or from its centre when pressed with the keyboard. Builds on Button. */\nexport interface RippleButtonSpecProps {\n  /**\n   * Button label. Icon-only buttons must pass aria-label instead.\n   */\n  children: ReactNode;\n  /**\n   * Visual emphasis, as on Button.\n   * @default \"primary\"\n   */\n  variant?: \"primary\" | \"secondary\" | \"ghost\" | \"danger\";\n  /**\n   * Height, padding and font size, as on Button.\n   * @default \"md\"\n   */\n  size?: \"sm\" | \"md\" | \"lg\";\n  /**\n   * Milliseconds the ripple takes to spread and fade.\n   * @default 600\n   */\n  duration?: number;\n  /**\n   * Prevents interaction and dims the button.\n   * @default false\n   */\n  isDisabled?: boolean;\n  /**\n   * Shows a spinner and blocks presses; the pending state is announced.\n   * @default false\n   */\n  isLoading?: boolean;\n  /**\n   * Called when the button is pressed by mouse, touch or keyboard.\n   */\n  onPress?: () => void;\n}\n\nexport const rippleButtonDefaults = {\n  variant: \"primary\",\n  size: \"md\",\n  duration: 600,\n  isDisabled: false,\n  isLoading: false,\n} as const;\n\nexport const rippleButtonMeta = {\n  \"name\": \"RippleButton\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"button\"\n} as const;\n"
+        }
+      ]
+    },
+    {
+      "id": "ripple",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "Ripple",
+        "version": "0.1.0",
+        "category": "motion",
+        "status": "experimental",
+        "description": "Concentric rings that swell outward from the centre, as a calm backdrop behind a heading or a call to action. Content goes in front of the rings.",
+        "props": {
+          "children": {
+            "type": "node",
+            "description": "Content shown in front of the rings, centred."
+          },
+          "size": {
+            "type": "number",
+            "description": "Diameter in pixels of the innermost ring.",
+            "default": 210
+          },
+          "rings": {
+            "type": "number",
+            "description": "How many rings, 1 to 12.",
+            "default": 6
+          },
+          "duration": {
+            "type": "number",
+            "description": "Seconds for one swell.",
+            "default": 4
+          },
+          "color": {
+            "type": "string",
+            "description": "Colour of the rings, any CSS colour. Defaults to the strong border colour."
+          },
+          "isPaused": {
+            "type": "boolean",
+            "description": "Stops the animation. Moving content that lasts more than five seconds should be stoppable.",
+            "default": false
+          },
+          "className": {
+            "type": "string",
+            "description": "Classes for the wrapper: size it and give it a background."
+          }
+        },
+        "variants": [
+          "isPaused"
+        ],
+        "states": [
+          "default"
+        ],
+        "slots": [
+          "root",
+          "rings",
+          "content"
+        ],
+        "tokens": [
+          "color.border.strong",
+          "color.text.default"
+        ],
+        "a11y": {
+          "role": "none",
+          "keyboard": [],
+          "requirements": [
+            "Decoration only: the animated layers are hidden from assistive technology and never take focus",
+            "Stands still for visitors who ask for less motion (prefers-reduced-motion), and the effect can also be shown still with the rdm-still class",
+            "The rings are low contrast by design and never carry meaning",
+            "Text placed over them keeps its own contrast against the page, not against the rings",
+            "Does not flash: nothing changes more than three times in a second (WCAG 2.3.1)",
+            "Optional: it is a separate component, so projects that do not add it carry none of its code"
+          ],
+          "screenReader": [
+            "Silent: only the content in front is read"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "Behind a hero heading or a sign-up block",
+            "An empty or waiting state that should feel calm"
+          ],
+          "avoid_when": [
+            "Behind dense text",
+            "Small areas, where rings are clipped awkwardly"
+          ],
+          "anti_patterns": [
+            "Bright, high-contrast ring colours behind text"
+          ]
+        },
+        "examples": [
+          "basic",
+          "with-content"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {
+            "isPaused": "Paused"
+          }
+        }
+      },
+      "install": {
+        "command": "npx rdloom add ripple",
+        "dependencies": [],
+        "registryDependencies": [
+          "tokens",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import { Ripple } from \"@rdloom/react\";\n\nexport default function RippleBasicExample() {\n  return <Ripple className=\"h-64 w-[26rem] max-w-full rounded-xl border border-[var(--rd-color-border-default)]\" />;\n}\n"
+        },
+        {
+          "name": "with-content",
+          "code": "import { Ripple } from \"@rdloom/react\";\n\nexport default function RippleWithContentExample() {\n  return (\n    <Ripple className=\"h-72 w-[30rem] max-w-full rounded-xl border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-subtle)]\" size={150} rings={5}>\n      <div className=\"text-center\">\n        <p className=\"text-xl font-semibold\">Join the waitlist</p>\n        <p className=\"pt-1 text-sm text-[var(--rd-color-text-muted)]\">Be first to know when it is ready.</p>\n      </div>\n    </Ripple>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "ripple/ripple.tsx",
+          "content": "import { forwardRef, type CSSProperties, type HTMLAttributes } from \"react\";\nimport { rippleDefaults, type RippleSpecProps } from \"../generated/ripple.types\";\nimport { cx } from \"../utils/cx\";\nimport { MotionStyle } from \"../utils/motion\";\n\n// Plain markup with no hooks, so it also works in a React Server Component.\n\nexport interface RippleProps extends RippleSpecProps, Omit<HTMLAttributes<HTMLDivElement>, keyof RippleSpecProps | \"className\"> {\n  className?: string;\n}\n\nconst css = `\n@keyframes rdm-ring{0%{transform:translate(-50%,-50%) scale(.86);opacity:.9}\n  50%{transform:translate(-50%,-50%) scale(1);opacity:.45}\n  100%{transform:translate(-50%,-50%) scale(.86);opacity:.9}}\n.rdm-ring{position:absolute;left:50%;top:50%;border-radius:9999px;pointer-events:none;\n  border:1px solid color-mix(in srgb,var(--rdm-c,var(--rd-color-border-strong)) 70%,transparent);\n  background:color-mix(in srgb,var(--rdm-c,var(--rd-color-border-strong)) 7%,transparent);\n  animation:rdm-ring var(--rdm-d,4s) ease-in-out infinite}\n[data-rdm-paused] .rdm-ring{animation-play-state:paused}\n`;\n\n/** Concentric rings that swell outward from the centre, as a calm backdrop. Content goes in front of them. */\nexport const Ripple = forwardRef<HTMLDivElement, RippleProps>(function Ripple(\n  { children, size = rippleDefaults.size, rings = rippleDefaults.rings, duration = rippleDefaults.duration, color, isPaused = rippleDefaults.isPaused, className, style, ...rest },\n  ref,\n) {\n  const count = Math.max(1, Math.min(12, Math.round(rings)));\n  return (\n    <>\n      <MotionStyle css={css} still={{ \".rdm-ring\": \"animation:none;opacity:.5\" }} />\n      <div\n        {...rest}\n        ref={ref}\n        data-rdm-paused={isPaused || undefined}\n        className={cx(\"relative isolate flex items-center justify-center overflow-hidden\", className)}\n        style={{ ...({ \"--rdm-d\": `${duration}s`, ...(color ? { \"--rdm-c\": color } : {}) } as CSSProperties), ...style }}\n      >\n        <div aria-hidden=\"true\" className=\"pointer-events-none absolute inset-0 -z-10\">\n          {Array.from({ length: count }, (_, i) => (\n            <span\n              key={i}\n              className=\"rdm-ring\"\n              style={{ width: size + i * 70, height: size + i * 70, animationDelay: `${i * 0.18}s`, opacity: Math.max(0.15, 0.9 - i * 0.12) }}\n            />\n          ))}\n        </div>\n        {children}\n      </div>\n    </>\n  );\n});\n"
+        },
+        {
+          "path": "generated/ripple.types.ts",
+          "content": "// Generated by rdloom codegen from specs/ripple.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nimport type { ReactNode } from \"react\";\n\n/** Concentric rings that swell outward from the centre, as a calm backdrop behind a heading or a call to action. Content goes in front of the rings. */\nexport interface RippleSpecProps {\n  /**\n   * Content shown in front of the rings, centred.\n   */\n  children?: ReactNode;\n  /**\n   * Diameter in pixels of the innermost ring.\n   * @default 210\n   */\n  size?: number;\n  /**\n   * How many rings, 1 to 12.\n   * @default 6\n   */\n  rings?: number;\n  /**\n   * Seconds for one swell.\n   * @default 4\n   */\n  duration?: number;\n  /**\n   * Colour of the rings, any CSS colour. Defaults to the strong border colour.\n   */\n  color?: string;\n  /**\n   * Stops the animation. Moving content that lasts more than five seconds should be stoppable.\n   * @default false\n   */\n  isPaused?: boolean;\n  /**\n   * Classes for the wrapper: size it and give it a background.\n   */\n  className?: string;\n}\n\nexport const rippleDefaults = {\n  size: 210,\n  rings: 6,\n  duration: 4,\n  isPaused: false,\n} as const;\n\nexport const rippleMeta = {\n  \"name\": \"Ripple\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"none\"\n} as const;\n"
         }
       ]
     },
@@ -4726,6 +5712,423 @@
         {
           "path": "generated/sheet.types.ts",
           "content": "// Generated by rdloom codegen from specs/sheet.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nimport type { ReactNode } from \"react\";\n\nexport const sheetSideValues = [\"end\", \"start\", \"bottom\"] as const;\nexport const sheetSizeValues = [\"sm\", \"md\", \"lg\"] as const;\n\n/** A modal panel that slides in from the edge of the screen, for filters, details or navigation on small screens. Open it with DialogTrigger. */\nexport interface SheetSpecProps {\n  /**\n   * Heading, also used as the sheet's accessible name.\n   */\n  title: string;\n  /**\n   * Short supporting text under the title.\n   */\n  description?: string;\n  /**\n   * The edge it slides in from. end is the right in left-to-right languages.\n   * @default \"end\"\n   */\n  side?: \"end\" | \"start\" | \"bottom\";\n  /**\n   * Width (or height for bottom sheets).\n   * @default \"md\"\n   */\n  size?: \"sm\" | \"md\" | \"lg\";\n  /**\n   * Closes on backdrop click. Esc always closes.\n   * @default true\n   */\n  isDismissable?: boolean;\n  /**\n   * Body and actions. A function receives close().\n   */\n  children?: ReactNode | ((opts: { close: () => void }) => ReactNode);\n}\n\nexport const sheetDefaults = {\n  side: \"end\",\n  size: \"md\",\n  isDismissable: true,\n} as const;\n\nexport const sheetMeta = {\n  \"name\": \"Sheet\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"dialog\"\n} as const;\n"
+        }
+      ]
+    },
+    {
+      "id": "shimmer-button",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "ShimmerButton",
+        "version": "0.1.0",
+        "category": "motion",
+        "status": "experimental",
+        "description": "A button with a soft band of light that crosses its surface now and then, for one standout action. Builds on Button, so focus, disabled and loading work the same.",
+        "props": {
+          "children": {
+            "type": "node",
+            "description": "Button label. Icon-only buttons must pass aria-label instead.",
+            "required": true
+          },
+          "variant": {
+            "type": "enum",
+            "values": [
+              "primary",
+              "secondary",
+              "ghost",
+              "danger"
+            ],
+            "description": "Visual emphasis, as on Button.",
+            "default": "primary"
+          },
+          "size": {
+            "type": "enum",
+            "values": [
+              "sm",
+              "md",
+              "lg"
+            ],
+            "description": "Height, padding and font size, as on Button.",
+            "default": "md"
+          },
+          "duration": {
+            "type": "number",
+            "description": "Seconds for one sweep, including the pause before the next.",
+            "default": 2.6
+          },
+          "isPaused": {
+            "type": "boolean",
+            "description": "Stops the animation. Moving content that lasts more than five seconds should be stoppable.",
+            "default": false
+          },
+          "isDisabled": {
+            "type": "boolean",
+            "description": "Prevents interaction and dims the button.",
+            "default": false
+          },
+          "isLoading": {
+            "type": "boolean",
+            "description": "Shows a spinner and blocks presses; the pending state is announced.",
+            "default": false
+          },
+          "onPress": {
+            "type": "callback",
+            "tsType": "() => void",
+            "description": "Called when the button is pressed by mouse, touch or keyboard."
+          }
+        },
+        "variants": [
+          "variant",
+          "size"
+        ],
+        "states": [
+          "default"
+        ],
+        "slots": [
+          "root",
+          "label",
+          "shimmer"
+        ],
+        "tokens": [
+          "color.action.primary",
+          "color.action.on-primary",
+          "color.action.danger",
+          "color.surface.default",
+          "color.text.default",
+          "color.border.default",
+          "color.focus.ring",
+          "radius.control"
+        ],
+        "a11y": {
+          "role": "button",
+          "keyboard": [
+            "Tab focuses it",
+            "Enter or Space presses it"
+          ],
+          "requirements": [
+            "Decoration only: the animated layers are hidden from assistive technology and never take focus",
+            "Stands still for visitors who ask for less motion (prefers-reduced-motion), and the effect can also be shown still with the rdm-still class",
+            "The label keeps the Button's contrast: the sweep is a translucent overlay behind the text",
+            "Does not flash: nothing changes more than three times in a second (WCAG 2.3.1)",
+            "Optional: it is a separate component, so projects that do not add it carry none of its code"
+          ],
+          "screenReader": [
+            "Announced exactly as a Button: its label, as a button; the effect adds nothing to what is read"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "The single primary call to action on a page, like Start free trial"
+          ],
+          "avoid_when": [
+            "More than one per screen: it stops standing out",
+            "Dense toolbars and forms"
+          ],
+          "anti_patterns": [
+            "Using it for every button",
+            "A very short duration, which reads as flicker"
+          ]
+        },
+        "examples": [
+          "basic",
+          "variants",
+          "paused"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {
+            "variant": "Variant",
+            "size": "Size"
+          }
+        }
+      },
+      "install": {
+        "command": "npx rdloom add shimmer-button",
+        "dependencies": [],
+        "registryDependencies": [
+          "tokens",
+          "button",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import { ShimmerButton } from \"@rdloom/react\";\n\nexport default function ShimmerButtonBasicExample() {\n  return (\n    <ShimmerButton>Start free trial</ShimmerButton>\n  );\n}\n"
+        },
+        {
+          "name": "variants",
+          "code": "import { ShimmerButton } from \"@rdloom/react\";\n\nexport default function ShimmerButtonVariantsExample() {\n  return (\n    <div className=\"flex flex-wrap items-center gap-3\">\n      <ShimmerButton>Primary</ShimmerButton>\n      <ShimmerButton variant=\"secondary\">Secondary</ShimmerButton>\n      <ShimmerButton variant=\"danger\">Danger</ShimmerButton>\n      <ShimmerButton size=\"lg\">Large</ShimmerButton>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "paused",
+          "code": "import { useState } from \"react\";\nimport { Button, ShimmerButton } from \"@rdloom/react\";\n\n// Anything that keeps moving should be stoppable: isPaused freezes the shimmer.\nexport default function ShimmerButtonPausedExample() {\n  const [paused, setPaused] = useState(false);\n  return (\n    <div className=\"flex items-center gap-3\">\n      <ShimmerButton isPaused={paused}>Upgrade</ShimmerButton>\n      <Button variant=\"ghost\" size=\"sm\" onPress={() => setPaused((p) => !p)} aria-pressed={paused}>\n        {paused ? \"Resume motion\" : \"Pause motion\"}\n      </Button>\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "shimmer-button/shimmer-button.tsx",
+          "content": "\"use client\";\n\nimport { forwardRef } from \"react\";\nimport { Button, type ButtonProps } from \"../button/button\";\nimport { shimmerButtonDefaults, type ShimmerButtonSpecProps } from \"../generated/shimmer-button.types\";\nimport { cx } from \"../utils/cx\";\nimport { MotionStyle, motionVars } from \"../utils/motion\";\n\nexport interface ShimmerButtonProps extends ShimmerButtonSpecProps, Omit<ButtonProps, keyof ShimmerButtonSpecProps> {}\n\nconst css = `\n@keyframes rdm-shimmer{0%{transform:translateX(-130%) skewX(-18deg)}55%,100%{transform:translateX(330%) skewX(-18deg)}}\n.rdm-shimmer{position:absolute;inset:0 auto 0 0;width:38%;pointer-events:none;\n  background:linear-gradient(90deg,transparent,color-mix(in srgb,currentColor 34%,transparent),transparent);\n  animation:rdm-shimmer var(--rdm-d,2.6s) ease-in-out infinite}\n[data-rdm-paused] .rdm-shimmer{animation-play-state:paused}\n`;\n\n/** A button whose surface is crossed by a soft band of light, now and then. Builds on Button. */\nexport const ShimmerButton = forwardRef<HTMLButtonElement, ShimmerButtonProps>(function ShimmerButton(\n  { children, duration = shimmerButtonDefaults.duration, isPaused = shimmerButtonDefaults.isPaused, className, style, ...rest },\n  ref,\n) {\n  return (\n    <>\n      <MotionStyle css={css} still={{ \".rdm-shimmer\": \"display:none\" }} />\n      <Button\n        {...rest}\n        ref={ref}\n        data-rdm-paused={isPaused || undefined}\n        className={cx(\"relative overflow-hidden\", className)}\n        style={(values) => ({ ...motionVars({ \"--rdm-d\": `${duration}s` }), ...(typeof style === \"function\" ? style(values) : style) })}\n      >\n        <span className=\"relative z-[1] inline-flex items-center gap-2\">{children}</span>\n        <span aria-hidden=\"true\" className=\"rdm-shimmer\" />\n      </Button>\n    </>\n  );\n});\n"
+        },
+        {
+          "path": "generated/shimmer-button.types.ts",
+          "content": "// Generated by rdloom codegen from specs/shimmer-button.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nimport type { ReactNode } from \"react\";\n\nexport const shimmerButtonVariantValues = [\"primary\", \"secondary\", \"ghost\", \"danger\"] as const;\nexport const shimmerButtonSizeValues = [\"sm\", \"md\", \"lg\"] as const;\n\n/** A button with a soft band of light that crosses its surface now and then, for one standout action. Builds on Button, so focus, disabled and loading work the same. */\nexport interface ShimmerButtonSpecProps {\n  /**\n   * Button label. Icon-only buttons must pass aria-label instead.\n   */\n  children: ReactNode;\n  /**\n   * Visual emphasis, as on Button.\n   * @default \"primary\"\n   */\n  variant?: \"primary\" | \"secondary\" | \"ghost\" | \"danger\";\n  /**\n   * Height, padding and font size, as on Button.\n   * @default \"md\"\n   */\n  size?: \"sm\" | \"md\" | \"lg\";\n  /**\n   * Seconds for one sweep, including the pause before the next.\n   * @default 2.6\n   */\n  duration?: number;\n  /**\n   * Stops the animation. Moving content that lasts more than five seconds should be stoppable.\n   * @default false\n   */\n  isPaused?: boolean;\n  /**\n   * Prevents interaction and dims the button.\n   * @default false\n   */\n  isDisabled?: boolean;\n  /**\n   * Shows a spinner and blocks presses; the pending state is announced.\n   * @default false\n   */\n  isLoading?: boolean;\n  /**\n   * Called when the button is pressed by mouse, touch or keyboard.\n   */\n  onPress?: () => void;\n}\n\nexport const shimmerButtonDefaults = {\n  variant: \"primary\",\n  size: \"md\",\n  duration: 2.6,\n  isPaused: false,\n  isDisabled: false,\n  isLoading: false,\n} as const;\n\nexport const shimmerButtonMeta = {\n  \"name\": \"ShimmerButton\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"button\"\n} as const;\n"
+        }
+      ]
+    },
+    {
+      "id": "shine-border",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "ShineBorder",
+        "version": "0.1.0",
+        "category": "motion",
+        "status": "experimental",
+        "description": "A band of colour that slides steadily along a border, so the edge seems to catch the light. Wrap a card or a field.",
+        "props": {
+          "children": {
+            "type": "node",
+            "description": "The content the border surrounds.",
+            "required": true
+          },
+          "colors": {
+            "type": "custom",
+            "tsType": "readonly string[]",
+            "description": "Colours of the band, any CSS colours. Two or more."
+          },
+          "duration": {
+            "type": "number",
+            "description": "Seconds for the band to travel its length.",
+            "default": 8
+          },
+          "borderWidth": {
+            "type": "number",
+            "description": "Thickness of the border in pixels.",
+            "default": 1.5
+          },
+          "isPaused": {
+            "type": "boolean",
+            "description": "Stops the animation. Moving content that lasts more than five seconds should be stoppable.",
+            "default": false
+          },
+          "className": {
+            "type": "string",
+            "description": "Classes for the wrapper: set its radius, background and border here."
+          }
+        },
+        "variants": [
+          "isPaused"
+        ],
+        "states": [
+          "default"
+        ],
+        "slots": [
+          "root",
+          "border",
+          "content"
+        ],
+        "tokens": [
+          "color.action.primary",
+          "color.feedback.warning",
+          "color.feedback.info",
+          "color.surface.default",
+          "color.border.default",
+          "radius.overlay"
+        ],
+        "a11y": {
+          "role": "none",
+          "keyboard": [],
+          "requirements": [
+            "Decoration only: the animated layers are hidden from assistive technology and never take focus",
+            "Stands still for visitors who ask for less motion (prefers-reduced-motion), and the effect can also be shown still with the rdm-still class",
+            "The border is a pointer-transparent layer, so clicks and selection reach the content",
+            "The content inside keeps its own contrast and focus",
+            "Does not flash: nothing changes more than three times in a second (WCAG 2.3.1)",
+            "Optional: it is a separate component, so projects that do not add it carry none of its code"
+          ],
+          "screenReader": [
+            "Silent: the wrapper adds nothing to what is read"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "A featured card or plan",
+            "A search or prompt field that should feel alive"
+          ],
+          "avoid_when": [
+            "Large lists or tables"
+          ],
+          "anti_patterns": [
+            "Many shining borders on one page"
+          ]
+        },
+        "examples": [
+          "basic",
+          "colors"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {
+            "isPaused": "Paused"
+          }
+        }
+      },
+      "install": {
+        "command": "npx rdloom add shine-border",
+        "dependencies": [],
+        "registryDependencies": [
+          "tokens",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import { ShineBorder } from \"@rdloom/react\";\n\nexport default function ShineBorderBasicExample() {\n  return (\n    <ShineBorder className=\"w-72 rounded-xl border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-default)] p-5\">\n      <h3 className=\"font-semibold\">Team plan</h3>\n      <p className=\"pt-1 text-sm text-[var(--rd-color-text-muted)]\">Shared workspaces and single sign-on.</p>\n    </ShineBorder>\n  );\n}\n"
+        },
+        {
+          "name": "colors",
+          "code": "import { ShineBorder } from \"@rdloom/react\";\n\nexport default function ShineBorderColorsExample() {\n  return (\n    <ShineBorder\n      className=\"w-72 rounded-xl border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-default)] p-5\"\n      colors={[\"#f97316\", \"#ec4899\", \"#8b5cf6\"]}\n      duration={5}\n      borderWidth={2}\n    >\n      <p className=\"text-sm\">Your own colours, speed and thickness.</p>\n    </ShineBorder>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "shine-border/shine-border.tsx",
+          "content": "import { forwardRef, type CSSProperties, type HTMLAttributes } from \"react\";\nimport { shineBorderDefaults, type ShineBorderSpecProps } from \"../generated/shine-border.types\";\nimport { cx } from \"../utils/cx\";\nimport { MotionStyle } from \"../utils/motion\";\n\n// Plain markup with no hooks, so it also works in a React Server Component.\n\nexport interface ShineBorderProps\n  extends ShineBorderSpecProps,\n    Omit<HTMLAttributes<HTMLDivElement>, keyof ShineBorderSpecProps | \"className\"> {\n  className?: string;\n}\n\nconst css = `\n@keyframes rdm-shine{to{background-position:300% 0}}\n.rdm-shine{position:absolute;inset:0;border-radius:inherit;padding:var(--rdm-w,1.5px);pointer-events:none;\n  background-size:300% 100%;\n  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;\n  mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0);\n  animation:rdm-shine var(--rdm-d,8s) linear infinite}\n[data-rdm-paused]>.rdm-shine{animation-play-state:paused}\n`;\n\nconst defaultColors = [\"var(--rd-color-action-primary)\", \"var(--rd-color-feedback-warning)\", \"var(--rd-color-feedback-info)\"];\n\n/** A band of colour that slides steadily along the border, so the edge seems to catch the light. */\nexport const ShineBorder = forwardRef<HTMLDivElement, ShineBorderProps>(function ShineBorder(\n  {\n    children,\n    colors = defaultColors,\n    duration = shineBorderDefaults.duration,\n    borderWidth = shineBorderDefaults.borderWidth,\n    isPaused = shineBorderDefaults.isPaused,\n    className,\n    style,\n    ...rest\n  },\n  ref,\n) {\n  const stops = [...colors, colors[0]].join(\", \");\n  return (\n    <>\n      <MotionStyle css={css} still={{ \".rdm-shine\": \"animation:none\" }} />\n      <div\n        {...rest}\n        ref={ref}\n        data-rdm-paused={isPaused || undefined}\n        className={cx(\"relative rounded-[var(--rd-radius-overlay)]\", className)}\n        style={{ ...({ \"--rdm-d\": `${duration}s`, \"--rdm-w\": `${borderWidth}px` } as CSSProperties), ...style }}\n      >\n        <span aria-hidden=\"true\" className=\"rdm-shine\" style={{ backgroundImage: `linear-gradient(115deg, ${stops})` }} />\n        {children}\n      </div>\n    </>\n  );\n});\n"
+        },
+        {
+          "path": "generated/shine-border.types.ts",
+          "content": "// Generated by rdloom codegen from specs/shine-border.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nimport type { ReactNode } from \"react\";\n\n/** A band of colour that slides steadily along a border, so the edge seems to catch the light. Wrap a card or a field. */\nexport interface ShineBorderSpecProps {\n  /**\n   * The content the border surrounds.\n   */\n  children: ReactNode;\n  /**\n   * Colours of the band, any CSS colours. Two or more.\n   */\n  colors?: readonly string[];\n  /**\n   * Seconds for the band to travel its length.\n   * @default 8\n   */\n  duration?: number;\n  /**\n   * Thickness of the border in pixels.\n   * @default 1.5\n   */\n  borderWidth?: number;\n  /**\n   * Stops the animation. Moving content that lasts more than five seconds should be stoppable.\n   * @default false\n   */\n  isPaused?: boolean;\n  /**\n   * Classes for the wrapper: set its radius, background and border here.\n   */\n  className?: string;\n}\n\nexport const shineBorderDefaults = {\n  duration: 8,\n  borderWidth: 1.5,\n  isPaused: false,\n} as const;\n\nexport const shineBorderMeta = {\n  \"name\": \"ShineBorder\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"none\"\n} as const;\n"
+        }
+      ]
+    },
+    {
+      "id": "shuttle-border",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "ShuttleBorder",
+        "version": "0.1.0",
+        "category": "motion",
+        "status": "experimental",
+        "description": "A point of light that runs around the edge of whatever is inside, like the shuttle of a loom crossing the threads. Wrap a card, an input or a button; give it your radius and background.",
+        "props": {
+          "children": {
+            "type": "node",
+            "description": "The content the light runs around.",
+            "required": true
+          },
+          "color": {
+            "type": "string",
+            "description": "Colour of the light, any CSS colour. Defaults to the action colour."
+          },
+          "duration": {
+            "type": "number",
+            "description": "Seconds for one lap.",
+            "default": 4
+          },
+          "borderWidth": {
+            "type": "number",
+            "description": "Thickness of the light in pixels.",
+            "default": 1.5
+          },
+          "isPaused": {
+            "type": "boolean",
+            "description": "Stops the animation. Moving content that lasts more than five seconds should be stoppable.",
+            "default": false
+          },
+          "className": {
+            "type": "string",
+            "description": "Classes for the wrapper: set its radius, background and border here."
+          }
+        },
+        "variants": [
+          "isPaused"
+        ],
+        "states": [
+          "default"
+        ],
+        "slots": [
+          "root",
+          "light",
+          "content"
+        ],
+        "tokens": [
+          "color.action.primary",
+          "color.feedback.warning",
+          "color.feedback.info",
+          "color.surface.default",
+          "color.border.default",
+          "radius.overlay"
+        ],
+        "a11y": {
+          "role": "none",
+          "keyboard": [],
+          "requirements": [
+            "Decoration only: the animated layers are hidden from assistive technology and never take focus",
+            "Stands still for visitors who ask for less motion (prefers-reduced-motion), and the effect can also be shown still with the rdm-still class",
+            "The light is drawn in a layer that ignores the pointer, so it never blocks clicks or text selection",
+            "The content inside is unchanged: its own contrast and focus apply",
+            "Does not flash: nothing changes more than three times in a second (WCAG 2.3.1)",
+            "Optional: it is a separate component, so projects that do not add it carry none of its code"
+          ],
+          "screenReader": [
+            "Silent: the wrapper adds nothing to what is read"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "Highlighting one card, pricing plan or search field",
+            "Drawing the eye to a featured block"
+          ],
+          "avoid_when": [
+            "Wrapping many items at once",
+            "Content that someone must read for a long time right next to the moving light"
+          ],
+          "anti_patterns": [
+            "Putting it on every card in a grid",
+            "A duration under two seconds"
+          ]
+        },
+        "examples": [
+          "basic",
+          "colors"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {
+            "isPaused": "Paused"
+          }
+        }
+      },
+      "install": {
+        "command": "npx rdloom add shuttle-border",
+        "dependencies": [],
+        "registryDependencies": [
+          "tokens",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import { ShuttleBorder } from \"@rdloom/react\";\n\n// The wrapper sets nothing but the light: give it your own radius, border and background.\nexport default function ShuttleBorderBasicExample() {\n  return (\n    <ShuttleBorder className=\"w-72 rounded-xl border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-default)] p-5\">\n      <h3 className=\"font-semibold\">Pro plan</h3>\n      <p className=\"pt-1 text-sm text-[var(--rd-color-text-muted)]\">Unlimited projects, priority support and version history.</p>\n    </ShuttleBorder>\n  );\n}\n"
+        },
+        {
+          "name": "colors",
+          "code": "import { ShuttleBorder } from \"@rdloom/react\";\n\nexport default function ShuttleBorderColorsExample() {\n  const card = \"w-56 rounded-xl border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-default)] p-4 text-sm\";\n  return (\n    <div className=\"flex flex-wrap gap-4\">\n      <ShuttleBorder className={card} color=\"var(--rd-color-feedback-success)\" duration={5}>\n        Healthy\n      </ShuttleBorder>\n      <ShuttleBorder className={card} color=\"var(--rd-color-feedback-info)\" borderWidth={2.5}>\n        Thicker light\n      </ShuttleBorder>\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "shuttle-border/shuttle-border.tsx",
+          "content": "import { forwardRef, type CSSProperties, type HTMLAttributes } from \"react\";\nimport { shuttleBorderDefaults, type ShuttleBorderSpecProps } from \"../generated/shuttle-border.types\";\nimport { cx } from \"../utils/cx\";\nimport { MotionStyle } from \"../utils/motion\";\n\n// Plain markup with no hooks, so it also works in a React Server Component.\n\nexport interface ShuttleBorderProps\n  extends ShuttleBorderSpecProps,\n    Omit<HTMLAttributes<HTMLDivElement>, keyof ShuttleBorderSpecProps | \"className\"> {\n  className?: string;\n}\n\nconst css = `\n@property --rdm-angle{syntax:\"<angle>\";inherits:false;initial-value:0deg}\n@keyframes rdm-spin{to{--rdm-angle:360deg}}\n.rdm-shuttle{position:absolute;inset:0;border-radius:inherit;padding:var(--rdm-w,1.5px);pointer-events:none;\n  background:conic-gradient(from var(--rdm-angle),transparent 0,transparent 70%,var(--rdm-c,var(--rd-color-action-primary)) 90%,transparent 100%);\n  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;\n  mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0);\n  animation:rdm-spin var(--rdm-d,4s) linear infinite}\n[data-rdm-paused]>.rdm-shuttle{animation-play-state:paused}\n`;\n\n/**\n * A point of light that runs around the edge of whatever is inside, like the shuttle of a loom\n * crossing the threads. Give it the radius and background you want through className.\n */\nexport const ShuttleBorder = forwardRef<HTMLDivElement, ShuttleBorderProps>(function ShuttleBorder(\n  {\n    children,\n    color,\n    duration = shuttleBorderDefaults.duration,\n    borderWidth = shuttleBorderDefaults.borderWidth,\n    isPaused = shuttleBorderDefaults.isPaused,\n    className,\n    style,\n    ...rest\n  },\n  ref,\n) {\n  const vars: Record<string, string | number> = { \"--rdm-d\": `${duration}s`, \"--rdm-w\": `${borderWidth}px` };\n  if (color) vars[\"--rdm-c\"] = color;\n  return (\n    <>\n      <MotionStyle css={css} still={{ \".rdm-shuttle\": \"animation:none;background:none\" }} />\n      <div\n        {...rest}\n        ref={ref}\n        data-rdm-paused={isPaused || undefined}\n        className={cx(\"relative rounded-[var(--rd-radius-overlay)]\", className)}\n        style={{ ...(vars as CSSProperties), ...style }}\n      >\n        <span aria-hidden=\"true\" className=\"rdm-shuttle\" />\n        {children}\n      </div>\n    </>\n  );\n});\n"
+        },
+        {
+          "path": "generated/shuttle-border.types.ts",
+          "content": "// Generated by rdloom codegen from specs/shuttle-border.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nimport type { ReactNode } from \"react\";\n\n/** A point of light that runs around the edge of whatever is inside, like the shuttle of a loom crossing the threads. Wrap a card, an input or a button; give it your radius and background. */\nexport interface ShuttleBorderSpecProps {\n  /**\n   * The content the light runs around.\n   */\n  children: ReactNode;\n  /**\n   * Colour of the light, any CSS colour. Defaults to the action colour.\n   */\n  color?: string;\n  /**\n   * Seconds for one lap.\n   * @default 4\n   */\n  duration?: number;\n  /**\n   * Thickness of the light in pixels.\n   * @default 1.5\n   */\n  borderWidth?: number;\n  /**\n   * Stops the animation. Moving content that lasts more than five seconds should be stoppable.\n   * @default false\n   */\n  isPaused?: boolean;\n  /**\n   * Classes for the wrapper: set its radius, background and border here.\n   */\n  className?: string;\n}\n\nexport const shuttleBorderDefaults = {\n  duration: 4,\n  borderWidth: 1.5,\n  isPaused: false,\n} as const;\n\nexport const shuttleBorderMeta = {\n  \"name\": \"ShuttleBorder\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"none\"\n} as const;\n"
         }
       ]
     },
@@ -6023,6 +7426,123 @@
       ]
     },
     {
+      "id": "text-shimmer",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "TextShimmer",
+        "version": "0.1.0",
+        "category": "motion",
+        "status": "experimental",
+        "description": "Text with a band of light sweeping across it, for a loading message or a quiet accent. The words stay real text: selectable and read as normal.",
+        "props": {
+          "children": {
+            "type": "node",
+            "description": "The text.",
+            "required": true
+          },
+          "duration": {
+            "type": "number",
+            "description": "Seconds for one sweep.",
+            "default": 2.8
+          },
+          "baseColor": {
+            "type": "string",
+            "description": "The resting colour of the text, any CSS colour. Defaults to the muted text colour."
+          },
+          "highlightColor": {
+            "type": "string",
+            "description": "The colour of the passing light, any CSS colour. Defaults to the main text colour."
+          },
+          "isPaused": {
+            "type": "boolean",
+            "description": "Stops the animation. Moving content that lasts more than five seconds should be stoppable.",
+            "default": false
+          }
+        },
+        "variants": [
+          "isPaused"
+        ],
+        "states": [
+          "default"
+        ],
+        "slots": [
+          "root"
+        ],
+        "tokens": [
+          "color.text.default",
+          "color.text.muted"
+        ],
+        "a11y": {
+          "role": "text",
+          "keyboard": [],
+          "requirements": [
+            "Decoration only: the animated layers are hidden from assistive technology and never take focus",
+            "Stands still for visitors who ask for less motion (prefers-reduced-motion), and the effect can also be shown still with the rdm-still class",
+            "Both colours meet 4.5:1 against the page, so the text is readable at every point of the sweep",
+            "In forced-colors (high contrast) mode it is drawn in the system text colour with no effect",
+            "Does not flash: nothing changes more than three times in a second (WCAG 2.3.1)",
+            "Optional: it is a separate component, so projects that do not add it carry none of its code"
+          ],
+          "screenReader": [
+            "Read as ordinary text: the sweep is purely visual"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "\"Thinking…\" and other loading messages",
+            "A short label that should feel alive"
+          ],
+          "avoid_when": [
+            "Paragraphs of body text",
+            "Anything the user must read closely"
+          ],
+          "anti_patterns": [
+            "Choosing two colours that are close in lightness, which makes the sweep invisible",
+            "Long passages"
+          ]
+        },
+        "examples": [
+          "basic",
+          "in-a-heading"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {
+            "isPaused": "Paused"
+          }
+        }
+      },
+      "install": {
+        "command": "npx rdloom add text-shimmer",
+        "dependencies": [],
+        "registryDependencies": [
+          "tokens",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import { TextShimmer } from \"@rdloom/react\";\n\nexport default function TextShimmerBasicExample() {\n  return (\n    <TextShimmer className=\"text-lg font-medium\">Thinking…</TextShimmer>\n  );\n}\n"
+        },
+        {
+          "name": "in-a-heading",
+          "code": "import { TextShimmer } from \"@rdloom/react\";\n\nexport default function TextShimmerInAHeadingExample() {\n  return (\n    <h3 className=\"text-2xl font-semibold\">\n      Your report is{\" \"}\n      <TextShimmer baseColor=\"var(--rd-color-action-primary)\" highlightColor=\"var(--rd-color-text-default)\" duration={2.2}>\n        being prepared\n      </TextShimmer>\n    </h3>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "text-shimmer/text-shimmer.tsx",
+          "content": "import { forwardRef, type CSSProperties, type HTMLAttributes } from \"react\";\nimport { textShimmerDefaults, type TextShimmerSpecProps } from \"../generated/text-shimmer.types\";\nimport { cx } from \"../utils/cx\";\nimport { MotionStyle } from \"../utils/motion\";\n\n// Plain markup with no hooks, so it also works in a React Server Component.\n\nexport interface TextShimmerProps\n  extends TextShimmerSpecProps,\n    Omit<HTMLAttributes<HTMLSpanElement>, keyof TextShimmerSpecProps | \"className\"> {\n  className?: string;\n}\n\nconst css = `\n@keyframes rdm-text-shimmer{from{background-position:120% 0}to{background-position:-120% 0}}\n.rdm-text-shimmer{color:transparent;-webkit-background-clip:text;background-clip:text;background-size:250% 100%;\n  background-image:linear-gradient(100deg,var(--rdm-base,var(--rd-color-text-muted)) 38%,var(--rdm-hi,var(--rd-color-text-default)) 50%,var(--rdm-base,var(--rd-color-text-muted)) 62%);\n  animation:rdm-text-shimmer var(--rdm-d,2.8s) linear infinite}\n[data-rdm-paused].rdm-text-shimmer{animation-play-state:paused}\n@media (forced-colors:active){.rdm-text-shimmer{color:CanvasText;background:none;animation:none}}\n`;\n\n/** Text with a band of light sweeping across it. The words stay real text: selectable and readable. */\nexport const TextShimmer = forwardRef<HTMLSpanElement, TextShimmerProps>(function TextShimmer(\n  { children, duration = textShimmerDefaults.duration, baseColor, highlightColor, isPaused = textShimmerDefaults.isPaused, className, style, ...rest },\n  ref,\n) {\n  const vars: Record<string, string> = { \"--rdm-d\": `${duration}s` };\n  if (baseColor) vars[\"--rdm-base\"] = baseColor;\n  if (highlightColor) vars[\"--rdm-hi\"] = highlightColor;\n  return (\n    <>\n      <MotionStyle css={css} still={{ \".rdm-text-shimmer\": \"animation:none;background:none;color:var(--rdm-base,var(--rd-color-text-default))\" }} />\n      <span\n        {...rest}\n        ref={ref}\n        data-rdm-paused={isPaused || undefined}\n        className={cx(\"rdm-text-shimmer\", className)}\n        style={{ ...(vars as CSSProperties), ...style }}\n      >\n        {children}\n      </span>\n    </>\n  );\n});\n"
+        },
+        {
+          "path": "generated/text-shimmer.types.ts",
+          "content": "// Generated by rdloom codegen from specs/text-shimmer.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nimport type { ReactNode } from \"react\";\n\n/** Text with a band of light sweeping across it, for a loading message or a quiet accent. The words stay real text: selectable and read as normal. */\nexport interface TextShimmerSpecProps {\n  /**\n   * The text.\n   */\n  children: ReactNode;\n  /**\n   * Seconds for one sweep.\n   * @default 2.8\n   */\n  duration?: number;\n  /**\n   * The resting colour of the text, any CSS colour. Defaults to the muted text colour.\n   */\n  baseColor?: string;\n  /**\n   * The colour of the passing light, any CSS colour. Defaults to the main text colour.\n   */\n  highlightColor?: string;\n  /**\n   * Stops the animation. Moving content that lasts more than five seconds should be stoppable.\n   * @default false\n   */\n  isPaused?: boolean;\n}\n\nexport const textShimmerDefaults = {\n  duration: 2.8,\n  isPaused: false,\n} as const;\n\nexport const textShimmerMeta = {\n  \"name\": \"TextShimmer\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"text\"\n} as const;\n"
+        }
+      ]
+    },
+    {
       "id": "time-field",
       "spec": {
         "$schema": "./schema/component.schema.json",
@@ -6877,6 +8397,10 @@
         {
           "path": "utils/icons.tsx",
           "content": "export function CheckIcon({ className = \"size-4 shrink-0 text-[var(--rd-color-action-primary)]\" }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 16 16\" className={className} fill=\"none\">\n      <path d=\"M3.5 8.5l3 3 6-7\" stroke=\"currentColor\" strokeWidth=\"2\" strokeLinecap=\"round\" strokeLinejoin=\"round\" />\n    </svg>\n  );\n}\n\nexport function ChevronDownIcon() {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 16 16\" className=\"size-4 shrink-0 text-[var(--rd-color-text-muted)]\" fill=\"none\">\n      <path d=\"M4 6l4 4 4-4\" stroke=\"currentColor\" strokeWidth=\"1.5\" strokeLinecap=\"round\" strokeLinejoin=\"round\" />\n    </svg>\n  );\n}\n\nexport function CloseIcon({ className = \"size-3\" }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 16 16\" className={className} fill=\"none\">\n      <path d=\"M4 4l8 8M12 4l-8 8\" stroke=\"currentColor\" strokeWidth=\"1.75\" strokeLinecap=\"round\" />\n    </svg>\n  );\n}\n\nexport function Spinner({ className = \"size-4\" }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 24 24\" className={`${className} animate-spin`} fill=\"none\">\n      <circle cx=\"12\" cy=\"12\" r=\"10\" stroke=\"currentColor\" strokeWidth=\"3\" opacity=\"0.25\" />\n      <path d=\"M22 12a10 10 0 0 0-10-10\" stroke=\"currentColor\" strokeWidth=\"3\" strokeLinecap=\"round\" />\n    </svg>\n  );\n}\n\nexport function CalendarIcon() {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 16 16\" className=\"size-4\" fill=\"none\">\n      <rect x=\"2.5\" y=\"3.5\" width=\"11\" height=\"10\" rx=\"1.5\" stroke=\"currentColor\" strokeWidth=\"1.3\" />\n      <path d=\"M2.5 6.5h11M5.5 2v3M10.5 2v3\" stroke=\"currentColor\" strokeWidth=\"1.3\" strokeLinecap=\"round\" />\n    </svg>\n  );\n}\n\n// Status icons for Alert. Each tone has its own shape (circle with i, check,\n// triangle, octagon) so the tone never depends on color alone.\nconst statusIcon = \"size-5 shrink-0\";\n\nexport function InfoIcon({ className = statusIcon }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 20 20\" className={className} fill=\"none\">\n      <circle cx=\"10\" cy=\"10\" r=\"8\" stroke=\"currentColor\" strokeWidth=\"1.6\" />\n      <path d=\"M10 9v5M10 6.25v.01\" stroke=\"currentColor\" strokeWidth=\"1.8\" strokeLinecap=\"round\" />\n    </svg>\n  );\n}\n\nexport function SuccessIcon({ className = statusIcon }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 20 20\" className={className} fill=\"none\">\n      <circle cx=\"10\" cy=\"10\" r=\"8\" stroke=\"currentColor\" strokeWidth=\"1.6\" />\n      <path d=\"M6.5 10.25l2.5 2.5 4.5-5\" stroke=\"currentColor\" strokeWidth=\"1.8\" strokeLinecap=\"round\" strokeLinejoin=\"round\" />\n    </svg>\n  );\n}\n\nexport function WarningIcon({ className = statusIcon }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 20 20\" className={className} fill=\"none\">\n      <path d=\"M10 2.75l8 14H2l8-14z\" stroke=\"currentColor\" strokeWidth=\"1.6\" strokeLinejoin=\"round\" />\n      <path d=\"M10 8v4M10 14.25v.01\" stroke=\"currentColor\" strokeWidth=\"1.8\" strokeLinecap=\"round\" />\n    </svg>\n  );\n}\n\nexport function ErrorIcon({ className = statusIcon }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 20 20\" className={className} fill=\"none\">\n      <path d=\"M7 2.5h6l4.5 4.5v6L13 17.5H7L2.5 13V7L7 2.5z\" stroke=\"currentColor\" strokeWidth=\"1.6\" strokeLinejoin=\"round\" />\n      <path d=\"M7.5 7.5l5 5M12.5 7.5l-5 5\" stroke=\"currentColor\" strokeWidth=\"1.8\" strokeLinecap=\"round\" />\n    </svg>\n  );\n}\n\nexport function SearchIcon({ className = \"size-5 shrink-0\" }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 20 20\" className={className} fill=\"none\">\n      <circle cx=\"9\" cy=\"9\" r=\"5.75\" stroke=\"currentColor\" strokeWidth=\"1.6\" />\n      <path d=\"M13.5 13.5L17 17\" stroke=\"currentColor\" strokeWidth=\"1.6\" strokeLinecap=\"round\" />\n    </svg>\n  );\n}\n\nexport function UploadIcon({ className = \"size-5 shrink-0\" }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 20 20\" className={className} fill=\"none\">\n      <path d=\"M10 13V3.5M6.25 7L10 3.25 13.75 7\" stroke=\"currentColor\" strokeWidth=\"1.6\" strokeLinecap=\"round\" strokeLinejoin=\"round\" />\n      <path d=\"M3.5 12.5v2.25c0 .83.67 1.5 1.5 1.5h10c.83 0 1.5-.67 1.5-1.5V12.5\" stroke=\"currentColor\" strokeWidth=\"1.6\" strokeLinecap=\"round\" />\n    </svg>\n  );\n}\n\nexport function FileIcon({ className = \"size-5 shrink-0\" }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 20 20\" className={className} fill=\"none\">\n      <path d=\"M5.5 2.75h5.25L15 7v9.5a.75.75 0 0 1-.75.75h-8.5A.75.75 0 0 1 5 16.5v-13a.75.75 0 0 1 .5-.75z\" stroke=\"currentColor\" strokeWidth=\"1.5\" strokeLinejoin=\"round\" />\n      <path d=\"M10.5 2.75V7H15\" stroke=\"currentColor\" strokeWidth=\"1.5\" strokeLinejoin=\"round\" />\n    </svg>\n  );\n}\n\nexport function ChevronRightIcon({ className = \"size-4 shrink-0\" }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 16 16\" className={className} fill=\"none\">\n      <path d=\"M6 3.5l4.5 4.5L6 12.5\" stroke=\"currentColor\" strokeWidth=\"1.6\" strokeLinecap=\"round\" strokeLinejoin=\"round\" />\n    </svg>\n  );\n}\n"
+        },
+        {
+          "path": "utils/motion.tsx",
+          "content": "\"use client\";\n\nimport { useEffect, useLayoutEffect, useState } from \"react\";\n\n// Shared by the motion components. They are optional extras: a project that never\n// adds one never carries this file's callers. Every effect follows the same rules:\n//   - it is decoration, so the animated layers are hidden from assistive technology\n//   - it stands still for people who ask for less motion\n//   - it can be paused (isPaused), because moving content must be stoppable\n//   - it brings its own keyframes (MotionStyle), so there is nothing to import or configure\n\n/** useLayoutEffect in the browser, useEffect on the server (which would otherwise warn). */\nexport const useIsomorphicLayoutEffect = typeof window === \"undefined\" ? useEffect : useLayoutEffect;\n\n/** Does the visitor ask for less motion? Reads the setting at call time, so it is safe to use in a layout effect. */\nexport const prefersReducedMotion = () =>\n  typeof window !== \"undefined\" && typeof window.matchMedia === \"function\" && window.matchMedia(\"(prefers-reduced-motion: reduce)\").matches;\n\n/** True when the visitor asks for less motion, and updates if they change the setting. */\nexport function useReducedMotion(): boolean {\n  const [reduced, setReduced] = useState(false);\n  useEffect(() => {\n    if (typeof window.matchMedia !== \"function\") return;\n    const query = window.matchMedia(\"(prefers-reduced-motion: reduce)\");\n    const update = () => setReduced(query.matches);\n    update();\n    query.addEventListener(\"change\", update);\n    return () => query.removeEventListener(\"change\", update);\n  }, []);\n  return reduced;\n}\n\n/**\n * One effect's keyframes and rules, written next to the component that uses them.\n *\n * `still` maps a selector to the declarations that should apply when the effect\n * must stand still: for visitors who prefer reduced motion, and inside any element\n * with the class `rdm-still` (the docs use it to show the still state on request).\n */\nexport function MotionStyle({ css, still = {} }: { css: string; still?: Record<string, string> }) {\n  const stillCss = Object.entries(still)\n    .map(([selector, rules]) => `@media (prefers-reduced-motion: reduce){${selector}{${rules}}}.rdm-still ${selector}{${rules}}`)\n    .join(\"\");\n  return <style>{css + stillCss}</style>;\n}\n\n/** The inline style for the optional CSS variables an effect reads: only the ones that were given. */\nexport function motionVars(vars: Record<string, string | number | undefined>): React.CSSProperties {\n  return Object.fromEntries(Object.entries(vars).filter(([, v]) => v !== undefined)) as React.CSSProperties;\n}\n"
         },
         {
           "path": "utils/use-media-query.ts",
