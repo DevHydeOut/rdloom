@@ -6,8 +6,11 @@ export interface DataGridColumnMeta {
   editable?: boolean;
   /** Editor type for editable cells. "number" rejects non-numeric input. Defaults to "text". */
   editor?: "text" | "number";
-  /** Filter shown in the filter row: "text" (contains) or "select" (one of the column's values). Defaults to "text". */
-  filter?: "text" | "select" | false;
+  /**
+   * Filter shown in the filter row: "text" (contains), "select" (one value from a list),
+   * "set" (any of several values, picked from a checklist), or false for none. Defaults to "text".
+   */
+  filter?: "text" | "select" | "set" | false;
   /**
    * Turns the value into display text, e.g. a currency formatter. The cell
    * shows it (unless the column has its own cell renderer), and search and
@@ -15,7 +18,7 @@ export interface DataGridColumnMeta {
    */
   format?: (value: any) => string;
   /**
-   * The values a "select" filter offers. Without it the grid lists the
+   * The values a "select" or "set" filter offers. Without it the grid lists the
    * column's distinct values in the rows it has, which with serverSide is only
    * the current page: pass the full list from your server instead.
    */
@@ -26,13 +29,22 @@ export interface DataGridColumnMeta {
 export interface DataGridQuery {
   /** Sort order, first entry first. */
   sorting: { id: string; desc: boolean }[];
-  /** Column filters: the text typed in a "text" filter, or the value chosen in a "select" one. */
-  filters: { id: string; value: string }[];
+  /** Column filters: the text typed in a "text" filter, the value chosen in a "select" one, or the values ticked in a "set" one. */
+  filters: { id: string; value: string | string[] }[];
   /** The grid's search text (globalFilter). */
   search: string;
   /** Zero-based page. */
   pageIndex: number;
   pageSize: number;
+}
+
+/** Sent to onRowReorder when a row is dragged or moved with Alt+Up / Alt+Down. */
+export interface DataGridRowMove {
+  rowId: string;
+  /** Where the row is in the data you passed. */
+  fromIndex: number;
+  /** Where it should end up: remove it from fromIndex, then insert it here. */
+  toIndex: number;
 }
 
 export interface DataGridExportOptions {

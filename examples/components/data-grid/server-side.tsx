@@ -25,7 +25,11 @@ async function fetchOrders(query: DataGridQuery) {
   await new Promise((resolve) => setTimeout(resolve, 300));
   let rows = everyOrder;
   for (const { id, value } of query.filters) {
-    rows = rows.filter((row) => String(row[id as keyof Order]).toLowerCase().includes(value.toLowerCase()));
+    // A "set" filter sends the ticked values as an array; text and select filters send a string.
+    rows = rows.filter((row) => {
+      const cell = String(row[id as keyof Order]);
+      return Array.isArray(value) ? value.includes(cell) : cell.toLowerCase().includes(value.toLowerCase());
+    });
   }
   if (query.sorting.length) {
     const [{ id, desc }] = query.sorting;
@@ -39,7 +43,7 @@ async function fetchOrders(query: DataGridQuery) {
 const columns: ColumnDef<Order, any>[] = [
   { accessorKey: "id", header: "Order", size: 110 },
   { accessorKey: "customer", header: "Customer", size: 160, meta: { filter: "select", filterOptions: customers } },
-  { accessorKey: "status", header: "Status", size: 130, meta: { filter: "select", filterOptions: statuses } },
+  { accessorKey: "status", header: "Status", size: 130, meta: { filter: "set", filterOptions: statuses } },
   { accessorKey: "total", header: "Total", size: 120, meta: { align: "end", filter: false, format: money.format } },
 ];
 

@@ -46,8 +46,8 @@
     {
       "name": "data-grid",
       "type": "registry:ui",
-      "version": "0.7.0",
-      "description": "Accessible, virtualized data grid for large datasets: sorting, filtering, row selection, resizable and pinned columns, row grouping with totals, tree data, expandable detail rows, cell range selection with copy and paste, CSV and Excel export, and server-side sorting, filtering and paging. Columns are TanStack Table column definitions."
+      "version": "0.8.0",
+      "description": "Accessible, virtualized data grid for large datasets: sorting, filtering, row selection, resizable and pinned columns, row grouping with totals, tree data, expandable detail rows, cell range selection with copy and paste, CSV and Excel export, server-side sorting, filtering and paging, a column menu, set filters and row reordering. Columns are TanStack Table column definitions."
     },
     {
       "name": "date-picker",

@@ -10,8 +10,10 @@ export {
   type DataGridColumnMeta,
   type DataGridExportOptions,
   type DataGridQuery,
+  type DataGridRowMove,
   type DataGridProps,
 } from "./data-grid/data-grid";
+export { reorderRows } from "./data-grid/reorder";
 export { DatePicker, type DatePickerProps } from "./date-picker/date-picker";
 export {
   DateRangePicker,

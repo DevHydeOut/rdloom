@@ -14,6 +14,7 @@ import type { DataGridColumnMeta } from "./types";
 //
 // With meta.format, search and text filters match the display text too.
 //   meta.filter "select" - cell equals the chosen option
+//   meta.filter "set"    - cell equals any of the chosen values (a checklist)
 
 const SEPARATOR = "\u0000";
 export const normalize = (v: unknown) => (v === null || v === undefined ? "" : String(v).toLocaleLowerCase());
@@ -30,6 +31,10 @@ export function searchText<T>(column: Column<T, unknown>, value: unknown): strin
 export function columnTest<T>(column: Column<T, unknown> | undefined, value: unknown): ((v: unknown) => boolean) | null {
   if (!column || value === undefined || value === "") return null;
   const kind = (column.columnDef.meta as DataGridColumnMeta | undefined)?.filter ?? "text";
+  if (kind === "set") {
+    const wanted = new Set(Array.isArray(value) ? value.map(String) : [String(value)]);
+    return wanted.size === 0 ? null : (v) => wanted.has(String(v ?? ""));
+  }
   if (kind === "select") {
     const wanted = String(value);
     return (v) => String(v ?? "") === wanted;

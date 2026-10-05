@@ -24,15 +24,16 @@ import { dataGridDefaults, type DataGridSpecProps } from "../generated/data-grid
 import { cx } from "../utils/cx";
 import { Spinner } from "../utils/icons";
 import { columnFilter, filteredRowModel, searchFilter, sortedRowModel } from "./hierarchy";
+import { ColumnMenu, RowHandle, SetFilter, type ColumnMenuAction } from "./column-ui";
 import { download, parseTsv, toCsv, toTsv, toXlsx, type ExportValue } from "./tabular";
-import type { DataGridApi, DataGridCellEdit, DataGridColumnMeta, DataGridExportOptions, DataGridQuery } from "./types";
+import type { DataGridApi, DataGridCellEdit, DataGridColumnMeta, DataGridExportOptions, DataGridQuery, DataGridRowMove } from "./types";
 
-export type { DataGridApi, DataGridCellEdit, DataGridColumnMeta, DataGridExportOptions, DataGridQuery } from "./types";
+export type { DataGridApi, DataGridCellEdit, DataGridColumnMeta, DataGridExportOptions, DataGridQuery, DataGridRowMove } from "./types";
 
 export interface DataGridProps<T>
   extends Omit<
     DataGridSpecProps,
-    "data" | "columns" | "getRowId" | "onRowAction" | "onCellEdit" | "onCellsEdit" | "getSubRows" | "renderDetail" | "apiRef"
+    "data" | "columns" | "getRowId" | "onRowAction" | "onCellEdit" | "onCellsEdit" | "onRowReorder" | "getSubRows" | "renderDetail" | "apiRef"
   > {
   data: readonly T[];
   columns: ColumnDef<T, any>[];
@@ -41,6 +42,8 @@ export interface DataGridProps<T>
   onCellEdit?: (edit: DataGridCellEdit<T>) => void;
   /** Called once with every cell a paste changes. Without it, a paste calls onCellEdit per cell. */
   onCellsEdit?: (edits: DataGridCellEdit<T>[]) => void;
+  /** Called when a row is dragged, or moved with Alt+Up / Alt+Down. Apply it with reorderRows(rows, move). */
+  onRowReorder?: (move: DataGridRowMove) => void;
   /** Filled with getCsv(), downloadCsv() and downloadExcel(). Create it with useRef<DataGridApi>(null). */
   apiRef?: { current: DataGridApi | null };
   /** Tree data: a row's children. Rows with children get an expand toggle. */
@@ -54,6 +57,9 @@ export interface DataGridProps<T>
 
 const rowHeights = { compact: 32, standard: 40, comfortable: 48 } as const;
 const SELECT_ID = "__select";
+const REORDER_ID = "__reorder";
+/** The columns the grid adds itself: they have no data, so copy, export and the column menu skip them. */
+const isSystemColumn = (id: string) => id === SELECT_ID || id === REORDER_ID;
 const RESIZE_STEP = 16;
 const MAX_SELECT_OPTIONS = 200;
 const numberFormat = new Intl.NumberFormat();
@@ -169,6 +175,9 @@ export function DataGrid<T>({
   rowCount,
   onQueryChange,
   queryDelay = dataGridDefaults.queryDelay,
+  columnMenu = dataGridDefaults.columnMenu,
+  rowReorder = dataGridDefaults.rowReorder,
+  onRowReorder,
   isLoading = dataGridDefaults.isLoading,
   emptyMessage = dataGridDefaults.emptyMessage,
   onRowAction,
@@ -188,6 +197,19 @@ export function DataGrid<T>({
   const isHierarchical = isTree || grouping.length > 0 || !!renderDetail;
   const [columnSizing, setColumnSizing] = useState<ColumnSizingState>({});
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  // Pinning and hiding start from the props and are then changed from the column menu.
+  const [pinned, setPinned] = useState<string[]>(() => [...(pinnedColumns ?? [])]);
+  const pinnedKey = (pinnedColumns ?? []).join("\u0000");
+  const pinnedMounted = useRef(false);
+  useEffect(() => {
+    if (pinnedMounted.current) setPinned(pinnedKey ? pinnedKey.split("\u0000") : []);
+    pinnedMounted.current = true;
+  }, [pinnedKey]);
+  const [hidden, setHidden] = useState<string[]>([]);
+  const columnVisibility = useMemo(() => Object.fromEntries(hidden.map((id) => [id, false])), [hidden]);
+  const [menuCol, setMenuCol] = useState<string | null>(null);
+  const [dragId, setDragId] = useState<string | null>(null);
+  const [drop, setDrop] = useState<{ id: string; after: boolean } | null>(null);
   const [pageIndex, setPageIndex] = useState(0);
   const [innerSelection, setInnerSelection] = useState(() => toSelection(defaultSelectedRowIds));
   const rowSelection = useMemo(
@@ -198,6 +220,9 @@ export function DataGrid<T>({
   const hasSelection = selectionMode !== "none";
   const isMultiple = selectionMode === "multiple";
   const isPaged = pageSize !== undefined && pageSize > 0;
+  // Rows can only be moved while they show in the order of your data.
+  const canReorder =
+    rowReorder && !serverSide && sorting.length === 0 && columnFilters.length === 0 && !globalFilter && grouping.length === 0 && !isTree;
 
   // New filters or a new sort order start again from page 1.
   useEffect(() => setPageIndex(0), [globalFilter, columnFilters, sorting]);
@@ -219,7 +244,7 @@ export function DataGrid<T>({
     const send = () => {
       onQuery.current?.({
         sorting: sorting.map(({ id, desc }) => ({ id, desc })),
-        filters: columnFilters.map(({ id, value }) => ({ id, value: String(value ?? "") })),
+        filters: columnFilters.map(({ id, value }) => ({ id, value: Array.isArray(value) ? value.map(String) : String(value ?? "") })),
         search: globalFilter ?? "",
         pageIndex,
         pageSize: pageSize ?? 0,
@@ -242,7 +267,20 @@ export function DataGrid<T>({
       const cell = (ctx: { getValue: () => unknown }) => (ctx.getValue() == null ? "" : format(ctx.getValue()));
       return { ...c, cell, aggregatedCell: c.aggregatedCell ?? cell }; // group totals are formatted too
     });
-    if (!hasSelection) return formatted;
+    const lead: ColumnDef<T, any>[] = [];
+    if (rowReorder) {
+      lead.push({
+        id: REORDER_ID,
+        size: 40,
+        minSize: 40,
+        enableSorting: false,
+        enableResizing: false,
+        enableGlobalFilter: false,
+        meta: { filter: false } satisfies DataGridColumnMeta,
+        header: () => <span className="sr-only">Reorder</span>,
+        cell: () => null, // the handle is drawn with the row, where it can see the drag state
+      });
+    }
     const select: ColumnDef<T, any> = {
       id: SELECT_ID,
       size: 44,
@@ -254,8 +292,9 @@ export function DataGrid<T>({
       header: () => (isMultiple ? null : <span className="sr-only">Selection</span>), // multiple: rendered with live state below
       cell: ({ row }) => <SelectBox label="Select row" checked={row.getIsSelected()} onToggle={() => row.toggleSelected()} />,
     };
-    return [select, ...formatted];
-  }, [columns, hasSelection, isMultiple]);
+    if (hasSelection) lead.push(select);
+    return [...lead, ...formatted];
+  }, [columns, hasSelection, isMultiple, rowReorder]);
 
   const table = useReactTable<T>({
     data: data as T[],
@@ -270,7 +309,8 @@ export function DataGrid<T>({
       columnSizing,
       columnFilters,
       globalFilter: globalFilter ?? "",
-      columnPinning: { left: hasSelection ? [SELECT_ID, ...(pinnedColumns ?? [])] : [...(pinnedColumns ?? [])] },
+      columnVisibility,
+      columnPinning: { left: [...(rowReorder ? [REORDER_ID] : []), ...(hasSelection ? [SELECT_ID] : []), ...pinned] },
       ...(isPaged ? { pagination: { pageIndex, pageSize } } : {}),
     },
     onSortingChange: setSorting,
@@ -359,7 +399,7 @@ export function DataGrid<T>({
   const totalWidth = table.getTotalSize();
   const isEmpty = rows.length === 0;
   // The column that holds expand toggles and tree indentation: the first after the checkboxes.
-  const expanderCol = hasSelection ? 1 : 0;
+  const expanderCol = (rowReorder ? 1 : 0) + (hasSelection ? 1 : 0);
   const lineHeight = (item: Item<T>) => (item.kind === "detail" ? detailHeight : rowHeight);
 
   // Grid rows: 0 is the header, 1 the filter row (if shown), then data.
@@ -389,7 +429,7 @@ export function DataGrid<T>({
     const out: Record<string, string[]> = {};
     if (!showColumnFilters) return out;
     for (const column of leafColumns) {
-      if (metaOf(column).filter !== "select") continue;
+      if (metaOf(column).filter !== "select" && metaOf(column).filter !== "set") continue;
       const given = metaOf(column).filterOptions;
       if (given) {
         out[column.id] = [...given];
@@ -576,8 +616,13 @@ export function DataGrid<T>({
 
   const focusFilter = (col: number, append?: string) => {
     const column = leafColumns[col];
-    const widget = cellEl(1, col)?.querySelector<HTMLInputElement | HTMLSelectElement>("input, select");
+    const widget = cellEl(1, col)?.querySelector<HTMLInputElement | HTMLSelectElement | HTMLButtonElement>("input, select, button[data-widget]");
     if (!widget) return false;
+    if (widget instanceof HTMLButtonElement) {
+      widget.focus();
+      widget.click(); // a set filter opens its checklist
+      return true;
+    }
     if (append !== undefined && widget instanceof HTMLInputElement) {
       column.setFilterValue(`${(column.getFilterValue() as string | undefined) ?? ""}${append}`);
     }
@@ -594,7 +639,7 @@ export function DataGrid<T>({
   };
 
   // --- Copy, paste and export ----------------------------------------------
-  const isWidget = (el: HTMLElement) => el.matches("input:not([type=checkbox]), select, textarea");
+  const isWidget = (el: HTMLElement) => el.matches("input:not([type=checkbox]), select, textarea, [data-widget]");
   /** The text a cell shows, which is what a spreadsheet user expects to copy. */
   const displayText = (row: Row<T>, column: Column<T, unknown>) => {
     const value = row.getValue(column.id);
@@ -612,12 +657,12 @@ export function DataGrid<T>({
   };
   const dataColsFrom = (from: number, to = colCount - 1) => {
     const cols: number[] = [];
-    for (let c = from; c <= to; c++) if (leafColumns[c].id !== SELECT_ID) cols.push(c);
+    for (let c = from; c <= to; c++) if (!isSystemColumn(leafColumns[c].id)) cols.push(c);
     return cols;
   };
 
   const onCopy = (e: ClipboardEvent<HTMLDivElement>) => {
-    if (!rangeSelection || isWidget(e.target as HTMLElement) || activeRow < bodyStart) return;
+    if (!rangeSelection || !e.currentTarget.contains(e.target as Node) || isWidget(e.target as HTMLElement) || activeRow < bodyStart) return;
     const lines = dataLinesFrom(rect ? rect.r0 : activeRow, rect ? rect.r1 : activeRow);
     const cols = dataColsFrom(rect ? rect.c0 : activeCol, rect ? rect.c1 : activeCol);
     if (!lines.length || !cols.length) return;
@@ -629,7 +674,7 @@ export function DataGrid<T>({
   };
 
   const onPaste = (e: ClipboardEvent<HTMLDivElement>) => {
-    if (!rangeSelection || (!onCellEdit && !onCellsEdit) || isWidget(e.target as HTMLElement) || activeRow < bodyStart) return;
+    if (!rangeSelection || (!onCellEdit && !onCellsEdit) || !e.currentTarget.contains(e.target as Node) || isWidget(e.target as HTMLElement) || activeRow < bodyStart) return;
     const matrix = parseTsv(e.clipboardData.getData("text/plain"));
     if (!matrix.length) return;
     e.preventDefault();
@@ -684,7 +729,7 @@ export function DataGrid<T>({
   };
 
   const exportData = (options?: DataGridExportOptions) => {
-    const columns = leafColumns.filter((c) => c.id !== SELECT_ID);
+    const columns = leafColumns.filter((c) => !isSystemColumn(c.id));
     const rows = options?.scope === "selected" ? dataRows.filter((r) => rowSelection[r.id]) : dataRows;
     const values = rows.map((r) =>
       columns.map<ExportValue>((c) => {
@@ -722,14 +767,85 @@ export function DataGrid<T>({
     };
   });
 
+  // --- Column menu and row reorder ------------------------------------------
+  const rowName = (row: Row<T>) => {
+    const column = leafColumns.find((c) => !isSystemColumn(c.id));
+    return (column && displayText(row, column)) || row.id;
+  };
+  const dataColumnCount = leafColumns.filter((c) => !isSystemColumn(c.id)).length;
+  const hiddenColumns = table
+    .getAllLeafColumns()
+    .filter((c) => hidden.includes(c.id))
+    .map((c) => ({ id: c.id, name: nameOf(c) }));
+
+  const onMenuAction = (column: Column<T, unknown>, action: ColumnMenuAction) => {
+    const name = nameOf(column);
+    if (action === "asc" || action === "desc") {
+      setSorting([{ id: column.id, desc: action === "desc" }]);
+      setStatus(`Sorted ${name} ${action === "asc" ? "ascending" : "descending"}`);
+    } else if (action === "clear-sort") {
+      setSorting((old) => old.filter((s) => s.id !== column.id));
+      setStatus(`Cleared the sort on ${name}`);
+    } else if (action === "pin") {
+      setPinned((old) => [...old.filter((id) => id !== column.id), column.id]);
+      setStatus(`${name} pinned to the left`);
+    } else if (action === "unpin") {
+      setPinned((old) => old.filter((id) => id !== column.id));
+      setStatus(`${name} unpinned`);
+    } else if (action === "reset-width") {
+      column.resetSize();
+      setStatus(`${name} width reset`);
+    } else if (action === "hide") {
+      setHidden((old) => [...old, column.id]);
+      setStatus(`${name} hidden`);
+    } else if (action.startsWith("show:")) {
+      const id = action.slice(5);
+      setHidden((old) => old.filter((x) => x !== id));
+      setStatus(`${nameOf(table.getColumn(id) ?? column)} shown`);
+    }
+  };
+
+  const moveRow = (row: Row<T>, delta: number) => {
+    const from = row.index;
+    const to = Math.max(0, Math.min(from + delta, data.length - 1));
+    if (to === from) return;
+    onRowReorder?.({ rowId: row.id, fromIndex: from, toIndex: to });
+    setStatus(`Moved ${rowName(row)} to position ${numberFormat.format(to + 1)} of ${numberFormat.format(data.length)}`);
+    moveTo(activeRow + delta, activeCol); // focus follows the row
+  };
+
+  const endDrag = () => {
+    setDragId(null);
+    setDrop(null);
+  };
+  const finishDrag = () => {
+    if (dragId && drop) {
+      const byId = table.getCoreRowModel().rowsById;
+      const dragged = byId[dragId];
+      const target = byId[drop.id];
+      if (dragged && target) {
+        const insertAt = target.index + (drop.after ? 1 : 0);
+        const to = dragged.index < insertAt ? insertAt - 1 : insertAt;
+        if (to !== dragged.index) {
+          onRowReorder?.({ rowId: dragged.id, fromIndex: dragged.index, toIndex: to });
+          setStatus(`Moved ${rowName(dragged)} to position ${numberFormat.format(to + 1)} of ${numberFormat.format(data.length)}`);
+        }
+      }
+    }
+    endDrag();
+  };
+
   const pageRows = Math.max(1, Math.floor(height / rowHeight) - bodyStart);
 
   const onKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
     const target = e.target as HTMLElement;
+    // Menus and pickers open in a popover outside the grid, but React still
+    // sends their key events up to it: they are not the grid's keys.
+    if (!e.currentTarget.contains(target)) return;
 
-    // Keys inside a cell widget (editor or filter) belong to the widget,
-    // except the ones that leave it.
-    if (target.matches("input:not([type=checkbox]), select, textarea")) {
+    // Keys inside a cell widget (editor, filter, menu button) belong to the
+    // widget, except the ones that leave it.
+    if (target.matches("input:not([type=checkbox]), select, textarea, [data-widget]")) {
       if (edit) {
         if (e.key === "Enter") {
           e.preventDefault();
@@ -752,6 +868,23 @@ export function DataGrid<T>({
     const row = rowAt(activeRow);
     // Like a tree: in the toggle cell, Right opens a row and Left closes it.
     const onToggle = !!row && isToggleCell(row, activeCol);
+
+    if (
+      columnMenu &&
+      isHeader &&
+      column &&
+      !isSystemColumn(column.id) &&
+      (e.key === "ContextMenu" || (e.key === "F10" && e.shiftKey) || (e.key === "ArrowDown" && e.altKey))
+    ) {
+      e.preventDefault();
+      setMenuCol(column.id);
+      return;
+    }
+    if (rowReorder && row && !row.getIsGrouped() && e.altKey && (e.key === "ArrowUp" || e.key === "ArrowDown")) {
+      e.preventDefault();
+      if (canReorder) moveRow(row, e.key === "ArrowUp" ? -1 : 1);
+      return;
+    }
 
     switch (e.key) {
       case "ArrowRight":
@@ -908,6 +1041,27 @@ export function DataGrid<T>({
                       <span className="truncate">{flexRender(column.columnDef.header, header.getContext())}</span>
                     )}
                     <SortIcon direction={sorted} index={sorting.length > 1 && sorted ? column.getSortIndex() : undefined} />
+                    {columnMenu && !isSystemColumn(column.id) && (
+                      // Stops clicks in the button and its popover from also sorting the column.
+                      <span className="ms-auto flex" onClick={(e) => e.stopPropagation()}>
+                        <ColumnMenu
+                          name={nameOf(column)}
+                          isOpen={menuCol === column.id}
+                          onOpenChange={(open) => {
+                            setMenuCol(open ? column.id : null);
+                            if (!open) requestAnimationFrame(() => cellEl(0, col)?.focus()); // back to the header, not the menu button
+                          }}
+                          sorted={sorted}
+                          canSort={canSort}
+                          canPin
+                          isPinned={pinned.includes(column.id)}
+                          canHide={dataColumnCount > 1}
+                          canResize={column.getCanResize()}
+                          hidden={hiddenColumns}
+                          onAction={(action) => onMenuAction(column, action)}
+                        />
+                      </span>
+                    )}
                     {column.getCanResize() && (
                       <div
                         aria-hidden="true"
@@ -966,6 +1120,13 @@ export function DataGrid<T>({
                             </option>
                           ))}
                         </select>
+                      ) : kind === "set" ? (
+                        <SetFilter
+                          label={filterLabel}
+                          options={selectOptions[column.id] ?? []}
+                          value={Array.isArray(column.getFilterValue()) ? (column.getFilterValue() as string[]) : []}
+                          onChange={(next) => column.setFilterValue(next)}
+                        />
                       ) : kind === "text" ? (
                         <input
                           type="search"
@@ -1042,6 +1203,25 @@ export function DataGrid<T>({
                   aria-expanded={canExpand ? row.getIsExpanded() : undefined}
                   data-selected={selected || undefined}
                   data-group={isGroup || undefined}
+                  onDragOver={
+                    dragId
+                      ? (e) => {
+                          e.preventDefault();
+                          e.dataTransfer.dropEffect = "move";
+                          const box = e.currentTarget.getBoundingClientRect();
+                          const after = e.clientY > box.top + box.height / 2;
+                          if (drop?.id !== row.id || drop.after !== after) setDrop({ id: row.id, after });
+                        }
+                      : undefined
+                  }
+                  onDrop={
+                    dragId
+                      ? (e) => {
+                          e.preventDefault();
+                          finishDrag();
+                        }
+                      : undefined
+                  }
                   onDoubleClick={isGroup ? () => row.toggleExpanded() : onRowAction ? () => onRowAction(row.original) : undefined}
                   className={
                     "group absolute left-0 flex border-b border-[var(--rd-color-border-default)] " +
@@ -1050,6 +1230,13 @@ export function DataGrid<T>({
                   }
                   style={{ ...rowStyle, top }}
                 >
+                  {drop?.id === row.id && (
+                    <div
+                      aria-hidden="true"
+                      className="pointer-events-none absolute inset-x-0 z-[4] h-0.5 bg-[var(--rd-color-action-primary)]"
+                      style={drop.after ? { bottom: 0 } : { top: 0 }}
+                    />
+                  )}
                   {row.getVisibleCells().map((cell, col) => {
                     const column = cell.column;
                     const pinned = column.getIsPinned();
@@ -1072,7 +1259,7 @@ export function DataGrid<T>({
                         onFocus={(e) => e.target === e.currentTarget && setActive({ row: gridRow, col })}
                         onMouseDown={(e) => {
                           if (isEditing) return;
-                          if (rangeSelection && e.button === 0) {
+                          if (rangeSelection && e.button === 0 && !isSystemColumn(column.id)) {
                             if (e.shiftKey && activeRow >= bodyStart) {
                               e.preventDefault(); // no text selection while extending a block
                               setAnchor(anchor ? { row: anchorRow, col: anchorCol } : { row: activeRow, col: activeCol });
@@ -1125,7 +1312,23 @@ export function DataGrid<T>({
                         style={{ width: column.getSize(), paddingInlineStart: indent ? 12 + indent : undefined, ...pinStyle(column) }}
                       >
                         {toggle && <ExpandToggle expanded={row.getIsExpanded()} onToggle={() => row.toggleExpanded()} />}
-                        {column.id === SELECT_ID && isGroup ? (
+                        {column.id === REORDER_ID ? (
+                          isGroup ? null : (
+                            <RowHandle
+                              name={rowName(row)}
+                              canReorder={canReorder}
+                              onDragStart={(e) => {
+                                e.dataTransfer.effectAllowed = "move";
+                                e.dataTransfer.setData("text/plain", row.id);
+                                const rowEl = (e.currentTarget as HTMLElement).closest('[role="row"]');
+                                if (rowEl) e.dataTransfer.setDragImage(rowEl, 16, 16);
+                                dragStart.current = null; // the browser drag ends without a mouseup
+                                setDragId(row.id);
+                              }}
+                              onDragEnd={endDrag}
+                            />
+                          )
+                        ) : column.id === SELECT_ID && isGroup ? (
                           <SelectBox
                             label="Select group"
                             checked={selected}

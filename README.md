@@ -313,6 +313,11 @@ Set `serverSide`, `pageSize`, `rowCount` (the server's total) and `onQueryChange
 - Selection is kept by row id across pages. "Select all" and the CSV/Excel export cover the rows that are loaded, so export from the server when you need everything.
 - `groupBy` and `getSubRows` need the whole dataset and are ignored. `renderDetail`, editing, ranges and copy/paste work as usual on the loaded page.
 
+### Data Grid column menu, set filters and row reorder
+- **Column menu** (`columnMenu`). Every header gets a menu: sort ascending or descending, clear the sort, pin to the left, reset the width, hide the column. Hidden columns come back from any header's menu ("Show City"). From the keyboard, Alt+Down, Shift+F10 or the Menu key on a header opens it; Escape closes it and returns to the header. The last visible column can't be hidden.
+- **Set filter** (`meta: { filter: "set" }`). A checklist of the column's values, like a spreadsheet's filter: any ticked value matches. It lists the values in the data (up to 200) or `meta.filterOptions` when you give them, and gets a search box once there are more than 8. Enter or typing on its filter cell opens it. With `serverSide`, its value reaches `onQueryChange` as an array of strings.
+- **Row reorder** (`rowReorder`, `onRowReorder`). A handle column lets users drag rows, or move the focused row with Alt+Up and Alt+Down. The grid never changes your data: it calls `onRowReorder({ rowId, fromIndex, toIndex })` and you apply it, usually with the exported `reorderRows(rows, move)`. Every move is announced ("Moved Ada to position 2 of 4"). Reordering is switched off, and the handles say so, whenever the displayed order is no longer your data's order: while sorting, filtering or searching, with `groupBy` or `getSubRows`, and with `serverSide`.
+
 ### Data Grid ranges, clipboard and export
 - **Ranges.** Shift+arrows, Shift+click or a mouse drag select a block of cells; Escape clears it. Turn it off with `rangeSelection={false}`.
 - **Copy** (Ctrl/Cmd+C) puts the block on the clipboard as tab-separated text, the way the cells show it (`$1,200.50`, not `1200.5`), so it pastes straight into Excel or Google Sheets. With no block, it copies the focused cell.
