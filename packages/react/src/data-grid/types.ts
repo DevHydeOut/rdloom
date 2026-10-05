@@ -16,6 +16,28 @@ export interface DataGridColumnMeta {
   format?: (value: any) => string;
 }
 
+export interface DataGridExportOptions {
+  /** File name for downloads, without the extension. Defaults to the grid's label. */
+  fileName?: string;
+  /** "filtered" (default): every row that passes the search and filters. "selected": only the selected rows. */
+  scope?: "filtered" | "selected";
+  /**
+   * CSV only. Prefixes text that starts with =, +, - or @ with an apostrophe so
+   * a spreadsheet doesn't run it as a formula. On by default.
+   */
+  sanitize?: boolean;
+}
+
+/** Filled in through the apiRef prop. */
+export interface DataGridApi {
+  /** The rows as CSV text, header first. */
+  getCsv(options?: DataGridExportOptions): string;
+  /** Downloads a .csv file. */
+  downloadCsv(options?: DataGridExportOptions): void;
+  /** Downloads an .xlsx workbook. Numbers stay numbers. */
+  downloadExcel(options?: DataGridExportOptions): void;
+}
+
 export interface DataGridCellEdit<T> {
   rowId: string;
   columnId: string;

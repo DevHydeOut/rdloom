@@ -1,10 +1,10 @@
 {
   "$schema": "./schema/component.schema.json",
   "name": "DataGrid",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "category": "data",
   "status": "experimental",
-  "description": "Accessible, virtualized data grid for large datasets: sorting, filtering, row selection, resizable and pinned columns, row grouping with totals, tree data and expandable detail rows. Columns are TanStack Table column definitions.",
+  "description": "Accessible, virtualized data grid for large datasets: sorting, filtering, row selection, resizable and pinned columns, row grouping with totals, tree data, expandable detail rows, cell range selection with copy and paste, and CSV and Excel export. Columns are TanStack Table column definitions.",
   "props": {
     "label": { "type": "string", "required": true, "description": "Accessible name of the grid, e.g. 'Orders'." },
     "data": { "type": "custom", "tsType": "readonly unknown[]", "description": "Rows to show. Keep the array reference stable between renders." },
@@ -31,6 +31,17 @@
       "type": "callback",
       "tsType": "(edit: import(\"../data-grid/types\").DataGridCellEdit<any>) => void",
       "description": "Called when the user saves an edit in a column with meta.editable. Update your data to apply it."
+    },
+    "onCellsEdit": {
+      "type": "callback",
+      "tsType": "(edits: import(\"../data-grid/types\").DataGridCellEdit<any>[]) => void",
+      "description": "Called once with every cell a paste changes. Prefer it to onCellEdit when you paste: applying a whole paste in one update avoids state updates overwriting each other. When it isn't set, a paste calls onCellEdit once per cell."
+    },
+    "rangeSelection": { "type": "boolean", "default": true, "description": "Select a block of cells with Shift+arrows, Shift+click or by dragging. Ctrl+C copies it as spreadsheet-ready text; Ctrl+V pastes into editable cells." },
+    "apiRef": {
+      "type": "custom",
+      "tsType": "{ current: import(\"../data-grid/types\").DataGridApi | null }",
+      "description": "Gives you getCsv(), downloadCsv() and downloadExcel() for the rows that pass the filters. Create it with useRef<DataGridApi>(null)."
     },
     "isLoading": { "type": "boolean", "default": false, "description": "Marks the grid busy and shows a loading message." },
     "emptyMessage": { "type": "string", "default": "No rows", "description": "Shown when there are no rows to display." },
@@ -73,7 +84,10 @@
       "While editing, Enter saves and Escape cancels; focus returns to the cell",
       "Enter or typing on a filter cell moves into its filter; Escape returns to the grid",
       "On a group, tree or detail row, Right arrow in the toggle cell expands it and Left arrow collapses it; Enter on a group row (or on the toggle cell, when it isn't editable) toggles it",
-      "Space on a group row selects or clears all its rows (multiple mode)"
+      "Space on a group row selects or clears all its rows (multiple mode)",
+      "Shift+arrows, Shift+Home/End and Shift+PageUp/PageDown extend a block of cells from the cell you started on; Escape clears it",
+      "Ctrl+C (Cmd+C) copies the block as tab-separated text, the way it is shown; with no block it copies the focused cell",
+      "Ctrl+V (Cmd+V) pastes spreadsheet text into editable cells from the focused cell; one copied value fills a selected block"
     ],
     "requirements": [
       "On touch screens, tapping the selected editable cell again opens its editor, so the phone keyboard appears",
@@ -86,7 +100,8 @@
       "Pager announces the visible row range",
       "With grouping, tree data or detail rows the role is treegrid; rows expose aria-level and, when they can open, aria-expanded",
       "Group rows show their row count; only columns with an aggregationFn show a total, never the first row's value",
-      "The expand toggle is a labelled button (Expand / Collapse) that isn't a separate tab stop"
+      "The expand toggle is a labelled button (Expand / Collapse) that isn't a separate tab stop",
+      "Cells in a selected block expose aria-selected, and a polite status announces how many cells are selected, copied or pasted"
     ],
     "screenReader": [
       "Entering the grid announces its name and size (rows and columns)",
@@ -97,6 +112,8 @@
       "Editing: Enter opens an edit field announced as Edit <column>; after Enter, the saved value is read",
       "The pager's range (Rows 11–20 of 237) is announced after changing page",
       "Group and tree rows announce their level and whether they are expanded or collapsed",
+      "Extending a block with Shift+arrows announces the number of cells selected (for example, 6 cells selected)",
+      "Copying announces how many cells were copied; pasting announces how many were changed and how many were skipped",
       "With NVDA, table navigation (Ctrl+Alt+Arrow keys) works in browse mode"
     ],
     "wcag": "2.2 AA"
@@ -106,7 +123,7 @@
     "avoid_when": ["A few items with rich layout: use a list or cards", "Pure layout: never use a grid for layout"],
     "anti_patterns": ["Buttons in every cell instead of a row action", "Horizontal scrolling without pinning the identifying column", "Formatting numbers or dates in a custom cell renderer: search and filters won't find the text users see. Use meta.format (e.g. a currency formatter) instead", "Rendering the grid straight from a React Server Component: getRowId, onCellEdit and the other callbacks are functions, which cannot cross the server boundary. Put the grid in your own component marked \"use client\""]
   },
-  "examples": ["basic", "selection", "large-dataset", "pinned", "filter", "column-filters", "editing", "pagination", "grouping", "tree-data", "master-detail"],
+  "examples": ["basic", "selection", "large-dataset", "pinned", "filter", "column-filters", "editing", "pagination", "grouping", "tree-data", "master-detail", "range-copy-export"],
   "figma": {
     "componentKey": null,
     "variantMap": { "density": "Density", "selectionMode": "Selection" }

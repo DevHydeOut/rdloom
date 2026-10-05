@@ -295,6 +295,12 @@ These are single-machine numbers; treat them as orders of magnitude. Search matc
 ### Data Grid editing notes
 Edits are reported through `onCellEdit`; the grid never changes your data. Enter, F2, double-click and typing start an edit. With an IME (Japanese, Chinese, Korean input), the first key opens an empty editor and the composition continues in it. On phones, where a cell can't bring up the keyboard, a second tap on the selected cell opens the editor (like a spreadsheet); double-tap works too. Touch is tested in Chromium with touch emulation (`tests/visual/interactions.spec.ts`).
 
+### Data Grid ranges, clipboard and export
+- **Ranges.** Shift+arrows, Shift+click or a mouse drag select a block of cells; Escape clears it. Turn it off with `rangeSelection={false}`.
+- **Copy** (Ctrl/Cmd+C) puts the block on the clipboard as tab-separated text, the way the cells show it (`$1,200.50`, not `1200.5`), so it pastes straight into Excel or Google Sheets. With no block, it copies the focused cell.
+- **Paste** (Ctrl/Cmd+V) writes spreadsheet text into editable cells from the focused cell; read-only cells and text in a number column are skipped and counted in the announcement. One copied value fills a selected block. Pass `onCellsEdit` to apply a whole paste in a single state update; without it, `onCellEdit` is called once per cell, and applying each with `setRows(rows.map(...))` instead of the functional form would keep only the last.
+- **Export.** Pass `apiRef` (`useRef<DataGridApi>(null)`) and call `getCsv()`, `downloadCsv()` or `downloadExcel()`. They export every row that passes the search and filters, across pages, in display order, with raw values (numbers stay numbers); `{ scope: "selected" }` exports only selected rows. CSV prefixes text starting with `=`, `+`, `-` or `@` with an apostrophe so a spreadsheet can't run it as a formula (`sanitize: false` turns that off). The .xlsx is written in the browser with no extra dependency.
+
 ## Renaming the library
 The name is kept in few places on purpose: `packages/codegen/src/brand.ts` (name, CSS prefix, npm scope), the `name` fields in each `package.json`, and this README.
 

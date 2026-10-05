@@ -3,7 +3,14 @@ export { Button, type ButtonProps } from "./button/button";
 export { Calendar, RangeCalendar, type CalendarProps, type RangeCalendarProps } from "./calendar/calendar";
 export { Checkbox, type CheckboxProps } from "./checkbox/checkbox";
 export { Combobox, ComboboxItem, type ComboboxItemProps, type ComboboxProps } from "./combobox/combobox";
-export { DataGrid, type DataGridCellEdit, type DataGridColumnMeta, type DataGridProps } from "./data-grid/data-grid";
+export {
+  DataGrid,
+  type DataGridApi,
+  type DataGridCellEdit,
+  type DataGridColumnMeta,
+  type DataGridExportOptions,
+  type DataGridProps,
+} from "./data-grid/data-grid";
 export { DatePicker, type DatePickerProps } from "./date-picker/date-picker";
 export {
   DateRangePicker,

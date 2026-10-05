@@ -18,23 +18,31 @@ import {
   type Updater,
 } from "@tanstack/react-table";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ClipboardEvent, type CSSProperties, type KeyboardEvent, type ReactNode } from "react";
 import { Button } from "../button/button";
 import { dataGridDefaults, type DataGridSpecProps } from "../generated/data-grid.types";
 import { cx } from "../utils/cx";
 import { Spinner } from "../utils/icons";
 import { columnFilter, filteredRowModel, searchFilter, sortedRowModel } from "./hierarchy";
-import type { DataGridCellEdit, DataGridColumnMeta } from "./types";
+import { download, parseTsv, toCsv, toTsv, toXlsx, type ExportValue } from "./tabular";
+import type { DataGridApi, DataGridCellEdit, DataGridColumnMeta, DataGridExportOptions } from "./types";
 
-export type { DataGridCellEdit, DataGridColumnMeta } from "./types";
+export type { DataGridApi, DataGridCellEdit, DataGridColumnMeta, DataGridExportOptions } from "./types";
 
 export interface DataGridProps<T>
-  extends Omit<DataGridSpecProps, "data" | "columns" | "getRowId" | "onRowAction" | "onCellEdit" | "getSubRows" | "renderDetail"> {
+  extends Omit<
+    DataGridSpecProps,
+    "data" | "columns" | "getRowId" | "onRowAction" | "onCellEdit" | "onCellsEdit" | "getSubRows" | "renderDetail" | "apiRef"
+  > {
   data: readonly T[];
   columns: ColumnDef<T, any>[];
   getRowId?: (row: T, index: number) => string;
   onRowAction?: (row: T) => void;
   onCellEdit?: (edit: DataGridCellEdit<T>) => void;
+  /** Called once with every cell a paste changes. Without it, a paste calls onCellEdit per cell. */
+  onCellsEdit?: (edits: DataGridCellEdit<T>[]) => void;
+  /** Filled with getCsv(), downloadCsv() and downloadExcel(). Create it with useRef<DataGridApi>(null). */
+  apiRef?: { current: DataGridApi | null };
   /** Tree data: a row's children. Rows with children get an expand toggle. */
   getSubRows?: (row: T) => readonly T[] | undefined;
   /** Master-detail: content shown under a row when it's expanded. */
@@ -154,6 +162,9 @@ export function DataGrid<T>({
   showColumnFilters = dataGridDefaults.showColumnFilters,
   pageSize,
   onCellEdit,
+  onCellsEdit,
+  rangeSelection = dataGridDefaults.rangeSelection,
+  apiRef,
   isLoading = dataGridDefaults.isLoading,
   emptyMessage = dataGridDefaults.emptyMessage,
   onRowAction,
@@ -402,6 +413,16 @@ export function DataGrid<T>({
   const [active, setActive] = useState({ row: bodyStart, col: 0 });
   const [edit, setEdit] = useState<{ row: number; col: number; draft: string; invalid: boolean } | null>(null);
   const focusPending = useRef(false);
+  // A block of cells runs from the anchor to the focused cell.
+  const [anchor, setAnchor] = useState<{ row: number; col: number } | null>(null);
+  /** Where a mouse drag began, while the button is held. */
+  const dragStart = useRef<{ row: number; col: number } | null>(null);
+  const [status, setStatus] = useState("");
+  useEffect(() => {
+    const stop = () => (dragStart.current = null);
+    window.addEventListener("mouseup", stop);
+    return () => window.removeEventListener("mouseup", stop);
+  }, []);
   /** A touch started on the already-active cell: lifting the finger edits it. */
   const tappedActive = useRef(false);
   const lastRow = isEmpty ? bodyStart - 1 : bodyStart + items.length - 1;
@@ -423,9 +444,32 @@ export function DataGrid<T>({
     return col === expanderCol;
   };
 
-  const moveTo = (row: number, col: number) => {
-    const r = Math.max(0, Math.min(row, lastRow));
+  // The block, once it spans more than the focused cell. Only body cells can be in one.
+  const anchorRow = anchor ? Math.min(anchor.row, lastRow) : -1;
+  const anchorCol = anchor ? Math.min(anchor.col, colCount - 1) : -1;
+  const rect =
+    rangeSelection && anchor && anchorRow >= bodyStart && activeRow >= bodyStart && (anchorRow !== activeRow || anchorCol !== activeCol)
+      ? {
+          r0: Math.min(anchorRow, activeRow),
+          r1: Math.max(anchorRow, activeRow),
+          c0: Math.min(anchorCol, activeCol),
+          c1: Math.max(anchorCol, activeCol),
+        }
+      : null;
+  const rectCells = rect ? (rect.r1 - rect.r0 + 1) * (rect.c1 - rect.c0 + 1) : 0;
+  // A paste selects the cells it changed; its own message should be the one that's read out.
+  const keepStatus = useRef(false);
+  useEffect(() => {
+    if (keepStatus.current) keepStatus.current = false;
+    else setStatus(rectCells ? `${numberFormat.format(rectCells)} cells selected` : "");
+  }, [rectCells]);
+
+  const moveTo = (row: number, col: number, extend = false) => {
+    // Shift extends a block from where it started; it can't reach into the header.
+    const extending = extend && rangeSelection && activeRow >= bodyStart;
+    const r = Math.max(extending ? bodyStart : 0, Math.min(row, lastRow));
     const c = Math.max(0, Math.min(col, colCount - 1));
+    setAnchor(extending ? (anchor ? { row: anchorRow, col: anchorCol } : { row: activeRow, col: activeCol }) : null);
     setActive({ row: r, col: c });
     focusPending.current = true;
     if (virtualized && r >= bodyStart) virtualizer.scrollToIndex(r - bodyStart, { align: "auto" });
@@ -501,6 +545,135 @@ export function DataGrid<T>({
     table.setColumnSizing((old) => ({ ...old, [column.id]: size }));
   };
 
+  // --- Copy, paste and export ----------------------------------------------
+  const isWidget = (el: HTMLElement) => el.matches("input:not([type=checkbox]), select, textarea");
+  /** The text a cell shows, which is what a spreadsheet user expects to copy. */
+  const displayText = (row: Row<T>, column: Column<T, unknown>) => {
+    const value = row.getValue(column.id);
+    if (value === null || value === undefined) return "";
+    const format = metaOf(column).format;
+    return format ? format(value) : value instanceof Date ? value.toISOString() : String(value);
+  };
+  const dataLinesFrom = (from: number, to = lastRow) => {
+    const lines: number[] = [];
+    for (let g = Math.max(from, bodyStart); g <= to; g++) {
+      const r = rowAt(g);
+      if (r && !r.getIsGrouped()) lines.push(g);
+    }
+    return lines;
+  };
+  const dataColsFrom = (from: number, to = colCount - 1) => {
+    const cols: number[] = [];
+    for (let c = from; c <= to; c++) if (leafColumns[c].id !== SELECT_ID) cols.push(c);
+    return cols;
+  };
+
+  const onCopy = (e: ClipboardEvent<HTMLDivElement>) => {
+    if (!rangeSelection || isWidget(e.target as HTMLElement) || activeRow < bodyStart) return;
+    const lines = dataLinesFrom(rect ? rect.r0 : activeRow, rect ? rect.r1 : activeRow);
+    const cols = dataColsFrom(rect ? rect.c0 : activeCol, rect ? rect.c1 : activeCol);
+    if (!lines.length || !cols.length) return;
+    const text = toTsv(lines.map((g) => cols.map((c) => displayText(rowAt(g)!, leafColumns[c]))));
+    e.clipboardData.setData("text/plain", text);
+    e.preventDefault();
+    const n = lines.length * cols.length;
+    setStatus(`${numberFormat.format(n)} ${n === 1 ? "cell" : "cells"} copied`);
+  };
+
+  const onPaste = (e: ClipboardEvent<HTMLDivElement>) => {
+    if (!rangeSelection || (!onCellEdit && !onCellsEdit) || isWidget(e.target as HTMLElement) || activeRow < bodyStart) return;
+    const matrix = parseTsv(e.clipboardData.getData("text/plain"));
+    if (!matrix.length) return;
+    e.preventDefault();
+    const single = matrix.length === 1 && matrix[0].length === 1;
+    // One copied value fills a selected block; anything bigger pastes from the block's top-left cell.
+    const lines = dataLinesFrom(rect ? rect.r0 : activeRow, single && rect ? rect.r1 : lastRow);
+    const cols = dataColsFrom(rect ? rect.c0 : activeCol, single && rect ? rect.c1 : colCount - 1);
+    if (!lines.length || !cols.length) return;
+    const edits: DataGridCellEdit<T>[] = [];
+    let skipped = 0;
+    const rowCount = single && rect ? lines.length : Math.min(matrix.length, lines.length);
+    for (let i = 0; i < rowCount; i++) {
+      const r = rowAt(lines[i])!;
+      const colCountHere = single && rect ? cols.length : Math.min(matrix[i].length, cols.length);
+      for (let j = 0; j < colCountHere; j++) {
+        const column = leafColumns[cols[j]];
+        const text = single ? matrix[0][0] : matrix[i][j];
+        if (!canEdit(column)) {
+          skipped++;
+          continue;
+        }
+        let value: unknown = text;
+        if (metaOf(column).editor === "number") {
+          const n = Number(text);
+          if (text.trim() === "" || !Number.isFinite(n)) {
+            skipped++;
+            continue;
+          }
+          value = n;
+        }
+        edits.push({ rowId: r.id, columnId: column.id, value, row: r.original });
+      }
+    }
+    if (edits.length) {
+      if (onCellsEdit) onCellsEdit(edits);
+      else edits.forEach((edit) => onCellEdit?.(edit));
+    }
+    // Show what the paste covered.
+    const lastLine = lines[Math.max(0, rowCount - 1)];
+    const width = single && rect ? cols.length : Math.min(matrix.reduce((n, m) => Math.max(n, m.length), 0), cols.length);
+    const lastCol = cols[Math.max(0, width - 1)];
+    if (rowCount > 1 || width > 1) {
+      keepStatus.current = true;
+      setAnchor({ row: lines[0], col: cols[0] });
+      setActive({ row: lastLine, col: lastCol });
+    }
+    focusPending.current = true;
+    setStatus(
+      `${numberFormat.format(edits.length)} ${edits.length === 1 ? "cell" : "cells"} pasted` +
+        (skipped ? `, ${numberFormat.format(skipped)} skipped` : ""),
+    );
+  };
+
+  const exportData = (options?: DataGridExportOptions) => {
+    const columns = leafColumns.filter((c) => c.id !== SELECT_ID);
+    const rows = options?.scope === "selected" ? dataRows.filter((r) => rowSelection[r.id]) : dataRows;
+    const values = rows.map((r) =>
+      columns.map<ExportValue>((c) => {
+        const v = r.getValue(c.id);
+        return v === null || v === undefined || typeof v === "string" || typeof v === "number" || typeof v === "boolean" || v instanceof Date
+          ? (v as ExportValue)
+          : String(v);
+      }),
+    );
+    return { headers: columns.map(nameOf), values };
+  };
+  const exportName = (options?: DataGridExportOptions) => options?.fileName || label.replace(/[\\/:*?"<>|]+/g, "-").trim() || "export";
+  useEffect(() => {
+    if (!apiRef) return;
+    apiRef.current = {
+      getCsv: (options) => {
+        const { headers, values } = exportData(options);
+        return toCsv(headers, values, options?.sanitize ?? true);
+      },
+      downloadCsv: (options) => {
+        const { headers, values } = exportData(options);
+        download(toCsv(headers, values, options?.sanitize ?? true), `${exportName(options)}.csv`, "text/csv;charset=utf-8");
+      },
+      downloadExcel: (options) => {
+        const { headers, values } = exportData(options);
+        download(
+          toXlsx(label, headers, values),
+          `${exportName(options)}.xlsx`,
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        );
+      },
+    };
+    return () => {
+      apiRef.current = null;
+    };
+  });
+
   const pageRows = Math.max(1, Math.floor(height / rowHeight) - bodyStart);
 
   const onKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
@@ -535,31 +708,31 @@ export function DataGrid<T>({
     switch (e.key) {
       case "ArrowRight":
         if (e.altKey && isHeader) resizeActive(RESIZE_STEP);
-        else if (onToggle && !row.getIsExpanded()) row.toggleExpanded(true);
-        else moveTo(activeRow, activeCol + 1);
+        else if (onToggle && !e.shiftKey && !row.getIsExpanded()) row.toggleExpanded(true);
+        else moveTo(activeRow, activeCol + 1, e.shiftKey);
         break;
       case "ArrowLeft":
         if (e.altKey && isHeader) resizeActive(-RESIZE_STEP);
-        else if (onToggle && row.getIsExpanded()) row.toggleExpanded(false);
-        else moveTo(activeRow, activeCol - 1);
+        else if (onToggle && !e.shiftKey && row.getIsExpanded()) row.toggleExpanded(false);
+        else moveTo(activeRow, activeCol - 1, e.shiftKey);
         break;
       case "ArrowDown":
-        moveTo(activeRow + 1, activeCol);
+        moveTo(activeRow + 1, activeCol, e.shiftKey);
         break;
       case "ArrowUp":
-        moveTo(activeRow - 1, activeCol);
+        moveTo(activeRow - 1, activeCol, e.shiftKey);
         break;
       case "Home":
-        moveTo(ctrl ? 0 : activeRow, 0);
+        moveTo(ctrl ? 0 : activeRow, 0, e.shiftKey);
         break;
       case "End":
-        moveTo(ctrl ? lastRow : activeRow, colCount - 1);
+        moveTo(ctrl ? lastRow : activeRow, colCount - 1, e.shiftKey);
         break;
       case "PageDown":
-        moveTo(activeRow + pageRows, activeCol);
+        moveTo(activeRow + pageRows, activeCol, e.shiftKey);
         break;
       case "PageUp":
-        moveTo(activeRow - pageRows, activeCol);
+        moveTo(activeRow - pageRows, activeCol, e.shiftKey);
         break;
       case "F2":
         if (!row || !startEdit(activeRow, activeCol)) return;
@@ -584,9 +757,21 @@ export function DataGrid<T>({
           startEdit(activeRow, activeCol, " ");
         } else return;
         break;
+      case "Escape":
+        if (!anchor) return;
+        setAnchor(null);
+        break;
       case "a":
         if (ctrl && isMultiple) {
           selectAllVisible(true);
+          break;
+        }
+        if (ctrl && rangeSelection && activeRow >= bodyStart) {
+          // Without row checkboxes, Ctrl+A takes every cell.
+          setAnchor({ row: bodyStart, col: 0 });
+          setActive({ row: lastRow, col: colCount - 1 });
+          focusPending.current = true;
+          if (virtualized) virtualizer.scrollToIndex(lastRow - bodyStart, { align: "auto" });
           break;
         }
       // fall through: a plain "a" is typing
@@ -629,6 +814,8 @@ export function DataGrid<T>({
         aria-multiselectable={isMultiple || undefined}
         aria-busy={isLoading || undefined}
         onKeyDown={onKeyDown}
+        onCopy={onCopy}
+        onPaste={onPaste}
       >
         <div ref={scrollRef} className="relative overflow-auto" style={{ height }}>
           <div role="rowgroup" className="sticky top-0 z-[2]" style={{ width: totalWidth, minWidth: "100%" }}>
@@ -821,6 +1008,7 @@ export function DataGrid<T>({
                     const editable = canEdit(column) && !isGroup;
                     const isEditing = edit?.row === gridRow && edit.col === col;
                     const toggle = isToggleCell(row, col);
+                    const inRange = !!rect && gridRow >= rect.r0 && gridRow <= rect.r1 && col >= rect.c0 && col <= rect.c1;
                     // Tree rows step in by depth; group rows and their rows line up by column.
                     const indent = isTree && col === expanderCol ? row.depth * 20 + (canExpand ? 0 : 24) : 0;
                     return (
@@ -829,11 +1017,30 @@ export function DataGrid<T>({
                         role="gridcell"
                         aria-colindex={col + 1}
                         aria-readonly={anyEditable && !editable && column.id !== SELECT_ID ? true : undefined}
+                        aria-selected={inRange || undefined}
+                        data-range={inRange || undefined}
                         data-cell={`${gridRow}:${col}`}
                         tabIndex={isTabStop(gridRow, col) ? 0 : -1}
                         onFocus={(e) => e.target === e.currentTarget && setActive({ row: gridRow, col })}
-                        onMouseDown={() => {
+                        onMouseDown={(e) => {
                           if (isEditing) return;
+                          if (rangeSelection && e.button === 0) {
+                            if (e.shiftKey && activeRow >= bodyStart) {
+                              e.preventDefault(); // no text selection while extending a block
+                              setAnchor(anchor ? { row: anchorRow, col: anchorCol } : { row: activeRow, col: activeCol });
+                              dragStart.current = null;
+                            } else {
+                              setAnchor(null);
+                              dragStart.current = { row: gridRow, col };
+                            }
+                          }
+                          setActive({ row: gridRow, col });
+                          focusPending.current = true;
+                        }}
+                        onMouseEnter={() => {
+                          const start = dragStart.current;
+                          if (!start || (start.row === gridRow && start.col === col)) return;
+                          setAnchor(start);
                           setActive({ row: gridRow, col });
                           focusPending.current = true;
                         }}
@@ -859,6 +1066,8 @@ export function DataGrid<T>({
                           "flex flex-none items-center overflow-hidden",
                           isEditing ? "px-1" : "px-3",
                           editable && "cursor-text",
+                          rangeSelection && !isEditing && "select-none",
+                          inRange && "bg-[var(--rd-color-surface-selected)]",
                           pinned &&
                             "bg-[var(--rd-color-surface-default)] group-hover:bg-[var(--rd-color-surface-subtle)] " +
                               "group-data-[selected]:bg-[var(--rd-color-surface-selected)]",
@@ -919,6 +1128,10 @@ export function DataGrid<T>({
             })}
           </div>
         </div>
+      </div>
+
+      <div aria-live="polite" aria-atomic="true" className="sr-only">
+        {status}
       </div>
 
       {isPaged && (
