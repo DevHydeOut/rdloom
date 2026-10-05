@@ -1,0 +1,39 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Skeleton",
+  "version": "0.1.0",
+  "category": "feedback",
+  "status": "experimental",
+  "description": "A grey placeholder shaped like the content that is loading, so the page doesn't jump when it arrives.",
+  "props": {
+    "variant": { "type": "enum", "values": ["text", "rect", "circle"], "default": "rect", "description": "text is a line (or lines) of text, rect a block like an image, circle an avatar." },
+    "width": { "type": "custom", "tsType": "string | number", "description": "CSS width: a number is px, a string is any CSS length, e.g. '60%'. Text lines default to full width; the last of several is shorter." },
+    "height": { "type": "custom", "tsType": "string | number", "description": "CSS height. Text uses the text's line height; rect defaults to 96px." },
+    "lines": { "type": "number", "default": 1, "description": "For text: how many lines to draw." }
+  },
+  "variants": ["variant"],
+  "states": ["loading"],
+  "slots": ["root"],
+  "tokens": ["color.surface.subtle", "radius.control"],
+  "a11y": {
+    "role": "none",
+    "keyboard": [],
+    "requirements": [
+      "It is hidden from assistive technology (aria-hidden): there is nothing to read",
+      "Mark the loading region with aria-busy=\"true\" and tell screen readers it is loading with a visually hidden status message",
+      "The pulse animation stops for people who prefer reduced motion"
+    ],
+    "screenReader": ["Skeletons themselves are silent; the loading region's status message (e.g. \"Loading orders\") is what is heard"],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["Loading content whose shape is known: lists, cards, profiles", "Avoiding layout shift when data arrives"],
+    "avoid_when": ["Unknown shape or a short wait: use a spinner", "Long operations with measurable progress: use Progress"],
+    "anti_patterns": ["Skeletons that don't match the real layout", "Leaving them up with no loading message for screen readers"]
+  },
+  "examples": ["text", "card", "avatar-row"],
+  "figma": {
+    "componentKey": null,
+    "variantMap": { "variant": "Variant" }
+  }
+}

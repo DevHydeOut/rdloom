@@ -106,6 +106,54 @@
       "dark": "#4ade80"
     },
     {
+      "name": "color/feedback/warning",
+      "token": "color.feedback.warning",
+      "cssVar": "--rd-color-feedback-warning",
+      "type": "COLOR",
+      "light": "#b45309",
+      "dark": "#fbbf24"
+    },
+    {
+      "name": "color/feedback/info",
+      "token": "color.feedback.info",
+      "cssVar": "--rd-color-feedback-info",
+      "type": "COLOR",
+      "light": "#2563eb",
+      "dark": "#60a5fa"
+    },
+    {
+      "name": "color/feedback/danger-subtle",
+      "token": "color.feedback.danger-subtle",
+      "cssVar": "--rd-color-feedback-danger-subtle",
+      "type": "COLOR",
+      "light": "#fef2f2",
+      "dark": "#450a0a"
+    },
+    {
+      "name": "color/feedback/success-subtle",
+      "token": "color.feedback.success-subtle",
+      "cssVar": "--rd-color-feedback-success-subtle",
+      "type": "COLOR",
+      "light": "#f0fdf4",
+      "dark": "#052e16"
+    },
+    {
+      "name": "color/feedback/warning-subtle",
+      "token": "color.feedback.warning-subtle",
+      "cssVar": "--rd-color-feedback-warning-subtle",
+      "type": "COLOR",
+      "light": "#fffbeb",
+      "dark": "#451a03"
+    },
+    {
+      "name": "color/feedback/info-subtle",
+      "token": "color.feedback.info-subtle",
+      "cssVar": "--rd-color-feedback-info-subtle",
+      "type": "COLOR",
+      "light": "#eff6ff",
+      "dark": "#172554"
+    },
+    {
       "name": "color/overlay/backdrop",
       "token": "color.overlay.backdrop",
       "cssVar": "--rd-color-overlay-backdrop",
@@ -181,6 +229,82 @@
       ]
     },
     {
+      "name": "Alert",
+      "id": "alert",
+      "version": "0.1.0",
+      "description": "An inline message about the state of the page or a task: a tip, a success, a warning or an error. For brief confirmations that disappear, use Toast.",
+      "properties": [
+        {
+          "prop": "variant",
+          "name": "Variant",
+          "values": [
+            "info",
+            "success",
+            "warning",
+            "danger"
+          ],
+          "default": "info"
+        }
+      ]
+    },
+    {
+      "name": "Avatar",
+      "id": "avatar",
+      "version": "0.1.0",
+      "description": "A person's or account's picture, falling back to their initials when there is no image or it fails to load.",
+      "properties": [
+        {
+          "prop": "size",
+          "name": "Size",
+          "values": [
+            "xs",
+            "sm",
+            "md",
+            "lg"
+          ],
+          "default": "md"
+        },
+        {
+          "prop": "shape",
+          "name": "Shape",
+          "values": [
+            "circle",
+            "square"
+          ],
+          "default": "circle"
+        }
+      ]
+    },
+    {
+      "name": "Badge",
+      "id": "badge",
+      "version": "0.1.0",
+      "description": "A small label that states a status or category, like Paid, Overdue or Beta. Not interactive.",
+      "properties": [
+        {
+          "prop": "variant",
+          "name": "Variant",
+          "values": [
+            "neutral",
+            "info",
+            "success",
+            "warning",
+            "danger"
+          ],
+          "default": "neutral"
+        },
+        {
+          "prop": "size",
+          "name": "Size",
+          "values": [
+            "sm",
+            "md"
+          ],
+          "default": "md"
+        }
+      ]
+    },
+    {
       "name": "Button",
       "id": "button",
       "version": "0.1.0",
@@ -232,6 +356,34 @@
             "true"
           ],
           "default": "false"
+        }
+      ]
+    },
+    {
+      "name": "Card",
+      "id": "card",
+      "version": "0.1.0",
+      "description": "A bordered container that groups related content under an optional heading, with an optional footer for actions.",
+      "properties": [
+        {
+          "prop": "variant",
+          "name": "Variant",
+          "values": [
+            "outlined",
+            "raised",
+            "subtle"
+          ],
+          "default": "outlined"
+        },
+        {
+          "prop": "padding",
+          "name": "Padding",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "default": "md"
         }
       ]
     },
@@ -489,6 +641,43 @@
       ]
     },
     {
+      "name": "Progress",
+      "id": "progress",
+      "version": "0.1.0",
+      "description": "A bar showing how far along a task is, or that something is working when the amount is unknown.",
+      "properties": [
+        {
+          "prop": "variant",
+          "name": "Variant",
+          "values": [
+            "default",
+            "success",
+            "warning",
+            "danger"
+          ],
+          "default": "default"
+        },
+        {
+          "prop": "size",
+          "name": "Size",
+          "values": [
+            "sm",
+            "md"
+          ],
+          "default": "md"
+        },
+        {
+          "prop": "isIndeterminate",
+          "name": "Indeterminate",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
       "name": "RadioGroup",
       "id": "radio-group",
       "version": "0.1.1",
@@ -584,6 +773,24 @@
             "lg"
           ],
           "default": "md"
+        }
+      ]
+    },
+    {
+      "name": "Skeleton",
+      "id": "skeleton",
+      "version": "0.1.0",
+      "description": "A grey placeholder shaped like the content that is loading, so the page doesn't jump when it arrives.",
+      "properties": [
+        {
+          "prop": "variant",
+          "name": "Variant",
+          "values": [
+            "text",
+            "rect",
+            "circle"
+          ],
+          "default": "rect"
         }
       ]
     },

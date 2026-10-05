@@ -179,6 +179,92 @@ const blueprints: Record<string, Blueprint> = {
     ]);
   },
 
+  Badge: (c) => {
+    const sm = c.size === "sm";
+    const tone = c.variant ?? "neutral";
+    const subtle = tone === "neutral" ? "color.surface.subtle" : `color.feedback.${tone}-subtle`;
+    const dot = tone === "neutral" ? "color.text.muted" : `color.feedback.${tone}`;
+    return frame(
+      { name: "badge", dir: "row", gap: sm ? 4 : 6, pad: sm ? [1, 6] : [2, 8], cross: "center", fill: subtle, stroke: tone === "neutral" ? "color.border.default" : undefined, radius: PILL },
+      [box(6, 6, { fill: dot, radius: PILL, name: "dot" }), text("Badge", sm ? 12 : 14, "color.text.default", "Medium")],
+    );
+  },
+
+  Alert: (c) => {
+    const tone = c.variant ?? "info";
+    return frame(
+      { name: "alert", dir: "row", gap: 12, pad: 12, w: 400, cross: "start", fill: `color.feedback.${tone}-subtle`, stroke: "color.border.default", radius: "radius.overlay" },
+      [
+        box(20, 20, { stroke: `color.feedback.${tone}`, radius: PILL, name: "icon" }),
+        frame({ name: "content", dir: "col", gap: 2, w: "fill" }, [
+          text("Alert title", 14, "color.text.default", "Medium"),
+          text("What happened and what to do next.", 14, "color.text.default", "Regular", "fill"),
+        ]),
+      ],
+    );
+  },
+
+  Card: (c) => {
+    const variant = c.variant ?? "outlined";
+    const pad = c.padding === "sm" ? 12 : c.padding === "lg" ? 24 : 16;
+    return frame(
+      {
+        name: "card",
+        dir: "col",
+        gap: pad > 16 ? 16 : 12,
+        pad,
+        w: 320,
+        fill: variant === "subtle" ? "color.surface.subtle" : variant === "raised" ? "color.surface.raised" : "color.surface.default",
+        stroke: variant === "subtle" ? undefined : "color.border.default",
+        radius: "radius.overlay",
+      },
+      [
+        frame({ name: "header", dir: "col", gap: 2, w: "fill" }, [
+          text("Card title", 16, "color.text.default", "Semi Bold"),
+          text("Supporting description", 14, "color.text.muted"),
+        ]),
+        text("Card content goes here.", 14, "color.text.default", "Regular", "fill"),
+      ],
+    );
+  },
+
+  Avatar: (c) => {
+    const px: Record<string, number> = { xs: 24, sm: 32, md: 40, lg: 56 };
+    const size = px[c.size ?? "md"] ?? 40;
+    return frame(
+      { name: "avatar", dir: "row", w: size, h: size, align: "center", cross: "center", fill: "color.surface.subtle", stroke: "color.border.default", radius: c.shape === "square" ? "radius.control" : PILL },
+      [text("AL", Math.round(size / 3), "color.text.default", "Medium")],
+    );
+  },
+
+  Progress: (c) => {
+    const tone = c.variant ?? "default";
+    const bar = tone === "default" ? "color.action.primary" : `color.feedback.${tone}`;
+    const h = c.size === "sm" ? 6 : 10;
+    const indeterminate = on(c, "isIndeterminate");
+    return frame({ name: "progress", dir: "col", gap: 6, w: 320 }, [
+      frame({ name: "label row", dir: "row", align: "between", w: "fill" }, [
+        text("Uploading report.pdf", 14, "color.text.default", "Medium"),
+        ...(indeterminate ? [] : [text("64%", 14, "color.text.muted")]),
+      ]),
+      frame({ name: "track", dir: "row", w: "fill", h, fill: "color.border.default", radius: PILL }, [
+        box(indeterminate ? "fill" : 205, h, { fill: bar, radius: PILL, name: "bar" }),
+      ]),
+    ]);
+  },
+
+  Skeleton: (c) => {
+    if (c.variant === "circle") return frame({ name: "skeleton", dir: "row" }, [box(40, 40, { fill: "color.surface.subtle", radius: PILL, name: "shape" })]);
+    if (c.variant === "text") {
+      return frame({ name: "skeleton", dir: "col", gap: 8, w: 320 }, [
+        box("fill", 14, { fill: "color.surface.subtle", radius: "radius.control" }),
+        box("fill", 14, { fill: "color.surface.subtle", radius: "radius.control" }),
+        box(192, 14, { fill: "color.surface.subtle", radius: "radius.control" }),
+      ]);
+    }
+    return frame({ name: "skeleton", dir: "row" }, [box(320, 96, { fill: "color.surface.subtle", radius: "radius.control", name: "shape" })]);
+  },
+
   RadioGroup: (c) => {
     const invalid = on(c, "isInvalid");
     const radio = (label: string, selected: boolean) =>

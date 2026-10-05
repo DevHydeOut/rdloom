@@ -1,0 +1,40 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Avatar",
+  "version": "0.1.0",
+  "category": "display",
+  "status": "experimental",
+  "description": "A person's or account's picture, falling back to their initials when there is no image or it fails to load.",
+  "props": {
+    "name": { "type": "string", "required": true, "description": "The person's name. It is the accessible name, and the source of the initials." },
+    "src": { "type": "string", "description": "Image URL. If it is missing or fails to load, the initials show instead." },
+    "size": { "type": "enum", "values": ["xs", "sm", "md", "lg"], "default": "md", "description": "24, 32, 40 or 56 px." },
+    "shape": { "type": "enum", "values": ["circle", "square"], "default": "circle", "description": "Circle for people, square for organisations." },
+    "decorative": { "type": "boolean", "default": false, "description": "Hides it from screen readers, for when the name is already written next to it." }
+  },
+  "variants": ["size", "shape"],
+  "states": ["default"],
+  "slots": ["root", "image", "initials"],
+  "tokens": ["color.surface.subtle", "color.text.default", "color.border.default"],
+  "a11y": {
+    "role": "img",
+    "keyboard": [],
+    "requirements": [
+      "It is an image with the person's name as its text alternative",
+      "With decorative set, it is hidden from assistive technology so a name next to it isn't read twice",
+      "Initials text meets 4.5:1 against the background"
+    ],
+    "screenReader": ["Announced as an image named after the person, e.g. \"Ada Lovelace\", unless decorative"],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["Showing who wrote, owns or is assigned something", "Account or user menus"],
+    "avoid_when": ["A logo or product image: use an img"],
+    "anti_patterns": ["Setting decorative when no name is written beside the avatar", "An empty name"]
+  },
+  "examples": ["basic", "sizes", "fallback"],
+  "figma": {
+    "componentKey": null,
+    "variantMap": { "size": "Size", "shape": "Shape" }
+  }
+}

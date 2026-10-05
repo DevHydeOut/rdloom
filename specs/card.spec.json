@@ -1,0 +1,53 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Card",
+  "version": "0.1.0",
+  "category": "layout",
+  "status": "experimental",
+  "description": "A bordered container that groups related content under an optional heading, with an optional footer for actions.",
+  "props": {
+    "children": { "type": "node", "required": true, "description": "The card's content." },
+    "title": { "type": "string", "description": "Heading shown at the top. Also names the card for screen readers." },
+    "description": { "type": "string", "description": "Supporting text under the title." },
+    "footer": { "type": "node", "description": "Actions or meta information along the bottom, e.g. buttons." },
+    "headingLevel": { "type": "number", "default": 3, "description": "Heading level for the title, 2 to 6. Pick the level that fits where the card sits in the page's outline." },
+    "variant": { "type": "enum", "values": ["outlined", "raised", "subtle"], "default": "outlined", "description": "outlined has a border, raised adds a shadow, subtle is a tinted block with no border." },
+    "padding": { "type": "enum", "values": ["sm", "md", "lg"], "default": "md", "description": "Inner spacing." }
+  },
+  "variants": ["variant", "padding"],
+  "states": ["default"],
+  "slots": ["root", "header", "title", "description", "body", "footer"],
+  "tokens": [
+    "color.surface.default",
+    "color.surface.subtle",
+    "color.surface.raised",
+    "color.border.default",
+    "color.text.default",
+    "color.text.muted",
+    "radius.overlay"
+  ],
+  "a11y": {
+    "role": "group",
+    "keyboard": [],
+    "requirements": [
+      "With a title, the card is a group labelled by it; without one it is a plain container",
+      "The title is a real heading at the level you choose, so the page outline stays correct",
+      "A card is not a landmark and not focusable: put links and buttons inside it"
+    ],
+    "screenReader": [
+      "Entering a titled card announces its name and that it is a group",
+      "The title is reachable as a heading when navigating by headings"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["Grouping a small set of related facts or controls, like a plan, a project or a setting", "A dashboard of independent blocks"],
+    "avoid_when": ["Rows of the same record type: use a table or data grid", "Wrapping a whole page"],
+    "anti_patterns": ["Cards inside cards", "A heading level that skips (h1 then h4)", "Making the whole card clickable and also putting buttons in it"]
+  },
+  "examples": ["basic", "with-footer", "variants"],
+  "figma": {
+    "componentKey": null,
+    "variantMap": { "variant": "Variant", "padding": "Padding" }
+  }
+}

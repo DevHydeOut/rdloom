@@ -1,0 +1,56 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Progress",
+  "version": "0.1.0",
+  "category": "feedback",
+  "status": "experimental",
+  "description": "A bar showing how far along a task is, or that something is working when the amount is unknown.",
+  "props": {
+    "label": { "type": "string", "required": true, "description": "What is progressing, e.g. 'Uploading report.pdf'. It is the accessible name." },
+    "value": { "type": "number", "description": "Current value between minValue and maxValue. Leave out with isIndeterminate." },
+    "minValue": { "type": "number", "default": 0, "description": "Value at an empty bar." },
+    "maxValue": { "type": "number", "default": 100, "description": "Value at a full bar." },
+    "isIndeterminate": { "type": "boolean", "default": false, "description": "The amount is unknown: shows a full, pulsing bar and no number." },
+    "showValue": { "type": "boolean", "default": true, "description": "Shows the percentage (or valueLabel) beside the label." },
+    "valueLabel": { "type": "string", "description": "Replaces the percentage in text and for screen readers, e.g. '3 of 10 files'." },
+    "variant": { "type": "enum", "values": ["default", "success", "warning", "danger"], "default": "default", "description": "Bar color. Say it in the label too: color alone isn't enough." },
+    "size": { "type": "enum", "values": ["sm", "md"], "default": "md", "description": "Bar thickness." }
+  },
+  "variants": ["variant", "size", "isIndeterminate"],
+  "states": ["default", "loading"],
+  "slots": ["label", "value", "track", "bar"],
+  "tokens": [
+    "color.action.primary",
+    "color.feedback.success",
+    "color.feedback.warning",
+    "color.feedback.danger",
+    "color.border.default",
+    "color.text.default",
+    "color.text.muted"
+  ],
+  "a11y": {
+    "role": "progressbar",
+    "keyboard": [],
+    "requirements": [
+      "Has an accessible name (the label)",
+      "Exposes aria-valuenow, aria-valuemin and aria-valuemax, or none of them when indeterminate",
+      "The bar color has 3:1 contrast against the track",
+      "The pulsing indeterminate animation stops for people who prefer reduced motion"
+    ],
+    "screenReader": [
+      "Announced as a progress bar with its name and percentage",
+      "An indeterminate bar is announced as busy, without a value"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["Uploads, imports, multi-step processes", "Showing usage against a limit"],
+    "avoid_when": ["A short wait with no meaningful progress: use a spinner", "A value that is not progress toward something: use a meter"],
+    "anti_patterns": ["A bar with no label", "Showing 100% while still working", "Danger color for something that is only slow"]
+  },
+  "examples": ["basic", "indeterminate", "variants"],
+  "figma": {
+    "componentKey": null,
+    "variantMap": { "variant": "Variant", "size": "Size", "isIndeterminate": "Indeterminate" }
+  }
+}

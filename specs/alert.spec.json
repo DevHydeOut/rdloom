@@ -1,0 +1,58 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Alert",
+  "version": "0.1.0",
+  "category": "feedback",
+  "status": "experimental",
+  "description": "An inline message about the state of the page or a task: a tip, a success, a warning or an error. For brief confirmations that disappear, use Toast.",
+  "props": {
+    "children": { "type": "node", "required": true, "description": "The message. Say what happened and what to do next." },
+    "title": { "type": "string", "description": "Optional bold first line, e.g. 'Payment failed'." },
+    "variant": { "type": "enum", "values": ["info", "success", "warning", "danger"], "default": "info", "description": "Tone and urgency. Warning and danger interrupt a screen reader; info and success wait their turn." },
+    "onDismiss": { "type": "callback", "tsType": "() => void", "description": "When set, a close button appears and calls this. You remove the alert." },
+    "dismissLabel": { "type": "string", "default": "Dismiss", "description": "Accessible name of the close button." }
+  },
+  "variants": ["variant"],
+  "states": ["default"],
+  "slots": ["icon", "title", "message", "dismiss"],
+  "tokens": [
+    "color.text.default",
+    "color.border.default",
+    "color.feedback.info-subtle",
+    "color.feedback.success-subtle",
+    "color.feedback.warning-subtle",
+    "color.feedback.danger-subtle",
+    "color.feedback.info",
+    "color.feedback.success",
+    "color.feedback.warning",
+    "color.feedback.danger",
+    "color.focus.ring",
+    "radius.overlay"
+  ],
+  "a11y": {
+    "role": "alert",
+    "keyboard": ["Tab reaches the close button, when there is one", "Enter or Space dismisses"],
+    "requirements": [
+      "Warning and danger use role=alert (announced at once); info and success use role=status (announced politely)",
+      "The tone is also said in words for screen readers (Warning:, Error:), and shown by an icon shape, never color alone",
+      "The icon is decorative (aria-hidden)",
+      "The close button has an accessible name and a visible focus ring"
+    ],
+    "screenReader": [
+      "A warning or error is announced as soon as it appears, prefixed with its tone",
+      "An info or success message is announced after the current speech finishes",
+      "The close button is announced as a button named Dismiss"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["A message tied to the page or a form that stays until it is fixed or dismissed", "Explaining why something is disabled or failed"],
+    "avoid_when": ["A short confirmation after an action: use Toast", "A decision that blocks the user: use Dialog", "An error on one field: use the field's own error message"],
+    "anti_patterns": ["Several alerts stacked on one screen", "Danger tone for something that is not an error", "Rendering an alert that is already on screen again, which re-announces it"]
+  },
+  "examples": ["variants", "dismissible", "with-action"],
+  "figma": {
+    "componentKey": null,
+    "variantMap": { "variant": "Variant" }
+  }
+}

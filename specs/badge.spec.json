@@ -1,0 +1,50 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Badge",
+  "version": "0.1.0",
+  "category": "display",
+  "status": "experimental",
+  "description": "A small label that states a status or category, like Paid, Overdue or Beta. Not interactive.",
+  "props": {
+    "children": { "type": "node", "required": true, "description": "The label. Say what it means in words: color alone never carries the meaning." },
+    "variant": { "type": "enum", "values": ["neutral", "info", "success", "warning", "danger"], "default": "neutral", "description": "Tone: neutral for categories, the others for statuses." },
+    "size": { "type": "enum", "values": ["sm", "md"], "default": "md", "description": "Text and padding size." }
+  },
+  "variants": ["variant", "size"],
+  "states": ["default"],
+  "slots": ["root"],
+  "tokens": [
+    "color.text.default",
+    "color.surface.subtle",
+    "color.border.default",
+    "color.feedback.info-subtle",
+    "color.feedback.success-subtle",
+    "color.feedback.warning-subtle",
+    "color.feedback.danger-subtle",
+    "color.feedback.info",
+    "color.feedback.success",
+    "color.feedback.warning",
+    "color.feedback.danger"
+  ],
+  "a11y": {
+    "role": "text",
+    "keyboard": [],
+    "requirements": [
+      "The status is in the text, not only the color (a colored dot is decoration)",
+      "Text meets 4.5:1 against every tone's background, in light and dark mode",
+      "It is plain inline text: not focusable, not a button"
+    ],
+    "screenReader": ["Read in place as ordinary text, e.g. \"Order 1042, Overdue\""],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["Showing the status of a record in a list or table", "Tagging something with a short category or version, like Beta"],
+    "avoid_when": ["Something the user can click or dismiss: use a Button or a tag input", "A count that changes and must be announced: use a live region"],
+    "anti_patterns": ["Using color as the only difference between two badges", "Long sentences inside a badge", "Making a badge a button"]
+  },
+  "examples": ["variants", "sizes", "in-a-list"],
+  "figma": {
+    "componentKey": null,
+    "variantMap": { "variant": "Variant", "size": "Size" }
+  }
+}

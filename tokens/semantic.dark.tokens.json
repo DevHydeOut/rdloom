@@ -20,7 +20,13 @@
     },
     "feedback": {
       "danger": { "$value": "{color.red.400}" },
-      "success": { "$value": "{color.green.400}" }
+      "success": { "$value": "{color.green.400}" },
+      "warning": { "$value": "{color.amber.400}" },
+      "info": { "$value": "{color.blue.400}" },
+      "danger-subtle": { "$value": "{color.red.950}" },
+      "success-subtle": { "$value": "{color.green.950}" },
+      "warning-subtle": { "$value": "{color.amber.950}" },
+      "info-subtle": { "$value": "{color.blue.950}" }
     },
     "overlay": {
       "backdrop": { "$value": "rgb(0 0 0 / 0.6)" }

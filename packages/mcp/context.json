@@ -150,6 +150,423 @@
       ]
     },
     {
+      "id": "alert",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "Alert",
+        "version": "0.1.0",
+        "category": "feedback",
+        "status": "experimental",
+        "description": "An inline message about the state of the page or a task: a tip, a success, a warning or an error. For brief confirmations that disappear, use Toast.",
+        "props": {
+          "children": {
+            "type": "node",
+            "required": true,
+            "description": "The message. Say what happened and what to do next."
+          },
+          "title": {
+            "type": "string",
+            "description": "Optional bold first line, e.g. 'Payment failed'."
+          },
+          "variant": {
+            "type": "enum",
+            "values": [
+              "info",
+              "success",
+              "warning",
+              "danger"
+            ],
+            "default": "info",
+            "description": "Tone and urgency. Warning and danger interrupt a screen reader; info and success wait their turn."
+          },
+          "onDismiss": {
+            "type": "callback",
+            "tsType": "() => void",
+            "description": "When set, a close button appears and calls this. You remove the alert."
+          },
+          "dismissLabel": {
+            "type": "string",
+            "default": "Dismiss",
+            "description": "Accessible name of the close button."
+          }
+        },
+        "variants": [
+          "variant"
+        ],
+        "states": [
+          "default"
+        ],
+        "slots": [
+          "icon",
+          "title",
+          "message",
+          "dismiss"
+        ],
+        "tokens": [
+          "color.text.default",
+          "color.border.default",
+          "color.feedback.info-subtle",
+          "color.feedback.success-subtle",
+          "color.feedback.warning-subtle",
+          "color.feedback.danger-subtle",
+          "color.feedback.info",
+          "color.feedback.success",
+          "color.feedback.warning",
+          "color.feedback.danger",
+          "color.focus.ring",
+          "radius.overlay"
+        ],
+        "a11y": {
+          "role": "alert",
+          "keyboard": [
+            "Tab reaches the close button, when there is one",
+            "Enter or Space dismisses"
+          ],
+          "requirements": [
+            "Warning and danger use role=alert (announced at once); info and success use role=status (announced politely)",
+            "The tone is also said in words for screen readers (Warning:, Error:), and shown by an icon shape, never color alone",
+            "The icon is decorative (aria-hidden)",
+            "The close button has an accessible name and a visible focus ring"
+          ],
+          "screenReader": [
+            "A warning or error is announced as soon as it appears, prefixed with its tone",
+            "An info or success message is announced after the current speech finishes",
+            "The close button is announced as a button named Dismiss"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "A message tied to the page or a form that stays until it is fixed or dismissed",
+            "Explaining why something is disabled or failed"
+          ],
+          "avoid_when": [
+            "A short confirmation after an action: use Toast",
+            "A decision that blocks the user: use Dialog",
+            "An error on one field: use the field's own error message"
+          ],
+          "anti_patterns": [
+            "Several alerts stacked on one screen",
+            "Danger tone for something that is not an error",
+            "Rendering an alert that is already on screen again, which re-announces it"
+          ]
+        },
+        "examples": [
+          "variants",
+          "dismissible",
+          "with-action"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {
+            "variant": "Variant"
+          }
+        }
+      },
+      "install": {
+        "command": "npx rdloom add alert",
+        "dependencies": [
+          "react-aria-components@^1.21.1"
+        ],
+        "registryDependencies": [
+          "tokens",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "variants",
+          "code": "import { Alert } from \"@rdloom/react\";\n\nexport default function AlertVariantsExample() {\n  return (\n    <div className=\"flex w-[28rem] max-w-full flex-col gap-3\">\n      <Alert title=\"Heads up\">Reports are generated once a day, at 02:00 UTC.</Alert>\n      <Alert variant=\"success\" title=\"Saved\">\n        Your changes are live.\n      </Alert>\n      <Alert variant=\"warning\" title=\"Storage almost full\">\n        You have used 92% of your plan. Uploads stop at 100%.\n      </Alert>\n      <Alert variant=\"danger\" title=\"Payment failed\">\n        Your card was declined. Update it to keep your subscription.\n      </Alert>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "dismissible",
+          "code": "import { useState } from \"react\";\nimport { Alert, Button } from \"@rdloom/react\";\n\n// onDismiss shows the close button; you decide what dismissing does.\nexport default function AlertDismissibleExample() {\n  const [open, setOpen] = useState(true);\n  return (\n    <div className=\"flex w-[28rem] max-w-full flex-col items-start gap-3\">\n      {open ? (\n        <Alert variant=\"info\" title=\"New: keyboard shortcuts\" onDismiss={() => setOpen(false)}>\n          Press ? anywhere to see them all.\n        </Alert>\n      ) : (\n        <Button variant=\"secondary\" size=\"sm\" onPress={() => setOpen(true)}>\n          Show the message again\n        </Button>\n      )}\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "with-action",
+          "code": "import { Alert, Button } from \"@rdloom/react\";\n\nexport default function AlertWithActionExample() {\n  return (\n    <div className=\"w-[28rem] max-w-full\">\n      <Alert variant=\"danger\" title=\"Sync failed\">\n        <p>We couldn&apos;t reach the server. Your changes are saved on this device.</p>\n        <div className=\"mt-2\">\n          <Button size=\"sm\" variant=\"secondary\">\n            Try again\n          </Button>\n        </div>\n      </Alert>\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "alert/alert.tsx",
+          "content": "\"use client\";\n\nimport { forwardRef, type HTMLAttributes } from \"react\";\nimport { Button as AriaButton } from \"react-aria-components\";\nimport { alertDefaults, type AlertSpecProps } from \"../generated/alert.types\";\nimport { cx } from \"../utils/cx\";\nimport { CloseIcon, ErrorIcon, InfoIcon, SuccessIcon, WarningIcon } from \"../utils/icons\";\n\nexport interface AlertProps\n  extends AlertSpecProps,\n    Omit<HTMLAttributes<HTMLDivElement>, keyof AlertSpecProps | \"className\" | \"title\" | \"role\"> {\n  className?: string;\n}\n\nconst tones: Record<NonNullable<AlertSpecProps[\"variant\"]>, { box: string; icon: string; Icon: typeof InfoIcon; say: string }> = {\n  info: {\n    box: \"bg-[var(--rd-color-feedback-info-subtle)] border-s-[var(--rd-color-feedback-info)]\",\n    icon: \"text-[var(--rd-color-feedback-info)]\",\n    Icon: InfoIcon,\n    say: \"Information\",\n  },\n  success: {\n    box: \"bg-[var(--rd-color-feedback-success-subtle)] border-s-[var(--rd-color-feedback-success)]\",\n    icon: \"text-[var(--rd-color-feedback-success)]\",\n    Icon: SuccessIcon,\n    say: \"Success\",\n  },\n  warning: {\n    box: \"bg-[var(--rd-color-feedback-warning-subtle)] border-s-[var(--rd-color-feedback-warning)]\",\n    icon: \"text-[var(--rd-color-feedback-warning)]\",\n    Icon: WarningIcon,\n    say: \"Warning\",\n  },\n  danger: {\n    box: \"bg-[var(--rd-color-feedback-danger-subtle)] border-s-[var(--rd-color-feedback-danger)]\",\n    icon: \"text-[var(--rd-color-feedback-danger)]\",\n    Icon: ErrorIcon,\n    say: \"Error\",\n  },\n};\n\nexport const Alert = forwardRef<HTMLDivElement, AlertProps>(function Alert(\n  {\n    children,\n    title,\n    variant = alertDefaults.variant,\n    onDismiss,\n    dismissLabel = alertDefaults.dismissLabel,\n    className,\n    ...rest\n  },\n  ref,\n) {\n  const tone = tones[variant];\n  const { Icon } = tone;\n  // Warnings and errors interrupt a screen reader; the rest wait for a pause.\n  const urgent = variant === \"warning\" || variant === \"danger\";\n  return (\n    <div\n      {...rest}\n      ref={ref}\n      role={urgent ? \"alert\" : \"status\"}\n      className={cx(\n        \"flex items-start gap-3 rounded-[var(--rd-radius-overlay)] border border-s-4 border-[var(--rd-color-border-default)] p-3 \" +\n          \"text-sm text-[var(--rd-color-text-default)]\",\n        tone.box,\n        className,\n      )}\n    >\n      <Icon className={cx(\"mt-0.5 size-5 shrink-0\", tone.icon)} />\n      <div className=\"flex min-w-0 flex-1 flex-col gap-0.5\">\n        {/* Said in words, so the tone isn't only a color and an icon. */}\n        <span className=\"sr-only\">{tone.say}: </span>\n        {title && <p className=\"font-medium\">{title}</p>}\n        <div>{children}</div>\n      </div>\n      {onDismiss && (\n        <AriaButton\n          aria-label={dismissLabel}\n          onPress={onDismiss}\n          className={\n            \"-m-1 flex size-7 shrink-0 items-center justify-center rounded-[var(--rd-radius-control)] outline-none \" +\n            \"data-[hovered]:bg-[var(--rd-color-surface-default)]/60 \" +\n            \"data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)]\"\n          }\n        >\n          <CloseIcon className=\"size-4\" />\n        </AriaButton>\n      )}\n    </div>\n  );\n});\n"
+        },
+        {
+          "path": "generated/alert.types.ts",
+          "content": "// Generated by rdloom codegen from specs/alert.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nimport type { ReactNode } from \"react\";\n\nexport const alertVariantValues = [\"info\", \"success\", \"warning\", \"danger\"] as const;\n\n/** An inline message about the state of the page or a task: a tip, a success, a warning or an error. For brief confirmations that disappear, use Toast. */\nexport interface AlertSpecProps {\n  /**\n   * The message. Say what happened and what to do next.\n   */\n  children: ReactNode;\n  /**\n   * Optional bold first line, e.g. 'Payment failed'.\n   */\n  title?: string;\n  /**\n   * Tone and urgency. Warning and danger interrupt a screen reader; info and success wait their turn.\n   * @default \"info\"\n   */\n  variant?: \"info\" | \"success\" | \"warning\" | \"danger\";\n  /**\n   * When set, a close button appears and calls this. You remove the alert.\n   */\n  onDismiss?: () => void;\n  /**\n   * Accessible name of the close button.\n   * @default \"Dismiss\"\n   */\n  dismissLabel?: string;\n}\n\nexport const alertDefaults = {\n  variant: \"info\",\n  dismissLabel: \"Dismiss\",\n} as const;\n\nexport const alertMeta = {\n  \"name\": \"Alert\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"alert\"\n} as const;\n"
+        }
+      ]
+    },
+    {
+      "id": "avatar",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "Avatar",
+        "version": "0.1.0",
+        "category": "display",
+        "status": "experimental",
+        "description": "A person's or account's picture, falling back to their initials when there is no image or it fails to load.",
+        "props": {
+          "name": {
+            "type": "string",
+            "required": true,
+            "description": "The person's name. It is the accessible name, and the source of the initials."
+          },
+          "src": {
+            "type": "string",
+            "description": "Image URL. If it is missing or fails to load, the initials show instead."
+          },
+          "size": {
+            "type": "enum",
+            "values": [
+              "xs",
+              "sm",
+              "md",
+              "lg"
+            ],
+            "default": "md",
+            "description": "24, 32, 40 or 56 px."
+          },
+          "shape": {
+            "type": "enum",
+            "values": [
+              "circle",
+              "square"
+            ],
+            "default": "circle",
+            "description": "Circle for people, square for organisations."
+          },
+          "decorative": {
+            "type": "boolean",
+            "default": false,
+            "description": "Hides it from screen readers, for when the name is already written next to it."
+          }
+        },
+        "variants": [
+          "size",
+          "shape"
+        ],
+        "states": [
+          "default"
+        ],
+        "slots": [
+          "root",
+          "image",
+          "initials"
+        ],
+        "tokens": [
+          "color.surface.subtle",
+          "color.text.default",
+          "color.border.default"
+        ],
+        "a11y": {
+          "role": "img",
+          "keyboard": [],
+          "requirements": [
+            "It is an image with the person's name as its text alternative",
+            "With decorative set, it is hidden from assistive technology so a name next to it isn't read twice",
+            "Initials text meets 4.5:1 against the background"
+          ],
+          "screenReader": [
+            "Announced as an image named after the person, e.g. \"Ada Lovelace\", unless decorative"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "Showing who wrote, owns or is assigned something",
+            "Account or user menus"
+          ],
+          "avoid_when": [
+            "A logo or product image: use an img"
+          ],
+          "anti_patterns": [
+            "Setting decorative when no name is written beside the avatar",
+            "An empty name"
+          ]
+        },
+        "examples": [
+          "basic",
+          "sizes",
+          "fallback"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {
+            "size": "Size",
+            "shape": "Shape"
+          }
+        }
+      },
+      "install": {
+        "command": "npx rdloom add avatar",
+        "dependencies": [],
+        "registryDependencies": [
+          "tokens",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import { Avatar } from \"@rdloom/react\";\n\nexport default function AvatarBasicExample() {\n  return (\n    <div className=\"flex items-center gap-3\">\n      <Avatar name=\"Ada Lovelace\" />\n      <Avatar name=\"Grace Hopper\" shape=\"square\" />\n      <Avatar name=\"Linus\" />\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "sizes",
+          "code": "import { Avatar } from \"@rdloom/react\";\n\nexport default function AvatarSizesExample() {\n  return (\n    <div className=\"flex items-end gap-3\">\n      <Avatar name=\"Ada Lovelace\" size=\"xs\" />\n      <Avatar name=\"Ada Lovelace\" size=\"sm\" />\n      <Avatar name=\"Ada Lovelace\" size=\"md\" />\n      <Avatar name=\"Ada Lovelace\" size=\"lg\" />\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "fallback",
+          "code": "import { Avatar } from \"@rdloom/react\";\n\n// A missing or broken image falls back to the initials. When the name is already\n// written next to the avatar, `decorative` keeps screen readers from saying it twice.\nexport default function AvatarFallbackExample() {\n  return (\n    <div className=\"flex flex-col gap-3 text-sm\">\n      <div className=\"flex items-center gap-2\">\n        <Avatar name=\"Katherine Johnson\" src=\"https://invalid.example/missing.png\" />\n        <span>Image fails to load</span>\n      </div>\n      <div className=\"flex items-center gap-2\">\n        <Avatar name=\"Margaret Hamilton\" decorative />\n        <span>Margaret Hamilton</span>\n      </div>\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "avatar/avatar.tsx",
+          "content": "\"use client\";\n\nimport { forwardRef, useEffect, useState, type HTMLAttributes } from \"react\";\nimport { avatarDefaults, type AvatarSpecProps } from \"../generated/avatar.types\";\nimport { cx } from \"../utils/cx\";\n\nexport interface AvatarProps\n  extends AvatarSpecProps,\n    Omit<HTMLAttributes<HTMLSpanElement>, keyof AvatarSpecProps | \"className\"> {\n  className?: string;\n}\n\nconst sizes: Record<NonNullable<AvatarSpecProps[\"size\"]>, string> = {\n  xs: \"size-6 text-[10px]\",\n  sm: \"size-8 text-xs\",\n  md: \"size-10 text-sm\",\n  lg: \"size-14 text-base\",\n};\n\n/** \"Ada Lovelace\" -> \"AL\", \"Ada\" -> \"A\". Works on whole characters, so emoji and non-Latin names don't split. */\nexport function initialsOf(name: string): string {\n  const words = name.trim().split(/\\s+/).filter(Boolean);\n  if (words.length === 0) return \"\";\n  const first = Array.from(words[0])[0] ?? \"\";\n  const last = words.length > 1 ? (Array.from(words[words.length - 1])[0] ?? \"\") : \"\";\n  return (first + last).toLocaleUpperCase();\n}\n\nexport const Avatar = forwardRef<HTMLSpanElement, AvatarProps>(function Avatar(\n  {\n    name,\n    src,\n    size = avatarDefaults.size,\n    shape = avatarDefaults.shape,\n    decorative = avatarDefaults.decorative,\n    className,\n    ...rest\n  },\n  ref,\n) {\n  const [failed, setFailed] = useState(false);\n  useEffect(() => setFailed(false), [src]); // a new image gets a new chance\n  const showImage = !!src && !failed;\n  return (\n    <span\n      {...rest}\n      ref={ref}\n      // The image carries its own alt text; initials are text drawn as a picture.\n      role={showImage || decorative ? undefined : \"img\"}\n      aria-label={showImage || decorative ? undefined : name}\n      aria-hidden={decorative || undefined}\n      className={cx(\n        \"inline-flex shrink-0 select-none items-center justify-center overflow-hidden border border-[var(--rd-color-border-default)] \" +\n          \"bg-[var(--rd-color-surface-subtle)] font-medium text-[var(--rd-color-text-default)]\",\n        shape === \"circle\" ? \"rounded-full\" : \"rounded-[var(--rd-radius-control)]\",\n        sizes[size],\n        className,\n      )}\n    >\n      {showImage ? (\n        <img src={src} alt={decorative ? \"\" : name} onError={() => setFailed(true)} className=\"size-full object-cover\" />\n      ) : (\n        <span aria-hidden=\"true\">{initialsOf(name)}</span>\n      )}\n    </span>\n  );\n});\n"
+        },
+        {
+          "path": "generated/avatar.types.ts",
+          "content": "// Generated by rdloom codegen from specs/avatar.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nexport const avatarSizeValues = [\"xs\", \"sm\", \"md\", \"lg\"] as const;\nexport const avatarShapeValues = [\"circle\", \"square\"] as const;\n\n/** A person's or account's picture, falling back to their initials when there is no image or it fails to load. */\nexport interface AvatarSpecProps {\n  /**\n   * The person's name. It is the accessible name, and the source of the initials.\n   */\n  name: string;\n  /**\n   * Image URL. If it is missing or fails to load, the initials show instead.\n   */\n  src?: string;\n  /**\n   * 24, 32, 40 or 56 px.\n   * @default \"md\"\n   */\n  size?: \"xs\" | \"sm\" | \"md\" | \"lg\";\n  /**\n   * Circle for people, square for organisations.\n   * @default \"circle\"\n   */\n  shape?: \"circle\" | \"square\";\n  /**\n   * Hides it from screen readers, for when the name is already written next to it.\n   * @default false\n   */\n  decorative?: boolean;\n}\n\nexport const avatarDefaults = {\n  size: \"md\",\n  shape: \"circle\",\n  decorative: false,\n} as const;\n\nexport const avatarMeta = {\n  \"name\": \"Avatar\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"img\"\n} as const;\n"
+        }
+      ]
+    },
+    {
+      "id": "badge",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "Badge",
+        "version": "0.1.0",
+        "category": "display",
+        "status": "experimental",
+        "description": "A small label that states a status or category, like Paid, Overdue or Beta. Not interactive.",
+        "props": {
+          "children": {
+            "type": "node",
+            "required": true,
+            "description": "The label. Say what it means in words: color alone never carries the meaning."
+          },
+          "variant": {
+            "type": "enum",
+            "values": [
+              "neutral",
+              "info",
+              "success",
+              "warning",
+              "danger"
+            ],
+            "default": "neutral",
+            "description": "Tone: neutral for categories, the others for statuses."
+          },
+          "size": {
+            "type": "enum",
+            "values": [
+              "sm",
+              "md"
+            ],
+            "default": "md",
+            "description": "Text and padding size."
+          }
+        },
+        "variants": [
+          "variant",
+          "size"
+        ],
+        "states": [
+          "default"
+        ],
+        "slots": [
+          "root"
+        ],
+        "tokens": [
+          "color.text.default",
+          "color.surface.subtle",
+          "color.border.default",
+          "color.feedback.info-subtle",
+          "color.feedback.success-subtle",
+          "color.feedback.warning-subtle",
+          "color.feedback.danger-subtle",
+          "color.feedback.info",
+          "color.feedback.success",
+          "color.feedback.warning",
+          "color.feedback.danger"
+        ],
+        "a11y": {
+          "role": "text",
+          "keyboard": [],
+          "requirements": [
+            "The status is in the text, not only the color (a colored dot is decoration)",
+            "Text meets 4.5:1 against every tone's background, in light and dark mode",
+            "It is plain inline text: not focusable, not a button"
+          ],
+          "screenReader": [
+            "Read in place as ordinary text, e.g. \"Order 1042, Overdue\""
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "Showing the status of a record in a list or table",
+            "Tagging something with a short category or version, like Beta"
+          ],
+          "avoid_when": [
+            "Something the user can click or dismiss: use a Button or a tag input",
+            "A count that changes and must be announced: use a live region"
+          ],
+          "anti_patterns": [
+            "Using color as the only difference between two badges",
+            "Long sentences inside a badge",
+            "Making a badge a button"
+          ]
+        },
+        "examples": [
+          "variants",
+          "sizes",
+          "in-a-list"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {
+            "variant": "Variant",
+            "size": "Size"
+          }
+        }
+      },
+      "install": {
+        "command": "npx rdloom add badge",
+        "dependencies": [],
+        "registryDependencies": [
+          "tokens",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "variants",
+          "code": "import { Badge } from \"@rdloom/react\";\n\nexport default function BadgeVariantsExample() {\n  return (\n    <div className=\"flex flex-wrap items-center gap-2\">\n      <Badge>Draft</Badge>\n      <Badge variant=\"info\">In review</Badge>\n      <Badge variant=\"success\">Paid</Badge>\n      <Badge variant=\"warning\">Due soon</Badge>\n      <Badge variant=\"danger\">Overdue</Badge>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "sizes",
+          "code": "import { Badge } from \"@rdloom/react\";\n\nexport default function BadgeSizesExample() {\n  return (\n    <div className=\"flex items-center gap-2\">\n      <Badge size=\"sm\" variant=\"info\">\n        Beta\n      </Badge>\n      <Badge size=\"md\" variant=\"info\">\n        Beta\n      </Badge>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "in-a-list",
+          "code": "import { Badge } from \"@rdloom/react\";\n\nconst invoices = [\n  { id: \"INV-1042\", status: \"Overdue\", variant: \"danger\" },\n  { id: \"INV-1043\", status: \"Paid\", variant: \"success\" },\n  { id: \"INV-1044\", status: \"Due soon\", variant: \"warning\" },\n] as const;\n\n// The status is written out: the color only helps people who can see it.\nexport default function BadgeInAListExample() {\n  return (\n    <ul className=\"flex w-72 flex-col gap-2 text-sm\">\n      {invoices.map((invoice) => (\n        <li key={invoice.id} className=\"flex items-center justify-between\">\n          <span>{invoice.id}</span>\n          <Badge variant={invoice.variant}>{invoice.status}</Badge>\n        </li>\n      ))}\n    </ul>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "badge/badge.tsx",
+          "content": "import { forwardRef, type HTMLAttributes } from \"react\";\nimport { badgeDefaults, type BadgeSpecProps } from \"../generated/badge.types\";\nimport { cx } from \"../utils/cx\";\n\n// Plain markup with no hooks, so it also works in a React Server Component.\n\nexport interface BadgeProps\n  extends BadgeSpecProps,\n    Omit<HTMLAttributes<HTMLSpanElement>, keyof BadgeSpecProps | \"className\"> {\n  className?: string;\n}\n\nconst tones: Record<NonNullable<BadgeSpecProps[\"variant\"]>, { box: string; dot: string }> = {\n  neutral: {\n    box: \"bg-[var(--rd-color-surface-subtle)] border-[var(--rd-color-border-default)]\",\n    dot: \"bg-[var(--rd-color-text-muted)]\",\n  },\n  info: {\n    box: \"bg-[var(--rd-color-feedback-info-subtle)] border-transparent\",\n    dot: \"bg-[var(--rd-color-feedback-info)]\",\n  },\n  success: {\n    box: \"bg-[var(--rd-color-feedback-success-subtle)] border-transparent\",\n    dot: \"bg-[var(--rd-color-feedback-success)]\",\n  },\n  warning: {\n    box: \"bg-[var(--rd-color-feedback-warning-subtle)] border-transparent\",\n    dot: \"bg-[var(--rd-color-feedback-warning)]\",\n  },\n  danger: {\n    box: \"bg-[var(--rd-color-feedback-danger-subtle)] border-transparent\",\n    dot: \"bg-[var(--rd-color-feedback-danger)]\",\n  },\n};\n\nconst sizes: Record<NonNullable<BadgeSpecProps[\"size\"]>, string> = {\n  sm: \"gap-1 px-1.5 py-px text-xs\",\n  md: \"gap-1.5 px-2 py-0.5 text-sm\",\n};\n\nexport const Badge = forwardRef<HTMLSpanElement, BadgeProps>(function Badge(\n  { children, variant = badgeDefaults.variant, size = badgeDefaults.size, className, ...rest },\n  ref,\n) {\n  const tone = tones[variant];\n  return (\n    <span\n      {...rest}\n      ref={ref}\n      className={cx(\n        \"inline-flex items-center rounded-full border font-medium whitespace-nowrap text-[var(--rd-color-text-default)]\",\n        tone.box,\n        sizes[size],\n        className,\n      )}\n    >\n      {/* The word says the status; the dot is only decoration. */}\n      <span aria-hidden=\"true\" className={cx(\"size-1.5 shrink-0 rounded-full\", tone.dot)} />\n      {children}\n    </span>\n  );\n});\n"
+        },
+        {
+          "path": "generated/badge.types.ts",
+          "content": "// Generated by rdloom codegen from specs/badge.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nimport type { ReactNode } from \"react\";\n\nexport const badgeVariantValues = [\"neutral\", \"info\", \"success\", \"warning\", \"danger\"] as const;\nexport const badgeSizeValues = [\"sm\", \"md\"] as const;\n\n/** A small label that states a status or category, like Paid, Overdue or Beta. Not interactive. */\nexport interface BadgeSpecProps {\n  /**\n   * The label. Say what it means in words: color alone never carries the meaning.\n   */\n  children: ReactNode;\n  /**\n   * Tone: neutral for categories, the others for statuses.\n   * @default \"neutral\"\n   */\n  variant?: \"neutral\" | \"info\" | \"success\" | \"warning\" | \"danger\";\n  /**\n   * Text and padding size.\n   * @default \"md\"\n   */\n  size?: \"sm\" | \"md\";\n}\n\nexport const badgeDefaults = {\n  variant: \"neutral\",\n  size: \"md\",\n} as const;\n\nexport const badgeMeta = {\n  \"name\": \"Badge\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"text\"\n} as const;\n"
+        }
+      ]
+    },
+    {
       "id": "button",
       "spec": {
         "$schema": "./schema/component.schema.json",
@@ -458,6 +875,158 @@
         {
           "path": "generated/calendar.types.ts",
           "content": "// Generated by rdloom codegen from specs/calendar.spec.json (v0.1.1).\n// Do not edit. Change the spec and run `npm run gen`.\n\n/** Month grid for picking a date. RangeCalendar picks a start and end. Used inside DatePicker and DateRangePicker. */\nexport interface CalendarSpecProps {\n  /**\n   * How many months to show side by side.\n   * @default 1\n   */\n  visibleMonths?: number;\n  /**\n   * Earliest selectable date.\n   */\n  minValue?: import(\"react-aria-components\").DateValue;\n  /**\n   * Latest selectable date.\n   */\n  maxValue?: import(\"react-aria-components\").DateValue;\n  /**\n   * Disables every date.\n   * @default false\n   */\n  isDisabled?: boolean;\n}\n\nexport const calendarDefaults = {\n  visibleMonths: 1,\n  isDisabled: false,\n} as const;\n\nexport const calendarMeta = {\n  \"name\": \"Calendar\",\n  \"version\": \"0.1.1\",\n  \"status\": \"experimental\",\n  \"role\": \"application\"\n} as const;\n"
+        }
+      ]
+    },
+    {
+      "id": "card",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "Card",
+        "version": "0.1.0",
+        "category": "layout",
+        "status": "experimental",
+        "description": "A bordered container that groups related content under an optional heading, with an optional footer for actions.",
+        "props": {
+          "children": {
+            "type": "node",
+            "required": true,
+            "description": "The card's content."
+          },
+          "title": {
+            "type": "string",
+            "description": "Heading shown at the top. Also names the card for screen readers."
+          },
+          "description": {
+            "type": "string",
+            "description": "Supporting text under the title."
+          },
+          "footer": {
+            "type": "node",
+            "description": "Actions or meta information along the bottom, e.g. buttons."
+          },
+          "headingLevel": {
+            "type": "number",
+            "default": 3,
+            "description": "Heading level for the title, 2 to 6. Pick the level that fits where the card sits in the page's outline."
+          },
+          "variant": {
+            "type": "enum",
+            "values": [
+              "outlined",
+              "raised",
+              "subtle"
+            ],
+            "default": "outlined",
+            "description": "outlined has a border, raised adds a shadow, subtle is a tinted block with no border."
+          },
+          "padding": {
+            "type": "enum",
+            "values": [
+              "sm",
+              "md",
+              "lg"
+            ],
+            "default": "md",
+            "description": "Inner spacing."
+          }
+        },
+        "variants": [
+          "variant",
+          "padding"
+        ],
+        "states": [
+          "default"
+        ],
+        "slots": [
+          "root",
+          "header",
+          "title",
+          "description",
+          "body",
+          "footer"
+        ],
+        "tokens": [
+          "color.surface.default",
+          "color.surface.subtle",
+          "color.surface.raised",
+          "color.border.default",
+          "color.text.default",
+          "color.text.muted",
+          "radius.overlay"
+        ],
+        "a11y": {
+          "role": "group",
+          "keyboard": [],
+          "requirements": [
+            "With a title, the card is a group labelled by it; without one it is a plain container",
+            "The title is a real heading at the level you choose, so the page outline stays correct",
+            "A card is not a landmark and not focusable: put links and buttons inside it"
+          ],
+          "screenReader": [
+            "Entering a titled card announces its name and that it is a group",
+            "The title is reachable as a heading when navigating by headings"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "Grouping a small set of related facts or controls, like a plan, a project or a setting",
+            "A dashboard of independent blocks"
+          ],
+          "avoid_when": [
+            "Rows of the same record type: use a table or data grid",
+            "Wrapping a whole page"
+          ],
+          "anti_patterns": [
+            "Cards inside cards",
+            "A heading level that skips (h1 then h4)",
+            "Making the whole card clickable and also putting buttons in it"
+          ]
+        },
+        "examples": [
+          "basic",
+          "with-footer",
+          "variants"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {
+            "variant": "Variant",
+            "padding": "Padding"
+          }
+        }
+      },
+      "install": {
+        "command": "npx rdloom add card",
+        "dependencies": [],
+        "registryDependencies": [
+          "tokens",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import { Card } from \"@rdloom/react\";\n\nexport default function CardBasicExample() {\n  return (\n    <div className=\"w-80 max-w-full\">\n      <Card title=\"Team plan\" description=\"Up to 10 members\">\n        <p>Shared projects, version history and priority support.</p>\n      </Card>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "with-footer",
+          "code": "import { Button, Card } from \"@rdloom/react\";\n\nexport default function CardWithFooterExample() {\n  return (\n    <div className=\"w-80 max-w-full\">\n      <Card\n        title=\"Delete project\"\n        description=\"This can't be undone.\"\n        footer={\n          <>\n            <Button variant=\"danger\" size=\"sm\">\n              Delete\n            </Button>\n            <Button variant=\"ghost\" size=\"sm\">\n              Cancel\n            </Button>\n          </>\n        }\n      >\n        <p>All files and comments in &quot;Website redesign&quot; will be removed for everyone.</p>\n      </Card>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "variants",
+          "code": "import { Card } from \"@rdloom/react\";\n\nexport default function CardVariantsExample() {\n  return (\n    <div className=\"grid w-[40rem] max-w-full gap-4 sm:grid-cols-3\">\n      <Card title=\"Outlined\" variant=\"outlined\">\n        A border, no shadow.\n      </Card>\n      <Card title=\"Raised\" variant=\"raised\">\n        A border and a shadow.\n      </Card>\n      <Card title=\"Subtle\" variant=\"subtle\">\n        A tinted block.\n      </Card>\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "card/card.tsx",
+          "content": "\"use client\";\n\nimport { forwardRef, useId, type HTMLAttributes, type ReactNode } from \"react\";\nimport { cardDefaults, type CardSpecProps } from \"../generated/card.types\";\nimport { cx } from \"../utils/cx\";\n\nexport interface CardProps\n  extends CardSpecProps,\n    Omit<HTMLAttributes<HTMLDivElement>, keyof CardSpecProps | \"className\" | \"title\"> {\n  className?: string;\n}\n\nconst variants: Record<NonNullable<CardSpecProps[\"variant\"]>, string> = {\n  outlined: \"bg-[var(--rd-color-surface-default)] border border-[var(--rd-color-border-default)]\",\n  raised: \"bg-[var(--rd-color-surface-raised)] border border-[var(--rd-color-border-default)] shadow-md\",\n  subtle: \"bg-[var(--rd-color-surface-subtle)] border border-transparent\",\n};\n\nconst paddings: Record<NonNullable<CardSpecProps[\"padding\"]>, string> = { sm: \"p-3 gap-2\", md: \"p-4 gap-3\", lg: \"p-6 gap-4\" };\n\nexport const Card = forwardRef<HTMLDivElement, CardProps>(function Card(\n  {\n    children,\n    title,\n    description,\n    footer,\n    headingLevel = cardDefaults.headingLevel,\n    variant = cardDefaults.variant,\n    padding = cardDefaults.padding,\n    className,\n    ...rest\n  },\n  ref,\n) {\n  const titleId = useId();\n  const level = Math.min(6, Math.max(2, Math.round(headingLevel)));\n  const Heading = `h${level}` as \"h2\";\n  return (\n    <div\n      {...rest}\n      ref={ref}\n      role={title ? \"group\" : undefined}\n      aria-labelledby={title ? titleId : undefined}\n      className={cx(\n        \"flex flex-col rounded-[var(--rd-radius-overlay)] text-sm text-[var(--rd-color-text-default)]\",\n        variants[variant],\n        paddings[padding],\n        className,\n      )}\n    >\n      {(title || description) && (\n        <div className=\"flex flex-col gap-0.5\">\n          {title && (\n            <Heading id={titleId} className=\"text-base font-semibold\">\n              {title}\n            </Heading>\n          )}\n          {description && <p className=\"text-[var(--rd-color-text-muted)]\">{description}</p>}\n        </div>\n      )}\n      <div>{children}</div>\n      {footer && <CardFooter>{footer}</CardFooter>}\n    </div>\n  );\n});\n\nfunction CardFooter({ children }: { children: ReactNode }) {\n  return (\n    <div className=\"mt-1 flex flex-wrap items-center gap-2 border-t border-[var(--rd-color-border-default)] pt-3\">{children}</div>\n  );\n}\n"
+        },
+        {
+          "path": "generated/card.types.ts",
+          "content": "// Generated by rdloom codegen from specs/card.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nimport type { ReactNode } from \"react\";\n\nexport const cardVariantValues = [\"outlined\", \"raised\", \"subtle\"] as const;\nexport const cardPaddingValues = [\"sm\", \"md\", \"lg\"] as const;\n\n/** A bordered container that groups related content under an optional heading, with an optional footer for actions. */\nexport interface CardSpecProps {\n  /**\n   * The card's content.\n   */\n  children: ReactNode;\n  /**\n   * Heading shown at the top. Also names the card for screen readers.\n   */\n  title?: string;\n  /**\n   * Supporting text under the title.\n   */\n  description?: string;\n  /**\n   * Actions or meta information along the bottom, e.g. buttons.\n   */\n  footer?: ReactNode;\n  /**\n   * Heading level for the title, 2 to 6. Pick the level that fits where the card sits in the page's outline.\n   * @default 3\n   */\n  headingLevel?: number;\n  /**\n   * outlined has a border, raised adds a shadow, subtle is a tinted block with no border.\n   * @default \"outlined\"\n   */\n  variant?: \"outlined\" | \"raised\" | \"subtle\";\n  /**\n   * Inner spacing.\n   * @default \"md\"\n   */\n  padding?: \"sm\" | \"md\" | \"lg\";\n}\n\nexport const cardDefaults = {\n  headingLevel: 3,\n  variant: \"outlined\",\n  padding: \"md\",\n} as const;\n\nexport const cardMeta = {\n  \"name\": \"Card\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"group\"\n} as const;\n"
         }
       ]
     },
@@ -2210,6 +2779,173 @@
       ]
     },
     {
+      "id": "progress",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "Progress",
+        "version": "0.1.0",
+        "category": "feedback",
+        "status": "experimental",
+        "description": "A bar showing how far along a task is, or that something is working when the amount is unknown.",
+        "props": {
+          "label": {
+            "type": "string",
+            "required": true,
+            "description": "What is progressing, e.g. 'Uploading report.pdf'. It is the accessible name."
+          },
+          "value": {
+            "type": "number",
+            "description": "Current value between minValue and maxValue. Leave out with isIndeterminate."
+          },
+          "minValue": {
+            "type": "number",
+            "default": 0,
+            "description": "Value at an empty bar."
+          },
+          "maxValue": {
+            "type": "number",
+            "default": 100,
+            "description": "Value at a full bar."
+          },
+          "isIndeterminate": {
+            "type": "boolean",
+            "default": false,
+            "description": "The amount is unknown: shows a full, pulsing bar and no number."
+          },
+          "showValue": {
+            "type": "boolean",
+            "default": true,
+            "description": "Shows the percentage (or valueLabel) beside the label."
+          },
+          "valueLabel": {
+            "type": "string",
+            "description": "Replaces the percentage in text and for screen readers, e.g. '3 of 10 files'."
+          },
+          "variant": {
+            "type": "enum",
+            "values": [
+              "default",
+              "success",
+              "warning",
+              "danger"
+            ],
+            "default": "default",
+            "description": "Bar color. Say it in the label too: color alone isn't enough."
+          },
+          "size": {
+            "type": "enum",
+            "values": [
+              "sm",
+              "md"
+            ],
+            "default": "md",
+            "description": "Bar thickness."
+          }
+        },
+        "variants": [
+          "variant",
+          "size",
+          "isIndeterminate"
+        ],
+        "states": [
+          "default",
+          "loading"
+        ],
+        "slots": [
+          "label",
+          "value",
+          "track",
+          "bar"
+        ],
+        "tokens": [
+          "color.action.primary",
+          "color.feedback.success",
+          "color.feedback.warning",
+          "color.feedback.danger",
+          "color.border.default",
+          "color.text.default",
+          "color.text.muted"
+        ],
+        "a11y": {
+          "role": "progressbar",
+          "keyboard": [],
+          "requirements": [
+            "Has an accessible name (the label)",
+            "Exposes aria-valuenow, aria-valuemin and aria-valuemax, or none of them when indeterminate",
+            "The bar color has 3:1 contrast against the track",
+            "The pulsing indeterminate animation stops for people who prefer reduced motion"
+          ],
+          "screenReader": [
+            "Announced as a progress bar with its name and percentage",
+            "An indeterminate bar is announced as busy, without a value"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "Uploads, imports, multi-step processes",
+            "Showing usage against a limit"
+          ],
+          "avoid_when": [
+            "A short wait with no meaningful progress: use a spinner",
+            "A value that is not progress toward something: use a meter"
+          ],
+          "anti_patterns": [
+            "A bar with no label",
+            "Showing 100% while still working",
+            "Danger color for something that is only slow"
+          ]
+        },
+        "examples": [
+          "basic",
+          "indeterminate",
+          "variants"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {
+            "variant": "Variant",
+            "size": "Size",
+            "isIndeterminate": "Indeterminate"
+          }
+        }
+      },
+      "install": {
+        "command": "npx rdloom add progress",
+        "dependencies": [
+          "react-aria-components@^1.21.1"
+        ],
+        "registryDependencies": [
+          "tokens",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import { Progress } from \"@rdloom/react\";\n\nexport default function ProgressBasicExample() {\n  return (\n    <div className=\"w-80 max-w-full\">\n      <Progress label=\"Uploading report.pdf\" value={64} />\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "indeterminate",
+          "code": "import { Progress } from \"@rdloom/react\";\n\nexport default function ProgressIndeterminateExample() {\n  return (\n    <div className=\"w-80 max-w-full\">\n      <Progress label=\"Preparing your export\" isIndeterminate />\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "variants",
+          "code": "import { Progress } from \"@rdloom/react\";\n\nexport default function ProgressVariantsExample() {\n  return (\n    <div className=\"flex w-80 max-w-full flex-col gap-4\">\n      <Progress label=\"Import finished\" value={100} variant=\"success\" />\n      <Progress label=\"Storage used\" value={92} variant=\"warning\" valueLabel=\"9.2 of 10 GB\" />\n      <Progress label=\"Quota exceeded\" value={100} variant=\"danger\" size=\"sm\" />\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "progress/progress.tsx",
+          "content": "\"use client\";\n\nimport { forwardRef } from \"react\";\nimport { Label, ProgressBar as AriaProgressBar, type ProgressBarProps as AriaProgressBarProps } from \"react-aria-components\";\nimport { progressDefaults, type ProgressSpecProps } from \"../generated/progress.types\";\nimport { cx } from \"../utils/cx\";\n\nexport interface ProgressProps\n  extends ProgressSpecProps,\n    Omit<AriaProgressBarProps, keyof ProgressSpecProps | \"className\" | \"children\" | \"aria-label\" | \"valueLabel\"> {\n  className?: string;\n}\n\nconst bars: Record<NonNullable<ProgressSpecProps[\"variant\"]>, string> = {\n  default: \"bg-[var(--rd-color-action-primary)]\",\n  success: \"bg-[var(--rd-color-feedback-success)]\",\n  warning: \"bg-[var(--rd-color-feedback-warning)]\",\n  danger: \"bg-[var(--rd-color-feedback-danger)]\",\n};\nconst heights: Record<NonNullable<ProgressSpecProps[\"size\"]>, string> = { sm: \"h-1.5\", md: \"h-2.5\" };\n\nexport const Progress = forwardRef<HTMLDivElement, ProgressProps>(function Progress(\n  {\n    label,\n    valueLabel,\n    variant = progressDefaults.variant,\n    size = progressDefaults.size,\n    showValue = progressDefaults.showValue,\n    isIndeterminate = progressDefaults.isIndeterminate,\n    minValue = progressDefaults.minValue,\n    maxValue = progressDefaults.maxValue,\n    className,\n    ...rest\n  },\n  ref,\n) {\n  return (\n    <AriaProgressBar\n      {...rest}\n      ref={ref}\n      minValue={minValue}\n      maxValue={maxValue}\n      isIndeterminate={isIndeterminate}\n      valueLabel={valueLabel}\n      className={cx(\"flex w-full flex-col gap-1.5 text-sm\", className)}\n    >\n      {({ percentage, valueText }) => (\n        <>\n          <div className=\"flex items-baseline justify-between gap-2\">\n            <Label className=\"font-medium text-[var(--rd-color-text-default)]\">{label}</Label>\n            {showValue && !isIndeterminate && (\n              <span className=\"tabular-nums text-[var(--rd-color-text-muted)]\">{valueLabel ?? valueText}</span>\n            )}\n          </div>\n          <div className={cx(\"w-full overflow-hidden rounded-full bg-[var(--rd-color-border-default)]\", heights[size])}>\n            <div\n              className={cx(\n                \"h-full rounded-full transition-[width] duration-300 motion-reduce:transition-none\",\n                bars[variant],\n                // The amount is unknown: a full, pulsing bar. Reduced motion keeps it still.\n                isIndeterminate && \"w-full animate-pulse motion-reduce:animate-none\",\n              )}\n              style={isIndeterminate ? undefined : { width: `${percentage}%` }}\n            />\n          </div>\n        </>\n      )}\n    </AriaProgressBar>\n  );\n});\n"
+        },
+        {
+          "path": "generated/progress.types.ts",
+          "content": "// Generated by rdloom codegen from specs/progress.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nexport const progressVariantValues = [\"default\", \"success\", \"warning\", \"danger\"] as const;\nexport const progressSizeValues = [\"sm\", \"md\"] as const;\n\n/** A bar showing how far along a task is, or that something is working when the amount is unknown. */\nexport interface ProgressSpecProps {\n  /**\n   * What is progressing, e.g. 'Uploading report.pdf'. It is the accessible name.\n   */\n  label: string;\n  /**\n   * Current value between minValue and maxValue. Leave out with isIndeterminate.\n   */\n  value?: number;\n  /**\n   * Value at an empty bar.\n   * @default 0\n   */\n  minValue?: number;\n  /**\n   * Value at a full bar.\n   * @default 100\n   */\n  maxValue?: number;\n  /**\n   * The amount is unknown: shows a full, pulsing bar and no number.\n   * @default false\n   */\n  isIndeterminate?: boolean;\n  /**\n   * Shows the percentage (or valueLabel) beside the label.\n   * @default true\n   */\n  showValue?: boolean;\n  /**\n   * Replaces the percentage in text and for screen readers, e.g. '3 of 10 files'.\n   */\n  valueLabel?: string;\n  /**\n   * Bar color. Say it in the label too: color alone isn't enough.\n   * @default \"default\"\n   */\n  variant?: \"default\" | \"success\" | \"warning\" | \"danger\";\n  /**\n   * Bar thickness.\n   * @default \"md\"\n   */\n  size?: \"sm\" | \"md\";\n}\n\nexport const progressDefaults = {\n  minValue: 0,\n  maxValue: 100,\n  isIndeterminate: false,\n  showValue: true,\n  variant: \"default\",\n  size: \"md\",\n} as const;\n\nexport const progressMeta = {\n  \"name\": \"Progress\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"progressbar\"\n} as const;\n"
+        }
+      ]
+    },
+    {
       "id": "radio-group",
       "spec": {
         "$schema": "./schema/component.schema.json",
@@ -2742,6 +3478,127 @@
         {
           "path": "generated/sheet.types.ts",
           "content": "// Generated by rdloom codegen from specs/sheet.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nimport type { ReactNode } from \"react\";\n\nexport const sheetSideValues = [\"end\", \"start\", \"bottom\"] as const;\nexport const sheetSizeValues = [\"sm\", \"md\", \"lg\"] as const;\n\n/** A modal panel that slides in from the edge of the screen, for filters, details or navigation on small screens. Open it with DialogTrigger. */\nexport interface SheetSpecProps {\n  /**\n   * Heading, also used as the sheet's accessible name.\n   */\n  title: string;\n  /**\n   * Short supporting text under the title.\n   */\n  description?: string;\n  /**\n   * The edge it slides in from. end is the right in left-to-right languages.\n   * @default \"end\"\n   */\n  side?: \"end\" | \"start\" | \"bottom\";\n  /**\n   * Width (or height for bottom sheets).\n   * @default \"md\"\n   */\n  size?: \"sm\" | \"md\" | \"lg\";\n  /**\n   * Closes on backdrop click. Esc always closes.\n   * @default true\n   */\n  isDismissable?: boolean;\n  /**\n   * Body and actions. A function receives close().\n   */\n  children?: ReactNode | ((opts: { close: () => void }) => ReactNode);\n}\n\nexport const sheetDefaults = {\n  side: \"end\",\n  size: \"md\",\n  isDismissable: true,\n} as const;\n\nexport const sheetMeta = {\n  \"name\": \"Sheet\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"dialog\"\n} as const;\n"
+        }
+      ]
+    },
+    {
+      "id": "skeleton",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "Skeleton",
+        "version": "0.1.0",
+        "category": "feedback",
+        "status": "experimental",
+        "description": "A grey placeholder shaped like the content that is loading, so the page doesn't jump when it arrives.",
+        "props": {
+          "variant": {
+            "type": "enum",
+            "values": [
+              "text",
+              "rect",
+              "circle"
+            ],
+            "default": "rect",
+            "description": "text is a line (or lines) of text, rect a block like an image, circle an avatar."
+          },
+          "width": {
+            "type": "custom",
+            "tsType": "string | number",
+            "description": "CSS width: a number is px, a string is any CSS length, e.g. '60%'. Text lines default to full width; the last of several is shorter."
+          },
+          "height": {
+            "type": "custom",
+            "tsType": "string | number",
+            "description": "CSS height. Text uses the text's line height; rect defaults to 96px."
+          },
+          "lines": {
+            "type": "number",
+            "default": 1,
+            "description": "For text: how many lines to draw."
+          }
+        },
+        "variants": [
+          "variant"
+        ],
+        "states": [
+          "loading"
+        ],
+        "slots": [
+          "root"
+        ],
+        "tokens": [
+          "color.surface.subtle",
+          "radius.control"
+        ],
+        "a11y": {
+          "role": "none",
+          "keyboard": [],
+          "requirements": [
+            "It is hidden from assistive technology (aria-hidden): there is nothing to read",
+            "Mark the loading region with aria-busy=\"true\" and tell screen readers it is loading with a visually hidden status message",
+            "The pulse animation stops for people who prefer reduced motion"
+          ],
+          "screenReader": [
+            "Skeletons themselves are silent; the loading region's status message (e.g. \"Loading orders\") is what is heard"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "Loading content whose shape is known: lists, cards, profiles",
+            "Avoiding layout shift when data arrives"
+          ],
+          "avoid_when": [
+            "Unknown shape or a short wait: use a spinner",
+            "Long operations with measurable progress: use Progress"
+          ],
+          "anti_patterns": [
+            "Skeletons that don't match the real layout",
+            "Leaving them up with no loading message for screen readers"
+          ]
+        },
+        "examples": [
+          "text",
+          "card",
+          "avatar-row"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {
+            "variant": "Variant"
+          }
+        }
+      },
+      "install": {
+        "command": "npx rdloom add skeleton",
+        "dependencies": [],
+        "registryDependencies": [
+          "tokens",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "text",
+          "code": "import { Skeleton } from \"@rdloom/react\";\n\nexport default function SkeletonTextExample() {\n  return (\n    <div className=\"w-80 max-w-full\">\n      <Skeleton variant=\"text\" lines={3} />\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "card",
+          "code": "import { Skeleton } from \"@rdloom/react\";\n\n// The loading region says it is busy; the placeholders themselves are silent.\nexport default function SkeletonCardExample() {\n  return (\n    <div aria-busy=\"true\" className=\"flex w-80 max-w-full flex-col gap-3\">\n      <span role=\"status\" className=\"sr-only\">\n        Loading project\n      </span>\n      <Skeleton variant=\"rect\" height={120} />\n      <Skeleton variant=\"text\" lines={2} />\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "avatar-row",
+          "code": "import { Skeleton } from \"@rdloom/react\";\n\nexport default function SkeletonAvatarRowExample() {\n  return (\n    <div aria-busy=\"true\" className=\"flex w-80 max-w-full items-center gap-3\">\n      <span role=\"status\" className=\"sr-only\">\n        Loading contact\n      </span>\n      <Skeleton variant=\"circle\" width={40} />\n      <div className=\"flex-1\">\n        <Skeleton variant=\"text\" lines={2} />\n      </div>\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "skeleton/skeleton.tsx",
+          "content": "import { forwardRef, type CSSProperties, type HTMLAttributes } from \"react\";\nimport { skeletonDefaults, type SkeletonSpecProps } from \"../generated/skeleton.types\";\nimport { cx } from \"../utils/cx\";\n\n// Plain markup with no hooks, so it also works in a React Server Component.\n\nexport interface SkeletonProps\n  extends SkeletonSpecProps,\n    Omit<HTMLAttributes<HTMLDivElement>, keyof SkeletonSpecProps | \"className\" | \"children\"> {\n  className?: string;\n}\n\nconst block = \"animate-pulse bg-[var(--rd-color-surface-subtle)] motion-reduce:animate-none\";\n\nconst size = (value: string | number | undefined) => (typeof value === \"number\" ? `${value}px` : value);\n\nexport const Skeleton = forwardRef<HTMLDivElement, SkeletonProps>(function Skeleton(\n  { variant = skeletonDefaults.variant, width, height, lines = skeletonDefaults.lines, className, style, ...rest },\n  ref,\n) {\n  // Nothing to read: a loading region should say so itself (aria-busy and a status message).\n  const common = { ...rest, ref, \"aria-hidden\": true as const };\n\n  if (variant === \"text\") {\n    const count = Math.max(1, Math.round(lines));\n    return (\n      <div {...common} className={cx(\"flex flex-col gap-2\", className)} style={{ width: size(width) ?? \"100%\", ...style }}>\n        {Array.from({ length: count }, (_, i) => (\n          <div\n            key={i}\n            className={cx(block, \"rounded-[var(--rd-radius-control)]\")}\n            // A paragraph's last line stops short.\n            style={{ height: size(height) ?? \"1em\", width: count > 1 && i === count - 1 ? \"60%\" : \"100%\" }}\n          />\n        ))}\n      </div>\n    );\n  }\n\n  const shape: CSSProperties =\n    variant === \"circle\"\n      ? { width: size(width) ?? size(height) ?? 40, height: size(height) ?? size(width) ?? 40 }\n      : { width: size(width) ?? \"100%\", height: size(height) ?? 96 };\n  return (\n    <div\n      {...common}\n      className={cx(block, variant === \"circle\" ? \"rounded-full\" : \"rounded-[var(--rd-radius-control)]\", className)}\n      style={{ ...shape, ...style }}\n    />\n  );\n});\n"
+        },
+        {
+          "path": "generated/skeleton.types.ts",
+          "content": "// Generated by rdloom codegen from specs/skeleton.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nexport const skeletonVariantValues = [\"text\", \"rect\", \"circle\"] as const;\n\n/** A grey placeholder shaped like the content that is loading, so the page doesn't jump when it arrives. */\nexport interface SkeletonSpecProps {\n  /**\n   * text is a line (or lines) of text, rect a block like an image, circle an avatar.\n   * @default \"rect\"\n   */\n  variant?: \"text\" | \"rect\" | \"circle\";\n  /**\n   * CSS width: a number is px, a string is any CSS length, e.g. '60%'. Text lines default to full width; the last of several is shorter.\n   */\n  width?: string | number;\n  /**\n   * CSS height. Text uses the text's line height; rect defaults to 96px.\n   */\n  height?: string | number;\n  /**\n   * For text: how many lines to draw.\n   * @default 1\n   */\n  lines?: number;\n}\n\nexport const skeletonDefaults = {\n  variant: \"rect\",\n  lines: 1,\n} as const;\n\nexport const skeletonMeta = {\n  \"name\": \"Skeleton\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"none\"\n} as const;\n"
         }
       ]
     },
@@ -3779,6 +4636,48 @@
       "dark": "#4ade80"
     },
     {
+      "path": "color.feedback.warning",
+      "cssVar": "--rd-color-feedback-warning",
+      "type": "color",
+      "light": "#b45309",
+      "dark": "#fbbf24"
+    },
+    {
+      "path": "color.feedback.info",
+      "cssVar": "--rd-color-feedback-info",
+      "type": "color",
+      "light": "#2563eb",
+      "dark": "#60a5fa"
+    },
+    {
+      "path": "color.feedback.danger-subtle",
+      "cssVar": "--rd-color-feedback-danger-subtle",
+      "type": "color",
+      "light": "#fef2f2",
+      "dark": "#450a0a"
+    },
+    {
+      "path": "color.feedback.success-subtle",
+      "cssVar": "--rd-color-feedback-success-subtle",
+      "type": "color",
+      "light": "#f0fdf4",
+      "dark": "#052e16"
+    },
+    {
+      "path": "color.feedback.warning-subtle",
+      "cssVar": "--rd-color-feedback-warning-subtle",
+      "type": "color",
+      "light": "#fffbeb",
+      "dark": "#451a03"
+    },
+    {
+      "path": "color.feedback.info-subtle",
+      "cssVar": "--rd-color-feedback-info-subtle",
+      "type": "color",
+      "light": "#eff6ff",
+      "dark": "#172554"
+    },
+    {
       "path": "color.overlay.backdrop",
       "cssVar": "--rd-color-overlay-backdrop",
       "type": "color",
@@ -3834,7 +4733,7 @@
       "files": [
         {
           "path": "@tokens",
-          "content": "/* Generated by rdloom codegen. Do not edit; change /tokens instead. */\n\n:root {\n  --rd-color-neutral-0: #ffffff;\n  --rd-color-neutral-50: #f7f7f8;\n  --rd-color-neutral-100: #eeeef1;\n  --rd-color-neutral-200: #dcdce2;\n  --rd-color-neutral-400: #9696a3;\n  --rd-color-neutral-500: #8a8a97;\n  --rd-color-neutral-600: #5b5b68;\n  --rd-color-neutral-800: #2a2a33;\n  --rd-color-neutral-900: #18181d;\n  --rd-color-neutral-950: #0e0e12;\n  --rd-color-indigo-50: #eef0ff;\n  --rd-color-indigo-300: #a5a8ff;\n  --rd-color-indigo-400: #8386f7;\n  --rd-color-indigo-500: #6366f1;\n  --rd-color-indigo-600: #4f46e5;\n  --rd-color-indigo-700: #4338ca;\n  --rd-color-indigo-950: #1f1d4d;\n  --rd-color-green-400: #4ade80;\n  --rd-color-green-600: #16a34a;\n  --rd-color-red-300: #fca5a5;\n  --rd-color-red-400: #f87171;\n  --rd-color-red-600: #dc2626;\n  --rd-color-red-700: #b91c1c;\n  --rd-radius-sm: 4px;\n  --rd-radius-md: 8px;\n  --rd-radius-lg: 12px;\n  --rd-space-1: 4px;\n  --rd-space-2: 8px;\n  --rd-space-3: 12px;\n  --rd-space-4: 16px;\n  --rd-space-5: 20px;\n  --rd-color-action-primary: #4f46e5;\n  --rd-color-action-primary-hover: #4338ca;\n  --rd-color-action-on-primary: #ffffff;\n  --rd-color-action-danger: #dc2626;\n  --rd-color-action-danger-hover: #b91c1c;\n  --rd-color-surface-default: #ffffff;\n  --rd-color-surface-subtle: #eeeef1;\n  --rd-color-surface-raised: #ffffff;\n  --rd-color-surface-selected: #eef0ff;\n  --rd-color-border-default: #dcdce2;\n  --rd-color-border-strong: #8a8a97;\n  --rd-color-feedback-danger: #dc2626;\n  --rd-color-feedback-success: #16a34a;\n  --rd-color-overlay-backdrop: rgb(14 14 18 / 0.5);\n  --rd-color-text-default: #18181d;\n  --rd-color-text-muted: #5b5b68;\n  --rd-color-focus-ring: #6366f1;\n  --rd-radius-control: 8px;\n  --rd-radius-overlay: 12px;\n  --rd-space-control-x: 16px;\n}\n\n@media (prefers-color-scheme: dark) {\n  :root:not([data-theme=\"light\"]) {\n    --rd-color-action-primary: #8386f7;\n    --rd-color-action-primary-hover: #a5a8ff;\n    --rd-color-action-on-primary: #0e0e12;\n    --rd-color-action-danger: #f87171;\n    --rd-color-action-danger-hover: #fca5a5;\n    --rd-color-surface-default: #0e0e12;\n    --rd-color-surface-subtle: #2a2a33;\n    --rd-color-surface-raised: #18181d;\n    --rd-color-surface-selected: #1f1d4d;\n    --rd-color-border-default: #2a2a33;\n    --rd-color-border-strong: #8a8a97;\n    --rd-color-feedback-danger: #f87171;\n    --rd-color-feedback-success: #4ade80;\n    --rd-color-overlay-backdrop: rgb(0 0 0 / 0.6);\n    --rd-color-text-default: #f7f7f8;\n    --rd-color-text-muted: #9696a3;\n    --rd-color-focus-ring: #a5a8ff;\n  }\n}\n\n:root[data-theme=\"dark\"] {\n  --rd-color-action-primary: #8386f7;\n  --rd-color-action-primary-hover: #a5a8ff;\n  --rd-color-action-on-primary: #0e0e12;\n  --rd-color-action-danger: #f87171;\n  --rd-color-action-danger-hover: #fca5a5;\n  --rd-color-surface-default: #0e0e12;\n  --rd-color-surface-subtle: #2a2a33;\n  --rd-color-surface-raised: #18181d;\n  --rd-color-surface-selected: #1f1d4d;\n  --rd-color-border-default: #2a2a33;\n  --rd-color-border-strong: #8a8a97;\n  --rd-color-feedback-danger: #f87171;\n  --rd-color-feedback-success: #4ade80;\n  --rd-color-overlay-backdrop: rgb(0 0 0 / 0.6);\n  --rd-color-text-default: #f7f7f8;\n  --rd-color-text-muted: #9696a3;\n  --rd-color-focus-ring: #a5a8ff;\n}\n\n"
+          "content": "/* Generated by rdloom codegen. Do not edit; change /tokens instead. */\n\n:root {\n  --rd-color-neutral-0: #ffffff;\n  --rd-color-neutral-50: #f7f7f8;\n  --rd-color-neutral-100: #eeeef1;\n  --rd-color-neutral-200: #dcdce2;\n  --rd-color-neutral-400: #9696a3;\n  --rd-color-neutral-500: #8a8a97;\n  --rd-color-neutral-600: #5b5b68;\n  --rd-color-neutral-800: #2a2a33;\n  --rd-color-neutral-900: #18181d;\n  --rd-color-neutral-950: #0e0e12;\n  --rd-color-indigo-50: #eef0ff;\n  --rd-color-indigo-300: #a5a8ff;\n  --rd-color-indigo-400: #8386f7;\n  --rd-color-indigo-500: #6366f1;\n  --rd-color-indigo-600: #4f46e5;\n  --rd-color-indigo-700: #4338ca;\n  --rd-color-indigo-950: #1f1d4d;\n  --rd-color-green-50: #f0fdf4;\n  --rd-color-green-400: #4ade80;\n  --rd-color-green-600: #16a34a;\n  --rd-color-green-700: #15803d;\n  --rd-color-green-950: #052e16;\n  --rd-color-red-50: #fef2f2;\n  --rd-color-red-300: #fca5a5;\n  --rd-color-red-400: #f87171;\n  --rd-color-red-600: #dc2626;\n  --rd-color-red-700: #b91c1c;\n  --rd-color-red-950: #450a0a;\n  --rd-color-amber-50: #fffbeb;\n  --rd-color-amber-400: #fbbf24;\n  --rd-color-amber-700: #b45309;\n  --rd-color-amber-950: #451a03;\n  --rd-color-blue-50: #eff6ff;\n  --rd-color-blue-400: #60a5fa;\n  --rd-color-blue-600: #2563eb;\n  --rd-color-blue-950: #172554;\n  --rd-radius-sm: 4px;\n  --rd-radius-md: 8px;\n  --rd-radius-lg: 12px;\n  --rd-space-1: 4px;\n  --rd-space-2: 8px;\n  --rd-space-3: 12px;\n  --rd-space-4: 16px;\n  --rd-space-5: 20px;\n  --rd-color-action-primary: #4f46e5;\n  --rd-color-action-primary-hover: #4338ca;\n  --rd-color-action-on-primary: #ffffff;\n  --rd-color-action-danger: #dc2626;\n  --rd-color-action-danger-hover: #b91c1c;\n  --rd-color-surface-default: #ffffff;\n  --rd-color-surface-subtle: #eeeef1;\n  --rd-color-surface-raised: #ffffff;\n  --rd-color-surface-selected: #eef0ff;\n  --rd-color-border-default: #dcdce2;\n  --rd-color-border-strong: #8a8a97;\n  --rd-color-feedback-danger: #dc2626;\n  --rd-color-feedback-success: #16a34a;\n  --rd-color-feedback-warning: #b45309;\n  --rd-color-feedback-info: #2563eb;\n  --rd-color-feedback-danger-subtle: #fef2f2;\n  --rd-color-feedback-success-subtle: #f0fdf4;\n  --rd-color-feedback-warning-subtle: #fffbeb;\n  --rd-color-feedback-info-subtle: #eff6ff;\n  --rd-color-overlay-backdrop: rgb(14 14 18 / 0.5);\n  --rd-color-text-default: #18181d;\n  --rd-color-text-muted: #5b5b68;\n  --rd-color-focus-ring: #6366f1;\n  --rd-radius-control: 8px;\n  --rd-radius-overlay: 12px;\n  --rd-space-control-x: 16px;\n}\n\n@media (prefers-color-scheme: dark) {\n  :root:not([data-theme=\"light\"]) {\n    --rd-color-action-primary: #8386f7;\n    --rd-color-action-primary-hover: #a5a8ff;\n    --rd-color-action-on-primary: #0e0e12;\n    --rd-color-action-danger: #f87171;\n    --rd-color-action-danger-hover: #fca5a5;\n    --rd-color-surface-default: #0e0e12;\n    --rd-color-surface-subtle: #2a2a33;\n    --rd-color-surface-raised: #18181d;\n    --rd-color-surface-selected: #1f1d4d;\n    --rd-color-border-default: #2a2a33;\n    --rd-color-border-strong: #8a8a97;\n    --rd-color-feedback-danger: #f87171;\n    --rd-color-feedback-success: #4ade80;\n    --rd-color-feedback-warning: #fbbf24;\n    --rd-color-feedback-info: #60a5fa;\n    --rd-color-feedback-danger-subtle: #450a0a;\n    --rd-color-feedback-success-subtle: #052e16;\n    --rd-color-feedback-warning-subtle: #451a03;\n    --rd-color-feedback-info-subtle: #172554;\n    --rd-color-overlay-backdrop: rgb(0 0 0 / 0.6);\n    --rd-color-text-default: #f7f7f8;\n    --rd-color-text-muted: #9696a3;\n    --rd-color-focus-ring: #a5a8ff;\n  }\n}\n\n:root[data-theme=\"dark\"] {\n  --rd-color-action-primary: #8386f7;\n  --rd-color-action-primary-hover: #a5a8ff;\n  --rd-color-action-on-primary: #0e0e12;\n  --rd-color-action-danger: #f87171;\n  --rd-color-action-danger-hover: #fca5a5;\n  --rd-color-surface-default: #0e0e12;\n  --rd-color-surface-subtle: #2a2a33;\n  --rd-color-surface-raised: #18181d;\n  --rd-color-surface-selected: #1f1d4d;\n  --rd-color-border-default: #2a2a33;\n  --rd-color-border-strong: #8a8a97;\n  --rd-color-feedback-danger: #f87171;\n  --rd-color-feedback-success: #4ade80;\n  --rd-color-feedback-warning: #fbbf24;\n  --rd-color-feedback-info: #60a5fa;\n  --rd-color-feedback-danger-subtle: #450a0a;\n  --rd-color-feedback-success-subtle: #052e16;\n  --rd-color-feedback-warning-subtle: #451a03;\n  --rd-color-feedback-info-subtle: #172554;\n  --rd-color-overlay-backdrop: rgb(0 0 0 / 0.6);\n  --rd-color-text-default: #f7f7f8;\n  --rd-color-text-muted: #9696a3;\n  --rd-color-focus-ring: #a5a8ff;\n}\n\n"
         }
       ]
     },
@@ -3855,7 +4754,7 @@
         },
         {
           "path": "utils/icons.tsx",
-          "content": "export function CheckIcon() {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 16 16\" className=\"size-4 shrink-0 text-[var(--rd-color-action-primary)]\" fill=\"none\">\n      <path d=\"M3.5 8.5l3 3 6-7\" stroke=\"currentColor\" strokeWidth=\"2\" strokeLinecap=\"round\" strokeLinejoin=\"round\" />\n    </svg>\n  );\n}\n\nexport function ChevronDownIcon() {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 16 16\" className=\"size-4 shrink-0 text-[var(--rd-color-text-muted)]\" fill=\"none\">\n      <path d=\"M4 6l4 4 4-4\" stroke=\"currentColor\" strokeWidth=\"1.5\" strokeLinecap=\"round\" strokeLinejoin=\"round\" />\n    </svg>\n  );\n}\n\nexport function CloseIcon({ className = \"size-3\" }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 16 16\" className={className} fill=\"none\">\n      <path d=\"M4 4l8 8M12 4l-8 8\" stroke=\"currentColor\" strokeWidth=\"1.75\" strokeLinecap=\"round\" />\n    </svg>\n  );\n}\n\nexport function Spinner({ className = \"size-4\" }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 24 24\" className={`${className} animate-spin`} fill=\"none\">\n      <circle cx=\"12\" cy=\"12\" r=\"10\" stroke=\"currentColor\" strokeWidth=\"3\" opacity=\"0.25\" />\n      <path d=\"M22 12a10 10 0 0 0-10-10\" stroke=\"currentColor\" strokeWidth=\"3\" strokeLinecap=\"round\" />\n    </svg>\n  );\n}\n\nexport function CalendarIcon() {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 16 16\" className=\"size-4\" fill=\"none\">\n      <rect x=\"2.5\" y=\"3.5\" width=\"11\" height=\"10\" rx=\"1.5\" stroke=\"currentColor\" strokeWidth=\"1.3\" />\n      <path d=\"M2.5 6.5h11M5.5 2v3M10.5 2v3\" stroke=\"currentColor\" strokeWidth=\"1.3\" strokeLinecap=\"round\" />\n    </svg>\n  );\n}\n"
+          "content": "export function CheckIcon() {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 16 16\" className=\"size-4 shrink-0 text-[var(--rd-color-action-primary)]\" fill=\"none\">\n      <path d=\"M3.5 8.5l3 3 6-7\" stroke=\"currentColor\" strokeWidth=\"2\" strokeLinecap=\"round\" strokeLinejoin=\"round\" />\n    </svg>\n  );\n}\n\nexport function ChevronDownIcon() {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 16 16\" className=\"size-4 shrink-0 text-[var(--rd-color-text-muted)]\" fill=\"none\">\n      <path d=\"M4 6l4 4 4-4\" stroke=\"currentColor\" strokeWidth=\"1.5\" strokeLinecap=\"round\" strokeLinejoin=\"round\" />\n    </svg>\n  );\n}\n\nexport function CloseIcon({ className = \"size-3\" }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 16 16\" className={className} fill=\"none\">\n      <path d=\"M4 4l8 8M12 4l-8 8\" stroke=\"currentColor\" strokeWidth=\"1.75\" strokeLinecap=\"round\" />\n    </svg>\n  );\n}\n\nexport function Spinner({ className = \"size-4\" }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 24 24\" className={`${className} animate-spin`} fill=\"none\">\n      <circle cx=\"12\" cy=\"12\" r=\"10\" stroke=\"currentColor\" strokeWidth=\"3\" opacity=\"0.25\" />\n      <path d=\"M22 12a10 10 0 0 0-10-10\" stroke=\"currentColor\" strokeWidth=\"3\" strokeLinecap=\"round\" />\n    </svg>\n  );\n}\n\nexport function CalendarIcon() {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 16 16\" className=\"size-4\" fill=\"none\">\n      <rect x=\"2.5\" y=\"3.5\" width=\"11\" height=\"10\" rx=\"1.5\" stroke=\"currentColor\" strokeWidth=\"1.3\" />\n      <path d=\"M2.5 6.5h11M5.5 2v3M10.5 2v3\" stroke=\"currentColor\" strokeWidth=\"1.3\" strokeLinecap=\"round\" />\n    </svg>\n  );\n}\n\n// Status icons for Alert. Each tone has its own shape (circle with i, check,\n// triangle, octagon) so the tone never depends on color alone.\nconst statusIcon = \"size-5 shrink-0\";\n\nexport function InfoIcon({ className = statusIcon }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 20 20\" className={className} fill=\"none\">\n      <circle cx=\"10\" cy=\"10\" r=\"8\" stroke=\"currentColor\" strokeWidth=\"1.6\" />\n      <path d=\"M10 9v5M10 6.25v.01\" stroke=\"currentColor\" strokeWidth=\"1.8\" strokeLinecap=\"round\" />\n    </svg>\n  );\n}\n\nexport function SuccessIcon({ className = statusIcon }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 20 20\" className={className} fill=\"none\">\n      <circle cx=\"10\" cy=\"10\" r=\"8\" stroke=\"currentColor\" strokeWidth=\"1.6\" />\n      <path d=\"M6.5 10.25l2.5 2.5 4.5-5\" stroke=\"currentColor\" strokeWidth=\"1.8\" strokeLinecap=\"round\" strokeLinejoin=\"round\" />\n    </svg>\n  );\n}\n\nexport function WarningIcon({ className = statusIcon }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 20 20\" className={className} fill=\"none\">\n      <path d=\"M10 2.75l8 14H2l8-14z\" stroke=\"currentColor\" strokeWidth=\"1.6\" strokeLinejoin=\"round\" />\n      <path d=\"M10 8v4M10 14.25v.01\" stroke=\"currentColor\" strokeWidth=\"1.8\" strokeLinecap=\"round\" />\n    </svg>\n  );\n}\n\nexport function ErrorIcon({ className = statusIcon }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 20 20\" className={className} fill=\"none\">\n      <path d=\"M7 2.5h6l4.5 4.5v6L13 17.5H7L2.5 13V7L7 2.5z\" stroke=\"currentColor\" strokeWidth=\"1.6\" strokeLinejoin=\"round\" />\n      <path d=\"M7.5 7.5l5 5M12.5 7.5l-5 5\" stroke=\"currentColor\" strokeWidth=\"1.8\" strokeLinecap=\"round\" />\n    </svg>\n  );\n}\n"
         },
         {
           "path": "utils/use-media-query.ts",
