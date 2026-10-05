@@ -150,6 +150,133 @@
       ]
     },
     {
+      "id": "agent-activity",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "AgentActivity",
+        "version": "0.1.0",
+        "category": "ai",
+        "status": "experimental",
+        "description": "A short summary of what the assistant is doing or did, such as \"Used 3 tools\", that opens into each step. It stays open while a step needs approval.",
+        "props": {
+          "tools": {
+            "type": "custom",
+            "description": "The tool parts, in order.",
+            "required": true,
+            "tsType": "import(\"../utils/ai\").ToolPart[]"
+          },
+          "onApprove": {
+            "type": "callback",
+            "description": "Called with a tool's id when the person approves it.",
+            "tsType": "(toolId: string) => void"
+          },
+          "onDeny": {
+            "type": "callback",
+            "description": "Called with a tool's id when the person declines it.",
+            "tsType": "(toolId: string) => void"
+          },
+          "defaultOpen": {
+            "type": "boolean",
+            "description": "Show the steps at first.",
+            "default": false
+          },
+          "focusApproval": {
+            "type": "boolean",
+            "description": "Move focus to an approval box when one appears.",
+            "default": false
+          }
+        },
+        "states": [
+          "default"
+        ],
+        "slots": [
+          "root",
+          "summary",
+          "steps"
+        ],
+        "tokens": [
+          "color.text.default",
+          "color.text.muted",
+          "color.action.primary",
+          "color.surface.subtle",
+          "color.focus.ring",
+          "radius.control"
+        ],
+        "a11y": {
+          "role": "group",
+          "keyboard": [
+            "Enter / Space on the summary: shows or hides the steps"
+          ],
+          "requirements": [
+            "The summary is a button with aria-expanded that controls the list of steps",
+            "While any step is waiting for approval the list is forced open and the button is disabled: a question can't be hidden",
+            "Progress reads in words (\"Working: 1 of 3 steps done\"), failures and declines are counted",
+            "Each step is a ToolCall, so it announces its own changes"
+          ],
+          "screenReader": [
+            "\"Used 3 tools (1 failed), button, collapsed\"",
+            "While working: \"Working: 1 of 3 steps done, button, collapsed\""
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "Grouping the tool calls inside one reply"
+          ],
+          "avoid_when": [
+            "A single tool call: use ToolCall directly"
+          ],
+          "anti_patterns": [
+            "Collapsing the list while an approval is pending"
+          ]
+        },
+        "examples": [
+          "working",
+          "finished",
+          "needs-approval"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {}
+        }
+      },
+      "install": {
+        "command": "npx rdloom add agent-activity",
+        "dependencies": [
+          "react-aria-components@^1.21.1"
+        ],
+        "registryDependencies": [
+          "tokens",
+          "tool-call",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "working",
+          "code": "import { AgentActivity } from \"@rdloom/react\";\n\nexport default function AgentActivityWorkingExample() {\n  return (\n    <div className=\"w-[30rem] max-w-full\">\n      <AgentActivity\n        defaultOpen\n        tools={[\n          { type: \"tool\", id: \"1\", name: \"search\", title: \"Searching the knowledge base\", state: \"done\", startedAt: \"2026-03-01T10:00:00Z\", endedAt: \"2026-03-01T10:00:01.200Z\" },\n          { type: \"tool\", id: \"2\", name: \"read\", title: \"Reading 3 documents\", state: \"running\" },\n          { type: \"tool\", id: \"3\", name: \"write\", title: \"Writing the summary\", state: \"pending\" },\n        ]}\n      />\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "finished",
+          "code": "import { AgentActivity } from \"@rdloom/react\";\n\n// Collapsed once it is done: \"Used 3 tools (1 failed)\". Open it to see each step.\nexport default function AgentActivityFinishedExample() {\n  return (\n    <div className=\"w-[30rem] max-w-full\">\n      <AgentActivity\n        tools={[\n          { type: \"tool\", id: \"1\", name: \"search\", title: \"Searching the knowledge base\", state: \"done\", startedAt: \"2026-03-01T10:00:00Z\", endedAt: \"2026-03-01T10:00:01Z\" },\n          { type: \"tool\", id: \"2\", name: \"fetch\", title: \"Fetching the pricing page\", state: \"failed\", error: \"The page returned 404.\" },\n          { type: \"tool\", id: \"3\", name: \"calc\", title: \"Calculating totals\", state: \"done\", startedAt: \"2026-03-01T10:00:02Z\", endedAt: \"2026-03-01T10:00:02.100Z\" },\n        ]}\n      />\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "needs-approval",
+          "code": "import { useState } from \"react\";\nimport { AgentActivity, updateTool, type ChatMessage, type ToolPart } from \"@rdloom/react\";\n\n// While a step waits for an answer the list stays open: a question can't be hidden.\nexport default function AgentActivityNeedsApprovalExample() {\n  const [message, setMessage] = useState<ChatMessage>({\n    id: \"m\",\n    role: \"assistant\",\n    parts: [\n      { type: \"tool\", id: \"1\", name: \"lookup\", title: \"Finding overdue invoices\", state: \"done\" },\n      { type: \"tool\", id: \"2\", name: \"email\", title: \"Email the customers\", state: \"awaiting-approval\", approval: { summary: \"Send a reminder to 8 customers\", risk: \"medium\", reversible: false } },\n    ],\n  });\n  const tools = message.parts.filter((p): p is ToolPart => p.type === \"tool\");\n  return (\n    <div className=\"w-[30rem] max-w-full\">\n      <AgentActivity\n        tools={tools}\n        onApprove={(id) => setMessage((m) => updateTool(m, id, { state: \"approved\" }))}\n        onDeny={(id) => setMessage((m) => updateTool(m, id, { state: \"denied\" }))}\n      />\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "agent-activity/agent-activity.tsx",
+          "content": "\"use client\";\n\nimport { forwardRef, useEffect, useId, useState } from \"react\";\nimport { Button as AriaButton } from \"react-aria-components\";\nimport { agentActivityDefaults, type AgentActivitySpecProps } from \"../generated/agent-activity.types\";\nimport { ToolCall } from \"../tool-call/tool-call\";\nimport { isToolActive } from \"../utils/ai\";\nimport { cx } from \"../utils/cx\";\nimport { ChevronRightIcon, Spinner, SparkleIcon } from \"../utils/icons\";\n\nexport interface AgentActivityProps extends AgentActivitySpecProps {\n  className?: string;\n}\n\nconst plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;\n\n/**\n * What the assistant is doing or did, as a short summary that opens into each step. While work is\n * under way, or a step needs approval, the list stays open: an approval can't be left hidden.\n */\nexport const AgentActivity = forwardRef<HTMLDivElement, AgentActivityProps>(function AgentActivity(\n  { tools, onApprove, onDeny, defaultOpen = agentActivityDefaults.defaultOpen, focusApproval = agentActivityDefaults.focusApproval, className },\n  ref,\n) {\n  const [open, setOpen] = useState(defaultOpen);\n  const listId = useId();\n  const total = tools.length;\n  const finished = tools.filter((t) => !isToolActive(t.state)).length;\n  const failed = tools.filter((t) => t.state === \"failed\").length;\n  const declined = tools.filter((t) => t.state === \"denied\").length;\n  const needsAnswer = tools.some((t) => t.state === \"awaiting-approval\");\n  const working = finished < total;\n  const expanded = open || needsAnswer;\n  // Once a question has been shown, keep the list open after it is answered: the step the person\n  // just answered must still be there (focus returns to it). They can close it afterwards.\n  useEffect(() => {\n    if (needsAnswer) setOpen(true);\n  }, [needsAnswer]);\n\n  let summary: string;\n  if (needsAnswer) summary = \"Waiting for your approval\";\n  else if (working) summary = `Working: ${finished} of ${plural(total, \"step\", \"steps\")} done`;\n  else {\n    summary = `Used ${plural(total, \"tool\", \"tools\")}`;\n    const notes = [failed && `${failed} failed`, declined && `${declined} declined`].filter(Boolean);\n    if (notes.length) summary += ` (${notes.join(\", \")})`;\n  }\n\n  if (total === 0) return null;\n  return (\n    <div ref={ref} className={cx(\"flex flex-col gap-2\", className)}>\n      <AriaButton\n        aria-expanded={expanded}\n        aria-controls={listId}\n        // While an approval is waiting the list can't be closed, so the button says nothing it can't do.\n        isDisabled={needsAnswer}\n        onPress={() => setOpen((v) => !v)}\n        className=\"inline-flex w-fit items-center gap-2 rounded-[var(--rd-radius-control)] px-2 py-1 text-sm text-[var(--rd-color-text-muted)] outline-none data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)] data-[hovered]:bg-[var(--rd-color-surface-subtle)] data-[disabled]:cursor-default\"\n      >\n        {working && !needsAnswer ? <Spinner className=\"size-4 text-[var(--rd-color-action-primary)]\" /> : <SparkleIcon />}\n        <span>{summary}</span>\n        <ChevronRightIcon className={cx(\"size-4 transition-transform motion-reduce:transition-none\", expanded && \"rotate-90\")} />\n      </AriaButton>\n      {expanded && (\n        <ul id={listId} aria-label=\"Steps\" className=\"flex flex-col gap-1.5\">\n          {tools.map((tool) => (\n            <li key={tool.id}>\n              <ToolCall tool={tool} onApprove={onApprove} onDeny={onDeny} focusApproval={focusApproval} />\n            </li>\n          ))}\n        </ul>\n      )}\n    </div>\n  );\n});\n"
+        },
+        {
+          "path": "generated/agent-activity.types.ts",
+          "content": "// Generated by rdloom codegen from specs/agent-activity.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\n/** A short summary of what the assistant is doing or did, such as \"Used 3 tools\", that opens into each step. It stays open while a step needs approval. */\nexport interface AgentActivitySpecProps {\n  /**\n   * The tool parts, in order.\n   */\n  tools: import(\"../utils/ai\").ToolPart[];\n  /**\n   * Called with a tool's id when the person approves it.\n   */\n  onApprove?: (toolId: string) => void;\n  /**\n   * Called with a tool's id when the person declines it.\n   */\n  onDeny?: (toolId: string) => void;\n  /**\n   * Show the steps at first.\n   * @default false\n   */\n  defaultOpen?: boolean;\n  /**\n   * Move focus to an approval box when one appears.\n   * @default false\n   */\n  focusApproval?: boolean;\n}\n\nexport const agentActivityDefaults = {\n  defaultOpen: false,\n  focusApproval: false,\n} as const;\n\nexport const agentActivityMeta = {\n  \"name\": \"AgentActivity\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"group\"\n} as const;\n"
+        }
+      ]
+    },
+    {
       "id": "alert",
       "spec": {
         "$schema": "./schema/component.schema.json",
@@ -295,6 +422,170 @@
         {
           "path": "generated/alert.types.ts",
           "content": "// Generated by rdloom codegen from specs/alert.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nimport type { ReactNode } from \"react\";\n\nexport const alertVariantValues = [\"info\", \"success\", \"warning\", \"danger\"] as const;\n\n/** An inline message about the state of the page or a task: a tip, a success, a warning or an error. For brief confirmations that disappear, use Toast. */\nexport interface AlertSpecProps {\n  /**\n   * The message. Say what happened and what to do next.\n   */\n  children: ReactNode;\n  /**\n   * Optional bold first line, e.g. 'Payment failed'.\n   */\n  title?: string;\n  /**\n   * Tone and urgency. Warning and danger interrupt a screen reader; info and success wait their turn.\n   * @default \"info\"\n   */\n  variant?: \"info\" | \"success\" | \"warning\" | \"danger\";\n  /**\n   * When set, a close button appears and calls this. You remove the alert.\n   */\n  onDismiss?: () => void;\n  /**\n   * Accessible name of the close button.\n   * @default \"Dismiss\"\n   */\n  dismissLabel?: string;\n}\n\nexport const alertDefaults = {\n  variant: \"info\",\n  dismissLabel: \"Dismiss\",\n} as const;\n\nexport const alertMeta = {\n  \"name\": \"Alert\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"alert\"\n} as const;\n"
+        }
+      ]
+    },
+    {
+      "id": "approval-box",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "ApprovalBox",
+        "version": "0.1.0",
+        "category": "ai",
+        "status": "experimental",
+        "description": "Asks someone to approve or decline something the assistant wants to do. It says what will happen, how risky it is and whether it can be undone, in words as well as color.",
+        "props": {
+          "summary": {
+            "type": "string",
+            "description": "What is about to happen, in plain words, e.g. \"Delete 12 draft invoices\".",
+            "required": true
+          },
+          "risk": {
+            "type": "enum",
+            "description": "How much could go wrong. High risk uses the danger style and interrupts speech.",
+            "values": [
+              "low",
+              "medium",
+              "high"
+            ],
+            "default": "medium"
+          },
+          "reversible": {
+            "type": "boolean",
+            "description": "Whether the action can be undone. Unset says nothing about it."
+          },
+          "onApprove": {
+            "type": "callback",
+            "description": "Called when the person approves.",
+            "tsType": "() => void"
+          },
+          "onDeny": {
+            "type": "callback",
+            "description": "Called when the person declines.",
+            "tsType": "() => void"
+          },
+          "approveLabel": {
+            "type": "string",
+            "description": "Text of the approve button. Say the action: \"Delete invoices\" beats \"OK\".",
+            "default": "Approve"
+          },
+          "denyLabel": {
+            "type": "string",
+            "description": "Text of the decline button.",
+            "default": "Deny"
+          },
+          "isPending": {
+            "type": "boolean",
+            "description": "True while the approval is being processed: shows a spinner and blocks a second press.",
+            "default": false
+          },
+          "autoFocus": {
+            "type": "boolean",
+            "description": "Move focus to the box when it appears, so a keyboard user lands on the question.",
+            "default": false
+          },
+          "children": {
+            "type": "node",
+            "description": "Extra detail, e.g. the list of items affected."
+          }
+        },
+        "variants": [
+          "risk"
+        ],
+        "states": [
+          "default"
+        ],
+        "slots": [
+          "root",
+          "icon",
+          "summary",
+          "risk",
+          "details",
+          "actions"
+        ],
+        "tokens": [
+          "color.surface.subtle",
+          "color.border.strong",
+          "color.feedback.danger",
+          "color.feedback.danger-subtle",
+          "color.feedback.info",
+          "color.text.default",
+          "color.text.muted",
+          "color.focus.ring",
+          "radius.overlay"
+        ],
+        "a11y": {
+          "role": "group",
+          "keyboard": [
+            "Tab: moves between Deny and Approve",
+            "Enter / Space: presses the focused button"
+          ],
+          "requirements": [
+            "A named group: its name is the summary, so the question is read first",
+            "The box is announced when it appears (assertively for high risk, politely otherwise)",
+            "Focus goes to the box, not to a button, so a stray Enter can't approve something",
+            "Risk is shown as words (\"High risk\") and a different icon, not only by color",
+            "Deny comes first in the tab order; the approving button names the action",
+            "The caller is responsible for what happens to focus after an answer (ToolCall returns it to the tool)"
+          ],
+          "screenReader": [
+            "On appearing: \"Approval needed: Delete 12 draft invoices. High risk. This can't be undone.\"",
+            "Then a group named by the summary, with the buttons Deny and Approve"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "The assistant needs permission before something that changes data, spends money or contacts someone"
+          ],
+          "avoid_when": [
+            "Asking about something trivial and reversible: just do it and offer undo",
+            "Collecting several fields: use a Dialog with a form"
+          ],
+          "anti_patterns": [
+            "Approval buttons labelled just OK and Cancel",
+            "Taking focus onto the approve button",
+            "Showing risk only with a red color"
+          ]
+        },
+        "examples": [
+          "default",
+          "high-risk"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {
+            "risk": "Risk"
+          }
+        }
+      },
+      "install": {
+        "command": "npx rdloom add approval-box",
+        "dependencies": [],
+        "registryDependencies": [
+          "tokens",
+          "button",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "default",
+          "code": "import { useState } from \"react\";\nimport { ApprovalBox } from \"@rdloom/react\";\n\nexport default function ApprovalBoxExample() {\n  const [answer, setAnswer] = useState<string | null>(null);\n  return (\n    <div className=\"flex w-[30rem] max-w-full flex-col gap-3\">\n      {answer ? (\n        <p className=\"text-sm\">You chose: {answer}</p>\n      ) : (\n        <ApprovalBox\n          summary=\"Send this report to finance@example.com\"\n          risk=\"medium\"\n          reversible={false}\n          approveLabel=\"Send report\"\n          onApprove={() => setAnswer(\"send\")}\n          onDeny={() => setAnswer(\"don't send\")}\n        >\n          Q3 revenue summary, 2 pages.\n        </ApprovalBox>\n      )}\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "high-risk",
+          "code": "import { ApprovalBox } from \"@rdloom/react\";\n\n// High risk uses the danger style, says so in words, and is announced assertively.\nexport default function ApprovalBoxHighRiskExample() {\n  return (\n    <div className=\"w-[30rem] max-w-full\">\n      <ApprovalBox summary=\"Delete 12 draft invoices\" risk=\"high\" reversible={false} approveLabel=\"Delete invoices\" denyLabel=\"Keep them\">\n        <ul className=\"list-disc ps-5\">\n          <li>INV-1041 to INV-1052</li>\n          <li>Created between March 3 and March 19</li>\n        </ul>\n      </ApprovalBox>\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "approval-box/approval-box.tsx",
+          "content": "\"use client\";\n\nimport { forwardRef, useEffect, useId, useRef, useState } from \"react\";\nimport { approvalBoxDefaults, type ApprovalBoxSpecProps } from \"../generated/approval-box.types\";\nimport { Button } from \"../button/button\";\nimport { cx } from \"../utils/cx\";\nimport { InfoIcon, WarningIcon } from \"../utils/icons\";\n\nexport interface ApprovalBoxProps extends ApprovalBoxSpecProps {\n  className?: string;\n}\n\nconst riskWords = { low: \"Low risk\", medium: \"Medium risk\", high: \"High risk\" } as const;\n\n/**\n * Asks a person to approve or decline something the assistant wants to do. It says what will\n * happen in plain words, how risky it is (in words and a shape, not just color), and whether it\n * can be undone. When it appears it is announced; with `autoFocus` it also takes focus, on the\n * box itself so reading starts at the question and no button is pressed by a stray Enter.\n */\nexport const ApprovalBox = forwardRef<HTMLDivElement, ApprovalBoxProps>(function ApprovalBox(\n  {\n    summary,\n    risk = approvalBoxDefaults.risk,\n    reversible,\n    onApprove,\n    onDeny,\n    approveLabel = approvalBoxDefaults.approveLabel,\n    denyLabel = approvalBoxDefaults.denyLabel,\n    isPending = approvalBoxDefaults.isPending,\n    autoFocus = approvalBoxDefaults.autoFocus,\n    children,\n    className,\n  },\n  forwardedRef,\n) {\n  const titleId = useId();\n  const own = useRef<HTMLDivElement | null>(null);\n  const [announcement, setAnnouncement] = useState(\"\");\n  const high = risk === \"high\";\n\n  useEffect(() => {\n    // A live region only speaks changes, so fill it after it exists.\n    setAnnouncement(`Approval needed: ${summary}. ${riskWords[risk]}.${reversible === false ? \" This can't be undone.\" : \"\"}`);\n    if (autoFocus) own.current?.focus();\n    // Once, when the question appears. A new question is a new box.\n    // eslint-disable-next-line react-hooks/exhaustive-deps\n  }, []);\n\n  return (\n    <div\n      ref={(node) => {\n        own.current = node;\n        if (typeof forwardedRef === \"function\") forwardedRef(node);\n        else if (forwardedRef) forwardedRef.current = node;\n      }}\n      role=\"group\"\n      aria-labelledby={titleId}\n      tabIndex={-1}\n      data-risk={risk}\n      className={cx(\n        \"flex flex-col gap-3 rounded-[var(--rd-radius-overlay)] border p-4 outline-none focus-visible:ring-2 focus-visible:ring-[var(--rd-color-focus-ring)]\",\n        high\n          ? \"border-[var(--rd-color-feedback-danger)] bg-[var(--rd-color-feedback-danger-subtle)]\"\n          : \"border-[var(--rd-color-border-strong)] bg-[var(--rd-color-surface-subtle)]\",\n        className,\n      )}\n    >\n      <div className=\"flex items-start gap-3\">\n        {high ? <WarningIcon className=\"mt-0.5 size-5 shrink-0 text-[var(--rd-color-feedback-danger)]\" /> : <InfoIcon className=\"mt-0.5 size-5 shrink-0 text-[var(--rd-color-feedback-info)]\" />}\n        <div className=\"flex min-w-0 flex-col gap-1\">\n          <p id={titleId} className=\"text-sm font-semibold text-[var(--rd-color-text-default)]\">\n            {summary}\n          </p>\n          <p className=\"text-xs text-[var(--rd-color-text-muted)]\">\n            <span className=\"font-medium text-[var(--rd-color-text-default)]\">{riskWords[risk]}</span>\n            {reversible === true && \" · Can be undone\"}\n            {reversible === false && \" · Can't be undone\"}\n          </p>\n          {children && <div className=\"mt-1 text-sm text-[var(--rd-color-text-default)]\">{children}</div>}\n        </div>\n      </div>\n      <div className=\"flex flex-wrap justify-end gap-2\">\n        <Button variant=\"secondary\" size=\"sm\" onPress={onDeny} isDisabled={isPending}>\n          {denyLabel}\n        </Button>\n        <Button variant={high ? \"danger\" : \"primary\"} size=\"sm\" onPress={onApprove} isLoading={isPending}>\n          {approveLabel}\n        </Button>\n      </div>\n      {/* Spoken once when the box appears; assertive for high risk so it isn't queued behind other speech. */}\n      <span role={high ? \"alert\" : \"status\"} className=\"sr-only\">\n        {announcement}\n      </span>\n    </div>\n  );\n});\n"
+        },
+        {
+          "path": "generated/approval-box.types.ts",
+          "content": "// Generated by rdloom codegen from specs/approval-box.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nimport type { ReactNode } from \"react\";\n\nexport const approvalBoxRiskValues = [\"low\", \"medium\", \"high\"] as const;\n\n/** Asks someone to approve or decline something the assistant wants to do. It says what will happen, how risky it is and whether it can be undone, in words as well as color. */\nexport interface ApprovalBoxSpecProps {\n  /**\n   * What is about to happen, in plain words, e.g. \"Delete 12 draft invoices\".\n   */\n  summary: string;\n  /**\n   * How much could go wrong. High risk uses the danger style and interrupts speech.\n   * @default \"medium\"\n   */\n  risk?: \"low\" | \"medium\" | \"high\";\n  /**\n   * Whether the action can be undone. Unset says nothing about it.\n   */\n  reversible?: boolean;\n  /**\n   * Called when the person approves.\n   */\n  onApprove?: () => void;\n  /**\n   * Called when the person declines.\n   */\n  onDeny?: () => void;\n  /**\n   * Text of the approve button. Say the action: \"Delete invoices\" beats \"OK\".\n   * @default \"Approve\"\n   */\n  approveLabel?: string;\n  /**\n   * Text of the decline button.\n   * @default \"Deny\"\n   */\n  denyLabel?: string;\n  /**\n   * True while the approval is being processed: shows a spinner and blocks a second press.\n   * @default false\n   */\n  isPending?: boolean;\n  /**\n   * Move focus to the box when it appears, so a keyboard user lands on the question.\n   * @default false\n   */\n  autoFocus?: boolean;\n  /**\n   * Extra detail, e.g. the list of items affected.\n   */\n  children?: ReactNode;\n}\n\nexport const approvalBoxDefaults = {\n  risk: \"medium\",\n  approveLabel: \"Approve\",\n  denyLabel: \"Deny\",\n  isPending: false,\n  autoFocus: false,\n} as const;\n\nexport const approvalBoxMeta = {\n  \"name\": \"ApprovalBox\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"group\"\n} as const;\n"
         }
       ]
     },
@@ -1267,6 +1558,189 @@
       ]
     },
     {
+      "id": "chat",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "Chat",
+        "version": "0.1.0",
+        "category": "ai",
+        "status": "experimental",
+        "description": "A whole conversation with an assistant: the messages, a box to write in, and the stop and jump-to-latest controls. It shows what you give it and reports what the person does; it never calls a model.",
+        "props": {
+          "messages": {
+            "type": "custom",
+            "description": "The conversation so far.",
+            "required": true,
+            "tsType": "import(\"../utils/ai\").ChatMessage[]"
+          },
+          "onSend": {
+            "type": "callback",
+            "description": "Called with the text when the person sends a message or picks a suggestion.",
+            "required": true,
+            "tsType": "(text: string) => void"
+          },
+          "onStop": {
+            "type": "callback",
+            "description": "Called when the person presses Stop while a reply is on its way.",
+            "tsType": "() => void"
+          },
+          "onApprove": {
+            "type": "callback",
+            "description": "Called with a tool's id when the person approves it.",
+            "tsType": "(toolId: string) => void"
+          },
+          "onDeny": {
+            "type": "callback",
+            "description": "Called with a tool's id when the person declines it.",
+            "tsType": "(toolId: string) => void"
+          },
+          "onRetry": {
+            "type": "callback",
+            "description": "Shows Try again on the last message when it failed.",
+            "tsType": "() => void"
+          },
+          "status": {
+            "type": "enum",
+            "description": "Where the conversation is: ready for input, waiting for the first words, streaming, or failed.",
+            "values": [
+              "ready",
+              "submitted",
+              "streaming",
+              "error"
+            ],
+            "default": "ready"
+          },
+          "label": {
+            "type": "string",
+            "description": "Accessible name of the chat.",
+            "default": "Chat"
+          },
+          "placeholder": {
+            "type": "string",
+            "description": "Hint in the message box."
+          },
+          "suggestions": {
+            "type": "custom",
+            "description": "Prompts to offer when the chat is empty. Choosing one sends it.",
+            "tsType": "string[]"
+          },
+          "emptyState": {
+            "type": "node",
+            "description": "Replaces the default empty message."
+          },
+          "headingLevel": {
+            "type": "number",
+            "description": "Level of headings inside replies, 2 to 6."
+          }
+        },
+        "states": [
+          "default",
+          "loading"
+        ],
+        "slots": [
+          "root",
+          "log",
+          "message",
+          "empty",
+          "suggestions",
+          "jump",
+          "input",
+          "status"
+        ],
+        "tokens": [
+          "color.text.default",
+          "color.text.muted",
+          "color.surface.default",
+          "color.surface.raised",
+          "color.surface.subtle",
+          "color.border.default",
+          "color.border.strong",
+          "color.action.primary",
+          "color.focus.ring"
+        ],
+        "a11y": {
+          "role": "log",
+          "keyboard": [
+            "Tab: moves from the message list (focusable, so it can scroll with arrow keys) to the message box",
+            "Enter: sends; Shift+Enter: new line",
+            "Arrow keys / Page Up / Page Down: scroll the messages when the list has focus"
+          ],
+          "requirements": [
+            "The message list is a log that is NOT live: streamed text would be read token by token",
+            "One polite status line says \"Assistant is responding\" and \"Response complete\"; tools announce their own changes",
+            "The list follows new text only while the reader is at the bottom; scrolling up stops it and shows Jump to latest",
+            "Only the newest unanswered approval takes focus",
+            "The message list is keyboard-scrollable (focusable) and has a visible focus ring",
+            "Sending always returns the view to the latest message"
+          ],
+          "screenReader": [
+            "\"Chat, region\", then \"Chat messages, log\"",
+            "After sending: \"Assistant is responding\", later \"Response complete\"",
+            "A tool needing approval: \"Approval needed: <what>\""
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "An assistant, copilot or agent conversation",
+            "Support chat with an AI"
+          ],
+          "avoid_when": [
+            "Chat between people with presence and typing: build on Message and PromptInput"
+          ],
+          "anti_patterns": [
+            "Making the whole list aria-live",
+            "Auto-scrolling while someone is reading earlier messages"
+          ]
+        },
+        "examples": [
+          "basic",
+          "with-tools",
+          "suggestions"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {}
+        }
+      },
+      "install": {
+        "command": "npx rdloom add chat",
+        "dependencies": [
+          "react-aria-components@^1.21.1"
+        ],
+        "registryDependencies": [
+          "tokens",
+          "message",
+          "prompt-input",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import { useEffect, useRef, useState } from \"react\";\nimport { Chat, appendText, finishMessage, type ChatMessage } from \"@rdloom/react\";\n\nconst reply =\n  \"Happy to help. **Rdloom** components are spec-driven and accessible, so you copy the source into your project and own it.\\n\\nWant a tour of the data grid next?\";\n\ntype Status = \"ready\" | \"submitted\" | \"streaming\";\n\n// The chat only shows what you pass in. Here a timer plays the part of a model.\nexport default function ChatBasicExample() {\n  const [messages, setMessages] = useState<ChatMessage[]>([]);\n  const [status, setStatus] = useState<Status>(\"ready\");\n  const timer = useRef<ReturnType<typeof setInterval>>(undefined);\n  useEffect(() => () => clearInterval(timer.current), []);\n\n  const send = (text: string) => {\n    const id = Date.now();\n    setMessages((m) => [...m, { id: `u${id}`, role: \"user\", parts: [{ type: \"text\", text }] }]);\n    setStatus(\"submitted\");\n    let at = 0;\n    timer.current = setInterval(() => {\n      const chunk = reply.slice(at, at + 4);\n      at += 4;\n      setStatus(\"streaming\");\n      setMessages((m) => {\n        const last = m[m.length - 1];\n        const current: ChatMessage = last?.role === \"assistant\" ? last : { id: `a${id}`, role: \"assistant\", parts: [] };\n        const next = appendText(current, chunk);\n        return last?.role === \"assistant\" ? [...m.slice(0, -1), next] : [...m, next];\n      });\n      if (at >= reply.length) {\n        clearInterval(timer.current);\n        setMessages((m) => [...m.slice(0, -1), finishMessage(m[m.length - 1])]);\n        setStatus(\"ready\");\n      }\n    }, 60);\n  };\n\n  const stop = () => {\n    clearInterval(timer.current);\n    setMessages((m) => (m.length ? [...m.slice(0, -1), finishMessage(m[m.length - 1], \"stopped\")] : m));\n    setStatus(\"ready\");\n  };\n\n  return (\n    <div className=\"h-[28rem] w-[40rem] max-w-full overflow-hidden rounded-xl border border-[var(--rd-color-border-default)]\">\n      <Chat label=\"Assistant\" messages={messages} status={status} onSend={send} onStop={stop} />\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "with-tools",
+          "code": "import { useEffect, useRef, useState } from \"react\";\nimport { Chat, finishMessage, updateTool, type ChatMessage } from \"@rdloom/react\";\n\nconst now = () => new Date().toISOString();\n\n// A scripted run: a tool works, a second one asks for approval, and then a chart and a table arrive.\nexport default function ChatWithToolsExample() {\n  const [messages, setMessages] = useState<ChatMessage[]>([]);\n  const [status, setStatus] = useState<\"ready\" | \"submitted\" | \"streaming\">(\"ready\");\n  const timers = useRef<number[]>([]);\n  useEffect(() => () => timers.current.forEach(clearTimeout), []);\n\n  const later = (ms: number, run: () => void) => void timers.current.push(window.setTimeout(run, ms));\n  const patch = (change: (m: ChatMessage) => ChatMessage) => setMessages((list) => list.map((m, i) => (i === list.length - 1 ? change(m) : m)));\n\n  const send = (text: string) => {\n    setMessages((m) => [...m, { id: `u${m.length}`, role: \"user\", parts: [{ type: \"text\", text }] }]);\n    setStatus(\"submitted\");\n    later(500, () => {\n      setStatus(\"streaming\");\n      setMessages((m) => [\n        ...m,\n        { id: `a${m.length}`, role: \"assistant\", status: \"streaming\", parts: [{ type: \"tool\", id: \"q\", name: \"query_sales\", title: \"Searching your sales data\", state: \"running\", startedAt: now() }] },\n      ]);\n    });\n    later(1700, () => patch((m) => updateTool(m, \"q\", { state: \"done\", endedAt: now(), output: { weeks: 4 } })));\n    later(1800, () =>\n      patch((m) => ({\n        ...m,\n        parts: [\n          ...m.parts,\n          { type: \"tool\", id: \"s\", name: \"email_report\", title: \"Email the report to finance\", state: \"awaiting-approval\", approval: { summary: \"Email this report to finance@example.com\", risk: \"medium\", reversible: false } },\n        ],\n      })),\n    );\n  };\n\n  const finish = (sent: boolean) => {\n    later(700, () => {\n      patch((m) => (sent ? updateTool(m, \"s\", { state: \"done\" }) : m));\n      patch((m) =>\n        finishMessage({\n          ...m,\n          parts: [\n            ...m.parts,\n            { type: \"text\", text: sent ? \"Sent. Here is last month at a glance:\" : \"Okay, I won't send it. Here is last month at a glance:\" },\n            {\n              type: \"artifact\",\n              kind: \"chart\",\n              title: \"Revenue by week\",\n              summary: \"Revenue rose every week, from $9.2K to $15.8K.\",\n              data: { labels: [\"Wk 1\", \"Wk 2\", \"Wk 3\", \"Wk 4\"], series: [{ name: \"Revenue\", values: [9200, 11400, 13100, 15800] }], unit: \"$\" },\n            },\n          ],\n        }),\n      );\n      setStatus(\"ready\");\n    });\n  };\n\n  return (\n    <div className=\"h-[32rem] w-[44rem] max-w-full overflow-hidden rounded-xl border border-[var(--rd-color-border-default)]\">\n      <Chat\n        label=\"Assistant\"\n        messages={messages}\n        status={status}\n        suggestions={[\"Show me sales from last month\"]}\n        onSend={send}\n        onApprove={(id) => {\n          patch((m) => updateTool(m, id, { state: \"approved\" }));\n          finish(true);\n        }}\n        onDeny={(id) => {\n          patch((m) => updateTool(m, id, { state: \"denied\" }));\n          finish(false);\n        }}\n      />\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "suggestions",
+          "code": "import { useState } from \"react\";\nimport { Chat, type ChatMessage } from \"@rdloom/react\";\n\n// An empty chat can offer ways to start. Choosing one sends it like any message.\nexport default function ChatSuggestionsExample() {\n  const [messages, setMessages] = useState<ChatMessage[]>([]);\n  return (\n    <div className=\"h-[24rem] w-[40rem] max-w-full overflow-hidden rounded-xl border border-[var(--rd-color-border-default)]\">\n      <Chat\n        label=\"Assistant\"\n        messages={messages}\n        suggestions={[\"Summarise last month's sales\", \"Which customers are overdue?\", \"Draft a reminder email\"]}\n        onSend={(text) =>\n          setMessages((m) => [\n            ...m,\n            { id: `u${m.length}`, role: \"user\", parts: [{ type: \"text\", text }] },\n            { id: `a${m.length}`, role: \"assistant\", parts: [{ type: \"text\", text: \"This demo doesn't call a model: you decide what happens in onSend.\" }] },\n          ])\n        }\n      />\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "chat/chat.tsx",
+          "content": "\"use client\";\n\nimport { forwardRef, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from \"react\";\nimport { Button as AriaButton } from \"react-aria-components\";\nimport { chatDefaults, type ChatSpecProps } from \"../generated/chat.types\";\nimport { Message } from \"../message/message\";\nimport { PromptInput } from \"../prompt-input/prompt-input\";\nimport { pendingApproval } from \"../utils/ai\";\nimport { cx } from \"../utils/cx\";\nimport { ArrowDownIcon, SparkleIcon } from \"../utils/icons\";\n\nexport interface ChatProps extends ChatSpecProps {\n  className?: string;\n}\n\nconst NEAR_BOTTOM = 80;\nconst useIsoLayoutEffect = typeof window === \"undefined\" ? useEffect : useLayoutEffect;\n\n/**\n * A whole conversation: the messages, a box to write in, and the stop and scroll controls.\n * It shows what you give it and reports what the person does (onSend, onStop, onApprove,\n * onDeny); it never calls a model. Give it a height (it fills its parent) so the messages scroll\n * and the box stays put.\n *\n * For screen readers the message list is not a live region (streamed text would be read token by\n * token). Instead a single status line says when a reply starts and when it is done, and each\n * tool announces its own changes.\n */\nexport const Chat = forwardRef<HTMLDivElement, ChatProps>(function Chat(\n  { messages, onSend, onStop, onApprove, onDeny, onRetry, status = chatDefaults.status, label = chatDefaults.label, placeholder, suggestions, emptyState, headingLevel, className },\n  ref,\n) {\n  const scroller = useRef<HTMLDivElement>(null);\n  const inner = useRef<HTMLDivElement>(null);\n  const stuck = useRef(true);\n  const [away, setAway] = useState(false);\n  const busy = status === \"submitted\" || status === \"streaming\";\n\n  const toBottom = useCallback(() => {\n    const el = scroller.current;\n    if (el) el.scrollTop = el.scrollHeight;\n  }, []);\n\n  const onScroll = () => {\n    const el = scroller.current;\n    if (!el) return;\n    const near = el.scrollHeight - el.scrollTop - el.clientHeight < NEAR_BOTTOM;\n    stuck.current = near;\n    setAway(!near);\n  };\n\n  // Follow the reply as it grows, unless the person scrolled up to read something.\n  useIsoLayoutEffect(() => {\n    if (stuck.current) toBottom();\n  }, [messages, status, toBottom]);\n  useEffect(() => {\n    const el = inner.current;\n    if (!el || typeof ResizeObserver === \"undefined\") return;\n    const observer = new ResizeObserver(() => stuck.current && toBottom());\n    observer.observe(el);\n    return () => observer.disconnect();\n  }, [toBottom]);\n\n  // One polite line for a reply starting and finishing; nothing per token.\n  const [announcement, setAnnouncement] = useState(\"\");\n  const before = useRef(status);\n  useEffect(() => {\n    const was = before.current;\n    before.current = status;\n    if (was === status) return;\n    if (status === \"submitted\" || (status === \"streaming\" && was === \"ready\")) setAnnouncement(\"Assistant is responding\");\n    else if (status === \"ready\" && (was === \"streaming\" || was === \"submitted\")) setAnnouncement(\"Response complete\");\n    else if (status === \"error\") setAnnouncement(\"Something went wrong with the response\");\n  }, [status]);\n\n  // Only the newest question should pull focus; older, unanswered ones stay quiet.\n  const lastApproval = useMemo(() => {\n    for (let i = messages.length - 1; i >= 0; i--) if (pendingApproval(messages[i])) return messages[i].id;\n    return undefined;\n  }, [messages]);\n\n  const empty = messages.length === 0;\n  const lastIndex = messages.length - 1;\n\n  const send = (text: string) => {\n    stuck.current = true; // sending means \"I'm here\": show what comes back\n    onSend(text);\n  };\n\n  return (\n    <section ref={ref} aria-label={label} className={cx(\"flex h-full min-h-0 flex-col\", className)}>\n      <div className=\"relative min-h-0 flex-1\">\n        <div\n          ref={scroller}\n          role=\"log\"\n          // Not live: the status line below speaks for the whole reply.\n          aria-live=\"off\"\n          aria-label={`${label} messages`}\n          aria-busy={busy || undefined}\n          tabIndex={0}\n          onScroll={onScroll}\n          className=\"h-full overflow-y-auto overscroll-contain px-4 py-4 outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--rd-color-focus-ring)]\"\n        >\n          <div ref={inner} className=\"mx-auto flex w-full max-w-3xl flex-col gap-6\">\n            {empty ? (\n              <div className=\"flex flex-col items-center gap-4 py-12 text-center\">\n                {emptyState ?? (\n                  <>\n                    <span aria-hidden=\"true\" className=\"flex size-10 items-center justify-center rounded-full bg-[var(--rd-color-surface-subtle)] text-[var(--rd-color-action-primary)] ring-1 ring-[var(--rd-color-border-default)]\">\n                      <SparkleIcon className=\"size-5\" />\n                    </span>\n                    <p className=\"text-sm text-[var(--rd-color-text-muted)]\">Ask anything to get started.</p>\n                  </>\n                )}\n                {suggestions && suggestions.length > 0 && (\n                  <ul aria-label=\"Suggested prompts\" className=\"flex flex-wrap justify-center gap-2\">\n                    {suggestions.map((text) => (\n                      <li key={text}>\n                        <AriaButton\n                          onPress={() => send(text)}\n                          className=\"rounded-full border border-[var(--rd-color-border-strong)] bg-[var(--rd-color-surface-default)] px-3 py-1.5 text-sm text-[var(--rd-color-text-default)] outline-none data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)] data-[hovered]:bg-[var(--rd-color-surface-subtle)]\"\n                        >\n                          {text}\n                        </AriaButton>\n                      </li>\n                    ))}\n                  </ul>\n                )}\n              </div>\n            ) : (\n              messages.map((message, i) => (\n                <Message\n                  key={message.id}\n                  message={message}\n                  onApprove={onApprove}\n                  onDeny={onDeny}\n                  onRetry={i === lastIndex ? onRetry : undefined}\n                  focusApproval={message.id === lastApproval}\n                  headingLevel={headingLevel}\n                />\n              ))\n            )}\n            {/* The assistant has been asked but hasn't produced a message yet. */}\n            {status === \"submitted\" && messages[lastIndex]?.role === \"user\" && (\n              <Message message={{ id: \"pending\", role: \"assistant\", status: \"streaming\", parts: [] }} />\n            )}\n          </div>\n        </div>\n        {away && (\n          <AriaButton\n            onPress={() => {\n              stuck.current = true;\n              toBottom();\n              setAway(false);\n              scroller.current?.focus();\n            }}\n            className=\"absolute start-1/2 bottom-3 inline-flex -translate-x-1/2 items-center gap-1.5 rounded-full border border-[var(--rd-color-border-strong)] bg-[var(--rd-color-surface-raised)] px-3 py-1.5 text-xs font-medium text-[var(--rd-color-text-default)] shadow-md outline-none data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)]\"\n          >\n            <ArrowDownIcon />\n            Jump to latest\n          </AriaButton>\n        )}\n      </div>\n\n      <div className=\"mx-auto w-full max-w-3xl px-4 pt-2 pb-4\">\n        <PromptInput onSubmit={send} onStop={onStop} isStreaming={busy} placeholder={placeholder} />\n      </div>\n\n      <div role=\"status\" className=\"sr-only\">\n        {announcement}\n      </div>\n    </section>\n  );\n});\n\n"
+        },
+        {
+          "path": "generated/chat.types.ts",
+          "content": "// Generated by rdloom codegen from specs/chat.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nimport type { ReactNode } from \"react\";\n\nexport const chatStatusValues = [\"ready\", \"submitted\", \"streaming\", \"error\"] as const;\n\n/** A whole conversation with an assistant: the messages, a box to write in, and the stop and jump-to-latest controls. It shows what you give it and reports what the person does; it never calls a model. */\nexport interface ChatSpecProps {\n  /**\n   * The conversation so far.\n   */\n  messages: import(\"../utils/ai\").ChatMessage[];\n  /**\n   * Called with the text when the person sends a message or picks a suggestion.\n   */\n  onSend: (text: string) => void;\n  /**\n   * Called when the person presses Stop while a reply is on its way.\n   */\n  onStop?: () => void;\n  /**\n   * Called with a tool's id when the person approves it.\n   */\n  onApprove?: (toolId: string) => void;\n  /**\n   * Called with a tool's id when the person declines it.\n   */\n  onDeny?: (toolId: string) => void;\n  /**\n   * Shows Try again on the last message when it failed.\n   */\n  onRetry?: () => void;\n  /**\n   * Where the conversation is: ready for input, waiting for the first words, streaming, or failed.\n   * @default \"ready\"\n   */\n  status?: \"ready\" | \"submitted\" | \"streaming\" | \"error\";\n  /**\n   * Accessible name of the chat.\n   * @default \"Chat\"\n   */\n  label?: string;\n  /**\n   * Hint in the message box.\n   */\n  placeholder?: string;\n  /**\n   * Prompts to offer when the chat is empty. Choosing one sends it.\n   */\n  suggestions?: string[];\n  /**\n   * Replaces the default empty message.\n   */\n  emptyState?: ReactNode;\n  /**\n   * Level of headings inside replies, 2 to 6.\n   */\n  headingLevel?: number;\n}\n\nexport const chatDefaults = {\n  status: \"ready\",\n  label: \"Chat\",\n} as const;\n\nexport const chatMeta = {\n  \"name\": \"Chat\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"log\"\n} as const;\n"
+        }
+      ]
+    },
+    {
       "id": "checkbox",
       "spec": {
         "$schema": "./schema/component.schema.json",
@@ -1422,6 +1896,105 @@
         {
           "path": "generated/checkbox.types.ts",
           "content": "// Generated by rdloom codegen from specs/checkbox.spec.json (v0.1.1).\n// Do not edit. Change the spec and run `npm run gen`.\n\nimport type { ReactNode } from \"react\";\n\n/** Lets the user turn a single option on or off, with an optional indeterminate state. */\nexport interface CheckboxSpecProps {\n  /**\n   * Visible label.\n   */\n  children: ReactNode;\n  /**\n   * Controlled checked state.\n   */\n  isSelected?: boolean;\n  /**\n   * Initial checked state when uncontrolled.\n   * @default false\n   */\n  defaultSelected?: boolean;\n  /**\n   * Shows a dash for a partially selected group, e.g. 'select all'.\n   * @default false\n   */\n  isIndeterminate?: boolean;\n  /**\n   * Prevents interaction and dims the checkbox.\n   * @default false\n   */\n  isDisabled?: boolean;\n  /**\n   * Marks the checkbox as invalid, e.g. an unaccepted required agreement.\n   * @default false\n   */\n  isInvalid?: boolean;\n  /**\n   * Called with the new checked state.\n   */\n  onChange?: (isSelected: boolean) => void;\n}\n\nexport const checkboxDefaults = {\n  defaultSelected: false,\n  isIndeterminate: false,\n  isDisabled: false,\n  isInvalid: false,\n} as const;\n\nexport const checkboxMeta = {\n  \"name\": \"Checkbox\",\n  \"version\": \"0.1.1\",\n  \"status\": \"experimental\",\n  \"role\": \"checkbox\"\n} as const;\n"
+        }
+      ]
+    },
+    {
+      "id": "citation",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "Citation",
+        "version": "0.1.0",
+        "category": "ai",
+        "status": "experimental",
+        "description": "A small numbered marker, like [1], inside a reply that jumps to the source it refers to.",
+        "props": {
+          "index": {
+            "type": "number",
+            "description": "The number shown, starting at 1.",
+            "required": true
+          },
+          "source": {
+            "type": "custom",
+            "description": "The source this marker points to.",
+            "required": true,
+            "tsType": "import(\"../utils/ai\").CitationPart"
+          },
+          "href": {
+            "type": "string",
+            "description": "Where the marker goes. Defaults to the matching entry in a Sources list on the same page."
+          }
+        },
+        "states": [
+          "default"
+        ],
+        "slots": [
+          "marker"
+        ],
+        "tokens": [
+          "color.surface.subtle",
+          "color.surface.selected",
+          "color.border.strong",
+          "color.text.default",
+          "color.focus.ring"
+        ],
+        "a11y": {
+          "role": "link",
+          "keyboard": [
+            "Enter: follows the link; with the default target, moves focus to the source entry"
+          ],
+          "requirements": [
+            "A real link, not a button: it goes somewhere",
+            "Its name says what it is (\"Source 2: Title\"), never just \"2\"",
+            "Focus moves to the source entry when it is on the same page, so Tab continues from there"
+          ],
+          "screenReader": [
+            "Announced as a link named \"Source 2: <title>\""
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "Marking which statement came from which source"
+          ],
+          "avoid_when": [
+            "Footnotes that aren't sources: use plain footnotes"
+          ],
+          "anti_patterns": [
+            "Using only a number as the link name",
+            "Citations with no list of sources to jump to"
+          ]
+        },
+        "examples": [
+          "inline"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {}
+        }
+      },
+      "install": {
+        "command": "npx rdloom add citation",
+        "dependencies": [],
+        "registryDependencies": [
+          "tokens",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "inline",
+          "code": "import { Citation, Sources, type CitationPart } from \"@rdloom/react\";\n\nconst sources: CitationPart[] = [\n  { type: \"citation\", id: \"a\", title: \"Accessibility guidelines\", url: \"https://example.com/wcag\" },\n  { type: \"citation\", id: \"b\", title: \"Keyboard patterns\", url: \"https://example.com/patterns\" },\n];\n\nexport default function CitationInlineExample() {\n  return (\n    <div className=\"flex w-[30rem] max-w-full flex-col gap-4\">\n      <p className=\"text-sm leading-relaxed\">\n        Every control must work with a keyboard\n        <Citation index={1} source={sources[0]} />\n        and show where focus is\n        <Citation index={2} source={sources[1]} />.\n      </p>\n      <Sources sources={sources} />\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "citation/citation.tsx",
+          "content": "\"use client\";\n\nimport type { MouseEvent } from \"react\";\nimport type { CitationSpecProps } from \"../generated/citation.types\";\nimport { cx } from \"../utils/cx\";\n\nexport interface CitationProps extends CitationSpecProps {\n  className?: string;\n}\n\n/** The id of the Sources entry for a citation: what the marker jumps to. */\nexport const sourceElementId = (id: string) => `source-${id}`;\n\n/** A small numbered marker, like [1], that jumps to its source in the Sources list. */\nexport function Citation({ index, source, href, className }: CitationProps) {\n  const target = href ?? `#${sourceElementId(source.id)}`;\n  const jump = (event: MouseEvent<HTMLAnchorElement>) => {\n    if (href || !target.startsWith(\"#\")) return;\n    // A hash link scrolls but doesn't always move keyboard focus: do it, so Tab continues from the source.\n    const el = document.getElementById(target.slice(1));\n    if (!el) return;\n    event.preventDefault();\n    el.focus(); // focusing scrolls it into view\n  };\n  return (\n    <sup className={cx(\"mx-0.5 align-baseline\", className)}>\n      <a\n        href={target}\n        onClick={jump}\n        aria-label={`Source ${index}: ${source.title}`}\n        className={cx(\n          \"inline-flex min-w-5 items-center justify-center rounded-full border border-[var(--rd-color-border-strong)] bg-[var(--rd-color-surface-subtle)] px-1 text-[0.7rem] font-medium leading-5 no-underline tabular-nums\",\n          \"text-[var(--rd-color-text-default)] outline-none hover:bg-[var(--rd-color-surface-selected)] focus-visible:ring-2 focus-visible:ring-[var(--rd-color-focus-ring)]\",\n        )}\n      >\n        {index}\n      </a>\n    </sup>\n  );\n}\n"
+        },
+        {
+          "path": "generated/citation.types.ts",
+          "content": "// Generated by rdloom codegen from specs/citation.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\n/** A small numbered marker, like [1], inside a reply that jumps to the source it refers to. */\nexport interface CitationSpecProps {\n  /**\n   * The number shown, starting at 1.\n   */\n  index: number;\n  /**\n   * The source this marker points to.\n   */\n  source: import(\"../utils/ai\").CitationPart;\n  /**\n   * Where the marker goes. Defaults to the matching entry in a Sources list on the same page.\n   */\n  href?: string;\n}\n\nexport const citationDefaults = {\n} as const;\n\nexport const citationMeta = {\n  \"name\": \"Citation\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"link\"\n} as const;\n"
         }
       ]
     },
@@ -3217,6 +3790,289 @@
       ]
     },
     {
+      "id": "generated-chart",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "GeneratedChart",
+        "version": "0.1.0",
+        "category": "ai",
+        "status": "experimental",
+        "description": "A bar or line chart an assistant produced, drawn without a chart library, always with a written summary and a View as table switch that shows the same numbers as a table.",
+        "props": {
+          "data": {
+            "type": "custom",
+            "description": "The labels along the bottom and one or more named series of values.",
+            "required": true,
+            "tsType": "import(\"../utils/ai\").ChartData"
+          },
+          "title": {
+            "type": "string",
+            "description": "What the chart shows.",
+            "required": true
+          },
+          "summary": {
+            "type": "string",
+            "description": "A sentence that tells the story of the chart. Defaults to the highest and lowest values of the first series."
+          },
+          "type": {
+            "type": "enum",
+            "description": "Bars or lines.",
+            "values": [
+              "bar",
+              "line"
+            ],
+            "default": "bar"
+          }
+        },
+        "variants": [
+          "type"
+        ],
+        "states": [
+          "default"
+        ],
+        "slots": [
+          "root",
+          "title",
+          "summary",
+          "plot",
+          "axis",
+          "legend",
+          "table"
+        ],
+        "tokens": [
+          "color.text.default",
+          "color.text.muted",
+          "color.action.primary",
+          "color.feedback.info",
+          "color.feedback.success",
+          "color.feedback.warning",
+          "color.border.default",
+          "color.surface.default",
+          "color.focus.ring",
+          "radius.control"
+        ],
+        "a11y": {
+          "role": "figure",
+          "keyboard": [
+            "Tab: moves to the View as table button",
+            "Arrow keys: move through the data table once it is shown"
+          ],
+          "requirements": [
+            "The drawing is decoration; the title, the written summary and the data table carry the meaning",
+            "View as table swaps in the same data as an accessible table (aria-pressed on the switch)",
+            "Series differ by marker shape or label as well as color, and a legend names them",
+            "Values are labelled directly when there are few bars",
+            "Empty data shows a message instead of an empty frame"
+          ],
+          "screenReader": [
+            "Announced as a figure named by the title, then the summary text",
+            "\"View as table, toggle button, not pressed\"",
+            "The table reads every value under its row and column headers"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "Showing trends or comparisons an assistant calculated"
+          ],
+          "avoid_when": [
+            "Dashboards with many linked charts: use a charting library",
+            "Exact numbers matter most: show a GeneratedTable"
+          ],
+          "anti_patterns": [
+            "A chart with no summary",
+            "Telling series apart by color only"
+          ]
+        },
+        "examples": [
+          "bar",
+          "line",
+          "multi-series"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {
+            "type": "Type"
+          }
+        }
+      },
+      "install": {
+        "command": "npx rdloom add generated-chart",
+        "dependencies": [],
+        "registryDependencies": [
+          "tokens",
+          "button",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "bar",
+          "code": "import { GeneratedChart } from \"@rdloom/react\";\n\nexport default function GeneratedChartBarExample() {\n  return (\n    <div className=\"w-[36rem] max-w-full\">\n      <GeneratedChart\n        title=\"Revenue by month\"\n        summary=\"Revenue grew every month except April, reaching $48K in June.\"\n        data={{\n          labels: [\"Jan\", \"Feb\", \"Mar\", \"Apr\", \"May\", \"Jun\"],\n          series: [{ name: \"Revenue\", values: [21000, 26500, 31000, 29000, 41000, 48000] }],\n          unit: \"$\",\n        }}\n      />\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "line",
+          "code": "import { GeneratedChart } from \"@rdloom/react\";\n\nexport default function GeneratedChartLineExample() {\n  return (\n    <div className=\"w-[36rem] max-w-full\">\n      <GeneratedChart\n        type=\"line\"\n        title=\"Daily active users\"\n        data={{\n          labels: [\"Mon\", \"Tue\", \"Wed\", \"Thu\", \"Fri\", \"Sat\", \"Sun\"],\n          series: [{ name: \"Users\", values: [820, 940, 910, 1180, 1320, 640, 590] }],\n        }}\n      />\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "multi-series",
+          "code": "import { GeneratedChart } from \"@rdloom/react\";\n\n// Series differ by marker shape as well as color, and a legend names them.\nexport default function GeneratedChartMultiSeriesExample() {\n  return (\n    <div className=\"w-[36rem] max-w-full\">\n      <GeneratedChart\n        type=\"line\"\n        title=\"Sign-ups by plan\"\n        data={{\n          labels: [\"Q1\", \"Q2\", \"Q3\", \"Q4\"],\n          series: [\n            { name: \"Free\", values: [400, 520, 610, 700] },\n            { name: \"Pro\", values: [120, 190, 260, 380] },\n            { name: \"Team\", values: [30, 45, 80, 140] },\n          ],\n        }}\n      />\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "generated-chart/generated-chart.tsx",
+          "content": "\"use client\";\n\nimport { forwardRef, useId, useMemo, useState } from \"react\";\nimport { Button } from \"../button/button\";\nimport { generatedChartDefaults, type GeneratedChartSpecProps } from \"../generated/generated-chart.types\";\nimport type { ChartData } from \"../utils/ai\";\nimport { cx } from \"../utils/cx\";\n\nexport interface GeneratedChartProps extends GeneratedChartSpecProps {\n  className?: string;\n}\n\n// One drawing, one data table. The chart is for people who can see it; the table is the same data\n// for everyone else and for anyone who wants exact numbers. Series differ by shape as well as color.\nconst SERIES_COLORS = [\n  \"var(--rd-color-action-primary)\",\n  \"var(--rd-color-feedback-info)\",\n  \"var(--rd-color-feedback-success)\",\n  \"var(--rd-color-feedback-warning)\",\n  \"var(--rd-color-neutral-500)\",\n];\nconst WIDTH = 640;\nconst HEIGHT = 300;\nconst PAD = { top: 16, right: 16, bottom: 36, left: 56 };\n\n/** A round maximum and evenly spaced ticks, so the axis reads 0, 50, 100 and not 0, 37, 74. */\nexport function niceScale(max: number, wanted = 4): { max: number; ticks: number[] } {\n  if (!Number.isFinite(max) || max <= 0) return { max: 1, ticks: [0, 1] };\n  const rough = max / wanted;\n  const magnitude = 10 ** Math.floor(Math.log10(rough));\n  const step = [1, 2, 2.5, 5, 10].map((m) => m * magnitude).find((s) => s >= rough) ?? 10 * magnitude;\n  const top = Math.ceil(max / step) * step;\n  const ticks: number[] = [];\n  for (let v = 0; v <= top + step / 2; v += step) ticks.push(Number(v.toFixed(10)));\n  return { max: top, ticks };\n}\n\n/** 12400 -> \"12.4K\" for the axis; exact values stay in the table. */\nconst compact = (value: number) => new Intl.NumberFormat(undefined, { notation: \"compact\", maximumFractionDigits: 1 }).format(value);\n\nfunction withUnit(text: string, unit?: string) {\n  if (!unit) return text;\n  return /^[$€£¥₹]$/.test(unit) ? `${unit}${text}` : `${text}${/^[%‰]$/.test(unit) ? \"\" : \" \"}${unit}`;\n}\n\nfunction Marker({ shape, x, y, color, size = 4.5 }: { shape: number; x: number; y: number; color: string; size?: number }) {\n  const common = { fill: color, stroke: \"var(--rd-color-surface-default)\", strokeWidth: 1.5 };\n  switch (shape % 3) {\n    case 0:\n      return <circle cx={x} cy={y} r={size} {...common} />;\n    case 1:\n      return <rect x={x - size} y={y - size} width={size * 2} height={size * 2} {...common} />;\n    default:\n      return <path d={`M${x} ${y - size - 1}L${x + size + 1} ${y + size}L${x - size - 1} ${y + size}Z`} {...common} />;\n  }\n}\n\n/** A short sentence for the summary when the sender didn't write one. */\nfunction describe(data: ChartData, type: \"bar\" | \"line\"): string {\n  const { labels, series, unit } = data;\n  if (labels.length === 0 || series.length === 0) return \"No data\";\n  const first = series[0];\n  const values = first.values;\n  const high = Math.max(...values);\n  const low = Math.min(...values);\n  const at = (v: number) => labels[values.indexOf(v)];\n  const lead = `${type === \"bar\" ? \"Bar\" : \"Line\"} chart of ${series.map((s) => s.name).join(\", \")} across ${labels.length} points.`;\n  return `${lead} ${first.name} is highest at ${withUnit(high.toLocaleString(), unit)} (${at(high)}) and lowest at ${withUnit(low.toLocaleString(), unit)} (${at(low)}).`;\n}\n\n/**\n * A chart an assistant produced. It draws bars or lines in plain SVG with no chart library, always\n * shows a written summary, and has a \"View as table\" switch that swaps the drawing for the same data.\n */\nexport const GeneratedChart = forwardRef<HTMLElement, GeneratedChartProps>(function GeneratedChart(\n  { data, title, summary, type = generatedChartDefaults.type, className },\n  ref,\n) {\n  const [asTable, setAsTable] = useState(false);\n  const titleId = useId();\n  const tableId = useId();\n  const { labels, series, unit } = data;\n\n  const all = series.flatMap((s) => s.values);\n  const { max, ticks } = useMemo(() => niceScale(Math.max(0, ...all)), [all.join(\",\")]);\n  const plotW = WIDTH - PAD.left - PAD.right;\n  const plotH = HEIGHT - PAD.top - PAD.bottom;\n  const y = (v: number) => PAD.top + plotH - (v / max) * plotH;\n  const band = labels.length > 0 ? plotW / labels.length : plotW;\n  const x = (i: number) => PAD.left + band * i + band / 2;\n  const groupW = Math.min(band * 0.7, 56 * series.length);\n  const barW = series.length > 0 ? groupW / series.length : groupW;\n  const direct = labels.length * series.length <= 12; // few enough bars to label each one\n  const text = summary ?? describe(data, type);\n  const empty = labels.length === 0 || series.length === 0;\n\n  return (\n    <figure ref={ref} aria-labelledby={titleId} className={cx(\"flex flex-col gap-2\", className)}>\n      <figcaption className=\"flex flex-wrap items-start justify-between gap-2\">\n        <div className=\"flex min-w-0 flex-col gap-0.5\">\n          <span id={titleId} className=\"text-sm font-semibold text-[var(--rd-color-text-default)]\">\n            {title}\n          </span>\n          <span className=\"max-w-prose text-xs text-[var(--rd-color-text-muted)]\">{text}</span>\n        </div>\n        {!empty && (\n          <Button variant=\"secondary\" size=\"sm\" aria-pressed={asTable} aria-controls={tableId} onPress={() => setAsTable((v) => !v)}>\n            {asTable ? \"View as chart\" : \"View as table\"}\n          </Button>\n        )}\n      </figcaption>\n\n      {empty ? (\n        <p className=\"rounded-[var(--rd-radius-control)] border border-dashed border-[var(--rd-color-border-strong)] p-6 text-center text-sm text-[var(--rd-color-text-muted)]\">No data to chart.</p>\n      ) : (\n        <div id={tableId}>\n          {asTable ? (\n            <div className=\"overflow-x-auto rounded-[var(--rd-radius-control)] border border-[var(--rd-color-border-default)]\" tabIndex={0} role=\"region\" aria-label={`${title}, data table`}>\n              <table className=\"w-full border-collapse text-sm\">\n                <caption className=\"sr-only\">{title}</caption>\n                <thead>\n                  <tr>\n                    <th scope=\"col\" className=\"border-b border-[var(--rd-color-border-strong)] px-3 py-2 text-start font-medium text-[var(--rd-color-text-muted)]\">\n                      <span className=\"sr-only\">Category</span>\n                    </th>\n                    {series.map((s) => (\n                      <th key={s.name} scope=\"col\" className=\"border-b border-[var(--rd-color-border-strong)] px-3 py-2 text-end font-medium text-[var(--rd-color-text-muted)]\">\n                        {s.name}\n                      </th>\n                    ))}\n                  </tr>\n                </thead>\n                <tbody>\n                  {labels.map((label, i) => (\n                    <tr key={`${label}-${i}`}>\n                      <th scope=\"row\" className=\"border-b border-[var(--rd-color-border-default)] px-3 py-2 text-start font-medium\">\n                        {label}\n                      </th>\n                      {series.map((s) => (\n                        <td key={s.name} className=\"border-b border-[var(--rd-color-border-default)] px-3 py-2 text-end tabular-nums\">\n                          {s.values[i] === undefined ? \"\" : withUnit(s.values[i].toLocaleString(), unit)}\n                        </td>\n                      ))}\n                    </tr>\n                  ))}\n                </tbody>\n              </table>\n            </div>\n          ) : (\n            <>\n              {/* The drawing is decoration for the data above and below it; the summary and table carry the meaning. */}\n              <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} aria-hidden=\"true\" focusable=\"false\" className=\"h-auto w-full text-[var(--rd-color-text-muted)]\">\n                {ticks.map((tick) => (\n                  <g key={tick}>\n                    <line x1={PAD.left} x2={WIDTH - PAD.right} y1={y(tick)} y2={y(tick)} stroke=\"var(--rd-color-border-default)\" strokeWidth={tick === 0 ? 1.5 : 1} />\n                    <text x={PAD.left - 8} y={y(tick)} textAnchor=\"end\" dominantBaseline=\"middle\" fontSize=\"11\" fill=\"currentColor\">\n                      {withUnit(compact(tick), unit)}\n                    </text>\n                  </g>\n                ))}\n                {labels.map((label, i) => (\n                  <text key={`${label}-${i}`} x={x(i)} y={HEIGHT - PAD.bottom + 18} textAnchor=\"middle\" fontSize=\"11\" fill=\"currentColor\">\n                    {label.length > 12 && labels.length > 6 ? `${label.slice(0, 11)}…` : label}\n                  </text>\n                ))}\n\n                {type === \"bar\" &&\n                  series.map((s, si) =>\n                    s.values.map((value, i) => {\n                      const left = x(i) - groupW / 2 + si * barW;\n                      const top = y(Math.max(0, value));\n                      return (\n                        <g key={`${s.name}-${i}`}>\n                          <rect x={left + 1} y={top} width={Math.max(1, barW - 2)} height={Math.max(0, y(0) - top)} rx=\"2\" fill={SERIES_COLORS[si % SERIES_COLORS.length]} />\n                          {direct && (\n                            <text x={left + barW / 2} y={top - 5} textAnchor=\"middle\" fontSize=\"11\" fill=\"var(--rd-color-text-default)\">\n                              {withUnit(compact(value), unit)}\n                            </text>\n                          )}\n                        </g>\n                      );\n                    }),\n                  )}\n\n                {type === \"line\" &&\n                  series.map((s, si) => {\n                    const color = SERIES_COLORS[si % SERIES_COLORS.length];\n                    const points = s.values.map((v, i) => [x(i), y(v)] as const);\n                    return (\n                      <g key={s.name}>\n                        <polyline points={points.map((p) => p.join(\",\")).join(\" \")} fill=\"none\" stroke={color} strokeWidth=\"2.25\" strokeLinejoin=\"round\" strokeLinecap=\"round\" />\n                        {points.map(([px, py], i) => (\n                          <Marker key={i} shape={si} x={px} y={py} color={color} />\n                        ))}\n                      </g>\n                    );\n                  })}\n              </svg>\n              {series.length > 1 && (\n                <ul aria-label=\"Legend\" className=\"flex flex-wrap gap-x-4 gap-y-1 text-xs text-[var(--rd-color-text-default)]\">\n                  {series.map((s, si) => (\n                    <li key={s.name} className=\"inline-flex items-center gap-1.5\">\n                      <svg aria-hidden=\"true\" viewBox=\"0 0 14 14\" className=\"size-3.5\" focusable=\"false\">\n                        {type === \"bar\" ? (\n                          <rect x=\"1\" y=\"1\" width=\"12\" height=\"12\" rx=\"2\" fill={SERIES_COLORS[si % SERIES_COLORS.length]} />\n                        ) : (\n                          <Marker shape={si} x={7} y={7} color={SERIES_COLORS[si % SERIES_COLORS.length]} size={4.5} />\n                        )}\n                      </svg>\n                      {s.name}\n                    </li>\n                  ))}\n                </ul>\n              )}\n            </>\n          )}\n        </div>\n      )}\n    </figure>\n  );\n});\n"
+        },
+        {
+          "path": "generated/generated-chart.types.ts",
+          "content": "// Generated by rdloom codegen from specs/generated-chart.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nexport const generatedChartTypeValues = [\"bar\", \"line\"] as const;\n\n/** A bar or line chart an assistant produced, drawn without a chart library, always with a written summary and a View as table switch that shows the same numbers as a table. */\nexport interface GeneratedChartSpecProps {\n  /**\n   * The labels along the bottom and one or more named series of values.\n   */\n  data: import(\"../utils/ai\").ChartData;\n  /**\n   * What the chart shows.\n   */\n  title: string;\n  /**\n   * A sentence that tells the story of the chart. Defaults to the highest and lowest values of the first series.\n   */\n  summary?: string;\n  /**\n   * Bars or lines.\n   * @default \"bar\"\n   */\n  type?: \"bar\" | \"line\";\n}\n\nexport const generatedChartDefaults = {\n  type: \"bar\",\n} as const;\n\nexport const generatedChartMeta = {\n  \"name\": \"GeneratedChart\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"figure\"\n} as const;\n"
+        }
+      ]
+    },
+    {
+      "id": "generated-table",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "GeneratedTable",
+        "version": "0.1.0",
+        "category": "ai",
+        "status": "experimental",
+        "description": "A table an assistant produced, shown as a real sortable table with a title and summary, numbers aligned, long results cut to a few rows, and a CSV download.",
+        "props": {
+          "data": {
+            "type": "custom",
+            "description": "The columns and rows.",
+            "required": true,
+            "tsType": "import(\"../utils/ai\").TableData"
+          },
+          "title": {
+            "type": "string",
+            "description": "What the table shows. It is also the table's accessible name.",
+            "required": true
+          },
+          "summary": {
+            "type": "string",
+            "description": "One line under the title. Defaults to the row and column count."
+          },
+          "maxRows": {
+            "type": "number",
+            "description": "Rows shown before a Show all button. 0 shows every row.",
+            "default": 10
+          },
+          "isSortable": {
+            "type": "boolean",
+            "description": "Let people sort by a column. Numbers sort by value, text in natural order.",
+            "default": true
+          },
+          "fileName": {
+            "type": "string",
+            "description": "Name of the downloaded file.",
+            "default": "table.csv"
+          },
+          "onExport": {
+            "type": "callback",
+            "description": "Replaces the built-in CSV download, e.g. to save on the server.",
+            "tsType": "(data: import(\"../utils/ai\").TableData) => void"
+          }
+        },
+        "states": [
+          "default"
+        ],
+        "slots": [
+          "root",
+          "title",
+          "summary",
+          "table",
+          "header",
+          "row",
+          "cell",
+          "export",
+          "more"
+        ],
+        "tokens": [
+          "color.text.default",
+          "color.text.muted",
+          "color.surface.default",
+          "color.border.default",
+          "color.focus.ring"
+        ],
+        "a11y": {
+          "role": "grid",
+          "keyboard": [
+            "Arrow keys: move between cells",
+            "Enter / Space on a column header: sorts",
+            "Tab: moves to the Download and Show all buttons"
+          ],
+          "requirements": [
+            "A real table with a named header row and the first column as row header",
+            "Sort direction is exposed (aria-sort) and drawn with an arrow",
+            "Number columns are right-aligned and use tabular figures",
+            "The summary says how many rows are shown when the list is cut",
+            "CSV export prefixes cells starting with = + - or @ so a spreadsheet can't run them as formulas, and says when a file was downloaded"
+          ],
+          "screenReader": [
+            "Announced as a table named by the title, with its row and column count",
+            "Sorting reads as \"sorted ascending\"",
+            "\"Downloaded table.csv\" after export"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "Showing rows of data an assistant looked up or built"
+          ],
+          "avoid_when": [
+            "Thousands of rows or editing: use DataGrid"
+          ],
+          "anti_patterns": [
+            "Dumping a hundred rows with no limit",
+            "Exporting without escaping spreadsheet formulas"
+          ]
+        },
+        "examples": [
+          "default",
+          "long"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {}
+        }
+      },
+      "install": {
+        "command": "npx rdloom add generated-table",
+        "dependencies": [
+          "react-aria-components@^1.21.1"
+        ],
+        "registryDependencies": [
+          "tokens",
+          "button",
+          "table",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "default",
+          "code": "import { GeneratedTable } from \"@rdloom/react\";\n\nexport default function GeneratedTableExample() {\n  return (\n    <div className=\"w-[34rem] max-w-full\">\n      <GeneratedTable\n        title=\"Sales by region, last month\"\n        fileName=\"sales-by-region.csv\"\n        data={{\n          columns: [\"Region\", \"Orders\", \"Revenue ($)\", \"Growth (%)\"],\n          rows: [\n            [\"Europe\", 1240, 412000, 9],\n            [\"Americas\", 1985, 655000, 14],\n            [\"Asia Pacific\", 870, 281500, 21],\n            [\"Africa\", 210, 64300, 4],\n          ],\n        }}\n      />\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "long",
+          "code": "import { GeneratedTable } from \"@rdloom/react\";\n\nconst rows = Array.from({ length: 24 }, (_, i) => [`Customer ${String(i + 1).padStart(2, \"0\")}`, 120 + ((i * 37) % 400), i % 3 === 0 ? \"Overdue\" : \"Paid\"]);\n\n// Long results show the first rows with a Show all button, so a reply doesn't become a wall of data.\nexport default function GeneratedTableLongExample() {\n  return (\n    <div className=\"w-[34rem] max-w-full\">\n      <GeneratedTable title=\"Invoices\" maxRows={6} data={{ columns: [\"Customer\", \"Amount ($)\", \"Status\"], rows }} />\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "generated-table/generated-table.tsx",
+          "content": "\"use client\";\n\nimport { forwardRef, useId, useMemo, useState } from \"react\";\nimport type { SortDescriptor } from \"react-aria-components\";\nimport { generatedTableDefaults, type GeneratedTableSpecProps } from \"../generated/generated-table.types\";\nimport { Button } from \"../button/button\";\nimport { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from \"../table/table\";\nimport type { TableData } from \"../utils/ai\";\nimport { cx } from \"../utils/cx\";\n\nexport interface GeneratedTableProps extends GeneratedTableSpecProps {\n  className?: string;\n}\n\ntype Cell = string | number | null;\n\nconst isNumber = (value: Cell): value is number => typeof value === \"number\";\n\n/** A column counts as numeric when every filled cell is a number: it lines up on the right and sorts by value. */\nfunction numericColumns(data: TableData): boolean[] {\n  return data.columns.map((_, c) => {\n    const values = data.rows.map((row) => row[c]).filter((v) => v !== null && v !== undefined && v !== \"\");\n    return values.length > 0 && values.every(isNumber);\n  });\n}\n\n/** A CSV cell. Text that starts with = + - or @ is prefixed so a spreadsheet won't run it as a formula. */\nconst csvCell = (value: Cell): string => {\n  let text = value === null || value === undefined ? \"\" : String(value);\n  if (typeof value === \"string\" && /^[=+\\-@\\t\\r]/.test(text)) text = `'${text}`;\n  return /[\",\\n\\r]/.test(text) ? `\"${text.replace(/\"/g, '\"\"')}\"` : text;\n};\n\nexport function tableToCsv(data: TableData): string {\n  return [data.columns, ...data.rows].map((row) => row.map(csvCell).join(\",\")).join(\"\\r\\n\");\n}\n\n/**\n * A table an assistant produced, shown as a real sortable table: a title and summary above it,\n * numbers aligned, long results cut to a few rows with a button to show the rest, and a CSV download.\n */\nexport const GeneratedTable = forwardRef<HTMLDivElement, GeneratedTableProps>(function GeneratedTable(\n  { data, title, summary, maxRows = generatedTableDefaults.maxRows, isSortable = generatedTableDefaults.isSortable, fileName = generatedTableDefaults.fileName, onExport, className },\n  ref,\n) {\n  const [sort, setSort] = useState<SortDescriptor | undefined>();\n  const [all, setAll] = useState(false);\n  const [notice, setNotice] = useState(\"\");\n  const titleId = useId();\n  const numeric = useMemo(() => numericColumns(data), [data]);\n\n  const rows = useMemo(() => {\n    const indexed = data.rows.map((cells, id) => ({ id, cells }));\n    if (!sort?.column) return indexed;\n    const c = Number(sort.column);\n    const direction = sort.direction === \"descending\" ? -1 : 1;\n    return [...indexed].sort((a, b) => {\n      const x = a.cells[c];\n      const y = b.cells[c];\n      if (x === null || x === undefined || x === \"\") return 1;\n      if (y === null || y === undefined || y === \"\") return -1;\n      const result = isNumber(x) && isNumber(y) ? x - y : String(x).localeCompare(String(y), undefined, { numeric: true, sensitivity: \"base\" });\n      return result * direction;\n    });\n  }, [data.rows, sort]);\n\n  const limited = maxRows > 0 && !all && rows.length > maxRows;\n  const shown = limited ? rows.slice(0, maxRows) : rows;\n\n  const exportCsv = () => {\n    if (onExport) {\n      onExport(data);\n      return;\n    }\n    const url = URL.createObjectURL(new Blob([\"﻿\" + tableToCsv(data)], { type: \"text/csv;charset=utf-8\" }));\n    const link = document.createElement(\"a\");\n    link.href = url;\n    link.download = fileName.endsWith(\".csv\") ? fileName : `${fileName}.csv`;\n    link.click();\n    URL.revokeObjectURL(url);\n    setNotice(`Downloaded ${link.download}`);\n  };\n\n  return (\n    <figure ref={ref} aria-labelledby={titleId} className={cx(\"flex flex-col gap-2\", className)}>\n      <figcaption className=\"flex flex-wrap items-end justify-between gap-2\">\n        <div className=\"flex min-w-0 flex-col\">\n          <span id={titleId} className=\"text-sm font-semibold text-[var(--rd-color-text-default)]\">\n            {title}\n          </span>\n          <span className=\"text-xs text-[var(--rd-color-text-muted)]\">\n            {summary ?? `${data.rows.length} ${data.rows.length === 1 ? \"row\" : \"rows\"}, ${data.columns.length} columns`}\n          </span>\n        </div>\n        <Button variant=\"secondary\" size=\"sm\" onPress={exportCsv}>\n          Download CSV\n        </Button>\n      </figcaption>\n\n      <Table\n        label={title}\n        density=\"compact\"\n        sortDescriptor={isSortable ? sort : undefined}\n        onSortChange={isSortable ? setSort : undefined}\n      >\n        <TableHeader>\n          {data.columns.map((name, c) => (\n            <TableColumn key={c} id={String(c)} isRowHeader={c === 0} allowsSorting={isSortable} className={numeric[c] ? \"!text-end\" : undefined}>\n              {name}\n            </TableColumn>\n          ))}\n        </TableHeader>\n        <TableBody items={shown}>\n          {(row) => (\n            <TableRow id={row.id}>\n              {data.columns.map((_, c) => (\n                <TableCell key={c} className={numeric[c] ? \"!text-end tabular-nums\" : undefined}>\n                  {row.cells[c] === null || row.cells[c] === undefined ? \"\" : isNumber(row.cells[c]) ? (row.cells[c] as number).toLocaleString() : String(row.cells[c])}\n                </TableCell>\n              ))}\n            </TableRow>\n          )}\n        </TableBody>\n      </Table>\n\n      {limited && (\n        <div className=\"flex items-center gap-2 text-xs text-[var(--rd-color-text-muted)]\">\n          <span>\n            Showing {shown.length} of {rows.length} rows\n          </span>\n          <Button variant=\"ghost\" size=\"sm\" onPress={() => setAll(true)}>\n            Show all\n          </Button>\n        </div>\n      )}\n      <span role=\"status\" className=\"sr-only\">\n        {notice}\n      </span>\n    </figure>\n  );\n});\n"
+        },
+        {
+          "path": "generated/generated-table.types.ts",
+          "content": "// Generated by rdloom codegen from specs/generated-table.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\n/** A table an assistant produced, shown as a real sortable table with a title and summary, numbers aligned, long results cut to a few rows, and a CSV download. */\nexport interface GeneratedTableSpecProps {\n  /**\n   * The columns and rows.\n   */\n  data: import(\"../utils/ai\").TableData;\n  /**\n   * What the table shows. It is also the table's accessible name.\n   */\n  title: string;\n  /**\n   * One line under the title. Defaults to the row and column count.\n   */\n  summary?: string;\n  /**\n   * Rows shown before a Show all button. 0 shows every row.\n   * @default 10\n   */\n  maxRows?: number;\n  /**\n   * Let people sort by a column. Numbers sort by value, text in natural order.\n   * @default true\n   */\n  isSortable?: boolean;\n  /**\n   * Name of the downloaded file.\n   * @default \"table.csv\"\n   */\n  fileName?: string;\n  /**\n   * Replaces the built-in CSV download, e.g. to save on the server.\n   */\n  onExport?: (data: import(\"../utils/ai\").TableData) => void;\n}\n\nexport const generatedTableDefaults = {\n  maxRows: 10,\n  isSortable: true,\n  fileName: \"table.csv\",\n} as const;\n\nexport const generatedTableMeta = {\n  \"name\": \"GeneratedTable\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"grid\"\n} as const;\n"
+        }
+      ]
+    },
+    {
       "id": "gradient-button",
       "spec": {
         "$schema": "./schema/component.schema.json",
@@ -3770,6 +4626,163 @@
         {
           "path": "generated/menu.types.ts",
           "content": "// Generated by rdloom codegen from specs/menu.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nimport type { ReactNode } from \"react\";\n\nexport const menuPlacementValues = [\"bottom start\", \"bottom end\", \"top start\", \"top end\"] as const;\nexport const menuSelectionModeValues = [\"none\", \"single\", \"multiple\"] as const;\n\n/** A list of actions or options that opens from a button, like a More (…) or Account menu. Use with MenuTrigger and MenuItem. */\nexport interface MenuSpecProps {\n  /**\n   * Where the menu opens relative to its button. It flips when there isn't room.\n   * @default \"bottom start\"\n   */\n  placement?: \"bottom start\" | \"bottom end\" | \"top start\" | \"top end\";\n  /**\n   * none for actions; single or multiple for options that stay checked, like view settings.\n   * @default \"none\"\n   */\n  selectionMode?: \"none\" | \"single\" | \"multiple\";\n  /**\n   * Called with the id of the item chosen.\n   */\n  onAction?: (key: import(\"react-aria-components\").Key) => void;\n  /**\n   * MenuItem, MenuSection and MenuSeparator elements.\n   */\n  children: ReactNode;\n}\n\nexport const menuDefaults = {\n  placement: \"bottom start\",\n  selectionMode: \"none\",\n} as const;\n\nexport const menuMeta = {\n  \"name\": \"Menu\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"menu\"\n} as const;\n"
+        }
+      ]
+    },
+    {
+      "id": "message",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "Message",
+        "version": "0.1.0",
+        "category": "ai",
+        "status": "experimental",
+        "description": "One message in a conversation, from you or the assistant. It renders each part in order with the right component: text as formatted markdown, tool calls as activity, tables and charts as real components, sources at the end.",
+        "props": {
+          "message": {
+            "type": "custom",
+            "description": "The message, as a list of typed parts.",
+            "required": true,
+            "tsType": "import(\"../utils/ai\").ChatMessage"
+          },
+          "onApprove": {
+            "type": "callback",
+            "description": "Called with a tool's id when the person approves it.",
+            "tsType": "(toolId: string) => void"
+          },
+          "onDeny": {
+            "type": "callback",
+            "description": "Called with a tool's id when the person declines it.",
+            "tsType": "(toolId: string) => void"
+          },
+          "onRetry": {
+            "type": "callback",
+            "description": "Shows a Try again button on a message that failed.",
+            "tsType": "() => void"
+          },
+          "actions": {
+            "type": "node",
+            "description": "Extra buttons under the message, e.g. thumbs up and down."
+          },
+          "focusApproval": {
+            "type": "boolean",
+            "description": "Move focus to an approval box when one appears.",
+            "default": false
+          },
+          "headingLevel": {
+            "type": "number",
+            "description": "Level of headings inside the reply, 2 to 6.",
+            "default": 3
+          }
+        },
+        "states": [
+          "default",
+          "loading"
+        ],
+        "slots": [
+          "root",
+          "avatar",
+          "bubble",
+          "parts",
+          "sources",
+          "actions",
+          "status"
+        ],
+        "tokens": [
+          "color.text.default",
+          "color.text.muted",
+          "color.surface.selected",
+          "color.surface.subtle",
+          "color.border.default",
+          "color.action.primary",
+          "color.feedback.danger",
+          "color.focus.ring",
+          "radius.overlay",
+          "radius.control"
+        ],
+        "a11y": {
+          "role": "article",
+          "keyboard": [
+            "Tab: moves through links, code copy buttons, tool steps and message actions"
+          ],
+          "requirements": [
+            "Each message is an article named by who wrote it (\"You message\", \"Assistant message\")",
+            "Your own text is plain text; the assistant's is formatted, with no HTML injected",
+            "A reply that hasn't started shows \"Assistant is thinking\" for screen readers as well as animated dots, and the dots stand still for reduced motion",
+            "Errors are announced (role alert) and offer Try again when you provide onRetry; a stopped reply says so",
+            "aria-busy is set while the message streams"
+          ],
+          "screenReader": [
+            "\"Assistant message, article\" then the reply",
+            "\"Assistant is thinking\" before any text arrives",
+            "\"Something went wrong. Try again\""
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "Showing one turn of a chat",
+            "Showing a saved conversation"
+          ],
+          "avoid_when": [
+            "A whole chat with input and scrolling: use Chat"
+          ],
+          "anti_patterns": [
+            "Building the message from one long markdown string, so tools, charts and sources lose their structure"
+          ]
+        },
+        "examples": [
+          "text",
+          "with-tools",
+          "with-artifacts",
+          "error"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {}
+        }
+      },
+      "install": {
+        "command": "npx rdloom add message",
+        "dependencies": [
+          "react-aria-components@^1.21.1"
+        ],
+        "registryDependencies": [
+          "tokens",
+          "agent-activity",
+          "generated-chart",
+          "generated-table",
+          "response",
+          "sources",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "text",
+          "code": "import { Message, type ChatMessage } from \"@rdloom/react\";\n\nconst question: ChatMessage = { id: \"1\", role: \"user\", parts: [{ type: \"text\", text: \"How do refunds work?\" }] };\n\nconst answer: ChatMessage = {\n  id: \"2\",\n  role: \"assistant\",\n  parts: [\n    { type: \"text\", text: \"Refunds are issued within **5 business days** [1]. You can ask for one:\\n\\n- from your order page\\n- by replying to the receipt\" },\n    { type: \"citation\", id: \"policy\", title: \"Refund policy\", url: \"https://example.com/policy\", snippet: \"Refunds are issued within 5 business days.\" },\n  ],\n};\n\nexport default function MessageTextExample() {\n  return (\n    <div className=\"flex w-[36rem] max-w-full flex-col gap-6\">\n      <Message message={question} />\n      <Message message={answer} />\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "with-tools",
+          "code": "import { Message, type ChatMessage } from \"@rdloom/react\";\n\nconst message: ChatMessage = {\n  id: \"1\",\n  role: \"assistant\",\n  parts: [\n    { type: \"reasoning\", text: \"The question is about last month, so I'll query orders for February and group them by week.\" },\n    { type: \"tool\", id: \"q\", name: \"query_orders\", title: \"Searching your orders\", state: \"done\", startedAt: \"2026-03-01T10:00:00Z\", endedAt: \"2026-03-01T10:00:02Z\", input: { month: \"2026-02\" }, output: { rows: 4 } },\n    { type: \"tool\", id: \"c\", name: \"make_chart\", title: \"Creating a chart\", state: \"done\" },\n    { type: \"text\", text: \"Orders peaked in the third week.\" },\n  ],\n};\n\nexport default function MessageWithToolsExample() {\n  return (\n    <div className=\"w-[36rem] max-w-full\">\n      <Message message={message} />\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "with-artifacts",
+          "code": "import { Message, type ChatMessage } from \"@rdloom/react\";\n\nconst message: ChatMessage = {\n  id: \"1\",\n  role: \"assistant\",\n  parts: [\n    { type: \"text\", text: \"Here is last month's revenue by week, and the same numbers as a table.\" },\n    {\n      type: \"artifact\",\n      kind: \"chart\",\n      title: \"Revenue by week, February\",\n      summary: \"Revenue rose each week, from $9.2K to $15.8K.\",\n      data: { labels: [\"Wk 1\", \"Wk 2\", \"Wk 3\", \"Wk 4\"], series: [{ name: \"Revenue\", values: [9200, 11400, 13100, 15800] }], unit: \"$\" },\n    },\n    {\n      type: \"artifact\",\n      kind: \"table\",\n      title: \"Revenue by week\",\n      data: {\n        columns: [\"Week\", \"Orders\", \"Revenue ($)\"],\n        rows: [[\"Wk 1\", 310, 9200], [\"Wk 2\", 385, 11400], [\"Wk 3\", 440, 13100], [\"Wk 4\", 512, 15800]],\n      },\n    },\n  ],\n};\n\nexport default function MessageWithArtifactsExample() {\n  return (\n    <div className=\"w-[40rem] max-w-full\">\n      <Message message={message} />\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "error",
+          "code": "import { Message, type ChatMessage } from \"@rdloom/react\";\n\nconst failed: ChatMessage = { id: \"1\", role: \"assistant\", status: \"error\", parts: [{ type: \"text\", text: \"I started looking, but\" }] };\nconst stopped: ChatMessage = { id: \"2\", role: \"assistant\", status: \"stopped\", parts: [{ type: \"text\", text: \"Here is the first part of the answer\" }] };\n\nexport default function MessageErrorExample() {\n  return (\n    <div className=\"flex w-[36rem] max-w-full flex-col gap-6\">\n      <Message message={failed} onRetry={() => {}} />\n      <Message message={stopped} />\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "message/message.tsx",
+          "content": "\"use client\";\n\nimport { forwardRef, useMemo, useState, type ReactNode } from \"react\";\nimport { Button as AriaButton } from \"react-aria-components\";\nimport { messageDefaults, type MessageSpecProps } from \"../generated/message.types\";\nimport { AgentActivity } from \"../agent-activity/agent-activity\";\nimport { GeneratedChart } from \"../generated-chart/generated-chart\";\nimport { GeneratedTable } from \"../generated-table/generated-table\";\nimport { Response } from \"../response/response\";\nimport { Sources } from \"../sources/sources\";\nimport { groupParts, messageText, type CitationPart, type ChatMessage, type ReasoningPart } from \"../utils/ai\";\nimport { cx } from \"../utils/cx\";\nimport { ChevronRightIcon, ErrorIcon, FileIcon, SparkleIcon } from \"../utils/icons\";\n\nexport interface MessageProps extends MessageSpecProps {\n  className?: string;\n}\n\nconst roleName = { user: \"You\", assistant: \"Assistant\", system: \"System\" } as const;\n\n/** The assistant's short account of how it got there. Closed by default: it is optional reading. */\nfunction Reasoning({ part }: { part: ReasoningPart }) {\n  const [open, setOpen] = useState(false);\n  return (\n    <div className=\"flex flex-col gap-1\">\n      <AriaButton\n        aria-expanded={open}\n        onPress={() => setOpen((v) => !v)}\n        className=\"inline-flex w-fit items-center gap-1.5 rounded px-1 text-xs text-[var(--rd-color-text-muted)] outline-none data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)] data-[hovered]:text-[var(--rd-color-text-default)]\"\n      >\n        <ChevronRightIcon className={cx(\"size-3.5 transition-transform motion-reduce:transition-none\", open && \"rotate-90\")} />\n        {part.streaming ? \"Thinking…\" : \"Reasoning\"}\n      </AriaButton>\n      {open && <p className=\"border-s-2 border-[var(--rd-color-border-default)] ps-3 text-sm whitespace-pre-wrap text-[var(--rd-color-text-muted)]\">{part.text}</p>}\n    </div>\n  );\n}\n\nfunction CopyMessage({ text }: { text: string }) {\n  const [copied, setCopied] = useState(false);\n  return (\n    <>\n      <AriaButton\n        onPress={async () => {\n          try {\n            await navigator.clipboard.writeText(text);\n            setCopied(true);\n            setTimeout(() => setCopied(false), 2000);\n          } catch {\n            /* clipboard blocked: nothing to confirm */\n          }\n        }}\n        className=\"inline-flex h-7 items-center gap-1.5 rounded px-2 text-xs text-[var(--rd-color-text-muted)] outline-none data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)] data-[hovered]:bg-[var(--rd-color-surface-subtle)]\"\n      >\n        {copied ? \"Copied\" : \"Copy\"}\n        <span className=\"sr-only\"> message</span>\n      </AriaButton>\n      <span role=\"status\" className=\"sr-only\">\n        {copied ? \"Message copied\" : \"\"}\n      </span>\n    </>\n  );\n}\n\nfunction ThinkingDots() {\n  return (\n    <div className=\"inline-flex items-center gap-1 text-sm text-[var(--rd-color-text-muted)]\">\n      <span className=\"sr-only\">Assistant is thinking</span>\n      <span aria-hidden=\"true\" className=\"flex gap-1\">\n        {[0, 1, 2].map((i) => (\n          <span key={i} className={cx(\"size-1.5 animate-pulse rounded-full bg-current motion-reduce:animate-none\", [\"\", \"[animation-delay:160ms]\", \"[animation-delay:320ms]\"][i])} />\n        ))}\n      </span>\n    </div>\n  );\n}\n\n/**\n * One message in a conversation: you or the assistant. It renders each part of the message with\n * the right component, in order: text as formatted markdown, tool calls grouped as activity,\n * tables and charts as real components, sources at the end.\n */\nexport const Message = forwardRef<HTMLElement, MessageProps>(function Message(\n  { message, onApprove, onDeny, onRetry, actions, focusApproval = messageDefaults.focusApproval, headingLevel = messageDefaults.headingLevel, className },\n  ref,\n) {\n  const mine = message.role === \"user\";\n  const citations = useMemo(() => message.parts.filter((p): p is CitationPart => p.type === \"citation\"), [message.parts]);\n  const groups = useMemo(() => groupParts(message.parts.filter((p) => p.type !== \"citation\")), [message.parts]);\n  const canCopy = message.role === \"assistant\" && message.status !== \"streaming\" && messageText(message) !== \"\";\n  const waiting = message.role === \"assistant\" && message.status === \"streaming\" && message.parts.length === 0;\n\n  const body: ReactNode[] = groups.map((group, i) => {\n    if (group.kind === \"tools\") {\n      return <AgentActivity key={`tools-${i}`} tools={group.tools} onApprove={onApprove} onDeny={onDeny} focusApproval={focusApproval} />;\n    }\n    const part = group.part;\n    switch (part.type) {\n      case \"text\":\n        return mine ? (\n          <p key={i} className=\"whitespace-pre-wrap break-words\">\n            {part.text}\n          </p>\n        ) : (\n          <Response key={i} isStreaming={part.streaming} citations={citations} headingLevel={headingLevel}>\n            {part.text}\n          </Response>\n        );\n      case \"reasoning\":\n        return <Reasoning key={i} part={part} />;\n      case \"artifact\":\n        return part.kind === \"table\" ? (\n          <GeneratedTable key={i} title={part.title} summary={part.summary} data={part.data} />\n        ) : (\n          <GeneratedChart key={i} title={part.title} summary={part.summary} data={part.data} />\n        );\n      case \"file\":\n        return (\n          <span key={i} className=\"inline-flex w-fit items-center gap-2 rounded-[var(--rd-radius-control)] border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-subtle)] px-2.5 py-1.5 text-sm\">\n            <FileIcon className=\"size-4 shrink-0\" />\n            {part.url ? (\n              <a href={part.url} download={part.name} className=\"underline underline-offset-2\">\n                {part.name}\n              </a>\n            ) : (\n              part.name\n            )}\n          </span>\n        );\n    }\n  });\n\n  return (\n    <article\n      ref={ref}\n      aria-label={`${roleName[message.role]} message`}\n      aria-busy={message.status === \"streaming\" || undefined}\n      data-role={message.role}\n      data-status={message.status ?? \"complete\"}\n      className={cx(\"flex gap-3\", mine && \"flex-row-reverse\", className)}\n    >\n      {message.role === \"assistant\" && (\n        <span aria-hidden=\"true\" className=\"mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full bg-[var(--rd-color-surface-subtle)] text-[var(--rd-color-action-primary)] ring-1 ring-[var(--rd-color-border-default)]\">\n          <SparkleIcon />\n        </span>\n      )}\n      <div className={cx(\"flex min-w-0 flex-col gap-3\", mine ? \"max-w-[85%] items-end\" : \"w-full max-w-prose\")}>\n        {mine ? (\n          <div className=\"rounded-[var(--rd-radius-overlay)] bg-[var(--rd-color-surface-selected)] px-3.5 py-2 text-[var(--rd-color-text-default)]\">{body}</div>\n        ) : (\n          body\n        )}\n        {waiting && <ThinkingDots />}\n        {citations.length > 0 && <Sources sources={citations} />}\n\n        {message.status === \"stopped\" && <p className=\"text-xs text-[var(--rd-color-text-muted)]\">Stopped</p>}\n        {message.status === \"error\" && (\n          <p role=\"alert\" className=\"inline-flex items-center gap-2 text-sm text-[var(--rd-color-feedback-danger)]\">\n            <ErrorIcon className=\"size-4 shrink-0\" />\n            Something went wrong.\n            {onRetry && (\n              <AriaButton onPress={onRetry} className=\"rounded px-1 font-medium underline underline-offset-2 outline-none data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)]\">\n                Try again\n              </AriaButton>\n            )}\n          </p>\n        )}\n        {(actions || canCopy) && (\n          <div className=\"flex items-center gap-1\">\n            {canCopy && <CopyMessage text={messageText(message)} />}\n            {actions}\n          </div>\n        )}\n      </div>\n    </article>\n  );\n});\n"
+        },
+        {
+          "path": "generated/message.types.ts",
+          "content": "// Generated by rdloom codegen from specs/message.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nimport type { ReactNode } from \"react\";\n\n/** One message in a conversation, from you or the assistant. It renders each part in order with the right component: text as formatted markdown, tool calls as activity, tables and charts as real components, sources at the end. */\nexport interface MessageSpecProps {\n  /**\n   * The message, as a list of typed parts.\n   */\n  message: import(\"../utils/ai\").ChatMessage;\n  /**\n   * Called with a tool's id when the person approves it.\n   */\n  onApprove?: (toolId: string) => void;\n  /**\n   * Called with a tool's id when the person declines it.\n   */\n  onDeny?: (toolId: string) => void;\n  /**\n   * Shows a Try again button on a message that failed.\n   */\n  onRetry?: () => void;\n  /**\n   * Extra buttons under the message, e.g. thumbs up and down.\n   */\n  actions?: ReactNode;\n  /**\n   * Move focus to an approval box when one appears.\n   * @default false\n   */\n  focusApproval?: boolean;\n  /**\n   * Level of headings inside the reply, 2 to 6.\n   * @default 3\n   */\n  headingLevel?: number;\n}\n\nexport const messageDefaults = {\n  focusApproval: false,\n  headingLevel: 3,\n} as const;\n\nexport const messageMeta = {\n  \"name\": \"Message\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"article\"\n} as const;\n"
         }
       ]
     },
@@ -4437,6 +5450,157 @@
       ]
     },
     {
+      "id": "prompt-input",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "PromptInput",
+        "version": "0.1.0",
+        "category": "ai",
+        "status": "experimental",
+        "description": "The box people type a message in. Enter sends, Shift+Enter adds a line, the box grows with the text, and the Send button becomes Stop while a reply is on its way.",
+        "props": {
+          "onSubmit": {
+            "type": "callback",
+            "description": "Called with the trimmed text when the person sends.",
+            "required": true,
+            "tsType": "(text: string) => void"
+          },
+          "onStop": {
+            "type": "callback",
+            "description": "Called when the person presses Stop.",
+            "tsType": "() => void"
+          },
+          "isStreaming": {
+            "type": "boolean",
+            "description": "A reply is on its way: the button becomes Stop and sending is blocked.",
+            "default": false
+          },
+          "isDisabled": {
+            "type": "boolean",
+            "description": "Stop all input.",
+            "default": false
+          },
+          "placeholder": {
+            "type": "string",
+            "description": "Hint shown while the box is empty.",
+            "default": "Message the assistant"
+          },
+          "label": {
+            "type": "string",
+            "description": "Accessible name of the text box.",
+            "default": "Message"
+          },
+          "value": {
+            "type": "string",
+            "description": "Controlled text. Leave out to let the box keep its own."
+          },
+          "onValueChange": {
+            "type": "callback",
+            "description": "Called as the text changes.",
+            "tsType": "(value: string) => void"
+          },
+          "maxLength": {
+            "type": "number",
+            "description": "Longest message allowed."
+          }
+        },
+        "states": [
+          "default",
+          "focus",
+          "disabled"
+        ],
+        "slots": [
+          "root",
+          "input",
+          "send",
+          "stop",
+          "hint"
+        ],
+        "tokens": [
+          "color.surface.default",
+          "color.border.strong",
+          "color.text.default",
+          "color.text.muted",
+          "color.action.primary",
+          "color.action.on-primary",
+          "color.action.primary-hover",
+          "color.focus.ring",
+          "radius.overlay"
+        ],
+        "a11y": {
+          "role": "textbox",
+          "keyboard": [
+            "Enter: sends",
+            "Shift+Enter: new line",
+            "Tab: moves to the Send or Stop button"
+          ],
+          "requirements": [
+            "A real labelled multi-line text box; the shortcut hint is attached with aria-describedby",
+            "Enter does nothing while an input method (IME) is composing, so a half-typed word can't be sent",
+            "Send is disabled for empty or whitespace-only text; Stop replaces it while streaming and has its own name",
+            "Focus stays in the box after sending",
+            "Growth stops at a maximum height, then the box scrolls"
+          ],
+          "screenReader": [
+            "\"Message, edit text, multi-line. Enter to send, Shift+Enter for a new line\"",
+            "\"Send message, button, dimmed\" while empty",
+            "\"Stop generating, button\" while streaming"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "Any place a person writes to an assistant"
+          ],
+          "avoid_when": [
+            "A short single-line field: use TextField"
+          ],
+          "anti_patterns": [
+            "Sending on Enter without checking for IME composition",
+            "Clearing the box before the message is sent"
+          ]
+        },
+        "examples": [
+          "default",
+          "streaming"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {}
+        }
+      },
+      "install": {
+        "command": "npx rdloom add prompt-input",
+        "dependencies": [
+          "react-aria-components@^1.21.1"
+        ],
+        "registryDependencies": [
+          "tokens",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "default",
+          "code": "import { useState } from \"react\";\nimport { PromptInput } from \"@rdloom/react\";\n\nexport default function PromptInputExample() {\n  const [sent, setSent] = useState<string[]>([]);\n  return (\n    <div className=\"flex w-[32rem] max-w-full flex-col gap-3\">\n      <PromptInput onSubmit={(text) => setSent((s) => [...s, text])} />\n      {sent.length > 0 && (\n        <ul className=\"flex flex-col gap-1 text-sm\">\n          {sent.map((text, i) => (\n            <li key={i}>You sent: {text}</li>\n          ))}\n        </ul>\n      )}\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "streaming",
+          "code": "import { useState } from \"react\";\nimport { PromptInput } from \"@rdloom/react\";\n\n// While a reply is on its way the button becomes Stop and sending is blocked.\nexport default function PromptInputStreamingExample() {\n  const [streaming, setStreaming] = useState(true);\n  return (\n    <div className=\"w-[32rem] max-w-full\">\n      <PromptInput isStreaming={streaming} onStop={() => setStreaming(false)} onSubmit={() => setStreaming(true)} />\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "prompt-input/prompt-input.tsx",
+          "content": "\"use client\";\n\nimport { forwardRef, useId, useImperativeHandle, useLayoutEffect, useRef, useState, type KeyboardEvent } from \"react\";\nimport { Button as AriaButton } from \"react-aria-components\";\nimport { promptInputDefaults, type PromptInputSpecProps } from \"../generated/prompt-input.types\";\nimport { cx } from \"../utils/cx\";\nimport { SendIcon, StopIcon } from \"../utils/icons\";\n\nexport interface PromptInputProps extends PromptInputSpecProps {\n  className?: string;\n}\n\nexport interface PromptInputHandle {\n  focus: () => void;\n}\n\nconst MAX_HEIGHT = 200;\n\n/**\n * The box people type a message in. Enter sends, Shift+Enter starts a new line, and the Send\n * button turns into Stop while a reply is on its way. Enter does nothing mid-IME-composition,\n * so typing in Japanese, Chinese or Korean can't send a half-written word.\n */\nexport const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(function PromptInput(\n  {\n    onSubmit,\n    onStop,\n    isStreaming = promptInputDefaults.isStreaming,\n    isDisabled = promptInputDefaults.isDisabled,\n    placeholder = promptInputDefaults.placeholder,\n    label = promptInputDefaults.label,\n    value: controlled,\n    onValueChange,\n    maxLength,\n    className,\n  },\n  ref,\n) {\n  const [inner, setInner] = useState(\"\");\n  const value = controlled ?? inner;\n  const field = useRef<HTMLTextAreaElement>(null);\n  const hintId = useId();\n  useImperativeHandle(ref, () => ({ focus: () => field.current?.focus() }), []);\n\n  const set = (next: string) => {\n    if (controlled === undefined) setInner(next);\n    onValueChange?.(next);\n  };\n\n  // Grow with the text up to a limit, then scroll.\n  useLayoutEffect(() => {\n    const el = field.current;\n    if (!el) return;\n    el.style.height = \"auto\";\n    el.style.height = `${Math.min(el.scrollHeight, MAX_HEIGHT)}px`;\n  }, [value]);\n\n  const trimmed = value.trim();\n  const canSend = trimmed !== \"\" && !isDisabled && !isStreaming;\n\n  const send = () => {\n    if (!canSend) return;\n    onSubmit(trimmed);\n    set(\"\");\n    field.current?.focus();\n  };\n\n  const onKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {\n    if (event.key !== \"Enter\" || event.shiftKey || event.nativeEvent.isComposing || event.keyCode === 229) return;\n    event.preventDefault();\n    send();\n  };\n\n  return (\n    <div\n      className={cx(\n        \"flex flex-col gap-1.5 rounded-[var(--rd-radius-overlay)] border border-[var(--rd-color-border-strong)] bg-[var(--rd-color-surface-default)] p-2 focus-within:ring-2 focus-within:ring-[var(--rd-color-focus-ring)]\",\n        isDisabled && \"opacity-60\",\n        className,\n      )}\n    >\n      <div className=\"flex items-end gap-2\">\n        <textarea\n          ref={field}\n          rows={1}\n          aria-label={label}\n          aria-describedby={hintId}\n          placeholder={placeholder}\n          value={value}\n          maxLength={maxLength}\n          disabled={isDisabled}\n          onChange={(e) => set(e.target.value)}\n          onKeyDown={onKeyDown}\n          className=\"max-h-[200px] min-h-9 flex-1 resize-none bg-transparent px-2 py-1.5 text-sm leading-relaxed text-[var(--rd-color-text-default)] outline-none placeholder:text-[var(--rd-color-text-muted)]\"\n        />\n        {isStreaming ? (\n          <AriaButton\n            aria-label=\"Stop generating\"\n            onPress={onStop}\n            className=\"flex size-9 shrink-0 items-center justify-center rounded-full bg-[var(--rd-color-text-default)] text-[var(--rd-color-surface-default)] outline-none data-[focus-visible]:ring-2 data-[focus-visible]:ring-offset-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)]\"\n          >\n            <StopIcon />\n          </AriaButton>\n        ) : (\n          <AriaButton\n            aria-label=\"Send message\"\n            isDisabled={!canSend}\n            onPress={send}\n            className=\"flex size-9 shrink-0 items-center justify-center rounded-full bg-[var(--rd-color-action-primary)] text-[var(--rd-color-action-on-primary)] outline-none data-[disabled]:cursor-not-allowed data-[disabled]:opacity-40 data-[focus-visible]:ring-2 data-[focus-visible]:ring-offset-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)] data-[hovered]:bg-[var(--rd-color-action-primary-hover)]\"\n          >\n            <SendIcon />\n          </AriaButton>\n        )}\n      </div>\n      <p id={hintId} className=\"px-2 text-xs text-[var(--rd-color-text-muted)]\">\n        Enter to send, Shift+Enter for a new line\n      </p>\n    </div>\n  );\n});\n"
+        },
+        {
+          "path": "generated/prompt-input.types.ts",
+          "content": "// Generated by rdloom codegen from specs/prompt-input.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\n/** The box people type a message in. Enter sends, Shift+Enter adds a line, the box grows with the text, and the Send button becomes Stop while a reply is on its way. */\nexport interface PromptInputSpecProps {\n  /**\n   * Called with the trimmed text when the person sends.\n   */\n  onSubmit: (text: string) => void;\n  /**\n   * Called when the person presses Stop.\n   */\n  onStop?: () => void;\n  /**\n   * A reply is on its way: the button becomes Stop and sending is blocked.\n   * @default false\n   */\n  isStreaming?: boolean;\n  /**\n   * Stop all input.\n   * @default false\n   */\n  isDisabled?: boolean;\n  /**\n   * Hint shown while the box is empty.\n   * @default \"Message the assistant\"\n   */\n  placeholder?: string;\n  /**\n   * Accessible name of the text box.\n   * @default \"Message\"\n   */\n  label?: string;\n  /**\n   * Controlled text. Leave out to let the box keep its own.\n   */\n  value?: string;\n  /**\n   * Called as the text changes.\n   */\n  onValueChange?: (value: string) => void;\n  /**\n   * Longest message allowed.\n   */\n  maxLength?: number;\n}\n\nexport const promptInputDefaults = {\n  isStreaming: false,\n  isDisabled: false,\n  placeholder: \"Message the assistant\",\n  label: \"Message\",\n} as const;\n\nexport const promptInputMeta = {\n  \"name\": \"PromptInput\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"textbox\"\n} as const;\n"
+        }
+      ]
+    },
+    {
       "id": "pulse-button",
       "spec": {
         "$schema": "./schema/component.schema.json",
@@ -4774,6 +5938,149 @@
         {
           "path": "generated/radio-group.types.ts",
           "content": "// Generated by rdloom codegen from specs/radio-group.spec.json (v0.1.1).\n// Do not edit. Change the spec and run `npm run gen`.\n\nimport type { ReactNode } from \"react\";\n\nexport const radioGroupOrientationValues = [\"vertical\", \"horizontal\"] as const;\n\n/** Lets the user pick exactly one option from a small, visible set. Use with Radio children. */\nexport interface RadioGroupSpecProps {\n  /**\n   * Visible group label.\n   */\n  label: string;\n  /**\n   * Help text shown under the options.\n   */\n  description?: string;\n  /**\n   * Shown when the group is invalid.\n   */\n  errorMessage?: string;\n  /**\n   * Layout direction of the options.\n   * @default \"vertical\"\n   */\n  orientation?: \"vertical\" | \"horizontal\";\n  /**\n   * Controlled selected value.\n   */\n  value?: string;\n  /**\n   * Initial value when uncontrolled.\n   */\n  defaultValue?: string;\n  /**\n   * Disables every option.\n   * @default false\n   */\n  isDisabled?: boolean;\n  /**\n   * Marks the group as invalid and shows errorMessage.\n   * @default false\n   */\n  isInvalid?: boolean;\n  /**\n   * Requires a selection for form submission.\n   * @default false\n   */\n  isRequired?: boolean;\n  /**\n   * Radio options.\n   */\n  children: ReactNode;\n  /**\n   * Called with the newly selected value.\n   */\n  onChange?: (value: string) => void;\n}\n\nexport const radioGroupDefaults = {\n  orientation: \"vertical\",\n  isDisabled: false,\n  isInvalid: false,\n  isRequired: false,\n} as const;\n\nexport const radioGroupMeta = {\n  \"name\": \"RadioGroup\",\n  \"version\": \"0.1.1\",\n  \"status\": \"experimental\",\n  \"role\": \"radiogroup\"\n} as const;\n"
+        }
+      ]
+    },
+    {
+      "id": "response",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "Response",
+        "version": "0.1.0",
+        "category": "ai",
+        "status": "experimental",
+        "description": "Shows an assistant's reply as formatted text: headings, lists, tables, code, links and source markers. It is safe for text you do not control and for text that is still arriving.",
+        "props": {
+          "children": {
+            "type": "string",
+            "description": "The reply, as markdown.",
+            "required": true
+          },
+          "isStreaming": {
+            "type": "boolean",
+            "description": "True while the reply is still arriving. Shows a caret and tells assistive technology the content is changing.",
+            "default": false
+          },
+          "citations": {
+            "type": "custom",
+            "description": "Sources for the [1], [2] markers in the text. A marker with no matching source stays as plain text.",
+            "tsType": "import(\"../utils/ai\").CitationPart[]"
+          },
+          "headingLevel": {
+            "type": "number",
+            "description": "Level of the reply's first heading (a # line), 2 to 6. Replies sit inside a page, so it starts at 3.",
+            "default": 3
+          }
+        },
+        "states": [
+          "default"
+        ],
+        "slots": [
+          "root",
+          "heading",
+          "paragraph",
+          "list",
+          "table",
+          "code",
+          "caret"
+        ],
+        "tokens": [
+          "color.text.default",
+          "color.text.muted",
+          "color.surface.subtle",
+          "color.border.default",
+          "color.border.strong",
+          "color.action.primary",
+          "color.focus.ring",
+          "radius.control"
+        ],
+        "a11y": {
+          "role": "none",
+          "keyboard": [
+            "Tab: moves to code blocks (copy button), long code that scrolls, wide tables and links"
+          ],
+          "requirements": [
+            "No raw HTML is ever injected: model output can't add markup or scripts",
+            "Links with unsafe schemes (javascript:, data:) show as plain text; links that open a new tab say so in words",
+            "Bare web addresses become links without taking the punctuation after them; a backslash keeps a character literal",
+            "Images in the text are never loaded (an address chosen by a model could track the reader): they show as a link named \"<alt text> (image)\"",
+            "Code blocks and tables that scroll sideways can be focused and scrolled with the keyboard",
+            "The copy button's name includes the language, and it confirms with a status message",
+            "While streaming, the region has aria-busy so a screen reader doesn't read each fragment",
+            "Half-finished markdown (an open code block, a cut-off list) never throws and still reads sensibly"
+          ],
+          "screenReader": [
+            "Headings, lists and tables are announced with their real structure",
+            "A copy button reads as, e.g. \"Copy typescript code\", then \"Copied to clipboard\"",
+            "Source markers read as \"Source 2: <title>\""
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "Showing what an AI assistant wrote",
+            "Any markdown from a source you can't fully trust"
+          ],
+          "avoid_when": [
+            "Authoring or editing markdown: this only displays it",
+            "Showing a user's own message: use plain text"
+          ],
+          "anti_patterns": [
+            "Rendering model output with dangerouslySetInnerHTML",
+            "Re-mounting the component on every streamed chunk instead of updating its text"
+          ]
+        },
+        "examples": [
+          "markdown",
+          "streaming",
+          "with-citations"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {}
+        }
+      },
+      "install": {
+        "command": "npx rdloom add response",
+        "dependencies": [
+          "react-aria-components@^1.21.1"
+        ],
+        "registryDependencies": [
+          "tokens",
+          "citation",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "markdown",
+          "code": "import { Response } from \"@rdloom/react\";\n\nconst reply = `## Quarterly summary\n\nRevenue grew **12%** over last quarter, driven by _new subscriptions_. The three biggest changes:\n\n1. Annual plans rose to \\`38%\\` of sign-ups\n2. Churn fell below 2%\n3. Support tickets per customer dropped\n\n| Region | Revenue | Change |\n| :----- | ------: | -----: |\n| Europe | $412K | +9% |\n| Americas | $655K | +14% |\n\n> Numbers are preliminary until the books close.\n\n\\`\\`\\`ts\nconst growth = (now: number, before: number) => (now - before) / before;\n\\`\\`\\`\n\nSee the [full report](https://example.com/report) for details.`;\n\nexport default function ResponseMarkdownExample() {\n  return (\n    <div className=\"w-[34rem] max-w-full\">\n      <Response>{reply}</Response>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "streaming",
+          "code": "import { useEffect, useState } from \"react\";\nimport { Button, Response } from \"@rdloom/react\";\n\nconst reply = \"Checking the numbers now. **Sales rose in March**, and the biggest gain came from the new annual plan:\\n\\n- Annual plans: up 18%\\n- Monthly plans: flat\\n\\n```sql\\nSELECT month, SUM(total) FROM orders GROUP BY month;\\n```\";\n\n// The text arrives a few characters at a time. Pass isStreaming while it does: the caret shows, and\n// a screen reader waits for the finished text instead of reading every fragment.\nexport default function ResponseStreamingExample() {\n  const [shown, setShown] = useState(0);\n  const [run, setRun] = useState(0);\n  const done = shown >= reply.length;\n\n  useEffect(() => {\n    setShown(0);\n    const id = setInterval(() => setShown((n) => (n >= reply.length ? n : n + 3)), 40);\n    return () => clearInterval(id);\n  }, [run]);\n\n  return (\n    <div className=\"flex w-[34rem] max-w-full flex-col items-start gap-3\">\n      <Response isStreaming={!done}>{reply.slice(0, shown)}</Response>\n      <Button variant=\"secondary\" size=\"sm\" onPress={() => setRun((n) => n + 1)}>\n        Replay\n      </Button>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "with-citations",
+          "code": "import { Response, Sources, type CitationPart } from \"@rdloom/react\";\n\nconst sources: CitationPart[] = [\n  { type: \"citation\", id: \"ops\", title: \"Operations handbook\", url: \"https://example.com/handbook\", snippet: \"Refunds are issued within 5 business days.\" },\n  { type: \"citation\", id: \"policy\", title: \"Refund policy\", url: \"https://example.com/policy\" },\n];\n\n// [1] and [2] in the text become markers that jump to the matching entry in Sources.\nexport default function ResponseWithCitationsExample() {\n  return (\n    <div className=\"flex w-[34rem] max-w-full flex-col gap-4\">\n      <Response citations={sources}>\n        Refunds go out within 5 business days [1], and only for orders placed in the last 30 days [2].\n      </Response>\n      <Sources sources={sources} />\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "response/code-block.tsx",
+          "content": "\"use client\";\n\nimport { useEffect, useRef, useState } from \"react\";\nimport { Button as AriaButton } from \"react-aria-components\";\nimport { CheckIcon } from \"../utils/icons\";\n\nexport interface CodeBlockProps {\n  code: string;\n  language?: string;\n  /** True while the closing fence hasn't arrived yet (the reply is still streaming). */\n  open?: boolean;\n}\n\nfunction CopyIcon() {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 16 16\" className=\"size-4\" fill=\"none\">\n      <rect x=\"5.5\" y=\"5.5\" width=\"8\" height=\"8\" rx=\"1.5\" stroke=\"currentColor\" strokeWidth=\"1.3\" />\n      <path d=\"M10.5 3.5v-.5A1.5 1.5 0 0 0 9 1.5H4A1.5 1.5 0 0 0 2.5 3v5A1.5 1.5 0 0 0 4 9.5h.5\" stroke=\"currentColor\" strokeWidth=\"1.3\" strokeLinecap=\"round\" />\n    </svg>\n  );\n}\n\n/** A code block with a copy button. Once copied, the button says so and a polite status repeats it. */\nexport function CodeBlock({ code, language, open = false }: CodeBlockProps) {\n  const [copied, setCopied] = useState(false);\n  const timer = useRef<ReturnType<typeof setTimeout>>(undefined);\n  useEffect(() => () => clearTimeout(timer.current), []);\n\n  const copy = async () => {\n    try {\n      await navigator.clipboard.writeText(code);\n      setCopied(true);\n      clearTimeout(timer.current);\n      timer.current = setTimeout(() => setCopied(false), 2000);\n    } catch {\n      /* clipboard blocked: nothing to confirm */\n    }\n  };\n\n  return (\n    <figure className=\"my-3 overflow-hidden rounded-[var(--rd-radius-control)] border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-subtle)]\">\n      <figcaption className=\"flex items-center justify-between border-b border-[var(--rd-color-border-default)] ps-3 pe-1 text-xs text-[var(--rd-color-text-muted)]\">\n        <span>{language || \"Code\"}</span>\n        <AriaButton\n          onPress={copy}\n          isDisabled={open}\n          className=\"my-1 inline-flex h-7 items-center gap-1.5 rounded px-2 text-xs outline-none data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)] data-[hovered]:bg-[var(--rd-color-surface-selected)] data-[disabled]:opacity-50\"\n        >\n          {copied ? <CheckIcon className=\"size-4\" /> : <CopyIcon />}\n          <span>{copied ? \"Copied\" : \"Copy\"}</span>\n          <span className=\"sr-only\">{language ? ` ${language} code` : \" code\"}</span>\n        </AriaButton>\n      </figcaption>\n      {/* A long line scrolls inside the block, so the block must be reachable without a mouse. */}\n      <pre tabIndex={0} className=\"overflow-x-auto p-3 text-sm leading-relaxed outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--rd-color-focus-ring)]\">\n        <code className=\"font-mono\">{code}</code>\n      </pre>\n      <span role=\"status\" className=\"sr-only\">\n        {copied ? \"Copied to clipboard\" : \"\"}\n      </span>\n    </figure>\n  );\n}\n"
+        },
+        {
+          "path": "response/markdown.tsx",
+          "content": "import { Fragment, type ReactNode } from \"react\";\nimport type { CitationPart } from \"../utils/ai\";\nimport { Citation } from \"../citation/citation\";\nimport { CodeBlock } from \"./code-block\";\n\n// A small markdown reader for assistant replies: paragraphs, headings, lists, quotes, tables,\n// code, emphasis, links. It builds React elements directly and never injects HTML, so text from a\n// model can't add markup or scripts. Anything it doesn't know shows as plain text, and text that\n// is cut off mid-way (while streaming) never throws: a half-open code block still shows as code.\n\nexport interface MarkdownOptions {\n  /** Level of the first heading (`#`). Replies sit inside a page, so this is 3 by default. */\n  headingStart: number;\n  citations?: CitationPart[];\n}\n\nconst SAFE_URL = /^(https?:|mailto:|\\/|#|\\.\\.?\\/)/i;\nexport const isSafeUrl = (url: string) => SAFE_URL.test(url.trim());\nconst isExternal = (url: string) => /^https?:/i.test(url.trim());\n\n// --- Inline\n\n// Groups: 1 code, 2-3 bold, 4-5 italic, 6 image, 7 link, 8 [n] source marker, 9 escaped character, 10 bare web address.\nconst INLINE = /(`[^`\\n]+`)|(\\*\\*[^*\\n]+?\\*\\*)|(__[^_\\n]+?__)|(\\*[^*\\s][^*\\n]*?\\*)|(\\b_[^_\\s][^_\\n]*?_\\b)|(!\\[[^\\]\\n]*\\]\\([^)\\s]+\\))|(\\[[^\\]\\n]+\\]\\([^)\\s]+\\))|(\\[\\d{1,2}\\])|(\\\\[\\\\`*_{}\\[\\]()#+.!>|-])|(https?:\\/\\/[^\\s<>()]*[^\\s<>().,;:!?'\"])/g;\n\nconst linkClass = \"font-medium underline underline-offset-2 hover:text-[var(--rd-color-action-primary)]\";\n\n/** A link: outside addresses open in a new tab and say so, and unsafe schemes are not links at all. */\nfunction renderLink(url: string, label: ReactNode, key: string): ReactNode {\n  if (!isSafeUrl(url)) return label;\n  if (!isExternal(url)) {\n    return (\n      <a key={key} href={url} className={linkClass}>\n        {label}\n      </a>\n    );\n  }\n  return (\n    <a key={key} href={url} target=\"_blank\" rel=\"noopener noreferrer\" className={linkClass}>\n      {label}\n      <span className=\"sr-only\"> (opens in a new tab)</span>\n    </a>\n  );\n}\n\nexport function renderInline(text: string, opts: MarkdownOptions, keyPrefix = \"i\"): ReactNode[] {\n  const out: ReactNode[] = [];\n  let last = 0;\n  let n = 0;\n  for (const m of text.matchAll(INLINE)) {\n    const index = m.index ?? 0;\n    if (index > last) out.push(text.slice(last, index));\n    const token = m[0];\n    const key = `${keyPrefix}${n++}`;\n    if (m[1]) {\n      out.push(\n        <code key={key} className=\"rounded bg-[var(--rd-color-surface-subtle)] px-1 py-0.5 font-mono text-[0.9em]\">\n          {token.slice(1, -1)}\n        </code>,\n      );\n    } else if (m[2] || m[3]) {\n      out.push(<strong key={key}>{renderInline(token.slice(2, -2), opts, key)}</strong>);\n    } else if (m[4] || m[5]) {\n      out.push(<em key={key}>{renderInline(token.slice(1, -1), opts, key)}</em>);\n    } else if (m[6]) {\n      // Images are shown as a link, never loaded: an address chosen by a model could be used to track the reader.\n      const close = token.indexOf(\"](\");\n      const alt = token.slice(2, close).trim();\n      out.push(renderLink(token.slice(close + 2, -1), alt ? `${alt} (image)` : \"Image\", key));\n    } else if (m[7]) {\n      const close = token.indexOf(\"](\");\n      out.push(renderLink(token.slice(close + 2, -1), renderInline(token.slice(1, close), opts, key), key));\n    } else if (m[8]) {\n      const number = Number(token.slice(1, -1));\n      const source = opts.citations?.[number - 1];\n      out.push(source ? <Citation key={key} index={number} source={source} /> : token);\n    } else if (m[9]) {\n      out.push(token.slice(1));\n    } else if (m[10]) {\n      out.push(renderLink(token, token, key));\n    }\n    last = index + token.length;\n  }\n  if (last < text.length) out.push(text.slice(last));\n  return out;\n}\n\n// --- Blocks\n\nconst FENCE = /^\\s*(`{3,}|~{3,})\\s*([\\w+#.-]*)\\s*$/;\nconst HEADING = /^(#{1,6})\\s+(.*?)\\s*#*\\s*$/;\nconst RULE = /^\\s*([-*_])(\\s*\\1){2,}\\s*$/;\nconst LIST_ITEM = /^(\\s*)([-*+]|\\d{1,9}[.)])\\s+(.*)$/;\nconst QUOTE = /^\\s*>\\s?(.*)$/;\nconst TABLE_SEPARATOR = /^\\s*\\|?\\s*:?-{2,}:?\\s*(\\|\\s*:?-{2,}:?\\s*)*\\|?\\s*$/;\nconst indentOf = (line: string) => line.match(/^\\s*/)![0].length;\n\nconst splitRow = (line: string) =>\n  line\n    .trim()\n    .replace(/^\\|/, \"\")\n    .replace(/\\|$/, \"\")\n    .split(\"|\")\n    .map((cell) => cell.trim());\n\nconst startsBlock = (line: string) => FENCE.test(line) || HEADING.test(line) || RULE.test(line) || LIST_ITEM.test(line) || QUOTE.test(line);\n\nexport function renderBlocks(source: string, opts: MarkdownOptions, keyPrefix = \"b\"): ReactNode[] {\n  const lines = source.replace(/\\r\\n?/g, \"\\n\").split(\"\\n\");\n  const out: ReactNode[] = [];\n  let i = 0;\n  let n = 0;\n  const key = () => `${keyPrefix}${n++}`;\n\n  while (i < lines.length) {\n    const line = lines[i];\n    if (line.trim() === \"\") {\n      i++;\n      continue;\n    }\n\n    const fence = line.match(FENCE);\n    if (fence) {\n      const marker = fence[1];\n      const body: string[] = [];\n      i++;\n      let closed = false;\n      while (i < lines.length) {\n        const t = lines[i].trim();\n        if (t.length >= marker.length && t === marker[0].repeat(t.length)) {\n          closed = true;\n          i++;\n          break;\n        }\n        body.push(lines[i]);\n        i++;\n      }\n      out.push(<CodeBlock key={key()} code={body.join(\"\\n\")} language={fence[2] || undefined} open={!closed} />);\n      continue;\n    }\n\n    const heading = line.match(HEADING);\n    if (heading) {\n      const level = Math.min(6, opts.headingStart + heading[1].length - 1);\n      const Tag = `h${level}` as \"h3\";\n      out.push(\n        <Tag key={key()} className=\"mt-4 mb-2 font-semibold first:mt-0\">\n          {renderInline(heading[2], opts)}\n        </Tag>,\n      );\n      i++;\n      continue;\n    }\n\n    if (RULE.test(line)) {\n      out.push(<hr key={key()} className=\"my-4 border-[var(--rd-color-border-default)]\" />);\n      i++;\n      continue;\n    }\n\n    if (QUOTE.test(line)) {\n      const body: string[] = [];\n      while (i < lines.length && QUOTE.test(lines[i])) {\n        body.push(lines[i].match(QUOTE)![1]);\n        i++;\n      }\n      out.push(\n        <blockquote key={key()} className=\"my-3 border-s-2 border-[var(--rd-color-border-strong)] ps-3 text-[var(--rd-color-text-muted)]\">\n          {renderBlocks(body.join(\"\\n\"), opts, key())}\n        </blockquote>,\n      );\n      continue;\n    }\n\n    const item = line.match(LIST_ITEM);\n    if (item) {\n      const ordered = /\\d/.test(item[2]);\n      const baseIndent = item[1].length;\n      const items: string[][] = [];\n      while (i < lines.length) {\n        const current = lines[i];\n        const next = current.match(LIST_ITEM);\n        if (next && next[1].length <= baseIndent && /\\d/.test(next[2]) === ordered) {\n          items.push([next[3]]);\n          i++;\n        } else if (current.trim() !== \"\" && items.length && indentOf(current) > baseIndent) {\n          // A nested list or a continuation line belongs to the item above it.\n          items[items.length - 1].push(current.slice(Math.min(indentOf(current), baseIndent + 2)));\n          i++;\n        } else if (current.trim() === \"\" && items.length && lines[i + 1] !== undefined && LIST_ITEM.test(lines[i + 1]) && indentOf(lines[i + 1]) >= baseIndent) {\n          i++; // a blank line between items doesn't end the list\n        } else break;\n      }\n      const Tag = ordered ? \"ol\" : \"ul\";\n      const listKey = key();\n      out.push(\n        <Tag key={listKey} className={`my-3 flex flex-col gap-1 ps-6 ${ordered ? \"list-decimal\" : \"list-disc\"}`}>\n          {items.map((parts, index) => (\n            <li key={index} className=\"ps-1\">\n              {renderBlocks(parts.join(\"\\n\"), opts, `${listKey}-${index}-`).map((node, k) => (\n                <Fragment key={k}>{unwrapParagraph(node)}</Fragment>\n              ))}\n            </li>\n          ))}\n        </Tag>,\n      );\n      continue;\n    }\n\n    if (line.includes(\"|\") && i + 1 < lines.length && TABLE_SEPARATOR.test(lines[i + 1]) && lines[i + 1].includes(\"-\")) {\n      const header = splitRow(line);\n      const align = splitRow(lines[i + 1]).map((cell) => (cell.startsWith(\":\") && cell.endsWith(\":\") ? \"center\" : cell.endsWith(\":\") ? \"right\" : \"left\"));\n      i += 2;\n      const rows: string[][] = [];\n      while (i < lines.length && lines[i].trim() !== \"\" && lines[i].includes(\"|\")) {\n        rows.push(splitRow(lines[i]));\n        i++;\n      }\n      const alignClass = (c: number) => (align[c] === \"right\" ? \"text-end\" : align[c] === \"center\" ? \"text-center\" : \"text-start\");\n      out.push(\n        <div key={key()} className=\"my-3 overflow-x-auto outline-none focus-visible:ring-2 focus-visible:ring-[var(--rd-color-focus-ring)]\" tabIndex={0} role=\"region\" aria-label=\"Table\">\n          <table className=\"w-full border-collapse text-sm\">\n            <thead>\n              <tr>\n                {header.map((cell, c) => (\n                  <th key={c} scope=\"col\" className={`border-b border-[var(--rd-color-border-strong)] px-3 py-2 font-semibold ${alignClass(c)}`}>\n                    {renderInline(cell, opts)}\n                  </th>\n                ))}\n              </tr>\n            </thead>\n            <tbody>\n              {rows.map((row, r) => (\n                <tr key={r}>\n                  {header.map((_, c) => (\n                    <td key={c} className={`border-b border-[var(--rd-color-border-default)] px-3 py-2 ${alignClass(c)}`}>\n                      {renderInline(row[c] ?? \"\", opts)}\n                    </td>\n                  ))}\n                </tr>\n              ))}\n            </tbody>\n          </table>\n        </div>,\n      );\n      continue;\n    }\n\n    // A paragraph runs until a blank line or the start of another block. Single line breaks stay line breaks.\n    const para: string[] = [line];\n    i++;\n    while (i < lines.length && lines[i].trim() !== \"\" && !startsBlock(lines[i])) {\n      para.push(lines[i]);\n      i++;\n    }\n    out.push(\n      <p key={key()} className=\"my-3 first:mt-0 last:mb-0\">\n        {para.map((text, index) => (\n          <Fragment key={index}>\n            {index > 0 && <br />}\n            {renderInline(text.trim(), opts, `p${index}-`)}\n          </Fragment>\n        ))}\n      </p>,\n    );\n  }\n  return out;\n}\n\n/** A list item's lone paragraph is just its text: no extra block spacing inside the bullet. */\nfunction unwrapParagraph(node: ReactNode): ReactNode {\n  if (node && typeof node === \"object\" && \"type\" in node && node.type === \"p\") {\n    return (node as { props: { children: ReactNode } }).props.children;\n  }\n  return node;\n}\n"
+        },
+        {
+          "path": "response/response.tsx",
+          "content": "\"use client\";\n\nimport { forwardRef, useMemo } from \"react\";\nimport { responseDefaults, type ResponseSpecProps } from \"../generated/response.types\";\nimport { cx } from \"../utils/cx\";\nimport { renderBlocks } from \"./markdown\";\n\nexport interface ResponseProps extends ResponseSpecProps {\n  className?: string;\n}\n\n/**\n * Shows an assistant's markdown reply. It is safe for text you don't control (no HTML is\n * injected) and for text that is still arriving: pass `isStreaming` while it streams.\n */\nexport const Response = forwardRef<HTMLDivElement, ResponseProps>(function Response(\n  { children, isStreaming = responseDefaults.isStreaming, citations, headingLevel = responseDefaults.headingLevel, className },\n  ref,\n) {\n  // Reading the markdown is the costly part of every streamed chunk: skip it when nothing it depends on changed.\n  const content = useMemo(() => renderBlocks(children, { headingStart: Math.min(6, Math.max(2, headingLevel)), citations }), [children, headingLevel, citations]);\n  return (\n    <div\n      ref={ref}\n      // aria-busy tells assistive tech the content is still changing, so it reads the finished text, not each fragment.\n      aria-busy={isStreaming || undefined}\n      data-streaming={isStreaming || undefined}\n      className={cx(\"min-w-0 break-words text-[var(--rd-color-text-default)] leading-relaxed\", className)}\n    >\n      {content}\n      {isStreaming && (\n        <span aria-hidden=\"true\" className=\"ms-0.5 inline-block h-[1.1em] w-[2px] translate-y-[0.2em] animate-pulse bg-current motion-reduce:animate-none\" />\n      )}\n    </div>\n  );\n});\n"
+        },
+        {
+          "path": "generated/response.types.ts",
+          "content": "// Generated by rdloom codegen from specs/response.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\n/** Shows an assistant's reply as formatted text: headings, lists, tables, code, links and source markers. It is safe for text you do not control and for text that is still arriving. */\nexport interface ResponseSpecProps {\n  /**\n   * The reply, as markdown.\n   */\n  children: string;\n  /**\n   * True while the reply is still arriving. Shows a caret and tells assistive technology the content is changing.\n   * @default false\n   */\n  isStreaming?: boolean;\n  /**\n   * Sources for the [1], [2] markers in the text. A marker with no matching source stays as plain text.\n   */\n  citations?: import(\"../utils/ai\").CitationPart[];\n  /**\n   * Level of the reply's first heading (a # line), 2 to 6. Replies sit inside a page, so it starts at 3.\n   * @default 3\n   */\n  headingLevel?: number;\n}\n\nexport const responseDefaults = {\n  isStreaming: false,\n  headingLevel: 3,\n} as const;\n\nexport const responseMeta = {\n  \"name\": \"Response\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"none\"\n} as const;\n"
         }
       ]
     },
@@ -6441,6 +7748,110 @@
       ]
     },
     {
+      "id": "sources",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "Sources",
+        "version": "0.1.0",
+        "category": "ai",
+        "status": "experimental",
+        "description": "The numbered list of sources a reply drew on, with title, site and a short excerpt. Each entry is where a Citation marker lands.",
+        "props": {
+          "sources": {
+            "type": "custom",
+            "description": "The sources, in order. Their position is their number.",
+            "required": true,
+            "tsType": "import(\"../utils/ai\").CitationPart[]"
+          },
+          "label": {
+            "type": "string",
+            "description": "Heading and accessible name of the list.",
+            "default": "Sources"
+          }
+        },
+        "states": [
+          "default"
+        ],
+        "slots": [
+          "root",
+          "heading",
+          "list",
+          "source",
+          "title",
+          "host",
+          "snippet"
+        ],
+        "tokens": [
+          "color.text.default",
+          "color.text.muted",
+          "color.border.strong",
+          "color.surface.selected",
+          "color.focus.ring",
+          "color.action.primary",
+          "radius.control"
+        ],
+        "a11y": {
+          "role": "region",
+          "keyboard": [
+            "Tab: moves through the source links",
+            "A source entry takes programmatic focus when a Citation marker is followed"
+          ],
+          "requirements": [
+            "A labelled region containing an ordered list",
+            "Links to other sites open in a new tab and say so in words",
+            "The entry a marker jumps to is highlighted and focusable"
+          ],
+          "screenReader": [
+            "Announced as a region named \"Sources\" with a list of N items",
+            "Each entry reads its title, and the site below it"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "Under any reply that cites its sources"
+          ],
+          "avoid_when": [
+            "A list of search results the user chooses from: use a list or Table"
+          ],
+          "anti_patterns": [
+            "Showing a source list with no markers pointing to it"
+          ]
+        },
+        "examples": [
+          "default"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {}
+        }
+      },
+      "install": {
+        "command": "npx rdloom add sources",
+        "dependencies": [],
+        "registryDependencies": [
+          "tokens",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "default",
+          "code": "import { Sources } from \"@rdloom/react\";\n\nexport default function SourcesExample() {\n  return (\n    <div className=\"w-[30rem] max-w-full\">\n      <Sources\n        sources={[\n          { type: \"citation\", id: \"1\", title: \"Quarterly report, Q3\", url: \"https://example.com/reports/q3\", snippet: \"Revenue grew 12% over the previous quarter, led by annual plans.\" },\n          { type: \"citation\", id: \"2\", title: \"Billing system export\", snippet: \"Internal data, March to June.\" },\n          { type: \"citation\", id: \"3\", title: \"Pricing page\", url: \"https://www.example.org/pricing\" },\n        ]}\n      />\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "sources/sources.tsx",
+          "content": "\"use client\";\n\nimport { sourcesDefaults, type SourcesSpecProps } from \"../generated/sources.types\";\nimport { cx } from \"../utils/cx\";\n\nexport interface SourcesProps extends SourcesSpecProps {\n  className?: string;\n}\n\nconst hostOf = (url: string) => {\n  try {\n    return new URL(url).hostname.replace(/^www\\./, \"\");\n  } catch {\n    return undefined;\n  }\n};\nconst isWeb = (url: string) => /^https?:/i.test(url);\n\n/** The numbered list of sources a reply drew on. Each entry is what a Citation marker jumps to. */\nexport function Sources({ sources, label = sourcesDefaults.label, className }: SourcesProps) {\n  if (sources.length === 0) return null;\n  return (\n    <section aria-label={label} className={cx(\"text-sm\", className)}>\n      <h4 className=\"mb-2 text-xs font-semibold tracking-wide text-[var(--rd-color-text-muted)] uppercase\">{label}</h4>\n      <ol className=\"flex flex-col gap-1.5\">\n        {sources.map((source, i) => {\n          const host = source.url ? hostOf(source.url) : undefined;\n          return (\n            <li\n              key={source.id}\n              id={`source-${source.id}`}\n              // Focusable so a Citation marker can move focus here.\n              tabIndex={-1}\n              className=\"flex gap-2.5 rounded-[var(--rd-radius-control)] p-1.5 outline-none focus-visible:ring-2 focus-visible:ring-[var(--rd-color-focus-ring)] target:bg-[var(--rd-color-surface-selected)]\"\n            >\n              <span aria-hidden=\"true\" className=\"mt-0.5 inline-flex size-5 shrink-0 items-center justify-center rounded-full border border-[var(--rd-color-border-strong)] text-[0.7rem] tabular-nums\">\n                {i + 1}\n              </span>\n              <span className=\"flex min-w-0 flex-col\">\n                {source.url && isWeb(source.url) ? (\n                  <a href={source.url} target=\"_blank\" rel=\"noopener noreferrer\" className=\"font-medium underline underline-offset-2 hover:text-[var(--rd-color-action-primary)]\">\n                    {source.title}\n                    <span className=\"sr-only\"> (opens in a new tab)</span>\n                  </a>\n                ) : (\n                  <span className=\"font-medium\">{source.title}</span>\n                )}\n                {host && <span className=\"text-xs text-[var(--rd-color-text-muted)]\">{host}</span>}\n                {source.snippet && <span className=\"line-clamp-2 text-[var(--rd-color-text-muted)]\">{source.snippet}</span>}\n              </span>\n            </li>\n          );\n        })}\n      </ol>\n    </section>\n  );\n}\n"
+        },
+        {
+          "path": "generated/sources.types.ts",
+          "content": "// Generated by rdloom codegen from specs/sources.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\n/** The numbered list of sources a reply drew on, with title, site and a short excerpt. Each entry is where a Citation marker lands. */\nexport interface SourcesSpecProps {\n  /**\n   * The sources, in order. Their position is their number.\n   */\n  sources: import(\"../utils/ai\").CitationPart[];\n  /**\n   * Heading and accessible name of the list.\n   * @default \"Sources\"\n   */\n  label?: string;\n}\n\nexport const sourcesDefaults = {\n  label: \"Sources\",\n} as const;\n\nexport const sourcesMeta = {\n  \"name\": \"Sources\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"region\"\n} as const;\n"
+        }
+      ]
+    },
+    {
       "id": "steps",
       "spec": {
         "$schema": "./schema/component.schema.json",
@@ -7895,6 +9306,152 @@
       ]
     },
     {
+      "id": "tool-call",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "ToolCall",
+        "version": "0.1.0",
+        "category": "ai",
+        "status": "experimental",
+        "description": "One thing the assistant did, such as searching or running a query: its name, where it is (waiting, running, needs approval, done, failed), how long it took, and on request what went in and out.",
+        "props": {
+          "tool": {
+            "type": "custom",
+            "description": "The tool part from the message.",
+            "required": true,
+            "tsType": "import(\"../utils/ai\").ToolPart"
+          },
+          "onApprove": {
+            "type": "callback",
+            "description": "Called with the tool's id when the person approves it.",
+            "tsType": "(toolId: string) => void"
+          },
+          "onDeny": {
+            "type": "callback",
+            "description": "Called with the tool's id when the person declines it.",
+            "tsType": "(toolId: string) => void"
+          },
+          "defaultExpanded": {
+            "type": "boolean",
+            "description": "Show the input and result at first.",
+            "default": false
+          },
+          "focusApproval": {
+            "type": "boolean",
+            "description": "Move focus to the approval box when this tool asks for approval.",
+            "default": false
+          }
+        },
+        "states": [
+          "default",
+          "loading",
+          "disabled"
+        ],
+        "slots": [
+          "root",
+          "header",
+          "icon",
+          "title",
+          "state",
+          "details",
+          "approval"
+        ],
+        "tokens": [
+          "color.surface.default",
+          "color.surface.subtle",
+          "color.border.default",
+          "color.border.strong",
+          "color.text.default",
+          "color.text.muted",
+          "color.action.primary",
+          "color.feedback.success",
+          "color.feedback.danger",
+          "color.feedback.warning",
+          "color.feedback.info",
+          "color.focus.ring",
+          "radius.control"
+        ],
+        "a11y": {
+          "role": "group",
+          "keyboard": [
+            "Enter / Space on the header: shows or hides the input and result",
+            "Tab: moves through the header, the approval buttons and the details"
+          ],
+          "requirements": [
+            "State is said in words (\"Running\", \"Done\", \"Needs your approval\") and drawn with a different icon for each, never color alone",
+            "State changes are announced politely; a tool that arrives already finished is not read out again",
+            "The header is a real button with aria-expanded, and only when there is something to show",
+            "Input and result are scrollable regions that can be focused",
+            "Once an approval is answered, focus returns to the tool's header instead of being lost",
+            "Odd or huge values never throw: long output is cut with a count of what was left out"
+          ],
+          "screenReader": [
+            "The header reads as a button, e.g. \"Searching your sales data, Running, collapsed\"",
+            "A change is announced once: \"Searching your sales data: Done\"",
+            "A failed tool also reads its error message"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "Showing the steps an assistant took to get to an answer"
+          ],
+          "avoid_when": [
+            "A progress bar for a long job: use Progress",
+            "Steps a person walks through: use Steps"
+          ],
+          "anti_patterns": [
+            "Showing only a spinner with no words",
+            "Hiding an approval inside a collapsed section"
+          ]
+        },
+        "examples": [
+          "states",
+          "with-details",
+          "needs-approval"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {}
+        }
+      },
+      "install": {
+        "command": "npx rdloom add tool-call",
+        "dependencies": [
+          "react-aria-components@^1.21.1"
+        ],
+        "registryDependencies": [
+          "tokens",
+          "approval-box",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "states",
+          "code": "import { ToolCall, type ToolPart, type ToolState } from \"@rdloom/react\";\n\nconst states: ToolState[] = [\"pending\", \"running\", \"awaiting-approval\", \"approved\", \"denied\", \"done\", \"failed\"];\n\nconst tool = (state: ToolState): ToolPart => ({\n  type: \"tool\",\n  id: state,\n  name: \"query_sales\",\n  title: \"Searching your sales data\",\n  state,\n  startedAt: \"2026-03-01T10:00:00Z\",\n  endedAt: state === \"done\" ? \"2026-03-01T10:00:03Z\" : undefined,\n  error: state === \"failed\" ? \"The database did not answer in time.\" : undefined,\n  approval: state === \"awaiting-approval\" ? { summary: \"Read every order from the last 12 months\", risk: \"low\" } : undefined,\n});\n\n// Every state has its own icon and its own words: nothing depends on color alone.\nexport default function ToolCallStatesExample() {\n  return (\n    <div className=\"flex w-[30rem] max-w-full flex-col gap-2\">\n      {states.map((state) => (\n        <ToolCall key={state} tool={tool(state)} />\n      ))}\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "with-details",
+          "code": "import { ToolCall } from \"@rdloom/react\";\n\nexport default function ToolCallWithDetailsExample() {\n  return (\n    <div className=\"w-[30rem] max-w-full\">\n      <ToolCall\n        defaultExpanded\n        tool={{\n          type: \"tool\",\n          id: \"sales\",\n          name: \"query_sales\",\n          title: \"Searching your sales data\",\n          state: \"done\",\n          startedAt: \"2026-03-01T10:00:00Z\",\n          endedAt: \"2026-03-01T10:00:02.400Z\",\n          input: { from: \"2026-02-01\", to: \"2026-02-28\", groupBy: \"week\" },\n          output: { rows: 4, total: 48210 },\n        }}\n      />\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "needs-approval",
+          "code": "import { useState } from \"react\";\nimport { ToolCall, updateTool, type ChatMessage } from \"@rdloom/react\";\n\n// You own the state. Approving or declining moves the tool forward; focus returns to the tool.\nexport default function ToolCallNeedsApprovalExample() {\n  const [message, setMessage] = useState<ChatMessage>({\n    id: \"m\",\n    role: \"assistant\",\n    parts: [\n      {\n        type: \"tool\",\n        id: \"t\",\n        name: \"delete_drafts\",\n        title: \"Delete draft invoices\",\n        state: \"awaiting-approval\",\n        approval: { summary: \"Delete 12 draft invoices\", risk: \"high\", reversible: false },\n      },\n    ],\n  });\n  const tool = message.parts[0];\n  return (\n    <div className=\"w-[30rem] max-w-full\">\n      {tool.type === \"tool\" && (\n        <ToolCall\n          tool={tool}\n          onApprove={(id) => setMessage((m) => updateTool(m, id, { state: \"approved\" }))}\n          onDeny={(id) => setMessage((m) => updateTool(m, id, { state: \"denied\" }))}\n        />\n      )}\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "tool-call/tool-call.tsx",
+          "content": "\"use client\";\n\nimport { forwardRef, useEffect, useId, useRef, useState } from \"react\";\nimport { Button as AriaButton } from \"react-aria-components\";\nimport { toolCallDefaults, type ToolCallSpecProps } from \"../generated/tool-call.types\";\nimport { ApprovalBox } from \"../approval-box/approval-box\";\nimport { toolDuration, toolStateLabel, type ToolState } from \"../utils/ai\";\nimport { cx } from \"../utils/cx\";\nimport { BanIcon, ChevronRightIcon, ClockIcon, ErrorIcon, Spinner, SuccessIcon, WarningIcon } from \"../utils/icons\";\n\nexport interface ToolCallProps extends ToolCallSpecProps {\n  className?: string;\n}\n\n/** Turns `query_sales` into \"Query sales\" when the tool has no title of its own. */\nconst readable = (name: string) => {\n  const spaced = name.replace(/[_-]+/g, \" \").replace(/([a-z])([A-Z])/g, \"$1 $2\").trim();\n  return spaced ? spaced[0].toUpperCase() + spaced.slice(1) : name;\n};\n\nfunction StateIcon({ state }: { state: ToolState }) {\n  switch (state) {\n    case \"pending\":\n      return <ClockIcon className=\"size-4 text-[var(--rd-color-text-muted)]\" />;\n    case \"running\":\n      return <Spinner className=\"size-4 text-[var(--rd-color-action-primary)]\" />;\n    case \"awaiting-approval\":\n      return <WarningIcon className=\"size-4 text-[var(--rd-color-feedback-warning)]\" />;\n    case \"approved\":\n      return <SuccessIcon className=\"size-4 text-[var(--rd-color-feedback-info)]\" />;\n    case \"denied\":\n      return <BanIcon className=\"size-4 text-[var(--rd-color-text-muted)]\" />;\n    case \"done\":\n      return <SuccessIcon className=\"size-4 text-[var(--rd-color-feedback-success)]\" />;\n    case \"failed\":\n      return <ErrorIcon className=\"size-4 text-[var(--rd-color-feedback-danger)]\" />;\n  }\n}\n\nconst MAX_SHOWN = 4000;\n/** Pretty JSON for display, cut at a sensible length, and never throwing on odd values. */\nfunction show(value: unknown): string {\n  let text: string;\n  try {\n    text = typeof value === \"string\" ? value : (JSON.stringify(value, null, 2) ?? String(value));\n  } catch {\n    text = String(value);\n  }\n  return text.length > MAX_SHOWN ? `${text.slice(0, MAX_SHOWN)}\\n… (${text.length - MAX_SHOWN} more characters)` : text;\n}\n\n/**\n * One thing the assistant did: its name, where it is (waiting, running, needs approval, done,\n * failed) in words and a distinct icon, how long it took, and on request what went in and out.\n * A tool that needs approval shows an ApprovalBox right here.\n */\nexport const ToolCall = forwardRef<HTMLDivElement, ToolCallProps>(function ToolCall(\n  { tool, onApprove, onDeny, defaultExpanded = toolCallDefaults.defaultExpanded, focusApproval = toolCallDefaults.focusApproval, className },\n  ref,\n) {\n  const [expanded, setExpanded] = useState(defaultExpanded);\n  const detailsId = useId();\n  const header = useRef<HTMLButtonElement>(null);\n  const title = tool.title ?? readable(tool.name);\n  const stateWords = toolStateLabel[tool.state];\n  const duration = toolDuration(tool);\n  const hasDetails = tool.input !== undefined || tool.output !== undefined || !!tool.error;\n  const awaiting = tool.state === \"awaiting-approval\" && !!tool.approval;\n\n  // A status line for screen readers that changes as the tool moves on. It starts empty so only changes are spoken.\n  const [spoken, setSpoken] = useState(\"\");\n  const first = useRef(true);\n  useEffect(() => {\n    if (first.current) {\n      first.current = false;\n      // A tool that arrives already finished is part of history: don't read it out again.\n      return;\n    }\n    setSpoken(`${title}: ${stateWords}${tool.state === \"failed\" && tool.error ? `. ${tool.error}` : \"\"}`);\n  }, [tool.state, title, stateWords, tool.error]);\n\n  // The approval box disappears once answered: send focus to the tool itself, not to the page top.\n  const answer = (handler?: (id: string) => void) => () => {\n    handler?.(tool.id);\n    queueMicrotask(() => header.current?.focus());\n  };\n\n  return (\n    <div\n      ref={ref}\n      data-state={tool.state}\n      className={cx(\"flex flex-col gap-2 rounded-[var(--rd-radius-control)] border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-default)]\", className)}\n    >\n      <div className=\"text-sm\">\n        <AriaButton\n          ref={header}\n          aria-expanded={hasDetails ? expanded : undefined}\n          aria-controls={hasDetails ? detailsId : undefined}\n          onPress={() => hasDetails && setExpanded((v) => !v)}\n          className={cx(\n            \"flex w-full items-center gap-2.5 rounded-[var(--rd-radius-control)] px-3 py-2 text-start outline-none data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)]\",\n            hasDetails ? \"data-[hovered]:bg-[var(--rd-color-surface-subtle)]\" : \"cursor-default\",\n          )}\n        >\n          <StateIcon state={tool.state} />\n          <span className=\"min-w-0 flex-1 truncate font-medium text-[var(--rd-color-text-default)]\">{title}</span>\n          <span className=\"sr-only\">, </span>\n          {/* The state is said in words as well as drawn, and it is part of the button's name. */}\n          <span className=\"shrink-0 text-xs text-[var(--rd-color-text-muted)]\">\n            {stateWords}\n            {duration && <span> · {duration}</span>}\n          </span>\n          {hasDetails && <ChevronRightIcon className={cx(\"size-4 shrink-0 text-[var(--rd-color-text-muted)] transition-transform motion-reduce:transition-none\", expanded && \"rotate-90\")} />}\n        </AriaButton>\n      </div>\n\n      {awaiting && (\n        <div className=\"px-3 pb-3\">\n          <ApprovalBox\n            summary={tool.approval!.summary}\n            risk={tool.approval!.risk}\n            reversible={tool.approval!.reversible}\n            onApprove={answer(onApprove)}\n            onDeny={answer(onDeny)}\n            autoFocus={focusApproval}\n          />\n        </div>\n      )}\n\n      {hasDetails && expanded && (\n        <div id={detailsId} className=\"flex flex-col gap-2 border-t border-[var(--rd-color-border-default)] px-3 py-2.5 text-xs\">\n          {tool.input !== undefined && <Detail label=\"Input\" text={show(tool.input)} />}\n          {tool.output !== undefined && <Detail label=\"Result\" text={show(tool.output)} />}\n          {tool.error && (\n            <p className=\"text-[var(--rd-color-feedback-danger)]\">\n              <span className=\"font-semibold\">Error: </span>\n              {tool.error}\n            </p>\n          )}\n        </div>\n      )}\n\n      <span role=\"status\" className=\"sr-only\">\n        {spoken}\n      </span>\n    </div>\n  );\n});\n\nfunction Detail({ label, text }: { label: string; text: string }) {\n  return (\n    <div className=\"flex min-w-0 flex-col gap-1\">\n      <span className=\"font-semibold text-[var(--rd-color-text-muted)]\">{label}</span>\n      <pre tabIndex={0} className=\"max-h-48 overflow-auto rounded bg-[var(--rd-color-surface-subtle)] p-2 font-mono leading-relaxed outline-none focus-visible:ring-2 focus-visible:ring-[var(--rd-color-focus-ring)]\">\n        {text}\n      </pre>\n    </div>\n  );\n}\n"
+        },
+        {
+          "path": "generated/tool-call.types.ts",
+          "content": "// Generated by rdloom codegen from specs/tool-call.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\n/** One thing the assistant did, such as searching or running a query: its name, where it is (waiting, running, needs approval, done, failed), how long it took, and on request what went in and out. */\nexport interface ToolCallSpecProps {\n  /**\n   * The tool part from the message.\n   */\n  tool: import(\"../utils/ai\").ToolPart;\n  /**\n   * Called with the tool's id when the person approves it.\n   */\n  onApprove?: (toolId: string) => void;\n  /**\n   * Called with the tool's id when the person declines it.\n   */\n  onDeny?: (toolId: string) => void;\n  /**\n   * Show the input and result at first.\n   * @default false\n   */\n  defaultExpanded?: boolean;\n  /**\n   * Move focus to the approval box when this tool asks for approval.\n   * @default false\n   */\n  focusApproval?: boolean;\n}\n\nexport const toolCallDefaults = {\n  defaultExpanded: false,\n  focusApproval: false,\n} as const;\n\nexport const toolCallMeta = {\n  \"name\": \"ToolCall\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"group\"\n} as const;\n"
+        }
+      ]
+    },
+    {
       "id": "tooltip",
       "spec": {
         "$schema": "./schema/component.schema.json",
@@ -8392,6 +9949,10 @@
       "name": "utils",
       "files": [
         {
+          "path": "utils/ai.ts",
+          "content": "// The shape every AI interface component reads, and the few helpers that keep it consistent.\n// Nothing here calls a model: you feed messages in, in this shape, from any backend.\n// specs/schema/ai-message.schema.json is the same shape as JSON Schema.\n\nexport type MessageRole = \"user\" | \"assistant\" | \"system\";\nexport type MessageStatus = \"streaming\" | \"complete\" | \"stopped\" | \"error\";\n\nexport type ToolState = \"pending\" | \"running\" | \"awaiting-approval\" | \"approved\" | \"denied\" | \"done\" | \"failed\";\n\nexport interface TextPart {\n  type: \"text\";\n  /** Markdown. */\n  text: string;\n  streaming?: boolean;\n}\n\nexport interface ReasoningPart {\n  type: \"reasoning\";\n  text: string;\n  streaming?: boolean;\n}\n\nexport interface ToolApproval {\n  /** Plain words about what is about to happen, e.g. \"Delete 12 draft invoices\". */\n  summary: string;\n  risk?: \"low\" | \"medium\" | \"high\";\n  reversible?: boolean;\n}\n\nexport interface ToolPart {\n  type: \"tool\";\n  id: string;\n  /** Machine name, e.g. `query_sales`. */\n  name: string;\n  /** What a person reads, e.g. \"Searching your sales data\". */\n  title?: string;\n  state: ToolState;\n  input?: unknown;\n  output?: unknown;\n  error?: string;\n  approval?: ToolApproval;\n  startedAt?: string;\n  endedAt?: string;\n}\n\nexport interface CitationPart {\n  type: \"citation\";\n  id: string;\n  title: string;\n  url?: string;\n  snippet?: string;\n}\n\nexport interface TableData {\n  columns: string[];\n  rows: Array<Array<string | number | null>>;\n}\n\nexport interface ChartData {\n  labels: string[];\n  series: Array<{ name: string; values: number[] }>;\n  /** Unit shown after values, e.g. \"$\" or \"%\". Optional. */\n  unit?: string;\n}\n\nexport interface TableArtifactPart {\n  type: \"artifact\";\n  kind: \"table\";\n  title: string;\n  summary?: string;\n  data: TableData;\n}\n\nexport interface ChartArtifactPart {\n  type: \"artifact\";\n  kind: \"chart\";\n  title: string;\n  /** A sentence a screen reader gets instead of the picture. */\n  summary?: string;\n  data: ChartData;\n}\n\nexport type ArtifactPart = TableArtifactPart | ChartArtifactPart;\n\nexport interface FilePart {\n  type: \"file\";\n  name: string;\n  mediaType?: string;\n  url?: string;\n  size?: number;\n}\n\nexport type MessagePart = TextPart | ReasoningPart | ToolPart | CitationPart | ArtifactPart | FilePart;\n\nexport interface ChatMessage {\n  id: string;\n  role: MessageRole;\n  status?: MessageStatus;\n  createdAt?: string;\n  parts: MessagePart[];\n}\n\n// --- Tool states\n\nconst NEXT: Record<ToolState, readonly ToolState[]> = {\n  pending: [\"running\", \"awaiting-approval\", \"failed\", \"denied\"],\n  running: [\"awaiting-approval\", \"done\", \"failed\"],\n  \"awaiting-approval\": [\"approved\", \"denied\"],\n  approved: [\"running\", \"done\", \"failed\"],\n  denied: [],\n  done: [],\n  failed: [],\n};\n\n/** Tool states only move forward, so a late or repeated update can't take a finished tool back. */\nexport function canMoveTool(from: ToolState, to: ToolState): boolean {\n  return from === to || NEXT[from].includes(to);\n}\n\nexport function isToolFinal(state: ToolState): boolean {\n  return NEXT[state].length === 0;\n}\n\n/** True while the tool is still going or waiting on someone. */\nexport function isToolActive(state: ToolState): boolean {\n  return !isToolFinal(state);\n}\n\n/** What each state is called to a person (and to a screen reader). */\nexport const toolStateLabel: Record<ToolState, string> = {\n  pending: \"Waiting\",\n  running: \"Running\",\n  \"awaiting-approval\": \"Needs your approval\",\n  approved: \"Approved\",\n  denied: \"Declined\",\n  done: \"Done\",\n  failed: \"Failed\",\n};\n\n// --- Updating messages. Each returns a new message and never changes the one passed in.\n\n/** Changes one tool part. An update that would move its state backwards is ignored. */\nexport function updateTool(message: ChatMessage, toolId: string, patch: Partial<Omit<ToolPart, \"type\" | \"id\">>): ChatMessage {\n  let changed = false;\n  const parts = message.parts.map((part) => {\n    if (part.type !== \"tool\" || part.id !== toolId) return part;\n    if (patch.state && !canMoveTool(part.state, patch.state)) return part;\n    changed = true;\n    return { ...part, ...patch };\n  });\n  return changed ? { ...message, parts } : message;\n}\n\n/** Adds streamed text to the end of the message, continuing the last text part if it is still streaming. */\nexport function appendText(message: ChatMessage, delta: string): ChatMessage {\n  const last = message.parts[message.parts.length - 1];\n  if (last && last.type === \"text\" && last.streaming) {\n    return { ...message, status: \"streaming\", parts: [...message.parts.slice(0, -1), { ...last, text: last.text + delta }] };\n  }\n  return { ...message, status: \"streaming\", parts: [...message.parts, { type: \"text\", text: delta, streaming: true }] };\n}\n\n/** Marks the message and all of its streaming parts as finished. */\nexport function finishMessage(message: ChatMessage, status: Exclude<MessageStatus, \"streaming\"> = \"complete\"): ChatMessage {\n  return {\n    ...message,\n    status,\n    parts: message.parts.map((part) => ((part.type === \"text\" || part.type === \"reasoning\") && part.streaming ? { ...part, streaming: false } : part)),\n  };\n}\n\n// --- Reading messages\n\n/** A message's text parts, joined: for copying, search and the accessible name of a result. */\nexport function messageText(message: ChatMessage): string {\n  return message.parts\n    .filter((part): part is TextPart => part.type === \"text\")\n    .map((part) => part.text)\n    .join(\"\\n\\n\");\n}\n\nexport type PartGroup = { kind: \"part\"; part: Exclude<MessagePart, ToolPart> } | { kind: \"tools\"; tools: ToolPart[] };\n\n/** Splits parts into runs: each stretch of consecutive tool calls becomes one group. */\nexport function groupParts(parts: MessagePart[]): PartGroup[] {\n  const groups: PartGroup[] = [];\n  for (const part of parts) {\n    if (part.type !== \"tool\") {\n      groups.push({ kind: \"part\", part });\n      continue;\n    }\n    const last = groups[groups.length - 1];\n    if (last && last.kind === \"tools\") last.tools.push(part);\n    else groups.push({ kind: \"tools\", tools: [part] });\n  }\n  return groups;\n}\n\n/** The tool that is waiting on a person, if any: the first one, since they answer in order. */\nexport function pendingApproval(message: ChatMessage): ToolPart | undefined {\n  return message.parts.find((part): part is ToolPart => part.type === \"tool\" && part.state === \"awaiting-approval\");\n}\n\n/** \"3.2 s\", \"1 min 5 s\": how long a tool took, when it recorded both times. */\nexport function toolDuration(tool: Pick<ToolPart, \"startedAt\" | \"endedAt\">): string | undefined {\n  if (!tool.startedAt || !tool.endedAt) return undefined;\n  const ms = Date.parse(tool.endedAt) - Date.parse(tool.startedAt);\n  if (!Number.isFinite(ms) || ms < 0) return undefined;\n  if (ms < 950) return `${Math.max(1, Math.round(ms))} ms`;\n  const s = ms / 1000;\n  if (s < 60) return `${s < 10 ? s.toFixed(1) : Math.round(s)} s`;\n  return `${Math.floor(s / 60)} min ${Math.round(s % 60)} s`;\n}\n"
+        },
+        {
           "path": "utils/arrow.tsx",
           "content": "\"use client\";\n\nimport { OverlayArrow } from \"react-aria-components\";\nimport { cx } from \"./cx\";\n\n/** Arrow for Popover and Tooltip. It rotates to face the trigger. */\nexport function Arrow({ className }: { className?: string }) {\n  return (\n    <OverlayArrow>\n      <svg\n        width={12}\n        height={12}\n        viewBox=\"0 0 12 12\"\n        aria-hidden=\"true\"\n        className={cx(\n          \"block [[data-placement=bottom]>&]:rotate-180 [[data-placement=left]>&]:-rotate-90 [[data-placement=right]>&]:rotate-90\",\n          className,\n        )}\n      >\n        <path d=\"M0 0 L6 6 L12 0\" />\n      </svg>\n    </OverlayArrow>\n  );\n}\n"
         },
@@ -8405,7 +9966,7 @@
         },
         {
           "path": "utils/icons.tsx",
-          "content": "export function CheckIcon({ className = \"size-4 shrink-0 text-[var(--rd-color-action-primary)]\" }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 16 16\" className={className} fill=\"none\">\n      <path d=\"M3.5 8.5l3 3 6-7\" stroke=\"currentColor\" strokeWidth=\"2\" strokeLinecap=\"round\" strokeLinejoin=\"round\" />\n    </svg>\n  );\n}\n\nexport function ChevronDownIcon() {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 16 16\" className=\"size-4 shrink-0 text-[var(--rd-color-text-muted)]\" fill=\"none\">\n      <path d=\"M4 6l4 4 4-4\" stroke=\"currentColor\" strokeWidth=\"1.5\" strokeLinecap=\"round\" strokeLinejoin=\"round\" />\n    </svg>\n  );\n}\n\nexport function CloseIcon({ className = \"size-3\" }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 16 16\" className={className} fill=\"none\">\n      <path d=\"M4 4l8 8M12 4l-8 8\" stroke=\"currentColor\" strokeWidth=\"1.75\" strokeLinecap=\"round\" />\n    </svg>\n  );\n}\n\nexport function Spinner({ className = \"size-4\" }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 24 24\" className={`${className} animate-spin`} fill=\"none\">\n      <circle cx=\"12\" cy=\"12\" r=\"10\" stroke=\"currentColor\" strokeWidth=\"3\" opacity=\"0.25\" />\n      <path d=\"M22 12a10 10 0 0 0-10-10\" stroke=\"currentColor\" strokeWidth=\"3\" strokeLinecap=\"round\" />\n    </svg>\n  );\n}\n\nexport function CalendarIcon() {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 16 16\" className=\"size-4\" fill=\"none\">\n      <rect x=\"2.5\" y=\"3.5\" width=\"11\" height=\"10\" rx=\"1.5\" stroke=\"currentColor\" strokeWidth=\"1.3\" />\n      <path d=\"M2.5 6.5h11M5.5 2v3M10.5 2v3\" stroke=\"currentColor\" strokeWidth=\"1.3\" strokeLinecap=\"round\" />\n    </svg>\n  );\n}\n\n// Status icons for Alert. Each tone has its own shape (circle with i, check,\n// triangle, octagon) so the tone never depends on color alone.\nconst statusIcon = \"size-5 shrink-0\";\n\nexport function InfoIcon({ className = statusIcon }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 20 20\" className={className} fill=\"none\">\n      <circle cx=\"10\" cy=\"10\" r=\"8\" stroke=\"currentColor\" strokeWidth=\"1.6\" />\n      <path d=\"M10 9v5M10 6.25v.01\" stroke=\"currentColor\" strokeWidth=\"1.8\" strokeLinecap=\"round\" />\n    </svg>\n  );\n}\n\nexport function SuccessIcon({ className = statusIcon }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 20 20\" className={className} fill=\"none\">\n      <circle cx=\"10\" cy=\"10\" r=\"8\" stroke=\"currentColor\" strokeWidth=\"1.6\" />\n      <path d=\"M6.5 10.25l2.5 2.5 4.5-5\" stroke=\"currentColor\" strokeWidth=\"1.8\" strokeLinecap=\"round\" strokeLinejoin=\"round\" />\n    </svg>\n  );\n}\n\nexport function WarningIcon({ className = statusIcon }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 20 20\" className={className} fill=\"none\">\n      <path d=\"M10 2.75l8 14H2l8-14z\" stroke=\"currentColor\" strokeWidth=\"1.6\" strokeLinejoin=\"round\" />\n      <path d=\"M10 8v4M10 14.25v.01\" stroke=\"currentColor\" strokeWidth=\"1.8\" strokeLinecap=\"round\" />\n    </svg>\n  );\n}\n\nexport function ErrorIcon({ className = statusIcon }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 20 20\" className={className} fill=\"none\">\n      <path d=\"M7 2.5h6l4.5 4.5v6L13 17.5H7L2.5 13V7L7 2.5z\" stroke=\"currentColor\" strokeWidth=\"1.6\" strokeLinejoin=\"round\" />\n      <path d=\"M7.5 7.5l5 5M12.5 7.5l-5 5\" stroke=\"currentColor\" strokeWidth=\"1.8\" strokeLinecap=\"round\" />\n    </svg>\n  );\n}\n\nexport function SearchIcon({ className = \"size-5 shrink-0\" }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 20 20\" className={className} fill=\"none\">\n      <circle cx=\"9\" cy=\"9\" r=\"5.75\" stroke=\"currentColor\" strokeWidth=\"1.6\" />\n      <path d=\"M13.5 13.5L17 17\" stroke=\"currentColor\" strokeWidth=\"1.6\" strokeLinecap=\"round\" />\n    </svg>\n  );\n}\n\nexport function UploadIcon({ className = \"size-5 shrink-0\" }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 20 20\" className={className} fill=\"none\">\n      <path d=\"M10 13V3.5M6.25 7L10 3.25 13.75 7\" stroke=\"currentColor\" strokeWidth=\"1.6\" strokeLinecap=\"round\" strokeLinejoin=\"round\" />\n      <path d=\"M3.5 12.5v2.25c0 .83.67 1.5 1.5 1.5h10c.83 0 1.5-.67 1.5-1.5V12.5\" stroke=\"currentColor\" strokeWidth=\"1.6\" strokeLinecap=\"round\" />\n    </svg>\n  );\n}\n\nexport function FileIcon({ className = \"size-5 shrink-0\" }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 20 20\" className={className} fill=\"none\">\n      <path d=\"M5.5 2.75h5.25L15 7v9.5a.75.75 0 0 1-.75.75h-8.5A.75.75 0 0 1 5 16.5v-13a.75.75 0 0 1 .5-.75z\" stroke=\"currentColor\" strokeWidth=\"1.5\" strokeLinejoin=\"round\" />\n      <path d=\"M10.5 2.75V7H15\" stroke=\"currentColor\" strokeWidth=\"1.5\" strokeLinejoin=\"round\" />\n    </svg>\n  );\n}\n\nexport function ChevronRightIcon({ className = \"size-4 shrink-0\" }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 16 16\" className={className} fill=\"none\">\n      <path d=\"M6 3.5l4.5 4.5L6 12.5\" stroke=\"currentColor\" strokeWidth=\"1.6\" strokeLinecap=\"round\" strokeLinejoin=\"round\" />\n    </svg>\n  );\n}\n"
+          "content": "export function CheckIcon({ className = \"size-4 shrink-0 text-[var(--rd-color-action-primary)]\" }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 16 16\" className={className} fill=\"none\">\n      <path d=\"M3.5 8.5l3 3 6-7\" stroke=\"currentColor\" strokeWidth=\"2\" strokeLinecap=\"round\" strokeLinejoin=\"round\" />\n    </svg>\n  );\n}\n\nexport function ChevronDownIcon() {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 16 16\" className=\"size-4 shrink-0 text-[var(--rd-color-text-muted)]\" fill=\"none\">\n      <path d=\"M4 6l4 4 4-4\" stroke=\"currentColor\" strokeWidth=\"1.5\" strokeLinecap=\"round\" strokeLinejoin=\"round\" />\n    </svg>\n  );\n}\n\nexport function CloseIcon({ className = \"size-3\" }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 16 16\" className={className} fill=\"none\">\n      <path d=\"M4 4l8 8M12 4l-8 8\" stroke=\"currentColor\" strokeWidth=\"1.75\" strokeLinecap=\"round\" />\n    </svg>\n  );\n}\n\nexport function Spinner({ className = \"size-4\" }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 24 24\" className={`${className} animate-spin`} fill=\"none\">\n      <circle cx=\"12\" cy=\"12\" r=\"10\" stroke=\"currentColor\" strokeWidth=\"3\" opacity=\"0.25\" />\n      <path d=\"M22 12a10 10 0 0 0-10-10\" stroke=\"currentColor\" strokeWidth=\"3\" strokeLinecap=\"round\" />\n    </svg>\n  );\n}\n\nexport function CalendarIcon() {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 16 16\" className=\"size-4\" fill=\"none\">\n      <rect x=\"2.5\" y=\"3.5\" width=\"11\" height=\"10\" rx=\"1.5\" stroke=\"currentColor\" strokeWidth=\"1.3\" />\n      <path d=\"M2.5 6.5h11M5.5 2v3M10.5 2v3\" stroke=\"currentColor\" strokeWidth=\"1.3\" strokeLinecap=\"round\" />\n    </svg>\n  );\n}\n\n// Status icons for Alert. Each tone has its own shape (circle with i, check,\n// triangle, octagon) so the tone never depends on color alone.\nconst statusIcon = \"size-5 shrink-0\";\n\nexport function InfoIcon({ className = statusIcon }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 20 20\" className={className} fill=\"none\">\n      <circle cx=\"10\" cy=\"10\" r=\"8\" stroke=\"currentColor\" strokeWidth=\"1.6\" />\n      <path d=\"M10 9v5M10 6.25v.01\" stroke=\"currentColor\" strokeWidth=\"1.8\" strokeLinecap=\"round\" />\n    </svg>\n  );\n}\n\nexport function SuccessIcon({ className = statusIcon }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 20 20\" className={className} fill=\"none\">\n      <circle cx=\"10\" cy=\"10\" r=\"8\" stroke=\"currentColor\" strokeWidth=\"1.6\" />\n      <path d=\"M6.5 10.25l2.5 2.5 4.5-5\" stroke=\"currentColor\" strokeWidth=\"1.8\" strokeLinecap=\"round\" strokeLinejoin=\"round\" />\n    </svg>\n  );\n}\n\nexport function WarningIcon({ className = statusIcon }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 20 20\" className={className} fill=\"none\">\n      <path d=\"M10 2.75l8 14H2l8-14z\" stroke=\"currentColor\" strokeWidth=\"1.6\" strokeLinejoin=\"round\" />\n      <path d=\"M10 8v4M10 14.25v.01\" stroke=\"currentColor\" strokeWidth=\"1.8\" strokeLinecap=\"round\" />\n    </svg>\n  );\n}\n\nexport function ErrorIcon({ className = statusIcon }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 20 20\" className={className} fill=\"none\">\n      <path d=\"M7 2.5h6l4.5 4.5v6L13 17.5H7L2.5 13V7L7 2.5z\" stroke=\"currentColor\" strokeWidth=\"1.6\" strokeLinejoin=\"round\" />\n      <path d=\"M7.5 7.5l5 5M12.5 7.5l-5 5\" stroke=\"currentColor\" strokeWidth=\"1.8\" strokeLinecap=\"round\" />\n    </svg>\n  );\n}\n\nexport function SearchIcon({ className = \"size-5 shrink-0\" }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 20 20\" className={className} fill=\"none\">\n      <circle cx=\"9\" cy=\"9\" r=\"5.75\" stroke=\"currentColor\" strokeWidth=\"1.6\" />\n      <path d=\"M13.5 13.5L17 17\" stroke=\"currentColor\" strokeWidth=\"1.6\" strokeLinecap=\"round\" />\n    </svg>\n  );\n}\n\nexport function UploadIcon({ className = \"size-5 shrink-0\" }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 20 20\" className={className} fill=\"none\">\n      <path d=\"M10 13V3.5M6.25 7L10 3.25 13.75 7\" stroke=\"currentColor\" strokeWidth=\"1.6\" strokeLinecap=\"round\" strokeLinejoin=\"round\" />\n      <path d=\"M3.5 12.5v2.25c0 .83.67 1.5 1.5 1.5h10c.83 0 1.5-.67 1.5-1.5V12.5\" stroke=\"currentColor\" strokeWidth=\"1.6\" strokeLinecap=\"round\" />\n    </svg>\n  );\n}\n\nexport function FileIcon({ className = \"size-5 shrink-0\" }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 20 20\" className={className} fill=\"none\">\n      <path d=\"M5.5 2.75h5.25L15 7v9.5a.75.75 0 0 1-.75.75h-8.5A.75.75 0 0 1 5 16.5v-13a.75.75 0 0 1 .5-.75z\" stroke=\"currentColor\" strokeWidth=\"1.5\" strokeLinejoin=\"round\" />\n      <path d=\"M10.5 2.75V7H15\" stroke=\"currentColor\" strokeWidth=\"1.5\" strokeLinejoin=\"round\" />\n    </svg>\n  );\n}\n\nexport function ChevronRightIcon({ className = \"size-4 shrink-0\" }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 16 16\" className={className} fill=\"none\">\n      <path d=\"M6 3.5l4.5 4.5L6 12.5\" stroke=\"currentColor\" strokeWidth=\"1.6\" strokeLinecap=\"round\" strokeLinejoin=\"round\" />\n    </svg>\n  );\n}\n\n// Icons for the AI interface components: each tool state has its own shape.\nexport function ClockIcon({ className = \"size-4 shrink-0\" }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 16 16\" className={className} fill=\"none\">\n      <circle cx=\"8\" cy=\"8\" r=\"6\" stroke=\"currentColor\" strokeWidth=\"1.4\" strokeDasharray=\"2.2 2.2\" />\n      <path d=\"M8 4.75V8l2 1.25\" stroke=\"currentColor\" strokeWidth=\"1.4\" strokeLinecap=\"round\" strokeLinejoin=\"round\" />\n    </svg>\n  );\n}\n\nexport function BanIcon({ className = \"size-4 shrink-0\" }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 16 16\" className={className} fill=\"none\">\n      <circle cx=\"8\" cy=\"8\" r=\"6\" stroke=\"currentColor\" strokeWidth=\"1.4\" />\n      <path d=\"M3.9 12.1l8.2-8.2\" stroke=\"currentColor\" strokeWidth=\"1.4\" strokeLinecap=\"round\" />\n    </svg>\n  );\n}\n\nexport function SparkleIcon({ className = \"size-4 shrink-0\" }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 16 16\" className={className} fill=\"none\">\n      <path d=\"M8 1.75l1.4 3.85 3.85 1.4-3.85 1.4L8 12.25 6.6 8.4 2.75 7l3.85-1.4L8 1.75z\" stroke=\"currentColor\" strokeWidth=\"1.3\" strokeLinejoin=\"round\" />\n      <path d=\"M12.5 11.25v2.5M11.25 12.5h2.5\" stroke=\"currentColor\" strokeWidth=\"1.3\" strokeLinecap=\"round\" />\n    </svg>\n  );\n}\n\nexport function SendIcon({ className = \"size-4 shrink-0\" }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 16 16\" className={className} fill=\"none\">\n      <path d=\"M8 12.5V3.5M4.25 7.25L8 3.5l3.75 3.75\" stroke=\"currentColor\" strokeWidth=\"1.6\" strokeLinecap=\"round\" strokeLinejoin=\"round\" />\n    </svg>\n  );\n}\n\nexport function StopIcon({ className = \"size-4 shrink-0\" }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 16 16\" className={className} fill=\"currentColor\">\n      <rect x=\"4\" y=\"4\" width=\"8\" height=\"8\" rx=\"1.5\" />\n    </svg>\n  );\n}\n\nexport function ArrowDownIcon({ className = \"size-4 shrink-0\" }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 16 16\" className={className} fill=\"none\">\n      <path d=\"M8 3.5v9M4.25 8.75L8 12.5l3.75-3.75\" stroke=\"currentColor\" strokeWidth=\"1.6\" strokeLinecap=\"round\" strokeLinejoin=\"round\" />\n    </svg>\n  );\n}\n"
         },
         {
           "path": "utils/motion.tsx",

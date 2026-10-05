@@ -1,0 +1,111 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Message",
+  "version": "0.1.0",
+  "category": "ai",
+  "status": "experimental",
+  "description": "One message in a conversation, from you or the assistant. It renders each part in order with the right component: text as formatted markdown, tool calls as activity, tables and charts as real components, sources at the end.",
+  "props": {
+    "message": {
+      "type": "custom",
+      "description": "The message, as a list of typed parts.",
+      "required": true,
+      "tsType": "import(\"../utils/ai\").ChatMessage"
+    },
+    "onApprove": {
+      "type": "callback",
+      "description": "Called with a tool's id when the person approves it.",
+      "tsType": "(toolId: string) => void"
+    },
+    "onDeny": {
+      "type": "callback",
+      "description": "Called with a tool's id when the person declines it.",
+      "tsType": "(toolId: string) => void"
+    },
+    "onRetry": {
+      "type": "callback",
+      "description": "Shows a Try again button on a message that failed.",
+      "tsType": "() => void"
+    },
+    "actions": {
+      "type": "node",
+      "description": "Extra buttons under the message, e.g. thumbs up and down."
+    },
+    "focusApproval": {
+      "type": "boolean",
+      "description": "Move focus to an approval box when one appears.",
+      "default": false
+    },
+    "headingLevel": {
+      "type": "number",
+      "description": "Level of headings inside the reply, 2 to 6.",
+      "default": 3
+    }
+  },
+  "states": [
+    "default",
+    "loading"
+  ],
+  "slots": [
+    "root",
+    "avatar",
+    "bubble",
+    "parts",
+    "sources",
+    "actions",
+    "status"
+  ],
+  "tokens": [
+    "color.text.default",
+    "color.text.muted",
+    "color.surface.selected",
+    "color.surface.subtle",
+    "color.border.default",
+    "color.action.primary",
+    "color.feedback.danger",
+    "color.focus.ring",
+    "radius.overlay",
+    "radius.control"
+  ],
+  "a11y": {
+    "role": "article",
+    "keyboard": [
+      "Tab: moves through links, code copy buttons, tool steps and message actions"
+    ],
+    "requirements": [
+      "Each message is an article named by who wrote it (\"You message\", \"Assistant message\")",
+      "Your own text is plain text; the assistant's is formatted, with no HTML injected",
+      "A reply that hasn't started shows \"Assistant is thinking\" for screen readers as well as animated dots, and the dots stand still for reduced motion",
+      "Errors are announced (role alert) and offer Try again when you provide onRetry; a stopped reply says so",
+      "aria-busy is set while the message streams"
+    ],
+    "screenReader": [
+      "\"Assistant message, article\" then the reply",
+      "\"Assistant is thinking\" before any text arrives",
+      "\"Something went wrong. Try again\""
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "Showing one turn of a chat",
+      "Showing a saved conversation"
+    ],
+    "avoid_when": [
+      "A whole chat with input and scrolling: use Chat"
+    ],
+    "anti_patterns": [
+      "Building the message from one long markdown string, so tools, charts and sources lose their structure"
+    ]
+  },
+  "examples": [
+    "text",
+    "with-tools",
+    "with-artifacts",
+    "error"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {}
+  }
+}

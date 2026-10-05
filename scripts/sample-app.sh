@@ -42,6 +42,14 @@ npx rdloom add shimmer-button text-shimmer blur-fade --install
 test -e src/styles/rdloom-motion.css || { echo "✗ rdloom add did not write the motion CSS"; exit 1; }
 grep -q 'rdloom-motion.css' src/styles/rdloom-tokens.css || { echo "✗ the tokens file does not import the motion CSS"; exit 1; }
 
+step "AI components: the chat and every part it is made of"
+npx rdloom add chat generated-chart --install
+for part in message response tool-call approval-box agent-activity citation sources prompt-input generated-table generated-chart chat button table; do
+  test -e "src/components/rdloom/$part/$part.tsx" || { echo "✗ rdloom add chat did not bring $part"; exit 1; }
+done
+test -e src/components/rdloom/utils/ai.ts || { echo "✗ the message types (utils/ai.ts) were not installed"; exit 1; }
+echo "✓ chat and its parts installed"
+
 step "Typecheck and production build"
 npm run build --silent
 # The keyframes must be in the CSS the browser actually loads, with no <style> tag in the markup.

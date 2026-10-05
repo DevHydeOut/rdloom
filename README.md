@@ -6,7 +6,7 @@
 
 Every component is defined once, as a JSON spec. That spec generates the TypeScript types, the design tokens, the Figma library, the documentation and the AI-agent context, so design, code and AI tools never drift apart.
 
-> Status: 50 components built and tested, including a 100,000-row DataGrid, a command palette, file upload, DateRangePicker, Combobox and Table. The CLI (`rdloom`) and the MCP server (`@rdloom/mcp`) are on npm; the docs site is not hosted yet.
+> Status: 61 components built and tested, including a 100,000-row DataGrid, a command palette, file upload, DateRangePicker, Combobox and Table. The CLI (`rdloom`) and the MCP server (`@rdloom/mcp`) are on npm; the docs site is not hosted yet.
 
 ## How it works
 
@@ -351,6 +351,17 @@ Every one of them follows the same rules, and tests check them:
 - **One stylesheet, no setup, no inline `<style>` tags.** The keyframes and still rules for every effect live in one file, `rdloom-motion.css`. The first time you add a motion component, `rdloom add` writes it next to your tokens CSS and adds a single `@import` line to the tokens file, so it loads with what you already import. A project that never adds an effect never gets the file, and because nothing is injected as a `<style>` tag it works under a strict content-security policy. (`BlurFade` and `RevealButton` are plain transitions and need no CSS.) Adding by hand? Save the file and import it. Per-effect settings such as speed are small CSS variables set on the element, with defaults in the stylesheet, so an effect still moves at a sensible pace even if a policy strips style attributes.
 - **No packages.** The text effects, borders and `BlurFade` need no npm packages beyond rdloom's own shared helpers, and several render in a React Server Component.
 - **Never hides content.** `BlurFade` is visible in the server HTML and for visitors without JavaScript; it is only hidden, before the first paint, once the browser can reveal it again, and never when reduced motion is on.
+
+## AI interface components
+
+Eleven components for building an assistant, copilot or agent screen: `Chat`, `Message`, `PromptInput`, `Response`, `ToolCall`, `AgentActivity`, `ApprovalBox`, `Citation`, `Sources`, `GeneratedTable` and `GeneratedChart`. They are in their own category (`ai`) and are opt-in like every other component.
+
+- **One message shape.** A message is an ordered list of typed parts (`text`, `reasoning`, `tool`, `citation`, `artifact`, `file`). The shape is in `packages/react/src/utils/ai.ts` and as JSON Schema in `specs/schema/ai-message.schema.json`. Each part has its own component, so tool steps, tables and charts keep their structure instead of becoming one long markdown string.
+- **Bring your own model.** Nothing calls a model or a server. You pass messages in and get `onSend`, `onStop`, `onApprove` and `onDeny` back, so it works with any backend or AI SDK (map its messages into the shape once).
+- **Tool states only move forward.** `pending → running → done | failed`, and `running → awaiting-approval → approved | denied`. `updateTool`, `appendText` and `finishMessage` return new messages and ignore a backwards update, so a late event can't reopen a finished tool.
+- **Built for how assistive technology handles streaming.** The message list is not a live region; one polite status line says when a reply starts and ends, and each tool announces its own change once. An approval is announced when it appears, takes focus on the box (not on a button), says its risk in words, can't be collapsed away, and returns focus to the tool when answered. Charts always carry a written summary and a "View as table" switch; series differ by shape, not only color.
+- **Safe with text you don't control.** `Response` reads markdown into React elements and never injects HTML; links with unsafe schemes show as plain text; half-finished markdown while streaming never throws. CSV export prefixes cells that start with `=`, `+`, `-` or `@` so a spreadsheet can't run them as formulas.
+- **No chart library.** `GeneratedChart` draws bars and lines in plain SVG.
 
 ## Renaming the library
 The name is kept in few places on purpose: `packages/codegen/src/brand.ts` (name, CSS prefix, npm scope), the `name` fields in each `package.json`, and this README.

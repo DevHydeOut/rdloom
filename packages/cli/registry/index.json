@@ -26,10 +26,22 @@
       "description": "A stack of sections whose content expands and collapses under a heading, like an FAQ. Use with AccordionItem."
     },
     {
+      "name": "agent-activity",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A short summary of what the assistant is doing or did, such as \"Used 3 tools\", that opens into each step. It stays open while a step needs approval."
+    },
+    {
       "name": "alert",
       "type": "registry:ui",
       "version": "0.1.0",
       "description": "An inline message about the state of the page or a task: a tip, a success, a warning or an error. For brief confirmations that disappear, use Toast."
+    },
+    {
+      "name": "approval-box",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "Asks someone to approve or decline something the assistant wants to do. It says what will happen, how risky it is and whether it can be undone, in words as well as color."
     },
     {
       "name": "avatar",
@@ -74,10 +86,22 @@
       "description": "A bordered container that groups related content under an optional heading, with an optional footer for actions."
     },
     {
+      "name": "chat",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A whole conversation with an assistant: the messages, a box to write in, and the stop and jump-to-latest controls. It shows what you give it and reports what the person does; it never calls a model."
+    },
+    {
       "name": "checkbox",
       "type": "registry:ui",
       "version": "0.1.1",
       "description": "Lets the user turn a single option on or off, with an optional indeterminate state."
+    },
+    {
+      "name": "citation",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A small numbered marker, like [1], inside a reply that jumps to the source it refers to."
     },
     {
       "name": "combobox",
@@ -128,6 +152,18 @@
       "description": "A drop zone and button for choosing files, with type, size and count limits and a list of the chosen files you can remove from. The component picks the files; you upload them."
     },
     {
+      "name": "generated-chart",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A bar or line chart an assistant produced, drawn without a chart library, always with a written summary and a View as table switch that shows the same numbers as a table."
+    },
+    {
+      "name": "generated-table",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A table an assistant produced, shown as a real sortable table with a title and summary, numbers aligned, long results cut to a few rows, and a CSV download."
+    },
+    {
       "name": "gradient-button",
       "type": "registry:ui",
       "version": "0.1.0",
@@ -150,6 +186,12 @@
       "type": "registry:ui",
       "version": "0.1.0",
       "description": "A list of actions or options that opens from a button, like a More (…) or Account menu. Use with MenuTrigger and MenuItem."
+    },
+    {
+      "name": "message",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "One message in a conversation, from you or the assistant. It renders each part in order with the right component: text as formatted markdown, tool calls as activity, tables and charts as real components, sources at the end."
     },
     {
       "name": "number-field",
@@ -176,6 +218,12 @@
       "description": "A bar showing how far along a task is, or that something is working when the amount is unknown."
     },
     {
+      "name": "prompt-input",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "The box people type a message in. Enter sends, Shift+Enter adds a line, the box grows with the text, and the Send button becomes Stop while a reply is on its way."
+    },
+    {
       "name": "pulse-button",
       "type": "registry:ui",
       "version": "0.1.0",
@@ -186,6 +234,12 @@
       "type": "registry:ui",
       "version": "0.1.1",
       "description": "Lets the user pick exactly one option from a small, visible set. Use with Radio children."
+    },
+    {
+      "name": "response",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "Shows an assistant's reply as formatted text: headings, lists, tables, code, links and source markers. It is safe for text you do not control and for text that is still arriving."
     },
     {
       "name": "reveal-button",
@@ -254,6 +308,12 @@
       "description": "Picks a number, or a range with two thumbs, by dragging along a track. Shows the formatted value."
     },
     {
+      "name": "sources",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "The numbered list of sources a reply drew on, with title, site and a short excerpt. Each entry is where a Citation marker lands."
+    },
+    {
       "name": "steps",
       "type": "registry:ui",
       "version": "0.1.0",
@@ -306,6 +366,12 @@
       "type": "registry:ui",
       "version": "0.1.0",
       "description": "Brief, non-blocking message about the result of an action. Render ToastRegion once and call toast()."
+    },
+    {
+      "name": "tool-call",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "One thing the assistant did, such as searching or running a query: its name, where it is (waiting, running, needs approval, done, failed), how long it took, and on request what went in and out."
     },
     {
       "name": "tooltip",

@@ -124,4 +124,4 @@ export function neighbours(id: string) {
 /** "DataGrid" -> "Data Grid": the name people read, while code keeps the real one. */
 export const displayName = (name: string) => name.replace(/([a-z0-9])([A-Z])/g, "$1 $2");
 
-export const categoryLabel = (category: string) => category[0].toUpperCase() + category.slice(1);
+export const categoryLabel = (category: string) => (category === "ai" ? "AI" : category[0].toUpperCase() + category.slice(1));

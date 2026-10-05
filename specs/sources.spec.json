@@ -1,0 +1,77 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Sources",
+  "version": "0.1.0",
+  "category": "ai",
+  "status": "experimental",
+  "description": "The numbered list of sources a reply drew on, with title, site and a short excerpt. Each entry is where a Citation marker lands.",
+  "props": {
+    "sources": {
+      "type": "custom",
+      "description": "The sources, in order. Their position is their number.",
+      "required": true,
+      "tsType": "import(\"../utils/ai\").CitationPart[]"
+    },
+    "label": {
+      "type": "string",
+      "description": "Heading and accessible name of the list.",
+      "default": "Sources"
+    }
+  },
+  "states": [
+    "default"
+  ],
+  "slots": [
+    "root",
+    "heading",
+    "list",
+    "source",
+    "title",
+    "host",
+    "snippet"
+  ],
+  "tokens": [
+    "color.text.default",
+    "color.text.muted",
+    "color.border.strong",
+    "color.surface.selected",
+    "color.focus.ring",
+    "color.action.primary",
+    "radius.control"
+  ],
+  "a11y": {
+    "role": "region",
+    "keyboard": [
+      "Tab: moves through the source links",
+      "A source entry takes programmatic focus when a Citation marker is followed"
+    ],
+    "requirements": [
+      "A labelled region containing an ordered list",
+      "Links to other sites open in a new tab and say so in words",
+      "The entry a marker jumps to is highlighted and focusable"
+    ],
+    "screenReader": [
+      "Announced as a region named \"Sources\" with a list of N items",
+      "Each entry reads its title, and the site below it"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "Under any reply that cites its sources"
+    ],
+    "avoid_when": [
+      "A list of search results the user chooses from: use a list or Table"
+    ],
+    "anti_patterns": [
+      "Showing a source list with no markers pointing to it"
+    ]
+  },
+  "examples": [
+    "default"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {}
+  }
+}

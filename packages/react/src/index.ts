@@ -96,3 +96,44 @@ export { ShineBorder, type ShineBorderProps } from "./shine-border/shine-border"
 export { ShuttleBorder, type ShuttleBorderProps } from "./shuttle-border/shuttle-border";
 export { TextShimmer, type TextShimmerProps } from "./text-shimmer/text-shimmer";
 export { useReducedMotion } from "./utils/motion";
+export { AgentActivity, type AgentActivityProps } from "./agent-activity/agent-activity";
+export { ApprovalBox, type ApprovalBoxProps } from "./approval-box/approval-box";
+export { Chat, type ChatProps } from "./chat/chat";
+export { Citation, sourceElementId, type CitationProps } from "./citation/citation";
+export { GeneratedChart, niceScale, type GeneratedChartProps } from "./generated-chart/generated-chart";
+export { GeneratedTable, tableToCsv, type GeneratedTableProps } from "./generated-table/generated-table";
+export { Message, type MessageProps } from "./message/message";
+export { PromptInput, type PromptInputHandle, type PromptInputProps } from "./prompt-input/prompt-input";
+export { Response, type ResponseProps } from "./response/response";
+export { Sources, type SourcesProps } from "./sources/sources";
+export { ToolCall, type ToolCallProps } from "./tool-call/tool-call";
+export {
+  appendText,
+  canMoveTool,
+  finishMessage,
+  groupParts,
+  isToolActive,
+  isToolFinal,
+  messageText,
+  pendingApproval,
+  toolDuration,
+  toolStateLabel,
+  updateTool,
+  type ArtifactPart,
+  type ChartArtifactPart,
+  type ChartData,
+  type ChatMessage,
+  type CitationPart,
+  type FilePart,
+  type MessagePart,
+  type MessageRole,
+  type MessageStatus,
+  type PartGroup,
+  type ReasoningPart,
+  type TableArtifactPart,
+  type TableData,
+  type TextPart,
+  type ToolApproval,
+  type ToolPart,
+  type ToolState,
+} from "./utils/ai";

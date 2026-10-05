@@ -1,0 +1,97 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Response",
+  "version": "0.1.0",
+  "category": "ai",
+  "status": "experimental",
+  "description": "Shows an assistant's reply as formatted text: headings, lists, tables, code, links and source markers. It is safe for text you do not control and for text that is still arriving.",
+  "props": {
+    "children": {
+      "type": "string",
+      "description": "The reply, as markdown.",
+      "required": true
+    },
+    "isStreaming": {
+      "type": "boolean",
+      "description": "True while the reply is still arriving. Shows a caret and tells assistive technology the content is changing.",
+      "default": false
+    },
+    "citations": {
+      "type": "custom",
+      "description": "Sources for the [1], [2] markers in the text. A marker with no matching source stays as plain text.",
+      "tsType": "import(\"../utils/ai\").CitationPart[]"
+    },
+    "headingLevel": {
+      "type": "number",
+      "description": "Level of the reply's first heading (a # line), 2 to 6. Replies sit inside a page, so it starts at 3.",
+      "default": 3
+    }
+  },
+  "states": [
+    "default"
+  ],
+  "slots": [
+    "root",
+    "heading",
+    "paragraph",
+    "list",
+    "table",
+    "code",
+    "caret"
+  ],
+  "tokens": [
+    "color.text.default",
+    "color.text.muted",
+    "color.surface.subtle",
+    "color.border.default",
+    "color.border.strong",
+    "color.action.primary",
+    "color.focus.ring",
+    "radius.control"
+  ],
+  "a11y": {
+    "role": "none",
+    "keyboard": [
+      "Tab: moves to code blocks (copy button), long code that scrolls, wide tables and links"
+    ],
+    "requirements": [
+      "No raw HTML is ever injected: model output can't add markup or scripts",
+      "Links with unsafe schemes (javascript:, data:) show as plain text; links that open a new tab say so in words",
+      "Bare web addresses become links without taking the punctuation after them; a backslash keeps a character literal",
+      "Images in the text are never loaded (an address chosen by a model could track the reader): they show as a link named \"<alt text> (image)\"",
+      "Code blocks and tables that scroll sideways can be focused and scrolled with the keyboard",
+      "The copy button's name includes the language, and it confirms with a status message",
+      "While streaming, the region has aria-busy so a screen reader doesn't read each fragment",
+      "Half-finished markdown (an open code block, a cut-off list) never throws and still reads sensibly"
+    ],
+    "screenReader": [
+      "Headings, lists and tables are announced with their real structure",
+      "A copy button reads as, e.g. \"Copy typescript code\", then \"Copied to clipboard\"",
+      "Source markers read as \"Source 2: <title>\""
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "Showing what an AI assistant wrote",
+      "Any markdown from a source you can't fully trust"
+    ],
+    "avoid_when": [
+      "Authoring or editing markdown: this only displays it",
+      "Showing a user's own message: use plain text"
+    ],
+    "anti_patterns": [
+      "Rendering model output with dangerouslySetInnerHTML",
+      "Re-mounting the component on every streamed chunk instead of updating its text"
+    ]
+  },
+  "examples": [
+    "markdown",
+    "streaming",
+    "with-citations"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {}
+  }
+}

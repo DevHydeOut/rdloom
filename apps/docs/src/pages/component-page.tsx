@@ -374,6 +374,22 @@ function MotionNote() {
   );
 }
 
+/** What every AI interface component promises, said once at the top of its page. */
+function AiNote() {
+  return (
+    <div className="mb-2 rounded-xl border border-[var(--site-border)] bg-[var(--site-subtle)] p-4 text-sm leading-6">
+      <p className="font-medium">Bring your own model.</p>
+      <p className="text-[var(--site-muted)]">
+        These components only show what you give them, in one{" "}
+        <Link href="/docs/ai" className="underline underline-offset-4">
+          message shape
+        </Link>
+        , and report what the person does. They never call a model or a server, so they work with any backend. They are built for how assistive technology handles streaming text, tool steps and approvals.
+      </p>
+    </div>
+  );
+}
+
 export function ComponentPage({ component }: { component: DocComponent }) {
   const { spec, id } = component;
   const a = spec.a11y;
@@ -400,6 +416,7 @@ export function ComponentPage({ component }: { component: DocComponent }) {
       />
 
       {spec.category === "motion" && <MotionNote />}
+      {spec.category === "ai" && <AiNote />}
 
       {hero && (
         <Preview code={hero.code} label={`${title(hero.name)} code`} tall={id === "data-grid" || id === "calendar"} motion={spec.category === "motion"}>

@@ -229,6 +229,13 @@
       ]
     },
     {
+      "name": "AgentActivity",
+      "id": "agent-activity",
+      "version": "0.1.0",
+      "description": "A short summary of what the assistant is doing or did, such as \"Used 3 tools\", that opens into each step. It stays open while a step needs approval.",
+      "properties": []
+    },
+    {
       "name": "Alert",
       "id": "alert",
       "version": "0.1.0",
@@ -244,6 +251,24 @@
             "danger"
           ],
           "default": "info"
+        }
+      ]
+    },
+    {
+      "name": "ApprovalBox",
+      "id": "approval-box",
+      "version": "0.1.0",
+      "description": "Asks someone to approve or decline something the assistant wants to do. It says what will happen, how risky it is and whether it can be undone, in words as well as color.",
+      "properties": [
+        {
+          "prop": "risk",
+          "name": "Risk",
+          "values": [
+            "low",
+            "medium",
+            "high"
+          ],
+          "default": "medium"
         }
       ]
     },
@@ -402,6 +427,13 @@
       ]
     },
     {
+      "name": "Chat",
+      "id": "chat",
+      "version": "0.1.0",
+      "description": "A whole conversation with an assistant: the messages, a box to write in, and the stop and jump-to-latest controls. It shows what you give it and reports what the person does; it never calls a model.",
+      "properties": []
+    },
+    {
       "name": "Checkbox",
       "id": "checkbox",
       "version": "0.1.1",
@@ -435,6 +467,13 @@
           "default": "false"
         }
       ]
+    },
+    {
+      "name": "Citation",
+      "id": "citation",
+      "version": "0.1.0",
+      "description": "A small numbered marker, like [1], inside a reply that jumps to the source it refers to.",
+      "properties": []
     },
     {
       "name": "Combobox",
@@ -650,6 +689,30 @@
       ]
     },
     {
+      "name": "GeneratedChart",
+      "id": "generated-chart",
+      "version": "0.1.0",
+      "description": "A bar or line chart an assistant produced, drawn without a chart library, always with a written summary and a View as table switch that shows the same numbers as a table.",
+      "properties": [
+        {
+          "prop": "type",
+          "name": "Type",
+          "values": [
+            "bar",
+            "line"
+          ],
+          "default": "bar"
+        }
+      ]
+    },
+    {
+      "name": "GeneratedTable",
+      "id": "generated-table",
+      "version": "0.1.0",
+      "description": "A table an assistant produced, shown as a real sortable table with a title and summary, numbers aligned, long results cut to a few rows, and a CSV download.",
+      "properties": []
+    },
+    {
       "name": "GradientButton",
       "id": "gradient-button",
       "version": "0.1.0",
@@ -729,6 +792,13 @@
           "default": "none"
         }
       ]
+    },
+    {
+      "name": "Message",
+      "id": "message",
+      "version": "0.1.0",
+      "description": "One message in a conversation, from you or the assistant. It renders each part in order with the right component: text as formatted markdown, tool calls as activity, tables and charts as real components, sources at the end.",
+      "properties": []
     },
     {
       "name": "NumberField",
@@ -858,6 +928,13 @@
       ]
     },
     {
+      "name": "PromptInput",
+      "id": "prompt-input",
+      "version": "0.1.0",
+      "description": "The box people type a message in. Enter sends, Shift+Enter adds a line, the box grows with the text, and the Send button becomes Stop while a reply is on its way.",
+      "properties": []
+    },
+    {
       "name": "PulseButton",
       "id": "pulse-button",
       "version": "0.1.0",
@@ -920,6 +997,13 @@
           "default": "false"
         }
       ]
+    },
+    {
+      "name": "Response",
+      "id": "response",
+      "version": "0.1.0",
+      "description": "Shows an assistant's reply as formatted text: headings, lists, tables, code, links and source markers. It is safe for text you do not control and for text that is still arriving.",
+      "properties": []
     },
     {
       "name": "RevealButton",
@@ -1185,6 +1269,13 @@
       ]
     },
     {
+      "name": "Sources",
+      "id": "sources",
+      "version": "0.1.0",
+      "description": "The numbered list of sources a reply drew on, with title, site and a short excerpt. Each entry is where a Citation marker lands.",
+      "properties": []
+    },
+    {
       "name": "Steps",
       "id": "steps",
       "version": "0.1.0",
@@ -1422,6 +1513,13 @@
           "default": "neutral"
         }
       ]
+    },
+    {
+      "name": "ToolCall",
+      "id": "tool-call",
+      "version": "0.1.0",
+      "description": "One thing the assistant did, such as searching or running a query: its name, where it is (waiting, running, needs approval, done, failed), how long it took, and on request what went in and out.",
+      "properties": []
     },
     {
       "name": "Tooltip",

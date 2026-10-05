@@ -1,0 +1,108 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "ToolCall",
+  "version": "0.1.0",
+  "category": "ai",
+  "status": "experimental",
+  "description": "One thing the assistant did, such as searching or running a query: its name, where it is (waiting, running, needs approval, done, failed), how long it took, and on request what went in and out.",
+  "props": {
+    "tool": {
+      "type": "custom",
+      "description": "The tool part from the message.",
+      "required": true,
+      "tsType": "import(\"../utils/ai\").ToolPart"
+    },
+    "onApprove": {
+      "type": "callback",
+      "description": "Called with the tool's id when the person approves it.",
+      "tsType": "(toolId: string) => void"
+    },
+    "onDeny": {
+      "type": "callback",
+      "description": "Called with the tool's id when the person declines it.",
+      "tsType": "(toolId: string) => void"
+    },
+    "defaultExpanded": {
+      "type": "boolean",
+      "description": "Show the input and result at first.",
+      "default": false
+    },
+    "focusApproval": {
+      "type": "boolean",
+      "description": "Move focus to the approval box when this tool asks for approval.",
+      "default": false
+    }
+  },
+  "states": [
+    "default",
+    "loading",
+    "disabled"
+  ],
+  "slots": [
+    "root",
+    "header",
+    "icon",
+    "title",
+    "state",
+    "details",
+    "approval"
+  ],
+  "tokens": [
+    "color.surface.default",
+    "color.surface.subtle",
+    "color.border.default",
+    "color.border.strong",
+    "color.text.default",
+    "color.text.muted",
+    "color.action.primary",
+    "color.feedback.success",
+    "color.feedback.danger",
+    "color.feedback.warning",
+    "color.feedback.info",
+    "color.focus.ring",
+    "radius.control"
+  ],
+  "a11y": {
+    "role": "group",
+    "keyboard": [
+      "Enter / Space on the header: shows or hides the input and result",
+      "Tab: moves through the header, the approval buttons and the details"
+    ],
+    "requirements": [
+      "State is said in words (\"Running\", \"Done\", \"Needs your approval\") and drawn with a different icon for each, never color alone",
+      "State changes are announced politely; a tool that arrives already finished is not read out again",
+      "The header is a real button with aria-expanded, and only when there is something to show",
+      "Input and result are scrollable regions that can be focused",
+      "Once an approval is answered, focus returns to the tool's header instead of being lost",
+      "Odd or huge values never throw: long output is cut with a count of what was left out"
+    ],
+    "screenReader": [
+      "The header reads as a button, e.g. \"Searching your sales data, Running, collapsed\"",
+      "A change is announced once: \"Searching your sales data: Done\"",
+      "A failed tool also reads its error message"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "Showing the steps an assistant took to get to an answer"
+    ],
+    "avoid_when": [
+      "A progress bar for a long job: use Progress",
+      "Steps a person walks through: use Steps"
+    ],
+    "anti_patterns": [
+      "Showing only a spinner with no words",
+      "Hiding an approval inside a collapsed section"
+    ]
+  },
+  "examples": [
+    "states",
+    "with-details",
+    "needs-approval"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {}
+  }
+}

@@ -59,6 +59,11 @@ export function validateSpecs(): ValidationResult[] {
     for (const t of spec.tokens ?? []) {
       if (!knownTokens.has(t)) errors.push(`tokens: "${t}" is not a semantic token`);
     }
+    const seenTokens = new Set<string>();
+    for (const t of spec.tokens ?? []) {
+      if (seenTokens.has(t)) errors.push(`tokens: "${t}" is listed twice`);
+      seenTokens.add(t);
+    }
 
     for (const key of Object.keys(spec.figma?.variantMap ?? {})) {
       if (!(spec.variants ?? []).includes(key)) errors.push(`figma.variantMap: "${key}" is not listed in variants`);

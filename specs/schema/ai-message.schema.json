@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rdloom.dev/schema/ai-message.v1.json",
+  "title": "rdloom conversation message v1",
+  "description": "The one shape every AI interface component reads. A message is an ordered list of parts. Components render parts; they never fetch or call a model, so any backend can feed them.",
+  "type": "object",
+  "required": ["id", "role", "parts"],
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string" },
+    "role": { "enum": ["user", "assistant", "system"] },
+    "status": {
+      "description": "Where the whole message is. 'streaming' while parts are still arriving; 'stopped' when the person pressed stop.",
+      "enum": ["streaming", "complete", "stopped", "error"],
+      "default": "complete"
+    },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "parts": { "type": "array", "items": { "$ref": "#/$defs/part" } }
+  },
+  "$defs": {
+    "part": {
+      "oneOf": [
+        { "$ref": "#/$defs/text" },
+        { "$ref": "#/$defs/reasoning" },
+        { "$ref": "#/$defs/tool" },
+        { "$ref": "#/$defs/citation" },
+        { "$ref": "#/$defs/artifact" },
+        { "$ref": "#/$defs/file" }
+      ]
+    },
+    "text": {
+      "type": "object",
+      "required": ["type", "text"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "text" },
+        "text": { "type": "string", "description": "Markdown." },
+        "streaming": { "type": "boolean", "default": false }
+      }
+    },
+    "reasoning": {
+      "description": "A short, optional summary of how the answer was reached. Collapsed by default.",
+      "type": "object",
+      "required": ["type", "text"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "reasoning" },
+        "text": { "type": "string" },
+        "streaming": { "type": "boolean", "default": false }
+      }
+    },
+    "tool": {
+      "description": "One tool the assistant used. state moves forward only: pending -> running -> done | failed. A tool that needs permission goes running -> awaiting-approval -> approved (then runs again and finishes) | denied. 'denied' and 'failed' are final.",
+      "type": "object",
+      "required": ["type", "id", "name", "state"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "tool" },
+        "id": { "type": "string" },
+        "name": { "type": "string", "description": "Machine name, e.g. query_sales." },
+        "title": { "type": "string", "description": "What a person reads, e.g. Searching your sales data." },
+        "state": { "enum": ["pending", "running", "awaiting-approval", "approved", "denied", "done", "failed"] },
+        "input": { "description": "Arguments the tool was called with." },
+        "output": { "description": "Result, shown on request." },
+        "error": { "type": "string" },
+        "approval": {
+          "description": "Required while state is awaiting-approval: what is about to happen and why it needs a yes.",
+          "type": "object",
+          "required": ["summary"],
+          "additionalProperties": false,
+          "properties": {
+            "summary": { "type": "string", "description": "Plain words, e.g. Delete 12 draft invoices." },
+            "risk": { "enum": ["low", "medium", "high"], "default": "medium" },
+            "reversible": { "type": "boolean" }
+          }
+        },
+        "startedAt": { "type": "string", "format": "date-time" },
+        "endedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "citation": {
+      "type": "object",
+      "required": ["type", "id", "title"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "citation" },
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "url": { "type": "string", "format": "uri" },
+        "snippet": { "type": "string" }
+      }
+    },
+    "artifact": {
+      "description": "Something the assistant produced that is worth showing as a real component, not as text.",
+      "type": "object",
+      "required": ["type", "kind", "title", "data"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "artifact" },
+        "kind": { "enum": ["table", "chart"] },
+        "title": { "type": "string" },
+        "summary": { "type": "string", "description": "A sentence a screen reader gets instead of the picture; required in practice for charts." },
+        "data": { "description": "table: { columns, rows }. chart: { series, labels }." }
+      }
+    },
+    "file": {
+      "type": "object",
+      "required": ["type", "name"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "file" },
+        "name": { "type": "string" },
+        "mediaType": { "type": "string" },
+        "url": { "type": "string" },
+        "size": { "type": "number" }
+      }
+    }
+  }
+}

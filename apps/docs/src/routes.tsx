@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { components, displayName } from "./data";
 import { ComponentPage } from "./pages/component-page";
 import { ComponentsIndex } from "./pages/components-index";
-import { CliGuide, FigmaGuide, GettingStarted, McpGuide, TokensGuide } from "./pages/guides";
+import { AiGuide, CliGuide, FigmaGuide, GettingStarted, McpGuide, TokensGuide } from "./pages/guides";
 import { Home } from "./pages/home";
 import { Link } from "./router";
 import { PageTitle } from "./ui";
@@ -24,6 +24,7 @@ export const guides = [
   { href: "/docs/getting-started", title: "Getting started", description: "Add rdloom to a React 19 and Tailwind CSS v4 app: init, tokens, and your first components.", Page: GettingStarted },
   { href: "/docs/cli", title: "CLI and upgrades", description: "The rdloom CLI copies components into your project and merges new versions into your edits, like git.", Page: CliGuide },
   { href: "/docs/mcp", title: "AI agents (MCP)", description: "An MCP server that gives Claude Code, Cursor and other AI agents rdloom's props, usage rules and tested examples.", Page: McpGuide },
+  { href: "/docs/ai", title: "AI interfaces", description: "Chat, streaming replies, tool steps, approvals, sources, tables and charts: components built around one message shape and for screen readers.", Page: AiGuide },
   { href: "/docs/figma", title: "Figma plugin", description: "Sync rdloom's design tokens and component variants into Figma, with Light and Dark modes.", Page: FigmaGuide },
   { href: "/docs/tokens", title: "Design tokens", description: "rdloom's semantic design tokens as CSS variables, with light and dark values.", Page: TokensGuide },
 ];

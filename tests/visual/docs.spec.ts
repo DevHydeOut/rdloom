@@ -54,10 +54,54 @@ test.describe("component page", () => {
     await expect(page.getByText("Add the motion stylesheet, and import it.")).toHaveCount(0);
   });
 
+  test("an AI component says it brings no model, and links to the guide", async ({ page }) => {
+    await page.goto("/components/chat");
+    await expect(page.getByText("Bring your own model.")).toBeVisible();
+    await page.getByRole("link", { name: "message shape" }).click();
+    await expect(page.getByRole("heading", { level: 1, name: "AI interfaces" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 2, name: "What is different about accessibility" })).toBeVisible();
+  });
+
+  test("the chat example answers, streams, and says when it is done", async ({ page }) => {
+    await page.goto("/components/chat");
+    await page.waitForLoadState("networkidle"); // the page is prerendered: wait until it is interactive
+    const box = page.getByRole("textbox", { name: "Message" }).first();
+    await box.fill("What is rdloom?");
+    await box.press("Enter");
+    // the reply streams in; the list itself is not a live region, a single status line speaks
+    await expect(page.getByRole("article", { name: "Assistant message" }).first()).toContainText("Want a tour of the data grid next?", { timeout: 15_000 });
+    await expect(page.getByRole("button", { name: "Send message" }).first()).toBeVisible();
+    await expect(page.getByRole("log", { name: "Assistant messages" }).first()).toHaveAttribute("aria-live", "off");
+    await expect(page.getByText("Response complete").first()).toBeAttached();
+  });
+
+  test("a tool that needs approval takes focus on its question, and the answer returns focus to the tool", async ({ page }) => {
+    await page.goto("/components/chat");
+    await page.waitForLoadState("networkidle");
+    await page.getByRole("button", { name: "Show me sales from last month" }).click();
+    const question = page.getByRole("group", { name: "Email this report to finance@example.com" });
+    await expect(question).toBeFocused({ timeout: 10_000 });
+    await page.keyboard.press("Tab"); // Deny
+    await page.keyboard.press("Tab"); // Approve
+    await page.keyboard.press("Enter");
+    await expect(question).toHaveCount(0);
+    await expect(page.getByRole("button", { name: /Email the report to finance/ })).toBeFocused();
+  });
+
+  test("a chart can be read as a table", async ({ page }) => {
+    await page.goto("/components/generated-chart");
+    await page.waitForLoadState("networkidle");
+    const chart = page.getByRole("figure", { name: "Revenue by month" });
+    await expect(chart).toContainText("reaching $48K in June");
+    await chart.getByRole("button", { name: "View as table" }).click();
+    await expect(chart.getByRole("table")).toBeVisible();
+    await expect(chart.getByRole("rowheader", { name: "Jun" })).toBeVisible();
+  });
+
   test("steps to the neighbouring components", async ({ page }) => {
     await page.goto("/components/alert");
-    await page.getByRole("link", { name: "Next: Avatar" }).click();
-    await expect(page.getByRole("heading", { level: 1, name: "Avatar" })).toBeVisible();
+    await page.getByRole("link", { name: "Next: Approval Box" }).click();
+    await expect(page.getByRole("heading", { level: 1, name: "Approval Box" })).toBeVisible();
     await page.getByRole("link", { name: "Previous: Alert" }).click();
     await expect(page.getByRole("heading", { level: 1, name: "Alert" })).toBeVisible();
   });
@@ -106,7 +150,7 @@ test.describe("small screens", () => {
     expect(overflow).toBeLessThanOrEqual(0);
   });
 
-  for (const path of ["/", "/components", "/docs/getting-started", "/components/data-grid"]) {
+  for (const path of ["/", "/components", "/docs/getting-started", "/components/data-grid", "/components/chat", "/components/generated-chart", "/docs/ai"]) {
     test(`${path} doesn't scroll sideways`, async ({ page }) => {
       await page.goto(path);
       await page.waitForLoadState("networkidle");

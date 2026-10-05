@@ -216,6 +216,134 @@ export function FigmaGuide() {
   );
 }
 
+export function AiGuide() {
+  return (
+    <article>
+      <PageTitle lead="Components for chat, tool use and approvals, built around one message shape and for how assistive technology handles text that streams in.">AI interfaces</PageTitle>
+      <Prose>
+        <p>
+          A normal screen is a button and a result. An AI screen is a conversation: the assistant looks something up, uses a tool, asks permission, and produces a table or a chart.
+          These components show that, and they leave the model, the server and the data to you. They take messages in one shape and tell you what the person did.
+        </p>
+
+        <H2 id="shape">The message shape</H2>
+        <p>
+          A message has a role (<code>user</code>, <code>assistant</code> or <code>system</code>), a status, and an ordered list of <strong>parts</strong>. Each part has a type, and each type has its own component.
+        </p>
+        <div role="region" aria-label="Message parts" tabIndex={0} className="overflow-x-auto rounded-[var(--site-radius)] border border-[var(--site-border)]">
+          <table className="w-full min-w-[32rem] text-left text-sm">
+            <thead className="bg-[var(--site-subtle)]">
+              <tr>
+                {["Part", "What it is", "Shown by"].map((h) => (
+                  <th key={h} scope="col" className="px-3 py-2 font-medium">
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                ["text", "Markdown, with a streaming flag", "Response"],
+                ["reasoning", "A short account of how the answer was reached", "Message (closed by default)"],
+                ["tool", "One tool the assistant used, and where it is", "ToolCall, grouped by AgentActivity"],
+                ["citation", "A source for a statement", "Citation markers and Sources"],
+                ["artifact", "A table or a chart the assistant made", "GeneratedTable and GeneratedChart"],
+                ["file", "An attachment", "Message"],
+              ].map(([part, what, shown]) => (
+                <tr key={part} className="border-t border-[var(--site-border)]">
+                  <th scope="row" className="px-3 py-2 font-mono font-medium">
+                    {part}
+                  </th>
+                  <td className="px-3 py-2">{what}</td>
+                  <td className="px-3 py-2 text-[var(--site-muted)]">{shown}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <H2 id="tools">Tool states</H2>
+        <p>
+          A tool is <code>pending</code>, <code>running</code>, <code>awaiting-approval</code>, <code>approved</code>, <code>denied</code>, <code>done</code> or <code>failed</code>. States only move forward: a tool that needs
+          permission goes from running to awaiting-approval, then to approved (and runs on) or denied. <code>denied</code>, <code>done</code> and <code>failed</code> are final. A late or repeated update can never take a finished tool
+          back, so a screen reader hears "Searching, done" once and never a flicker.
+        </p>
+
+        <H2 id="wire">Wire it up</H2>
+        <p>
+          The helpers return new messages and never change the one you pass in, so they fit any state library. This is the whole loop for a streamed reply:
+        </p>
+        <CodeBlock
+          label="Streaming a reply"
+          code={`import { Chat, appendText, finishMessage, updateTool, type ChatMessage } from "@rdloom/react";
+
+const [messages, setMessages] = useState<ChatMessage[]>([]);
+const [status, setStatus] = useState<"ready" | "submitted" | "streaming">("ready");
+
+// Text arrives: add it to the last assistant message.
+setMessages((m) => [...m.slice(0, -1), appendText(m[m.length - 1], chunk)]);
+
+// A tool moved on (it can't go backwards).
+setMessages((m) => [...m.slice(0, -1), updateTool(m[m.length - 1], "q1", { state: "done" })]);
+
+// All done.
+setMessages((m) => [...m.slice(0, -1), finishMessage(m[m.length - 1])]);
+
+<Chat
+  messages={messages}
+  status={status}
+  onSend={send}          // call your model or API here
+  onStop={stop}
+  onApprove={(toolId) => approve(toolId)}
+  onDeny={(toolId) => deny(toolId)}
+/>`}
+        />
+        <p>
+          Nothing here talks to a model. If you use an AI SDK, map its messages into this shape once, in a small function, and keep the rest of your app unchanged.
+        </p>
+
+        <H2 id="a11y">What is different about accessibility</H2>
+        <ul className="flex list-disc flex-col gap-2 ps-5">
+          <li>
+            <strong>Streaming is not read token by token.</strong> The message list is not a live region. One polite status line says "Assistant is responding" and "Response complete", and the reply is marked busy while it grows.
+          </li>
+          <li>
+            <strong>Tools announce themselves.</strong> Each tool says its own state changes, once, and a tool that arrives already finished is not read out again.
+          </li>
+          <li>
+            <strong>Approvals are never hidden or accidental.</strong> The question is announced when it appears (assertively for high risk), focus goes to the box and not to a button, risk is said in words as well as drawn, and a group with
+            a waiting question can't be collapsed. After an answer, focus returns to the tool.
+          </li>
+          <li>
+            <strong>Charts always have words.</strong> A written summary sits beside every chart and View as table shows the same numbers as a table. Series differ by shape, not just color.
+          </li>
+          <li>
+            <strong>Following the reply is polite.</strong> The list follows new text only while you are at the bottom; scroll up and it stops, with a Jump to latest button.
+          </li>
+          <li>
+            <strong>Model text is never trusted.</strong> Replies are built as elements, never injected as HTML, and unsafe links show as plain text.
+          </li>
+        </ul>
+
+        <H2 id="components">The components</H2>
+        <p>
+          <Link href="/components/chat" className="underline underline-offset-4">Chat</Link> puts it all together. Use the parts on their own for your own layout:{" "}
+          <Link href="/components/message" className="underline underline-offset-4">Message</Link>,{" "}
+          <Link href="/components/prompt-input" className="underline underline-offset-4">PromptInput</Link>,{" "}
+          <Link href="/components/response" className="underline underline-offset-4">Response</Link>,{" "}
+          <Link href="/components/tool-call" className="underline underline-offset-4">ToolCall</Link>,{" "}
+          <Link href="/components/agent-activity" className="underline underline-offset-4">AgentActivity</Link>,{" "}
+          <Link href="/components/approval-box" className="underline underline-offset-4">ApprovalBox</Link>,{" "}
+          <Link href="/components/citation" className="underline underline-offset-4">Citation</Link>,{" "}
+          <Link href="/components/sources" className="underline underline-offset-4">Sources</Link>,{" "}
+          <Link href="/components/generated-table" className="underline underline-offset-4">GeneratedTable</Link> and{" "}
+          <Link href="/components/generated-chart" className="underline underline-offset-4">GeneratedChart</Link>.
+        </p>
+      </Prose>
+    </article>
+  );
+}
+
 export function TokensGuide() {
   return (
     <article>

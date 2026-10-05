@@ -1,0 +1,72 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Citation",
+  "version": "0.1.0",
+  "category": "ai",
+  "status": "experimental",
+  "description": "A small numbered marker, like [1], inside a reply that jumps to the source it refers to.",
+  "props": {
+    "index": {
+      "type": "number",
+      "description": "The number shown, starting at 1.",
+      "required": true
+    },
+    "source": {
+      "type": "custom",
+      "description": "The source this marker points to.",
+      "required": true,
+      "tsType": "import(\"../utils/ai\").CitationPart"
+    },
+    "href": {
+      "type": "string",
+      "description": "Where the marker goes. Defaults to the matching entry in a Sources list on the same page."
+    }
+  },
+  "states": [
+    "default"
+  ],
+  "slots": [
+    "marker"
+  ],
+  "tokens": [
+    "color.surface.subtle",
+    "color.surface.selected",
+    "color.border.strong",
+    "color.text.default",
+    "color.focus.ring"
+  ],
+  "a11y": {
+    "role": "link",
+    "keyboard": [
+      "Enter: follows the link; with the default target, moves focus to the source entry"
+    ],
+    "requirements": [
+      "A real link, not a button: it goes somewhere",
+      "Its name says what it is (\"Source 2: Title\"), never just \"2\"",
+      "Focus moves to the source entry when it is on the same page, so Tab continues from there"
+    ],
+    "screenReader": [
+      "Announced as a link named \"Source 2: <title>\""
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "Marking which statement came from which source"
+    ],
+    "avoid_when": [
+      "Footnotes that aren't sources: use plain footnotes"
+    ],
+    "anti_patterns": [
+      "Using only a number as the link name",
+      "Citations with no list of sources to jump to"
+    ]
+  },
+  "examples": [
+    "inline"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {}
+  }
+}

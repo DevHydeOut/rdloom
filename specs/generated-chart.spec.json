@@ -1,0 +1,105 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "GeneratedChart",
+  "version": "0.1.0",
+  "category": "ai",
+  "status": "experimental",
+  "description": "A bar or line chart an assistant produced, drawn without a chart library, always with a written summary and a View as table switch that shows the same numbers as a table.",
+  "props": {
+    "data": {
+      "type": "custom",
+      "description": "The labels along the bottom and one or more named series of values.",
+      "required": true,
+      "tsType": "import(\"../utils/ai\").ChartData"
+    },
+    "title": {
+      "type": "string",
+      "description": "What the chart shows.",
+      "required": true
+    },
+    "summary": {
+      "type": "string",
+      "description": "A sentence that tells the story of the chart. Defaults to the highest and lowest values of the first series."
+    },
+    "type": {
+      "type": "enum",
+      "description": "Bars or lines.",
+      "values": [
+        "bar",
+        "line"
+      ],
+      "default": "bar"
+    }
+  },
+  "variants": [
+    "type"
+  ],
+  "states": [
+    "default"
+  ],
+  "slots": [
+    "root",
+    "title",
+    "summary",
+    "plot",
+    "axis",
+    "legend",
+    "table"
+  ],
+  "tokens": [
+    "color.text.default",
+    "color.text.muted",
+    "color.action.primary",
+    "color.feedback.info",
+    "color.feedback.success",
+    "color.feedback.warning",
+    "color.border.default",
+    "color.surface.default",
+    "color.focus.ring",
+    "radius.control"
+  ],
+  "a11y": {
+    "role": "figure",
+    "keyboard": [
+      "Tab: moves to the View as table button",
+      "Arrow keys: move through the data table once it is shown"
+    ],
+    "requirements": [
+      "The drawing is decoration; the title, the written summary and the data table carry the meaning",
+      "View as table swaps in the same data as an accessible table (aria-pressed on the switch)",
+      "Series differ by marker shape or label as well as color, and a legend names them",
+      "Values are labelled directly when there are few bars",
+      "Empty data shows a message instead of an empty frame"
+    ],
+    "screenReader": [
+      "Announced as a figure named by the title, then the summary text",
+      "\"View as table, toggle button, not pressed\"",
+      "The table reads every value under its row and column headers"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "Showing trends or comparisons an assistant calculated"
+    ],
+    "avoid_when": [
+      "Dashboards with many linked charts: use a charting library",
+      "Exact numbers matter most: show a GeneratedTable"
+    ],
+    "anti_patterns": [
+      "A chart with no summary",
+      "Telling series apart by color only"
+    ]
+  },
+  "examples": [
+    "bar",
+    "line",
+    "multi-series"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {
+      "type": "Type"
+    }
+  }
+}

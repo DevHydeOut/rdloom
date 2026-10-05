@@ -114,3 +114,55 @@ export function ChevronRightIcon({ className = "size-4 shrink-0" }: { className?
     </svg>
   );
 }
+
+// Icons for the AI interface components: each tool state has its own shape.
+export function ClockIcon({ className = "size-4 shrink-0" }: { className?: string }) {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 16 16" className={className} fill="none">
+      <circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="1.4" strokeDasharray="2.2 2.2" />
+      <path d="M8 4.75V8l2 1.25" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+export function BanIcon({ className = "size-4 shrink-0" }: { className?: string }) {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 16 16" className={className} fill="none">
+      <circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="1.4" />
+      <path d="M3.9 12.1l8.2-8.2" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+export function SparkleIcon({ className = "size-4 shrink-0" }: { className?: string }) {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 16 16" className={className} fill="none">
+      <path d="M8 1.75l1.4 3.85 3.85 1.4-3.85 1.4L8 12.25 6.6 8.4 2.75 7l3.85-1.4L8 1.75z" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round" />
+      <path d="M12.5 11.25v2.5M11.25 12.5h2.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+export function SendIcon({ className = "size-4 shrink-0" }: { className?: string }) {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 16 16" className={className} fill="none">
+      <path d="M8 12.5V3.5M4.25 7.25L8 3.5l3.75 3.75" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+export function StopIcon({ className = "size-4 shrink-0" }: { className?: string }) {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 16 16" className={className} fill="currentColor">
+      <rect x="4" y="4" width="8" height="8" rx="1.5" />
+    </svg>
+  );
+}
+
+export function ArrowDownIcon({ className = "size-4 shrink-0" }: { className?: string }) {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 16 16" className={className} fill="none">
+      <path d="M8 3.5v9M4.25 8.75L8 12.5l3.75-3.75" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}

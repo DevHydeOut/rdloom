@@ -1,0 +1,89 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "AgentActivity",
+  "version": "0.1.0",
+  "category": "ai",
+  "status": "experimental",
+  "description": "A short summary of what the assistant is doing or did, such as \"Used 3 tools\", that opens into each step. It stays open while a step needs approval.",
+  "props": {
+    "tools": {
+      "type": "custom",
+      "description": "The tool parts, in order.",
+      "required": true,
+      "tsType": "import(\"../utils/ai\").ToolPart[]"
+    },
+    "onApprove": {
+      "type": "callback",
+      "description": "Called with a tool's id when the person approves it.",
+      "tsType": "(toolId: string) => void"
+    },
+    "onDeny": {
+      "type": "callback",
+      "description": "Called with a tool's id when the person declines it.",
+      "tsType": "(toolId: string) => void"
+    },
+    "defaultOpen": {
+      "type": "boolean",
+      "description": "Show the steps at first.",
+      "default": false
+    },
+    "focusApproval": {
+      "type": "boolean",
+      "description": "Move focus to an approval box when one appears.",
+      "default": false
+    }
+  },
+  "states": [
+    "default"
+  ],
+  "slots": [
+    "root",
+    "summary",
+    "steps"
+  ],
+  "tokens": [
+    "color.text.default",
+    "color.text.muted",
+    "color.action.primary",
+    "color.surface.subtle",
+    "color.focus.ring",
+    "radius.control"
+  ],
+  "a11y": {
+    "role": "group",
+    "keyboard": [
+      "Enter / Space on the summary: shows or hides the steps"
+    ],
+    "requirements": [
+      "The summary is a button with aria-expanded that controls the list of steps",
+      "While any step is waiting for approval the list is forced open and the button is disabled: a question can't be hidden",
+      "Progress reads in words (\"Working: 1 of 3 steps done\"), failures and declines are counted",
+      "Each step is a ToolCall, so it announces its own changes"
+    ],
+    "screenReader": [
+      "\"Used 3 tools (1 failed), button, collapsed\"",
+      "While working: \"Working: 1 of 3 steps done, button, collapsed\""
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "Grouping the tool calls inside one reply"
+    ],
+    "avoid_when": [
+      "A single tool call: use ToolCall directly"
+    ],
+    "anti_patterns": [
+      "Collapsing the list while an approval is pending"
+    ]
+  },
+  "examples": [
+    "working",
+    "finished",
+    "needs-approval"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {}
+  }
+}

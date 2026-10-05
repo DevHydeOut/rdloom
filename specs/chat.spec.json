@@ -1,0 +1,144 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Chat",
+  "version": "0.1.0",
+  "category": "ai",
+  "status": "experimental",
+  "description": "A whole conversation with an assistant: the messages, a box to write in, and the stop and jump-to-latest controls. It shows what you give it and reports what the person does; it never calls a model.",
+  "props": {
+    "messages": {
+      "type": "custom",
+      "description": "The conversation so far.",
+      "required": true,
+      "tsType": "import(\"../utils/ai\").ChatMessage[]"
+    },
+    "onSend": {
+      "type": "callback",
+      "description": "Called with the text when the person sends a message or picks a suggestion.",
+      "required": true,
+      "tsType": "(text: string) => void"
+    },
+    "onStop": {
+      "type": "callback",
+      "description": "Called when the person presses Stop while a reply is on its way.",
+      "tsType": "() => void"
+    },
+    "onApprove": {
+      "type": "callback",
+      "description": "Called with a tool's id when the person approves it.",
+      "tsType": "(toolId: string) => void"
+    },
+    "onDeny": {
+      "type": "callback",
+      "description": "Called with a tool's id when the person declines it.",
+      "tsType": "(toolId: string) => void"
+    },
+    "onRetry": {
+      "type": "callback",
+      "description": "Shows Try again on the last message when it failed.",
+      "tsType": "() => void"
+    },
+    "status": {
+      "type": "enum",
+      "description": "Where the conversation is: ready for input, waiting for the first words, streaming, or failed.",
+      "values": [
+        "ready",
+        "submitted",
+        "streaming",
+        "error"
+      ],
+      "default": "ready"
+    },
+    "label": {
+      "type": "string",
+      "description": "Accessible name of the chat.",
+      "default": "Chat"
+    },
+    "placeholder": {
+      "type": "string",
+      "description": "Hint in the message box."
+    },
+    "suggestions": {
+      "type": "custom",
+      "description": "Prompts to offer when the chat is empty. Choosing one sends it.",
+      "tsType": "string[]"
+    },
+    "emptyState": {
+      "type": "node",
+      "description": "Replaces the default empty message."
+    },
+    "headingLevel": {
+      "type": "number",
+      "description": "Level of headings inside replies, 2 to 6."
+    }
+  },
+  "states": [
+    "default",
+    "loading"
+  ],
+  "slots": [
+    "root",
+    "log",
+    "message",
+    "empty",
+    "suggestions",
+    "jump",
+    "input",
+    "status"
+  ],
+  "tokens": [
+    "color.text.default",
+    "color.text.muted",
+    "color.surface.default",
+    "color.surface.raised",
+    "color.surface.subtle",
+    "color.border.default",
+    "color.border.strong",
+    "color.action.primary",
+    "color.focus.ring"
+  ],
+  "a11y": {
+    "role": "log",
+    "keyboard": [
+      "Tab: moves from the message list (focusable, so it can scroll with arrow keys) to the message box",
+      "Enter: sends; Shift+Enter: new line",
+      "Arrow keys / Page Up / Page Down: scroll the messages when the list has focus"
+    ],
+    "requirements": [
+      "The message list is a log that is NOT live: streamed text would be read token by token",
+      "One polite status line says \"Assistant is responding\" and \"Response complete\"; tools announce their own changes",
+      "The list follows new text only while the reader is at the bottom; scrolling up stops it and shows Jump to latest",
+      "Only the newest unanswered approval takes focus",
+      "The message list is keyboard-scrollable (focusable) and has a visible focus ring",
+      "Sending always returns the view to the latest message"
+    ],
+    "screenReader": [
+      "\"Chat, region\", then \"Chat messages, log\"",
+      "After sending: \"Assistant is responding\", later \"Response complete\"",
+      "A tool needing approval: \"Approval needed: <what>\""
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "An assistant, copilot or agent conversation",
+      "Support chat with an AI"
+    ],
+    "avoid_when": [
+      "Chat between people with presence and typing: build on Message and PromptInput"
+    ],
+    "anti_patterns": [
+      "Making the whole list aria-live",
+      "Auto-scrolling while someone is reading earlier messages"
+    ]
+  },
+  "examples": [
+    "basic",
+    "with-tools",
+    "suggestions"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {}
+  }
+}

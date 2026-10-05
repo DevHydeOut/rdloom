@@ -1,0 +1,107 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "GeneratedTable",
+  "version": "0.1.0",
+  "category": "ai",
+  "status": "experimental",
+  "description": "A table an assistant produced, shown as a real sortable table with a title and summary, numbers aligned, long results cut to a few rows, and a CSV download.",
+  "props": {
+    "data": {
+      "type": "custom",
+      "description": "The columns and rows.",
+      "required": true,
+      "tsType": "import(\"../utils/ai\").TableData"
+    },
+    "title": {
+      "type": "string",
+      "description": "What the table shows. It is also the table's accessible name.",
+      "required": true
+    },
+    "summary": {
+      "type": "string",
+      "description": "One line under the title. Defaults to the row and column count."
+    },
+    "maxRows": {
+      "type": "number",
+      "description": "Rows shown before a Show all button. 0 shows every row.",
+      "default": 10
+    },
+    "isSortable": {
+      "type": "boolean",
+      "description": "Let people sort by a column. Numbers sort by value, text in natural order.",
+      "default": true
+    },
+    "fileName": {
+      "type": "string",
+      "description": "Name of the downloaded file.",
+      "default": "table.csv"
+    },
+    "onExport": {
+      "type": "callback",
+      "description": "Replaces the built-in CSV download, e.g. to save on the server.",
+      "tsType": "(data: import(\"../utils/ai\").TableData) => void"
+    }
+  },
+  "states": [
+    "default"
+  ],
+  "slots": [
+    "root",
+    "title",
+    "summary",
+    "table",
+    "header",
+    "row",
+    "cell",
+    "export",
+    "more"
+  ],
+  "tokens": [
+    "color.text.default",
+    "color.text.muted",
+    "color.surface.default",
+    "color.border.default",
+    "color.focus.ring"
+  ],
+  "a11y": {
+    "role": "grid",
+    "keyboard": [
+      "Arrow keys: move between cells",
+      "Enter / Space on a column header: sorts",
+      "Tab: moves to the Download and Show all buttons"
+    ],
+    "requirements": [
+      "A real table with a named header row and the first column as row header",
+      "Sort direction is exposed (aria-sort) and drawn with an arrow",
+      "Number columns are right-aligned and use tabular figures",
+      "The summary says how many rows are shown when the list is cut",
+      "CSV export prefixes cells starting with = + - or @ so a spreadsheet can't run them as formulas, and says when a file was downloaded"
+    ],
+    "screenReader": [
+      "Announced as a table named by the title, with its row and column count",
+      "Sorting reads as \"sorted ascending\"",
+      "\"Downloaded table.csv\" after export"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "Showing rows of data an assistant looked up or built"
+    ],
+    "avoid_when": [
+      "Thousands of rows or editing: use DataGrid"
+    ],
+    "anti_patterns": [
+      "Dumping a hundred rows with no limit",
+      "Exporting without escaping spreadsheet formulas"
+    ]
+  },
+  "examples": [
+    "default",
+    "long"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {}
+  }
+}

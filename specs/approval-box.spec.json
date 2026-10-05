@@ -1,0 +1,132 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "ApprovalBox",
+  "version": "0.1.0",
+  "category": "ai",
+  "status": "experimental",
+  "description": "Asks someone to approve or decline something the assistant wants to do. It says what will happen, how risky it is and whether it can be undone, in words as well as color.",
+  "props": {
+    "summary": {
+      "type": "string",
+      "description": "What is about to happen, in plain words, e.g. \"Delete 12 draft invoices\".",
+      "required": true
+    },
+    "risk": {
+      "type": "enum",
+      "description": "How much could go wrong. High risk uses the danger style and interrupts speech.",
+      "values": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "default": "medium"
+    },
+    "reversible": {
+      "type": "boolean",
+      "description": "Whether the action can be undone. Unset says nothing about it."
+    },
+    "onApprove": {
+      "type": "callback",
+      "description": "Called when the person approves.",
+      "tsType": "() => void"
+    },
+    "onDeny": {
+      "type": "callback",
+      "description": "Called when the person declines.",
+      "tsType": "() => void"
+    },
+    "approveLabel": {
+      "type": "string",
+      "description": "Text of the approve button. Say the action: \"Delete invoices\" beats \"OK\".",
+      "default": "Approve"
+    },
+    "denyLabel": {
+      "type": "string",
+      "description": "Text of the decline button.",
+      "default": "Deny"
+    },
+    "isPending": {
+      "type": "boolean",
+      "description": "True while the approval is being processed: shows a spinner and blocks a second press.",
+      "default": false
+    },
+    "autoFocus": {
+      "type": "boolean",
+      "description": "Move focus to the box when it appears, so a keyboard user lands on the question.",
+      "default": false
+    },
+    "children": {
+      "type": "node",
+      "description": "Extra detail, e.g. the list of items affected."
+    }
+  },
+  "variants": [
+    "risk"
+  ],
+  "states": [
+    "default"
+  ],
+  "slots": [
+    "root",
+    "icon",
+    "summary",
+    "risk",
+    "details",
+    "actions"
+  ],
+  "tokens": [
+    "color.surface.subtle",
+    "color.border.strong",
+    "color.feedback.danger",
+    "color.feedback.danger-subtle",
+    "color.feedback.info",
+    "color.text.default",
+    "color.text.muted",
+    "color.focus.ring",
+    "radius.overlay"
+  ],
+  "a11y": {
+    "role": "group",
+    "keyboard": [
+      "Tab: moves between Deny and Approve",
+      "Enter / Space: presses the focused button"
+    ],
+    "requirements": [
+      "A named group: its name is the summary, so the question is read first",
+      "The box is announced when it appears (assertively for high risk, politely otherwise)",
+      "Focus goes to the box, not to a button, so a stray Enter can't approve something",
+      "Risk is shown as words (\"High risk\") and a different icon, not only by color",
+      "Deny comes first in the tab order; the approving button names the action",
+      "The caller is responsible for what happens to focus after an answer (ToolCall returns it to the tool)"
+    ],
+    "screenReader": [
+      "On appearing: \"Approval needed: Delete 12 draft invoices. High risk. This can't be undone.\"",
+      "Then a group named by the summary, with the buttons Deny and Approve"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "The assistant needs permission before something that changes data, spends money or contacts someone"
+    ],
+    "avoid_when": [
+      "Asking about something trivial and reversible: just do it and offer undo",
+      "Collecting several fields: use a Dialog with a form"
+    ],
+    "anti_patterns": [
+      "Approval buttons labelled just OK and Cancel",
+      "Taking focus onto the approve button",
+      "Showing risk only with a red color"
+    ]
+  },
+  "examples": [
+    "default",
+    "high-risk"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {
+      "risk": "Risk"
+    }
+  }
+}

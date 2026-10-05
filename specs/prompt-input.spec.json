@@ -1,0 +1,118 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "PromptInput",
+  "version": "0.1.0",
+  "category": "ai",
+  "status": "experimental",
+  "description": "The box people type a message in. Enter sends, Shift+Enter adds a line, the box grows with the text, and the Send button becomes Stop while a reply is on its way.",
+  "props": {
+    "onSubmit": {
+      "type": "callback",
+      "description": "Called with the trimmed text when the person sends.",
+      "required": true,
+      "tsType": "(text: string) => void"
+    },
+    "onStop": {
+      "type": "callback",
+      "description": "Called when the person presses Stop.",
+      "tsType": "() => void"
+    },
+    "isStreaming": {
+      "type": "boolean",
+      "description": "A reply is on its way: the button becomes Stop and sending is blocked.",
+      "default": false
+    },
+    "isDisabled": {
+      "type": "boolean",
+      "description": "Stop all input.",
+      "default": false
+    },
+    "placeholder": {
+      "type": "string",
+      "description": "Hint shown while the box is empty.",
+      "default": "Message the assistant"
+    },
+    "label": {
+      "type": "string",
+      "description": "Accessible name of the text box.",
+      "default": "Message"
+    },
+    "value": {
+      "type": "string",
+      "description": "Controlled text. Leave out to let the box keep its own."
+    },
+    "onValueChange": {
+      "type": "callback",
+      "description": "Called as the text changes.",
+      "tsType": "(value: string) => void"
+    },
+    "maxLength": {
+      "type": "number",
+      "description": "Longest message allowed."
+    }
+  },
+  "states": [
+    "default",
+    "focus",
+    "disabled"
+  ],
+  "slots": [
+    "root",
+    "input",
+    "send",
+    "stop",
+    "hint"
+  ],
+  "tokens": [
+    "color.surface.default",
+    "color.border.strong",
+    "color.text.default",
+    "color.text.muted",
+    "color.action.primary",
+    "color.action.on-primary",
+    "color.action.primary-hover",
+    "color.focus.ring",
+    "radius.overlay"
+  ],
+  "a11y": {
+    "role": "textbox",
+    "keyboard": [
+      "Enter: sends",
+      "Shift+Enter: new line",
+      "Tab: moves to the Send or Stop button"
+    ],
+    "requirements": [
+      "A real labelled multi-line text box; the shortcut hint is attached with aria-describedby",
+      "Enter does nothing while an input method (IME) is composing, so a half-typed word can't be sent",
+      "Send is disabled for empty or whitespace-only text; Stop replaces it while streaming and has its own name",
+      "Focus stays in the box after sending",
+      "Growth stops at a maximum height, then the box scrolls"
+    ],
+    "screenReader": [
+      "\"Message, edit text, multi-line. Enter to send, Shift+Enter for a new line\"",
+      "\"Send message, button, dimmed\" while empty",
+      "\"Stop generating, button\" while streaming"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "Any place a person writes to an assistant"
+    ],
+    "avoid_when": [
+      "A short single-line field: use TextField"
+    ],
+    "anti_patterns": [
+      "Sending on Enter without checking for IME composition",
+      "Clearing the box before the message is sent"
+    ]
+  },
+  "examples": [
+    "default",
+    "streaming"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {}
+  }
+}

@@ -405,6 +405,156 @@ const blueprints: Record<string, Blueprint> = {
     ]);
   },
 
+  // --- AI interface components -------------------------------------------------
+
+  Response: () =>
+    frame({ name: "response", dir: "col", gap: 8, w: 440 }, [
+      text("Summary", 16, "color.text.default", "Semi Bold"),
+      text("Revenue grew 12% over last quarter, led by new annual plans [1].", 14, "color.text.default", "Regular", "fill"),
+      frame({ name: "code", dir: "col", pad: 12, w: "fill", fill: "color.surface.subtle", stroke: "color.border.default", radius: "radius.control" }, [
+        text("const growth = (now - before) / before;", 13, "color.text.default"),
+      ]),
+    ]),
+
+  Citation: () =>
+    frame({ name: "citation", dir: "row", gap: 6, cross: "center" }, [
+      text("Refunds take five days", 14),
+      frame({ name: "marker", dir: "row", w: 20, h: 20, align: "center", cross: "center", fill: "color.surface.subtle", stroke: "color.border.strong", radius: PILL }, [
+        text("1", 11, "color.text.default", "Medium"),
+      ]),
+    ]),
+
+  Sources: () => {
+    const entry = (n: string, title: string, host: string) =>
+      frame({ name: "source", dir: "row", gap: 10, cross: "start" }, [
+        frame({ name: "number", dir: "row", w: 20, h: 20, align: "center", cross: "center", stroke: "color.border.strong", radius: PILL }, [text(n, 11, "color.text.default")]),
+        frame({ name: "text", dir: "col", gap: 2 }, [text(title, 14, "color.text.default", "Medium"), text(host, 12, "color.text.muted")]),
+      ]);
+    return frame({ name: "sources", dir: "col", gap: 8, w: 320 }, [
+      text("SOURCES", 12, "color.text.muted", "Semi Bold"),
+      entry("1", "Refund policy", "example.com"),
+      entry("2", "Operations handbook", "example.com"),
+    ]);
+  },
+
+  ApprovalBox: (c) => {
+    const high = c.risk === "high";
+    return frame(
+      { name: "approval box", dir: "col", gap: 12, pad: 16, w: 400, fill: high ? "color.feedback.danger-subtle" : "color.surface.subtle", stroke: high ? "color.feedback.danger" : "color.border.strong", radius: "radius.overlay" },
+      [
+        frame({ name: "message", dir: "row", gap: 12, cross: "start" }, [
+          box(20, 20, { stroke: high ? "color.feedback.danger" : "color.feedback.info", radius: PILL, name: "icon" }),
+          frame({ name: "text", dir: "col", gap: 4, w: "fill" }, [
+            text(high ? "Delete 12 draft invoices" : "Send this report to finance", 14, "color.text.default", "Semi Bold"),
+            text(high ? "High risk · Can't be undone" : c.risk === "low" ? "Low risk · Can be undone" : "Medium risk", 12, "color.text.muted"),
+          ]),
+        ]),
+        frame({ name: "actions", dir: "row", gap: 8, w: "fill", align: "end" }, [button("Deny", "secondary", "sm"), button(high ? "Delete invoices" : "Approve", high ? "danger" : "primary", "sm")]),
+      ],
+    );
+  },
+
+  ToolCall: () =>
+    frame({ name: "tool call", dir: "row", gap: 10, pad: [8, 12], w: 400, cross: "center", fill: "color.surface.default", stroke: "color.border.default", radius: "radius.control" }, [
+      box(16, 16, { stroke: "color.feedback.success", radius: PILL, name: "icon" }),
+      text("Searching your sales data", 14, "color.text.default", "Medium", "fill"),
+      text("Done · 2.4 s", 12, "color.text.muted"),
+    ]),
+
+  AgentActivity: () => {
+    const step = (label: string, state: string, tone: string) =>
+      frame({ name: "step", dir: "row", gap: 10, pad: [8, 12], w: 400, cross: "center", fill: "color.surface.default", stroke: "color.border.default", radius: "radius.control" }, [
+        box(16, 16, { stroke: tone, radius: PILL, name: "icon" }),
+        text(label, 14, "color.text.default", "Medium", "fill"),
+        text(state, 12, "color.text.muted"),
+      ]);
+    return frame({ name: "agent activity", dir: "col", gap: 8 }, [
+      text("Working: 1 of 3 steps done", 14, "color.text.muted"),
+      step("Searching the knowledge base", "Done", "color.feedback.success"),
+      step("Reading 3 documents", "Running", "color.action.primary"),
+      step("Writing the summary", "Waiting", "color.border.strong"),
+    ]);
+  },
+
+  GeneratedTable: () => {
+    const row = (cells: string[], head = false) =>
+      frame(
+        { name: head ? "header" : "row", dir: "row", gap: 0, w: "fill", pad: [8, 12], stroke: "color.border.default" },
+        cells.map((cell, i) => text(cell, 14, head ? "color.text.muted" : "color.text.default", head ? "Medium" : "Regular", i === 0 ? "fill" : undefined)),
+      );
+    return frame({ name: "generated table", dir: "col", gap: 8, w: 400 }, [
+      frame({ name: "title", dir: "row", w: "fill", align: "between", cross: "center" }, [
+        frame({ name: "text", dir: "col", gap: 2 }, [text("Sales by region", 14, "color.text.default", "Semi Bold"), text("4 rows, 3 columns", 12, "color.text.muted")]),
+        button("Download CSV", "secondary", "sm"),
+      ]),
+      frame({ name: "table", dir: "col", w: "fill", fill: "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, [
+        row(["Region", "Orders", "Revenue"], true),
+        row(["Europe", "1,240", "412,000"]),
+        row(["Americas", "1,985", "655,000"]),
+        row(["Asia Pacific", "870", "281,500"]),
+      ]),
+    ]);
+  },
+
+  GeneratedChart: (c) => {
+    const bars = [90, 130, 110, 160, 190, 150];
+    return frame({ name: "generated chart", dir: "col", gap: 8, w: 400 }, [
+      frame({ name: "title", dir: "row", w: "fill", align: "between", cross: "start" }, [
+        frame({ name: "text", dir: "col", gap: 2 }, [text("Revenue by month", 14, "color.text.default", "Semi Bold"), text("Revenue grew every month but April.", 12, "color.text.muted")]),
+        button("View as table", "secondary", "sm"),
+      ]),
+      frame(
+        { name: "plot", dir: "row", gap: 12, pad: 12, w: "fill", h: 220, cross: "end", fill: "color.surface.default", stroke: "color.border.default", radius: "radius.control" },
+        c.type === "line"
+          ? [box(8, 8, { fill: "color.action.primary", radius: PILL }), box(8, 8, { fill: "color.action.primary", radius: PILL }), box(8, 8, { fill: "color.action.primary", radius: PILL })]
+          : bars.map((h) => box(40, h, { fill: "color.action.primary", radius: 2, name: "bar" })),
+      ),
+    ]);
+  },
+
+  Message: () =>
+    frame({ name: "messages", dir: "col", gap: 16, w: 440 }, [
+      frame({ name: "you", dir: "row", w: "fill", align: "end" }, [
+        frame({ name: "bubble", dir: "row", pad: [8, 14], fill: "color.surface.selected", radius: "radius.overlay" }, [text("How do refunds work?", 14)]),
+      ]),
+      frame({ name: "assistant", dir: "row", gap: 12, cross: "start" }, [
+        box(28, 28, { fill: "color.surface.subtle", stroke: "color.border.default", radius: PILL, name: "avatar" }),
+        text("Refunds are issued within 5 business days.", 14, "color.text.default", "Regular", "fill"),
+      ]),
+    ]),
+
+  PromptInput: () =>
+    frame({ name: "prompt input", dir: "col", gap: 6, pad: 8, w: 440, fill: "color.surface.default", stroke: "color.border.strong", radius: "radius.overlay" }, [
+      frame({ name: "row", dir: "row", gap: 8, w: "fill", cross: "end" }, [
+        text("Message the assistant", 14, "color.text.muted", "Regular", "fill"),
+        box(36, 36, { fill: "color.action.primary", radius: PILL, name: "send" }),
+      ]),
+      text("Enter to send, Shift+Enter for a new line", 12, "color.text.muted"),
+    ]),
+
+  Chat: () =>
+    frame({ name: "chat", dir: "col", gap: 16, pad: 16, w: 480, h: 360, fill: "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, [
+      frame({ name: "messages", dir: "col", gap: 12, w: "fill" }, [
+        frame({ name: "you", dir: "row", w: "fill", align: "end" }, [
+          frame({ name: "bubble", dir: "row", pad: [8, 14], fill: "color.surface.selected", radius: "radius.overlay" }, [text("Show me sales from last month", 14)]),
+        ]),
+        frame({ name: "assistant", dir: "row", gap: 12, cross: "start" }, [
+          box(28, 28, { fill: "color.surface.subtle", stroke: "color.border.default", radius: PILL, name: "avatar" }),
+          frame({ name: "reply", dir: "col", gap: 8, w: "fill" }, [
+            frame({ name: "tool", dir: "row", gap: 8, pad: [6, 10], cross: "center", stroke: "color.border.default", radius: "radius.control" }, [
+              box(14, 14, { stroke: "color.feedback.success", radius: PILL, name: "icon" }),
+              text("Searching your sales data · Done", 13, "color.text.default"),
+            ]),
+            text("Sales were up 12% last month.", 14, "color.text.default", "Regular", "fill"),
+          ]),
+        ]),
+      ]),
+      frame({ name: "input", dir: "row", gap: 8, pad: 8, w: "fill", cross: "center", stroke: "color.border.strong", radius: "radius.overlay" }, [
+        text("Message the assistant", 14, "color.text.muted", "Regular", "fill"),
+        box(32, 32, { fill: "color.action.primary", radius: PILL, name: "send" }),
+      ]),
+    ]),
+
   Steps: (c) => {
     const vertical = c.orientation === "vertical";
     const marker = (n: string, state: "done" | "current" | "todo") =>
