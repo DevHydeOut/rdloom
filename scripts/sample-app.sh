@@ -36,8 +36,18 @@ npx rdloom init
 npx rdloom add "${components[@]}" --install
 npx rdloom list | head -3
 
+step "Motion components: one stylesheet, installed and imported for you"
+test ! -e src/styles/rdloom-motion.css || { echo "✗ motion CSS exists before any motion component was added"; exit 1; }
+npx rdloom add shimmer-button text-shimmer blur-fade --install
+test -e src/styles/rdloom-motion.css || { echo "✗ rdloom add did not write the motion CSS"; exit 1; }
+grep -q 'rdloom-motion.css' src/styles/rdloom-tokens.css || { echo "✗ the tokens file does not import the motion CSS"; exit 1; }
+
 step "Typecheck and production build"
 npm run build --silent
+# The keyframes must be in the CSS the browser actually loads, with no <style> tag in the markup.
+grep -rq '@keyframes rdm-shimmer' dist/assets/*.css || { echo "✗ the motion keyframes are not in the built CSS"; exit 1; }
+! grep -rl '<style' src/components/rdloom/shimmer-button src/components/rdloom/text-shimmer >/dev/null 2>&1 || { echo "✗ a motion component still renders a <style> tag"; exit 1; }
+echo "✓ motion keyframes ship in the built CSS"
 
 step "MCP server, started from the installed package"
 node --input-type=module -e '

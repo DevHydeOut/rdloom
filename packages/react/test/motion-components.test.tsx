@@ -1,3 +1,5 @@
+import fs from "node:fs";
+import path from "node:path";
 import { act, createEvent, fireEvent, render, renderHook, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { renderToString } from "react-dom/server";
@@ -16,11 +18,29 @@ import {
   TextShimmer,
   useReducedMotion,
 } from "../src";
-import { MotionStyle, motionVars } from "../src/utils/motion";
+import { motionVars } from "../src/utils/motion";
 import { axeViolations } from "./axe";
 
-/** What the page's <style> tags say, joined. */
-const css = (container: HTMLElement | Document = document) => [...container.querySelectorAll("style")].map((s) => s.textContent).join("\n");
+// The motion rules live in one CSS file that the CLI installs and imports. jsdom leaves
+// import.meta.url as a non-file URL, so find the package by walking up from the working directory.
+function packageRoot(): string {
+  for (let dir = process.cwd(); ; dir = path.dirname(dir)) {
+    for (const candidate of [dir, path.join(dir, "packages", "react")]) {
+      if (fs.existsSync(path.join(candidate, "src", "motion", "rdloom-motion.css"))) return candidate;
+    }
+    if (dir === path.dirname(dir)) throw new Error("packages/react not found above " + process.cwd());
+  }
+}
+const root = packageRoot();
+const motionCss = fs.readFileSync(path.join(root, "src", "motion", "rdloom-motion.css"), "utf8");
+const reducedBlock = motionCss.slice(motionCss.indexOf("@media (prefers-reduced-motion: reduce)"), motionCss.indexOf(".rdm-still .rdm-shimmer"));
+const stillBlock = motionCss.slice(motionCss.indexOf(".rdm-still .rdm-shimmer"));
+
+/** The effect has a still version for reduced motion, and the same one inside .rdm-still. */
+function standsStill(selector: string) {
+  expect(reducedBlock, `${selector} has no reduced-motion rule`).toContain(selector);
+  expect(stillBlock, `${selector} has no .rdm-still rule`).toContain(`.rdm-still ${selector}`);
+}
 
 function mockMotionPreference(reduce: boolean) {
   const listeners = new Set<() => void>();
@@ -42,15 +62,76 @@ function mockMotionPreference(reduce: boolean) {
 beforeEach(() => mockMotionPreference(false));
 afterEach(() => vi.unstubAllGlobals());
 
-describe("motion helpers", () => {
-  it("MotionStyle writes each still rule twice: for reduced motion and for the rdm-still class", () => {
-    const { container } = render(<MotionStyle css=".a{color:red}" still={{ ".a": "animation:none" }} />);
-    const text = css(container);
-    expect(text).toContain(".a{color:red}");
-    expect(text).toContain("@media (prefers-reduced-motion: reduce){.a{animation:none}}");
-    expect(text).toContain(".rdm-still .a{animation:none}");
+describe("the motion CSS", () => {
+  const classes = [...motionCss.matchAll(/(?:^|[\s,>])\.(rdm-[a-z-]+)/gm)].map((m) => m[1]);
+
+  it("gives every animated class a still version for reduced motion and for .rdm-still, and the two lists match", () => {
+    const selectors = (block: string) => [...new Set([...block.matchAll(/\.rdm-(?!still)[a-z-]+/g)].map((m) => m[0]))].sort();
+    expect(selectors(stillBlock)).toEqual(selectors(reducedBlock));
+    for (const animated of [".rdm-shimmer", ".rdm-ripple", ".rdm-pulse", ".rdm-gradient", ".rdm-shuttle", ".rdm-shine", ".rdm-text-shimmer", ".rdm-gradient-text", ".rdm-ring"]) {
+      standsStill(animated);
+    }
   });
 
+  it("defines every motion class the components use, so nothing renders unstyled", () => {
+    const used = new Set<string>();
+    for (const dir of fs.readdirSync(path.join(root, "src"))) {
+      const file = path.join(root, "src", dir, `${dir}.tsx`);
+      if (!fs.existsSync(file)) continue;
+      for (const [, name] of fs.readFileSync(file, "utf8").matchAll(/["' ](rdm-[a-z-]+)/g)) used.add(name);
+    }
+    expect(used.size).toBeGreaterThan(5);
+    for (const name of used) expect(classes, `.${name} is used but not defined`).toContain(name);
+  });
+
+  it("defines the animation every class refers to", () => {
+    for (const [, name] of motionCss.matchAll(/animation:\s*(rdm-[a-z-]+)/g)) expect(motionCss).toContain(`@keyframes ${name}`);
+  });
+
+  it("gives every effect a default speed, so a stripped style attribute still leaves it moving at a sensible pace", () => {
+    for (const [, vars] of motionCss.matchAll(/animation:\s*rdm-[a-z-]+\s+([^;]+);/g)) expect(vars).toMatch(/var\(--rdm-d,\s*[\d.]+m?s\)/);
+  });
+
+  it("draws the text effects plainly in high-contrast mode", () => {
+    const block = motionCss.slice(motionCss.indexOf("@media (forced-colors: active)"));
+    expect(block).toContain(".rdm-text-shimmer");
+    expect(block).toContain(".rdm-gradient-text");
+    expect(block).toContain("CanvasText");
+  });
+
+  it("lets pointer events through the decorative layers", () => {
+    for (const layer of [".rdm-shuttle {", ".rdm-shine {", ".rdm-shimmer {", ".rdm-ring {", ".rdm-ripple {"]) {
+      const start = motionCss.indexOf(layer);
+      expect(motionCss.slice(start, motionCss.indexOf("}", start)), layer).toContain("pointer-events: none");
+    }
+  });
+
+  it("registers the angle property the rotating borders animate", () => {
+    expect(motionCss).toContain("@property --rdm-angle");
+  });
+
+  it("is plain CSS with no inline-style needs: nothing in the components renders a <style> tag", () => {
+    const { container } = render(
+      <>
+        <ShimmerButton>a</ShimmerButton>
+        <RippleButton>b</RippleButton>
+        <PulseButton>c</PulseButton>
+        <GradientButton>d</GradientButton>
+        <RevealButton>e</RevealButton>
+        <ShuttleBorder>f</ShuttleBorder>
+        <ShineBorder>g</ShineBorder>
+        <TextShimmer>h</TextShimmer>
+        <GradientText>i</GradientText>
+        <Ripple>j</Ripple>
+        <BlurFade>k</BlurFade>
+      </>,
+    );
+    expect(container.querySelectorAll("style")).toHaveLength(0);
+    expect(renderToString(<ShuttleBorder>x</ShuttleBorder>)).not.toContain("<style");
+  });
+});
+
+describe("motion helpers", () => {
   it("motionVars keeps only the values that were given", () => {
     expect(motionVars({ "--a": 1, "--b": undefined, "--c": "x" })).toEqual({ "--a": 1, "--c": "x" });
   });
@@ -71,10 +152,12 @@ describe("ShimmerButton", () => {
     expect(container.querySelector(".rdm-shimmer")).toHaveAttribute("aria-hidden", "true");
   });
 
-  it("brings its own keyframes, and stands still for reduced motion", () => {
+  it("uses classes from the motion CSS, writes no style tag, and stands still for reduced motion", () => {
     const { container } = render(<ShimmerButton>Go</ShimmerButton>);
-    expect(css(container)).toContain("@keyframes rdm-shimmer");
-    expect(css(container)).toContain("@media (prefers-reduced-motion: reduce){.rdm-shimmer{display:none}}");
+    expect(container.querySelector("style")).toBeNull();
+    expect(container.querySelector(".rdm-shimmer")).toBeInTheDocument();
+    expect(motionCss).toContain("@keyframes rdm-shimmer");
+    standsStill(".rdm-shimmer");
   });
 
   it("can be paused, and its speed is set", () => {
@@ -176,7 +259,8 @@ describe("RippleButton", () => {
     const { container } = render(<RippleButton onPress={onPress}>Press</RippleButton>);
     await user.click(screen.getByRole("button"));
     expect(onPress).toHaveBeenCalledTimes(1);
-    expect(css(container)).toContain("@media (prefers-reduced-motion: reduce){.rdm-ripple{display:none}}");
+    expect(container.querySelector("style")).toBeNull();
+    standsStill(".rdm-ripple");
   });
 
   it("takes its duration", () => {
@@ -205,10 +289,10 @@ describe("PulseButton", () => {
   });
 
   it("stops for reduced motion, and can be paused or disabled", () => {
-    const { container, rerender } = render(<PulseButton isPaused>Go</PulseButton>);
-    expect(css(container)).toContain("@media (prefers-reduced-motion: reduce){.rdm-pulse{animation:none}}");
+    const { rerender } = render(<PulseButton isPaused>Go</PulseButton>);
+    standsStill(".rdm-pulse");
     expect(screen.getByRole("button")).toHaveAttribute("data-rdm-paused");
-    expect(css(container)).toContain(".rdm-pulse[data-disabled]{animation-play-state:paused}");
+    expect(motionCss).toContain(".rdm-pulse[data-disabled]");
     rerender(<PulseButton isDisabled>Go</PulseButton>);
     expect(screen.getByRole("button")).toBeDisabled();
   });
@@ -247,7 +331,7 @@ describe("GradientButton", () => {
 
   it("stops for reduced motion, when paused, and when disabled", () => {
     const { container, rerender } = render(<GradientButton isPaused>Try it</GradientButton>);
-    expect(css(container)).toContain("@media (prefers-reduced-motion: reduce){.rdm-gradient{animation:none}}");
+    standsStill(".rdm-gradient");
     expect(container.querySelector(".rdm-gradient")).toHaveAttribute("data-rdm-paused");
     rerender(<GradientButton isDisabled>Try it</GradientButton>);
     expect(container.querySelector(".rdm-gradient")).toHaveAttribute("data-rdm-paused");
@@ -321,14 +405,14 @@ describe("ShuttleBorder", () => {
   });
 
   it("stands still for reduced motion", () => {
-    const { container } = render(<ShuttleBorder>x</ShuttleBorder>);
-    expect(css(container)).toContain("@media (prefers-reduced-motion: reduce){.rdm-shuttle{animation:none;background:none}}");
-    expect(css(container)).toContain("@property --rdm-angle");
+    render(<ShuttleBorder>x</ShuttleBorder>);
+    standsStill(".rdm-shuttle");
+    expect(motionCss).toContain("@property --rdm-angle");
   });
 
   it("lets the pointer through to the content", () => {
-    const { container } = render(<ShuttleBorder>x</ShuttleBorder>);
-    expect(css(container)).toContain("pointer-events:none");
+    const start = motionCss.indexOf(".rdm-shuttle {");
+    expect(motionCss.slice(start, motionCss.indexOf("}", start))).toContain("pointer-events: none");
   });
 
   it("renders on the server with no client code", () => {
@@ -360,7 +444,7 @@ describe("ShineBorder", () => {
   it("can be paused and stands still for reduced motion", () => {
     const { container } = render(<ShineBorder isPaused>x</ShineBorder>);
     expect(container.querySelector("[data-rdm-paused]")).toBeInTheDocument();
-    expect(css(container)).toContain("@media (prefers-reduced-motion: reduce){.rdm-shine{animation:none}}");
+    standsStill(".rdm-shine");
   });
 
   it("renders on the server with no client code", () => {
@@ -396,9 +480,10 @@ describe("TextShimmer", () => {
   });
 
   it("is drawn plainly in reduced motion and in high-contrast mode", () => {
-    const { container } = render(<TextShimmer>Hi</TextShimmer>);
-    expect(css(container)).toContain("@media (prefers-reduced-motion: reduce){.rdm-text-shimmer{animation:none;background:none;color:");
-    expect(css(container)).toContain("@media (forced-colors:active){.rdm-text-shimmer{color:CanvasText");
+    render(<TextShimmer>Hi</TextShimmer>);
+    standsStill(".rdm-text-shimmer");
+    expect(reducedBlock).toContain("color: var(--rdm-base, var(--rd-color-text-default))");
+    expect(motionCss.slice(motionCss.indexOf("@media (forced-colors: active)"))).toContain(".rdm-text-shimmer");
   });
 
   it("can be paused, and renders on the server", () => {
@@ -420,9 +505,11 @@ describe("GradientText", () => {
   });
 
   it("falls back to its first colour, plainly, for reduced motion and high contrast", () => {
-    const { container } = render(<GradientText colors={["red", "blue"]}>Build</GradientText>);
-    expect(css(container)).toContain("@media (prefers-reduced-motion: reduce){.rdm-gradient-text{animation:none;background-image:none;color:red}}");
-    expect(css(container)).toContain("@media (forced-colors:active)");
+    render(<GradientText colors={["red", "blue"]}>Build</GradientText>);
+    // The still colour is the first one you chose, handed to the stylesheet as a variable.
+    expect(screen.getByText("Build").style.getPropertyValue("--rdm-first")).toBe("red");
+    standsStill(".rdm-gradient-text");
+    expect(reducedBlock).toContain("color: var(--rdm-first,");
   });
 
   it("defaults to colours that read on the page", () => {
@@ -468,7 +555,7 @@ describe("Ripple", () => {
     const { container } = render(<Ripple color="teal" isPaused />);
     const box = container.querySelector<HTMLElement>("[data-rdm-paused]")!;
     expect(box.style.getPropertyValue("--rdm-c")).toBe("teal");
-    expect(css(container)).toContain("@media (prefers-reduced-motion: reduce){.rdm-ring{animation:none;opacity:.5}}");
+    standsStill(".rdm-ring");
   });
 
   it("renders on the server, and has no axe violations", async () => {

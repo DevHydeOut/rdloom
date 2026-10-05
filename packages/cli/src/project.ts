@@ -5,7 +5,7 @@ import path from "node:path";
 // Everything the CLI reads and writes in a user's project, plus the registry.
 
 export interface RegistryFile {
-  path: string; // relative to componentsDir; "@tokens" targets config.tokensCss
+  path: string; // relative to componentsDir; "@tokens" targets config.tokensCss, "@motion" the motion CSS beside it
   type: string;
   content: string;
 }
@@ -39,6 +39,8 @@ export interface Lock {
   items: Record<string, LockItem>;
 }
 
+/** The motion components' keyframes: written next to the tokens CSS and imported from it. */
+export const MOTION_CSS = "rdloom-motion.css";
 export const CONFIG_FILE = "rdloom.json";
 export const LOCK_FILE = "rdloom.lock.json";
 /** Copies of each file as shipped: the merge base for `upgrade`. Commit it. */
@@ -235,12 +237,14 @@ export class Project {
 
   /** Where a registry file lives in the user's project. */
   target(file: string, config = this.config()): string {
-    return file === "@tokens" ? path.join(this.root, config.tokensCss) : path.join(this.root, config.componentsDir, file);
+    if (file === "@tokens") return path.join(this.root, config.tokensCss);
+    if (file === "@motion") return path.join(this.root, path.dirname(config.tokensCss), MOTION_CSS);
+    return path.join(this.root, config.componentsDir, file);
   }
 
   /** Where the as-shipped copy of a registry file is kept. */
   base(file: string): string {
-    return path.join(this.root, BASE_DIR, file === "@tokens" ? "@tokens.css" : file);
+    return path.join(this.root, BASE_DIR, file === "@tokens" ? "@tokens.css" : file === "@motion" ? "@motion.css" : file);
   }
 
   rel(abs: string) {

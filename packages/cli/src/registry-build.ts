@@ -95,7 +95,7 @@ export function checkManifest(loaded: Loaded, builtin: Set<string> = new Set()):
         errors.push(`${at}: a file has no path`);
         continue;
       }
-      if (f.path !== "@tokens" && (path.isAbsolute(f.path) || f.path.split(/[\\/]/).includes(".."))) {
+      if (f.path !== "@tokens" && f.path !== "@motion" && (path.isAbsolute(f.path) || f.path.split(/[\\/]/).includes(".."))) {
         errors.push(`${at}: file path "${f.path}" must be relative, without ..`);
       }
       const src = path.resolve(dir, sourceOf(f));

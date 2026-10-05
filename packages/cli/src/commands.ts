@@ -9,6 +9,7 @@ import {
   CONFIG_FILE,
   normalizeName,
   DEFAULT_CONFIG,
+  MOTION_CSS,
   Project,
   readJson,
   readText,
@@ -149,6 +150,26 @@ export interface AddOptions {
   quiet?: boolean;
 }
 
+/**
+ * Makes the tokens CSS import the motion CSS, once, so an added motion component needs no setup.
+ * An @import has to come before other rules (comments may precede it), and after any @charset.
+ */
+function ensureMotionImport(ctx: Context, project: Project, config: Config) {
+  const motion = project.target("@motion", config);
+  const tokens = project.target("@tokens", config);
+  const current = readText(tokens);
+  if (!current) {
+    ctx.out.warn(`\nImport ${project.rel(motion)} in your global CSS: the tokens file ${project.rel(tokens)} wasn't found to do it for you.`);
+    return;
+  }
+  if (current.text.includes(MOTION_CSS)) return;
+  const line = `@import "./${MOTION_CSS}";`;
+  const charset = current.text.match(/^@charset[^;]*;\s*\n?/);
+  const head = charset ? charset[0] : "";
+  writeText(tokens, `${head}${line}\n${current.text.slice(head.length)}`, current.eol);
+  ctx.out.info(`write ${project.rel(tokens)} (imports ${MOTION_CSS})`);
+}
+
 export function add(ctx: Context, requested: string[], opts: AddOptions = {}) {
   const names = requested.map(localName);
   if (names.length === 0) throw new CliError("name at least one component, e.g. `rdloom add button`");
@@ -191,6 +212,8 @@ export function add(ctx: Context, requested: string[], opts: AddOptions = {}) {
     added.push(item.name);
   }
   project.saveLock(lock);
+  // The motion CSS is only useful once something loads it: tie it to the tokens file you already import.
+  if (added.includes("motion-css")) ensureMotionImport(ctx, project, config);
 
   installDependencies(ctx, [...deps], opts.install);
   if (skipped > 0) ctx.out.warn(`\n${skipped} file(s) skipped because you've changed them.`);

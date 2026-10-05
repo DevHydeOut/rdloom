@@ -40,6 +40,20 @@ test.describe("component page", () => {
     await expect(page.getByText("src/components/rdloom/alert/alert.tsx")).toBeVisible();
   });
 
+  test("a motion component explains the one stylesheet it needs, and a plain transition doesn't", async ({ page }) => {
+    await page.goto("/components/shimmer-button");
+    await expect(page.getByText("Optional, and kept apart.")).toBeVisible();
+    await expect(page.getByText(/imports it from the tokens file, once/)).toBeVisible();
+    await page.getByRole("tab", { name: "Manual" }).click();
+    await expect(page.getByText("Add the motion stylesheet, and import it.")).toBeVisible();
+    await expect(page.locator('pre[aria-label="Import the motion CSS"]')).toContainText('@import "./rdloom-motion.css";');
+
+    // BlurFade is only a transition: nothing to import.
+    await page.goto("/components/blur-fade");
+    await page.getByRole("tab", { name: "Manual" }).click();
+    await expect(page.getByText("Add the motion stylesheet, and import it.")).toHaveCount(0);
+  });
+
   test("steps to the neighbouring components", async ({ page }) => {
     await page.goto("/components/alert");
     await page.getByRole("link", { name: "Next: Avatar" }).click();

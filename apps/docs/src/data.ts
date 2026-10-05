@@ -107,8 +107,13 @@ export const semanticTokens: TokenRow[] = Object.entries(light).map(([path, t]) 
 
 export const repoUrl = "https://github.com/DevHydeOut/rdloom";
 
+/** The motion components' shared stylesheet, as the registry ships it. Loaded on demand. */
+export const loadMotionCss = () => registrySources["../../../packages/cli/registry/motion-css.json"]?.() ?? Promise.resolve([] as RegistryFile[]);
+
 /** The folder the CLI copies into by default. */
 export const defaultComponentsDir = "src/components/rdloom";
+/** Where the CLI writes the motion CSS: beside the tokens file. */
+export const defaultMotionCssPath = "src/styles/rdloom-motion.css";
 
 /** The component before and after this one in the sidebar's order. */
 export function neighbours(id: string) {

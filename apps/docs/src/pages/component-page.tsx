@@ -3,7 +3,9 @@ import {
   categoryLabel,
   components,
   defaultComponentsDir,
+  defaultMotionCssPath,
   displayName,
+  loadMotionCss,
   EagerExamples,
   neighbours,
   repoUrl,
@@ -130,10 +132,89 @@ function Step({ n, title: heading, children }: { n: number; title: string; child
   );
 }
 
+/** The motion stylesheet, fetched when the Manual tab is opened. */
+function MotionCssFile() {
+  const [file, setFile] = useState<RegistryFile | null>(null);
+  useEffect(() => {
+    let live = true;
+    loadMotionCss().then((files) => live && setFile(files[0] ?? null));
+    return () => {
+      live = false;
+    };
+  }, []);
+  if (!file) return <Muted>Loading the stylesheet…</Muted>;
+  return (
+    <details className="group/file overflow-hidden rounded-xl border border-[var(--site-border)]">
+      <summary className="flex cursor-pointer list-none items-center justify-between gap-3 bg-[var(--site-subtle)] px-4 py-2.5 font-mono text-xs outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--rd-color-focus-ring)] [&::-webkit-details-marker]:hidden">
+        <span>{defaultMotionCssPath}</span>
+        <span aria-hidden="true" className="text-[var(--site-muted)] transition-transform group-open/file:rotate-90">
+          ›
+        </span>
+      </summary>
+      <CodeBlock bare code={file.content} label="Motion CSS" lang="text" className="border-t border-[var(--site-border)]" />
+    </details>
+  );
+}
+
 function Installation({ component }: { component: DocComponent }) {
   const { id, dependencies, registryDependencies } = component;
-  const parts = registryDependencies.filter((d) => d !== "tokens" && d !== "utils");
+  const parts = registryDependencies.filter((d) => d !== "tokens" && d !== "utils" && d !== "motion-css");
   const needsShared = registryDependencies.includes("tokens") || registryDependencies.includes("utils");
+  const needsMotionCss = registryDependencies.includes("motion-css");
+
+  const manualSteps: Array<{ title: string; body: ReactNode }> = [];
+  if (dependencies.length > 0) {
+    manualSteps.push({ title: "Install the dependencies.", body: <CommandBlock commands={addCommand(dependencies.map((d) => `"${d}"`).join(" "))} label="Dependencies command" /> });
+  }
+  if (needsShared || parts.length > 0) {
+    manualSteps.push({
+      title: "Add the parts it builds on.",
+      body: (
+        <Muted>
+          {needsShared && (
+            <>
+              The design tokens and shared helpers: <code>npx rdloom init</code> adds them. Or copy <code>utils</code> and the tokens CSS by hand.{" "}
+            </>
+          )}
+          {parts.length > 0 && (
+            <>
+              It also uses{" "}
+              {parts.map((p, i) => (
+                <span key={p}>
+                  {i > 0 && ", "}
+                  {components.some((c) => c.id === p) ? (
+                    <Link href={`/components/${p}`} className="underline underline-offset-4">
+                      {displayName(components.find((c) => c.id === p)!.spec.name)}
+                    </Link>
+                  ) : (
+                    p
+                  )}
+                </span>
+              ))}
+              : add those first.
+            </>
+          )}
+        </Muted>
+      ),
+    });
+  }
+  if (needsMotionCss) {
+    manualSteps.push({
+      title: "Add the motion stylesheet, and import it.",
+      body: (
+        <>
+          <Muted>
+            The keyframes for every motion component live in one CSS file. Save it beside your tokens CSS, then import it once, at the top of the tokens file or in your global CSS:
+          </Muted>
+          <CodeBlock lang="text" code={`@import "./rdloom-motion.css";`} label="Import the motion CSS" />
+          <MotionCssFile />
+        </>
+      ),
+    });
+  }
+  manualSteps.push({ title: "Copy this source into your project.", body: <ManualFiles component={component} /> });
+  manualSteps.push({ title: "Update the import paths to match your setup.", body: <Muted>Imports between these files are relative. If you keep them together in one folder, nothing needs to change.</Muted> });
+
   return (
     <DocTabs
       label="Installation method"
@@ -153,12 +234,18 @@ function Installation({ component }: { component: DocComponent }) {
                   </>
                 )}
               </Muted>
+              {needsMotionCss && (
+                <Muted>
+                  It also adds <code>rdloom-motion.css</code> next to your tokens and imports it from the tokens file, once: no setup, and no inline styles. The plain components you already use are untouched.
+                </Muted>
+              )}
               <details className="text-sm">
                 <summary className="cursor-pointer text-[var(--site-muted)] hover:text-[var(--site-fg)]">Use another registry client</summary>
                 <div className="flex flex-col gap-2 pt-3">
                   <CodeBlock lang="text" code={`npx shadcn@latest add ${registryBase}/r/${id}.json`} label="Registry command" />
                   <Muted>
-                    Works, but <Link href="/docs/cli#shadcn" className="underline underline-offset-4">without upgrade tracking</Link>.
+                    Works, but <Link href="/docs/cli#shadcn" className="underline underline-offset-4">without upgrade tracking</Link>
+                    {needsMotionCss && ", and you import the motion CSS yourself"}.
                   </Muted>
                 </div>
               </details>
@@ -170,46 +257,11 @@ function Installation({ component }: { component: DocComponent }) {
           title: "Manual",
           content: (
             <ol className="flex flex-col pt-1">
-              {dependencies.length > 0 && (
-                <Step n={1} title="Install the dependencies.">
-                  <CommandBlock commands={addCommand(dependencies.map((d) => `"${d}"`).join(" "))} label="Dependencies command" />
+              {manualSteps.map((step, i) => (
+                <Step key={step.title} n={i + 1} title={step.title}>
+                  {step.body}
                 </Step>
-              )}
-              {(needsShared || parts.length > 0) && (
-                <Step n={dependencies.length > 0 ? 2 : 1} title="Add the parts it builds on.">
-                  <Muted>
-                    {needsShared && (
-                      <>
-                        The design tokens and shared helpers: <code>npx rdloom init</code> adds them. Or copy <code>utils</code> and the tokens CSS by hand.{" "}
-                      </>
-                    )}
-                    {parts.length > 0 && (
-                      <>
-                        It also uses{" "}
-                        {parts.map((p, i) => (
-                          <span key={p}>
-                            {i > 0 && ", "}
-                            {components.some((c) => c.id === p) ? (
-                              <Link href={`/components/${p}`} className="underline underline-offset-4">
-                                {displayName(components.find((c) => c.id === p)!.spec.name)}
-                              </Link>
-                            ) : (
-                              p
-                            )}
-                          </span>
-                        ))}
-                        : add those first.
-                      </>
-                    )}
-                  </Muted>
-                </Step>
-              )}
-              <Step n={1 + (dependencies.length > 0 ? 1 : 0) + (needsShared || parts.length > 0 ? 1 : 0)} title="Copy this source into your project.">
-                <ManualFiles component={component} />
-              </Step>
-              <Step n={2 + (dependencies.length > 0 ? 1 : 0) + (needsShared || parts.length > 0 ? 1 : 0)} title="Update the import paths to match your setup.">
-                <Muted>Imports between these files are relative. If you keep them together in one folder, nothing needs to change.</Muted>
-              </Step>
+              ))}
             </ol>
           ),
         },

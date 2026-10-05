@@ -4,15 +4,9 @@ import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
 import { Button, type ButtonProps } from "../button/button";
 import { rippleButtonDefaults, type RippleButtonSpecProps } from "../generated/ripple-button.types";
 import { cx } from "../utils/cx";
-import { MotionStyle, motionVars } from "../utils/motion";
+import { motionVars } from "../utils/motion";
 
 export interface RippleButtonProps extends RippleButtonSpecProps, Omit<ButtonProps, keyof RippleButtonSpecProps> {}
-
-const css = `
-@keyframes rdm-ripple{from{transform:translate(-50%,-50%) scale(0);opacity:.34}to{transform:translate(-50%,-50%) scale(1);opacity:0}}
-.rdm-ripple{position:absolute;border-radius:9999px;background:currentColor;pointer-events:none;
-  transform:translate(-50%,-50%) scale(0);animation:rdm-ripple var(--rdm-d,600ms) ease-out forwards}
-`;
 
 interface Wave {
   id: number;
@@ -56,33 +50,30 @@ export const RippleButton = forwardRef<HTMLButtonElement, RippleButtonProps>(fun
   }, []);
 
   return (
-    <>
-      <MotionStyle css={css} still={{ ".rdm-ripple": "display:none" }} />
-      <Button
-        {...rest}
-        ref={setRef}
-        className={cx("relative overflow-hidden", className)}
-        style={(values) => ({ ...motionVars({ "--rdm-d": `${duration}ms` }), ...(typeof style === "function" ? style(values) : style) })}
-        onPressStart={(e) => {
-          onPressStart?.(e);
-          // A key press has no pointer: ripple from the middle.
-          if ((e.pointerType === "keyboard" || e.pointerType === "virtual") && element.current) {
-            const { width, height } = element.current.getBoundingClientRect();
-            send(width / 2, height / 2, width, height);
-          }
-        }}
-      >
-        <span className="relative z-[1] inline-flex items-center gap-2">{children}</span>
-        {waves.map((w) => (
-          <span
-            key={w.id}
-            aria-hidden="true"
-            className="rdm-ripple"
-            style={{ left: w.x, top: w.y, width: w.size, height: w.size }}
-            onAnimationEnd={() => setWaves((all) => all.filter((x) => x.id !== w.id))}
-          />
-        ))}
-      </Button>
-    </>
+    <Button
+      {...rest}
+      ref={setRef}
+      className={cx("relative overflow-hidden", className)}
+      style={(values) => ({ ...motionVars({ "--rdm-d": `${duration}ms` }), ...(typeof style === "function" ? style(values) : style) })}
+      onPressStart={(e) => {
+        onPressStart?.(e);
+        // A key press has no pointer: ripple from the middle.
+        if ((e.pointerType === "keyboard" || e.pointerType === "virtual") && element.current) {
+          const { width, height } = element.current.getBoundingClientRect();
+          send(width / 2, height / 2, width, height);
+        }
+      }}
+    >
+      <span className="relative z-[1] inline-flex items-center gap-2">{children}</span>
+      {waves.map((w) => (
+        <span
+          key={w.id}
+          aria-hidden="true"
+          className="rdm-ripple"
+          style={{ left: w.x, top: w.y, width: w.size, height: w.size }}
+          onAnimationEnd={() => setWaves((all) => all.filter((x) => x.id !== w.id))}
+        />
+      ))}
+    </Button>
   );
 });

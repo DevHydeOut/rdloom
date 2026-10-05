@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "@rdloom/tokens/tokens.css";
+@import "../../../packages/react/src/motion/rdloom-motion.css";
 @import "@fontsource-variable/plus-jakarta-sans/wght.css";
 @import "@fontsource-variable/instrument-sans";
 @import "@fontsource/ibm-plex-mono/latin-400.css";

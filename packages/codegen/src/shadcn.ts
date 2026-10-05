@@ -71,6 +71,19 @@ export function toShadcn(item: RegistryItem) {
   if (item.name === "tokens") {
     return { ...base, ...tokenStyles(item.files[0].content), files: [] };
   }
+  if (item.name === "motion-css") {
+    // A stylesheet to import yourself: that CLI writes files but does not edit your CSS.
+    return {
+      ...base,
+      type: "registry:file",
+      files: item.files.map((f) => ({
+        path: `registry/${brand.name}/motion/rdloom-motion.css`,
+        type: "registry:file",
+        target: "~/src/styles/rdloom-motion.css",
+        content: f.content,
+      })),
+    };
+  }
   return {
     ...base,
     files: item.files.map((f) => ({

@@ -10,7 +10,7 @@ import { kebab, loadSpecs } from "./specs.ts";
 // `version` is our addition; the rdloom CLI uses it for diff/upgrade.
 
 export interface RegistryFile {
-  path: string; // relative to the user's componentsDir; "@tokens" targets config.tokensCss
+  path: string; // relative to the user's componentsDir; "@tokens" targets config.tokensCss, "@motion" the motion CSS beside it
   type: "registry:ui" | "registry:lib" | "registry:style";
   content: string;
 }
@@ -79,6 +79,22 @@ function utilsItem(): RegistryItem {
   };
 }
 
+/**
+ * The keyframes and still-motion rules behind the motion components. It is its own item, so it
+ * is installed only when a motion component is, and the CLI imports it from the tokens file.
+ */
+function motionItem(): RegistryItem {
+  return {
+    name: "motion-css",
+    type: "registry:style",
+    version: reactPkg.version,
+    description: "Keyframes and reduced-motion rules for the optional motion components.",
+    dependencies: [],
+    registryDependencies: [],
+    files: [{ path: "@motion", type: "registry:style", content: read("motion/rdloom-motion.css") }],
+  };
+}
+
 function tokensItem(): RegistryItem {
   return {
     name: "tokens",
@@ -128,7 +144,7 @@ function checkDependencyFloors() {
 
 export function buildRegistry(): string[] {
   checkDependencyFloors();
-  const items: RegistryItem[] = [utilsItem(), tokensItem()];
+  const items: RegistryItem[] = [utilsItem(), tokensItem(), motionItem()];
 
   for (const { spec } of loadSpecs()) {
     const id = kebab(spec.name);
@@ -151,7 +167,8 @@ export function buildRegistry(): string[] {
       version: spec.version,
       description: spec.description,
       dependencies: imports.npm,
-      registryDependencies: ["tokens", ...imports.local],
+      // Only the effects that use a motion class need the CSS: BlurFade and RevealButton are plain transitions.
+      registryDependencies: ["tokens", ...(files.some((f) => /["' ]rdm-[a-z]/.test(f.content)) ? ["motion-css"] : []), ...imports.local],
       files,
     });
   }

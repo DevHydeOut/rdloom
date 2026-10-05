@@ -7,7 +7,8 @@ import { useEffect, useLayoutEffect, useState } from "react";
 //   - it is decoration, so the animated layers are hidden from assistive technology
 //   - it stands still for people who ask for less motion
 //   - it can be paused (isPaused), because moving content must be stoppable
-//   - it brings its own keyframes (MotionStyle), so there is nothing to import or configure
+//   - its keyframes and still rules live in one CSS file (motion/rdloom-motion.css) that
+//     `rdloom add` installs and imports from your tokens file, so there is nothing to set up
 
 /** useLayoutEffect in the browser, useEffect on the server (which would otherwise warn). */
 export const useIsomorphicLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
@@ -28,20 +29,6 @@ export function useReducedMotion(): boolean {
     return () => query.removeEventListener("change", update);
   }, []);
   return reduced;
-}
-
-/**
- * One effect's keyframes and rules, written next to the component that uses them.
- *
- * `still` maps a selector to the declarations that should apply when the effect
- * must stand still: for visitors who prefer reduced motion, and inside any element
- * with the class `rdm-still` (the docs use it to show the still state on request).
- */
-export function MotionStyle({ css, still = {} }: { css: string; still?: Record<string, string> }) {
-  const stillCss = Object.entries(still)
-    .map(([selector, rules]) => `@media (prefers-reduced-motion: reduce){${selector}{${rules}}}.rdm-still ${selector}{${rules}}`)
-    .join("");
-  return <style>{css + stillCss}</style>;
 }
 
 /** The inline style for the optional CSS variables an effect reads: only the ones that were given. */
