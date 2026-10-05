@@ -1,7 +1,6 @@
 @import "tailwindcss";
 @import "@rdloom/tokens/tokens.css";
-@import "@fontsource/instrument-serif/latin-400.css";
-@import "@fontsource/instrument-serif/latin-400-italic.css";
+@import "@fontsource-variable/plus-jakarta-sans/wght.css";
 @import "@fontsource-variable/instrument-sans";
 @import "@fontsource/ibm-plex-mono/latin-400.css";
 @import "@fontsource/ibm-plex-mono/latin-500.css";
@@ -84,7 +83,7 @@ pre {
 /*
  * The docs' reading typography. It is scoped to .docs (the site shell) so the
  * /visual pages that the screenshot tests use keep the components' own font.
- * Titles are set in a serif; everything you read or click is in the sans.
+ * Titles are set in Plus Jakarta Sans; the text you read is in Instrument Sans.
  */
 .docs {
   /* Decoration that reaches past the viewport (the hero grid) must never add a sideways scrollbar. clip, unlike hidden, leaves sticky positioning alone. */
@@ -100,10 +99,12 @@ pre {
   font-family: "IBM Plex Mono", ui-monospace, "Cascadia Code", Menlo, monospace;
 }
 
-.font-display {
-  font-family: "Instrument Serif", ui-serif, Georgia, "Times New Roman", serif;
-  font-weight: 400;
-  font-optical-sizing: auto;
+/* Headings. In a layer, so a utility such as font-semibold can still override the weight. */
+@layer components {
+  .font-display {
+    font-family: "Plus Jakarta Sans Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-weight: 700;
+  }
 }
 
 /* Inline code in prose, not inside a code block. */
@@ -201,7 +202,7 @@ pre {
   .thread h2[id]::before {
     content: "";
     position: absolute;
-    top: 3.65rem;
+    top: 4.2rem;
     left: -2rem;
     width: 9px;
     height: 9px;

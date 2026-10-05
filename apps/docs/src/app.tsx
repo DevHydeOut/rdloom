@@ -233,7 +233,7 @@ function Shell() {
           </button>
           <Link href="/" className="flex items-center gap-2.5">
             <img src="/favicon.svg" alt="" width="24" height="24" />
-            <span className="font-display text-[26px] leading-none tracking-[-0.01em]">rdloom</span>
+            <span className="font-display text-[22px] leading-none tracking-[-0.04em]">rdloom</span>
           </Link>
           <nav aria-label="Main" className="hidden md:block">
             <ul className="flex items-center gap-6 text-sm">

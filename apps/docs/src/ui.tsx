@@ -216,7 +216,7 @@ export function PageHeader({ title, lead, actions, meta }: { title: ReactNode; l
     <div className="loom-grid flex flex-col gap-3 pb-9">
       <div className="flex items-start justify-between gap-4">
         {/* Focused on navigation, so screen readers announce the new page. */}
-        <h1 id="page-title" tabIndex={-1} className="font-display text-[44px] leading-[1.05] tracking-[-0.015em] outline-none sm:text-[52px]">
+        <h1 id="page-title" tabIndex={-1} className="font-display text-[34px] leading-[1.1] tracking-[-0.035em] outline-none sm:text-[42px]">
           {title}
         </h1>
         {actions && <div className="flex shrink-0 items-center gap-1.5 pt-0.5">{actions}</div>}
@@ -237,7 +237,7 @@ export function H2({ id, label, children }: { id: string; /** Text for "On this 
     <h2
       id={id}
       data-label={label ?? (typeof children === "string" ? children : undefined)}
-      className="font-display group scroll-mt-20 pt-14 pb-4 text-[30px] leading-9 tracking-[-0.01em]"
+      className="font-display group scroll-mt-20 pt-14 pb-4 text-[24px] leading-8 tracking-[-0.03em]"
     >
       <a href={`#${id}`} data-anchor="" className="outline-none focus-visible:underline">
         {children}

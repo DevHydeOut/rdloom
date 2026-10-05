@@ -50,7 +50,7 @@ export function Home() {
         >
           New: DataGrid search matches formatted values →
         </Link>
-        <h1 id="page-title" tabIndex={-1} className="font-display max-w-4xl text-[52px] leading-[1] tracking-[-0.02em] text-balance outline-none sm:text-[88px]">
+        <h1 id="page-title" tabIndex={-1} className="font-display max-w-4xl text-[40px] leading-[1.05] tracking-[-0.045em] text-balance outline-none sm:text-[68px]">
           Accessible React components you own, that keep getting better.
         </h1>
         <p className="max-w-2xl text-[19px] leading-8 text-balance text-[var(--site-muted)]">
@@ -70,7 +70,7 @@ export function Home() {
       </section>
 
       <section aria-labelledby="live" className="flex flex-col gap-4">
-        <h2 id="live" className="font-display text-[34px] leading-10 tracking-[-0.01em]">
+        <h2 id="live" className="font-display text-[26px] leading-9 tracking-[-0.03em]">
           The hard ones, live
         </h2>
         {/* grid-cols-1 and min-w-0: without them the DataGrid's width stretches the card past a phone screen. */}
@@ -92,7 +92,7 @@ export function Home() {
       </section>
 
       <section aria-labelledby="why" className="flex flex-col gap-4">
-        <h2 id="why" className="font-display text-[34px] leading-10 tracking-[-0.01em]">
+        <h2 id="why" className="font-display text-[26px] leading-9 tracking-[-0.03em]">
           Why rdloom
         </h2>
         <ul className="grid gap-4 sm:grid-cols-2">
@@ -106,7 +106,7 @@ export function Home() {
       </section>
 
       <section aria-labelledby="all" className="flex flex-col gap-4">
-        <h2 id="all" className="font-display text-[34px] leading-10 tracking-[-0.01em]">
+        <h2 id="all" className="font-display text-[26px] leading-9 tracking-[-0.03em]">
           {components.length} components
         </h2>
         <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
