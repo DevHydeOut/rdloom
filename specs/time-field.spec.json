@@ -1,0 +1,166 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "TimeField",
+  "version": "0.1.0",
+  "category": "input",
+  "status": "experimental",
+  "description": "A field for a time of day, with separate hour, minute and (optional) second segments that follow the visitor's locale and 12 or 24 hour clock.",
+  "props": {
+    "label": {
+      "type": "string",
+      "description": "Visible label, also the accessible name.",
+      "required": true
+    },
+    "description": {
+      "type": "string",
+      "description": "Help text under the field."
+    },
+    "errorMessage": {
+      "type": "string",
+      "description": "Shown when the value is invalid. Leave out to use the built-in message."
+    },
+    "value": {
+      "type": "custom",
+      "tsType": "import(\"react-aria-components\").TimeValue | null",
+      "description": "Controlled value."
+    },
+    "defaultValue": {
+      "type": "custom",
+      "tsType": "import(\"react-aria-components\").TimeValue | null",
+      "description": "Initial value when uncontrolled."
+    },
+    "onChange": {
+      "type": "callback",
+      "tsType": "(value: import(\"react-aria-components\").TimeValue | null) => void",
+      "description": "Called with the time, or null when it is cleared."
+    },
+    "granularity": {
+      "type": "enum",
+      "values": [
+        "hour",
+        "minute",
+        "second"
+      ],
+      "description": "Smallest unit shown and edited.",
+      "default": "minute"
+    },
+    "hourCycle": {
+      "type": "custom",
+      "tsType": "12 | 24",
+      "description": "Force a 12 or 24 hour clock. Leave out to follow the locale."
+    },
+    "minValue": {
+      "type": "custom",
+      "tsType": "import(\"react-aria-components\").TimeValue",
+      "description": "Earliest allowed time."
+    },
+    "maxValue": {
+      "type": "custom",
+      "tsType": "import(\"react-aria-components\").TimeValue",
+      "description": "Latest allowed time."
+    },
+    "size": {
+      "type": "enum",
+      "values": [
+        "sm",
+        "md",
+        "lg"
+      ],
+      "description": "Field height and text size.",
+      "default": "md"
+    },
+    "isDisabled": {
+      "type": "boolean",
+      "description": "Prevents interaction and dims the field.",
+      "default": false
+    },
+    "isInvalid": {
+      "type": "boolean",
+      "description": "Marks the field invalid. Leave undefined to let validation decide."
+    },
+    "isRequired": {
+      "type": "boolean",
+      "description": "Marks the field required and adds an asterisk.",
+      "default": false
+    }
+  },
+  "variants": [
+    "size",
+    "isDisabled",
+    "isInvalid"
+  ],
+  "states": [
+    "default",
+    "hover",
+    "focus",
+    "disabled",
+    "invalid"
+  ],
+  "slots": [
+    "label",
+    "group",
+    "segment",
+    "description",
+    "error"
+  ],
+  "tokens": [
+    "color.surface.default",
+    "color.surface.subtle",
+    "color.border.default",
+    "color.border.strong",
+    "color.text.default",
+    "color.text.muted",
+    "color.feedback.danger",
+    "color.focus.ring",
+    "radius.control",
+    "color.action.primary",
+    "color.action.on-primary"
+  ],
+  "a11y": {
+    "role": "group",
+    "keyboard": [
+      "Left and Right arrows (or Tab) move between hour, minute and AM/PM",
+      "Up and Down arrows change the focused segment; typing digits sets it",
+      "Backspace clears the focused segment"
+    ],
+    "requirements": [
+      "A labelled group of spin buttons: each segment is named (hours, minutes, AM/PM) and exposes its range",
+      "Digits typed move to the next segment on their own",
+      "Invalid state and the error message are linked to the field",
+      "The focused segment is highlighted with 3:1 contrast, not only by color"
+    ],
+    "screenReader": [
+      "Entering announces the label, then the first segment as \"hours, spin button\" with its value",
+      "Changing a segment announces the new value",
+      "The group is announced with the full time, e.g. \"9:30 AM\""
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "Opening hours, reminders, meeting times and schedules",
+      "Any time of day that is not tied to a date"
+    ],
+    "avoid_when": [
+      "A date and a time together: use DatePicker and TimeField side by side",
+      "A duration, such as 90 minutes: use NumberField"
+    ],
+    "anti_patterns": [
+      "Forcing a 24 hour clock on people who use 12 hour (leave hourCycle to the locale unless you must)",
+      "A free text field for times"
+    ]
+  },
+  "examples": [
+    "basic",
+    "seconds",
+    "range"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {
+      "size": "Size",
+      "isDisabled": "Disabled",
+      "isInvalid": "Invalid"
+    }
+  }
+}

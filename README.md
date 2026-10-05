@@ -6,7 +6,7 @@
 
 Every component is defined once, as a JSON spec. That spec generates the TypeScript types, the design tokens, the Figma library, the documentation and the AI-agent context, so design, code and AI tools never drift apart.
 
-> Status: 31 components built and tested, including a 100,000-row DataGrid, DateRangePicker, Combobox, Table and Pagination. The CLI (`rdloom`) and the MCP server (`@rdloom/mcp`) are on npm; the docs site is not hosted yet.
+> Status: 39 components built and tested, including a 100,000-row DataGrid, a command palette, file upload, DateRangePicker, Combobox and Table. The CLI (`rdloom`) and the MCP server (`@rdloom/mcp`) are on npm; the docs site is not hosted yet.
 
 ## How it works
 

@@ -290,7 +290,7 @@
       "files": [
         {
           "path": "alert/alert.tsx",
-          "content": "\"use client\";\n\nimport { forwardRef, type HTMLAttributes } from \"react\";\nimport { Button as AriaButton } from \"react-aria-components\";\nimport { alertDefaults, type AlertSpecProps } from \"../generated/alert.types\";\nimport { cx } from \"../utils/cx\";\nimport { CloseIcon, ErrorIcon, InfoIcon, SuccessIcon, WarningIcon } from \"../utils/icons\";\n\nexport interface AlertProps\n  extends AlertSpecProps,\n    Omit<HTMLAttributes<HTMLDivElement>, keyof AlertSpecProps | \"className\" | \"title\" | \"role\"> {\n  className?: string;\n}\n\nconst tones: Record<NonNullable<AlertSpecProps[\"variant\"]>, { box: string; icon: string; Icon: typeof InfoIcon; say: string }> = {\n  info: {\n    box: \"bg-[var(--rd-color-feedback-info-subtle)] border-s-[var(--rd-color-feedback-info)]\",\n    icon: \"text-[var(--rd-color-feedback-info)]\",\n    Icon: InfoIcon,\n    say: \"Information\",\n  },\n  success: {\n    box: \"bg-[var(--rd-color-feedback-success-subtle)] border-s-[var(--rd-color-feedback-success)]\",\n    icon: \"text-[var(--rd-color-feedback-success)]\",\n    Icon: SuccessIcon,\n    say: \"Success\",\n  },\n  warning: {\n    box: \"bg-[var(--rd-color-feedback-warning-subtle)] border-s-[var(--rd-color-feedback-warning)]\",\n    icon: \"text-[var(--rd-color-feedback-warning)]\",\n    Icon: WarningIcon,\n    say: \"Warning\",\n  },\n  danger: {\n    box: \"bg-[var(--rd-color-feedback-danger-subtle)] border-s-[var(--rd-color-feedback-danger)]\",\n    icon: \"text-[var(--rd-color-feedback-danger)]\",\n    Icon: ErrorIcon,\n    say: \"Error\",\n  },\n};\n\nexport const Alert = forwardRef<HTMLDivElement, AlertProps>(function Alert(\n  {\n    children,\n    title,\n    variant = alertDefaults.variant,\n    onDismiss,\n    dismissLabel = alertDefaults.dismissLabel,\n    className,\n    ...rest\n  },\n  ref,\n) {\n  const tone = tones[variant];\n  const { Icon } = tone;\n  // Warnings and errors interrupt a screen reader; the rest wait for a pause.\n  const urgent = variant === \"warning\" || variant === \"danger\";\n  return (\n    <div\n      {...rest}\n      ref={ref}\n      role={urgent ? \"alert\" : \"status\"}\n      className={cx(\n        \"flex items-start gap-3 rounded-[var(--rd-radius-overlay)] border border-s-4 border-[var(--rd-color-border-default)] p-3 \" +\n          \"text-sm text-[var(--rd-color-text-default)]\",\n        tone.box,\n        className,\n      )}\n    >\n      <Icon className={cx(\"mt-0.5 size-5 shrink-0\", tone.icon)} />\n      <div className=\"flex min-w-0 flex-1 flex-col gap-0.5\">\n        {/* Said in words, so the tone isn't only a color and an icon. */}\n        <span className=\"sr-only\">{tone.say}: </span>\n        {title && <p className=\"font-medium\">{title}</p>}\n        <div>{children}</div>\n      </div>\n      {onDismiss && (\n        <AriaButton\n          aria-label={dismissLabel}\n          onPress={onDismiss}\n          className={\n            \"-m-1 flex size-7 shrink-0 items-center justify-center rounded-[var(--rd-radius-control)] outline-none \" +\n            \"data-[hovered]:bg-[var(--rd-color-surface-default)]/60 \" +\n            \"data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)]\"\n          }\n        >\n          <CloseIcon className=\"size-4\" />\n        </AriaButton>\n      )}\n    </div>\n  );\n});\n"
+          "content": "\"use client\";\n\nimport { forwardRef, type HTMLAttributes } from \"react\";\nimport { Button as AriaButton } from \"react-aria-components\";\nimport { alertDefaults, type AlertSpecProps } from \"../generated/alert.types\";\nimport { cx } from \"../utils/cx\";\nimport { CloseIcon, ErrorIcon, InfoIcon, SuccessIcon, WarningIcon } from \"../utils/icons\";\n\nexport interface AlertProps\n  extends AlertSpecProps,\n    Omit<HTMLAttributes<HTMLDivElement>, keyof AlertSpecProps | \"className\" | \"title\" | \"role\"> {\n  className?: string;\n}\n\nconst tones: Record<NonNullable<AlertSpecProps[\"variant\"]>, { box: string; icon: string; Icon: typeof InfoIcon; say: string }> = {\n  info: {\n    box: \"bg-[var(--rd-color-feedback-info-subtle)] border-[color-mix(in_srgb,var(--rd-color-feedback-info)_32%,transparent)]\",\n    icon: \"text-[var(--rd-color-feedback-info)]\",\n    Icon: InfoIcon,\n    say: \"Information\",\n  },\n  success: {\n    box: \"bg-[var(--rd-color-feedback-success-subtle)] border-[color-mix(in_srgb,var(--rd-color-feedback-success)_32%,transparent)]\",\n    icon: \"text-[var(--rd-color-feedback-success)]\",\n    Icon: SuccessIcon,\n    say: \"Success\",\n  },\n  warning: {\n    box: \"bg-[var(--rd-color-feedback-warning-subtle)] border-[color-mix(in_srgb,var(--rd-color-feedback-warning)_32%,transparent)]\",\n    icon: \"text-[var(--rd-color-feedback-warning)]\",\n    Icon: WarningIcon,\n    say: \"Warning\",\n  },\n  danger: {\n    box: \"bg-[var(--rd-color-feedback-danger-subtle)] border-[color-mix(in_srgb,var(--rd-color-feedback-danger)_32%,transparent)]\",\n    icon: \"text-[var(--rd-color-feedback-danger)]\",\n    Icon: ErrorIcon,\n    say: \"Error\",\n  },\n};\n\nexport const Alert = forwardRef<HTMLDivElement, AlertProps>(function Alert(\n  {\n    children,\n    title,\n    variant = alertDefaults.variant,\n    onDismiss,\n    dismissLabel = alertDefaults.dismissLabel,\n    className,\n    ...rest\n  },\n  ref,\n) {\n  const tone = tones[variant];\n  const { Icon } = tone;\n  // Warnings and errors interrupt a screen reader; the rest wait for a pause.\n  const urgent = variant === \"warning\" || variant === \"danger\";\n  return (\n    <div\n      {...rest}\n      ref={ref}\n      role={urgent ? \"alert\" : \"status\"}\n      className={cx(\n        \"flex items-start gap-3 rounded-[var(--rd-radius-overlay)] border p-3.5 \" +\n          \"text-sm leading-relaxed text-[var(--rd-color-text-default)] shadow-[0_1px_2px_rgb(0_0_0/0.04)]\",\n        tone.box,\n        className,\n      )}\n    >\n      <Icon className={cx(\"mt-0.5 size-5 shrink-0\", tone.icon)} />\n      <div className=\"flex min-w-0 flex-1 flex-col gap-0.5\">\n        {/* Said in words, so the tone isn't only a color and an icon. */}\n        <span className=\"sr-only\">{tone.say}: </span>\n        {title && <p className=\"font-medium\">{title}</p>}\n        <div>{children}</div>\n      </div>\n      {onDismiss && (\n        <AriaButton\n          aria-label={dismissLabel}\n          onPress={onDismiss}\n          className={\n            \"-m-1 flex size-7 shrink-0 items-center justify-center rounded-[var(--rd-radius-control)] outline-none \" +\n            \"data-[hovered]:bg-[var(--rd-color-surface-default)]/60 \" +\n            \"data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)]\"\n          }\n        >\n          <CloseIcon className=\"size-4\" />\n        </AriaButton>\n      )}\n    </div>\n  );\n});\n"
         },
         {
           "path": "generated/alert.types.ts",
@@ -1549,6 +1549,175 @@
       ]
     },
     {
+      "id": "command-palette",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "CommandPalette",
+        "version": "0.1.0",
+        "category": "overlay",
+        "status": "experimental",
+        "description": "A search box in a dialog that finds and runs commands, jumps to pages and triggers actions from the keyboard. Opens with Ctrl or Cmd + K. Use CommandGroup and CommandItem for the results.",
+        "props": {
+          "label": {
+            "type": "string",
+            "description": "Accessible name of the dialog, e.g. \"Command palette\".",
+            "required": true
+          },
+          "children": {
+            "type": "node",
+            "description": "CommandGroup and CommandItem elements.",
+            "required": true
+          },
+          "isOpen": {
+            "type": "boolean",
+            "description": "Controlled open state."
+          },
+          "defaultOpen": {
+            "type": "boolean",
+            "description": "Initial state when uncontrolled.",
+            "default": false
+          },
+          "onOpenChange": {
+            "type": "callback",
+            "tsType": "(isOpen: boolean) => void",
+            "description": "Called when it opens or closes."
+          },
+          "placeholder": {
+            "type": "string",
+            "description": "Hint in the search box.",
+            "default": "Search commands…"
+          },
+          "emptyMessage": {
+            "type": "string",
+            "description": "Shown when nothing matches.",
+            "default": "No results found."
+          },
+          "shortcut": {
+            "type": "custom",
+            "tsType": "string | null",
+            "description": "Letter that opens it with Ctrl (Windows, Linux) or Cmd (Mac) held. Set null to turn the shortcut off and open it yourself.",
+            "default": "k"
+          },
+          "onAction": {
+            "type": "callback",
+            "tsType": "(key: import(\"react-aria-components\").Key) => void",
+            "description": "Called with the id of any command run, in addition to the command's own onAction."
+          }
+        },
+        "variants": [],
+        "states": [
+          "default",
+          "open"
+        ],
+        "slots": [
+          "overlay",
+          "dialog",
+          "input",
+          "list",
+          "group",
+          "item",
+          "shortcut",
+          "empty"
+        ],
+        "tokens": [
+          "color.surface.raised",
+          "color.surface.subtle",
+          "color.overlay.backdrop",
+          "color.border.default",
+          "color.text.default",
+          "color.text.muted",
+          "color.focus.ring",
+          "radius.overlay",
+          "radius.control"
+        ],
+        "a11y": {
+          "role": "dialog",
+          "keyboard": [
+            "Ctrl+K (Cmd+K on Mac) opens it, and closes it when open",
+            "Typing filters the commands as you type",
+            "Up and Down arrows move through the results; Home and End jump to the first and last",
+            "Enter runs the highlighted command and closes the palette",
+            "Esc closes it and returns focus to where you were"
+          ],
+          "requirements": [
+            "A modal dialog with an accessible name; focus moves into the search box when it opens and is restored on close",
+            "The search box stays focused while arrows move a highlight through the results (an active descendant), so typing never stops working",
+            "Groups have visible headings that are also read to screen readers",
+            "When nothing matches, the empty message is announced",
+            "Shortcut hints on commands are display only, read after the command name",
+            "The backdrop blur is decoration; the dialog meets 4.5:1 contrast without it"
+          ],
+          "screenReader": [
+            "Opening announces the dialog name and the search box",
+            "Moving through results announces each command with its group and position",
+            "Typing announces the number of results, or that there are none",
+            "Running a command closes the dialog and focus returns to the page"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "Apps with many actions or pages, where search is faster than menus",
+            "Power users who prefer the keyboard"
+          ],
+          "avoid_when": [
+            "A short list of actions: use Menu",
+            "Choosing a value for a form field: use Combobox",
+            "The only way to reach important features"
+          ],
+          "anti_patterns": [
+            "Hiding essential navigation behind it",
+            "Commands whose names are not words people would search for",
+            "Not telling people the shortcut exists"
+          ]
+        },
+        "examples": [
+          "basic",
+          "grouped",
+          "controlled"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {}
+        }
+      },
+      "install": {
+        "command": "npx rdloom add command-palette",
+        "dependencies": [
+          "react-aria-components@^1.21.1"
+        ],
+        "registryDependencies": [
+          "tokens",
+          "kbd",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import { useState } from \"react\";\nimport { Button, CommandItem, CommandPalette, Kbd } from \"@rdloom/react\";\n\n// Ctrl+K (Cmd+K on a Mac) opens and closes it from anywhere on the page.\nexport default function CommandPaletteBasicExample() {\n  const [last, setLast] = useState(\"\");\n  return (\n    <div className=\"flex flex-col items-start gap-3 text-sm\">\n      <p className=\"flex items-center gap-1.5\">\n        Press <Kbd>Ctrl</Kbd> <Kbd>K</Kbd> to open the palette.\n      </p>\n      <CommandPalette label=\"Command palette\" onAction={(key) => setLast(String(key))}>\n        <CommandItem id=\"new-project\">New project</CommandItem>\n        <CommandItem id=\"invite\">Invite a teammate</CommandItem>\n        <CommandItem id=\"settings\">Open settings</CommandItem>\n        <CommandItem id=\"theme\" keywords=\"dark light appearance\">\n          Switch theme\n        </CommandItem>\n      </CommandPalette>\n      <p aria-live=\"polite\" className=\"text-[var(--rd-color-text-muted)]\">\n        {last ? `Ran: ${last}` : \"Nothing run yet.\"}\n      </p>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "grouped",
+          "code": "import { useState } from \"react\";\nimport { Button, CommandGroup, CommandItem, CommandPalette } from \"@rdloom/react\";\n\nconst FolderIcon = () => (\n  <svg viewBox=\"0 0 20 20\" fill=\"none\" aria-hidden=\"true\">\n    <path d=\"M2.75 5.5A1.5 1.5 0 0 1 4.25 4h3.4l1.6 1.75h6.5a1.5 1.5 0 0 1 1.5 1.5v6.75a1.5 1.5 0 0 1-1.5 1.5H4.25a1.5 1.5 0 0 1-1.5-1.5V5.5z\" stroke=\"currentColor\" strokeWidth=\"1.5\" strokeLinejoin=\"round\" />\n  </svg>\n);\n\nconst GearIcon = () => (\n  <svg viewBox=\"0 0 20 20\" fill=\"none\" aria-hidden=\"true\">\n    <circle cx=\"10\" cy=\"10\" r=\"2.5\" stroke=\"currentColor\" strokeWidth=\"1.5\" />\n    <path d=\"M10 2.5v2M10 15.5v2M2.5 10h2M15.5 10h2M4.7 4.7l1.4 1.4M13.9 13.9l1.4 1.4M4.7 15.3l1.4-1.4M13.9 6.1l1.4-1.4\" stroke=\"currentColor\" strokeWidth=\"1.5\" strokeLinecap=\"round\" />\n  </svg>\n);\n\n// Groups give long lists a shape; icons and shortcut hints are optional extras.\nexport default function CommandPaletteGroupedExample() {\n  const [open, setOpen] = useState(false);\n  return (\n    <div>\n      <Button variant=\"secondary\" onPress={() => setOpen(true)}>\n        Open commands\n      </Button>\n      <CommandPalette label=\"Commands\" isOpen={open} onOpenChange={setOpen} shortcut={null} placeholder=\"Type a command or search…\">\n        <CommandGroup title=\"Go to\">\n          <CommandItem id=\"projects\" icon={<FolderIcon />} shortcut=\"G P\">\n            Projects\n          </CommandItem>\n          <CommandItem id=\"settings\" icon={<GearIcon />} shortcut=\"G S\">\n            Settings\n          </CommandItem>\n        </CommandGroup>\n        <CommandGroup title=\"Actions\">\n          <CommandItem id=\"new\" shortcut=\"Ctrl N\">\n            Create a project\n          </CommandItem>\n          <CommandItem id=\"export\">Export all data</CommandItem>\n        </CommandGroup>\n      </CommandPalette>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "controlled",
+          "code": "import { useState } from \"react\";\nimport { Button, CommandItem, CommandPalette } from \"@rdloom/react\";\n\n// shortcut={null} turns off Ctrl+K: you decide when it opens.\nexport default function CommandPaletteControlledExample() {\n  const [open, setOpen] = useState(false);\n  return (\n    <div className=\"flex items-center gap-3 text-sm\">\n      <Button onPress={() => setOpen(true)}>Search everything</Button>\n      <span aria-live=\"polite\">{open ? \"Open\" : \"Closed\"}</span>\n      <CommandPalette label=\"Search\" isOpen={open} onOpenChange={setOpen} shortcut={null}>\n        <CommandItem id=\"a\">First command</CommandItem>\n        <CommandItem id=\"b\">Second command</CommandItem>\n      </CommandPalette>\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "command-palette/command-palette.tsx",
+          "content": "\"use client\";\n\nimport { forwardRef, useEffect, useRef, useState, type ReactNode } from \"react\";\nimport {\n  Autocomplete,\n  Dialog,\n  Header,\n  Input,\n  Menu,\n  MenuItem,\n  MenuSection,\n  Modal,\n  ModalOverlay,\n  SearchField,\n  useFilter,\n  type Key,\n} from \"react-aria-components\";\nimport { commandPaletteDefaults, type CommandPaletteSpecProps } from \"../generated/command-palette.types\";\nimport { Kbd } from \"../kbd/kbd\";\nimport { cx } from \"../utils/cx\";\nimport { SearchIcon } from \"../utils/icons\";\n\nexport interface CommandPaletteProps extends CommandPaletteSpecProps {\n  className?: string;\n}\n\nexport const CommandPalette = forwardRef<HTMLDivElement, CommandPaletteProps>(function CommandPalette(\n  {\n    label,\n    children,\n    isOpen,\n    defaultOpen = commandPaletteDefaults.defaultOpen,\n    onOpenChange,\n    placeholder = commandPaletteDefaults.placeholder,\n    emptyMessage = commandPaletteDefaults.emptyMessage,\n    shortcut = commandPaletteDefaults.shortcut,\n    onAction,\n    className,\n  },\n  ref,\n) {\n  const [inner, setInner] = useState(defaultOpen);\n  const open = isOpen ?? inner;\n  const setOpen = (next: boolean) => {\n    if (isOpen === undefined) setInner(next);\n    onOpenChange?.(next);\n  };\n\n  // The shortcut handler lives for the whole page, so it reads the latest state through a ref.\n  const toggle = useRef(() => {});\n  toggle.current = () => setOpen(!open);\n  useEffect(() => {\n    if (!shortcut) return;\n    const onKey = (e: KeyboardEvent) => {\n      if ((e.metaKey || e.ctrlKey) && !e.altKey && !e.shiftKey && e.key.toLocaleLowerCase() === shortcut.toLocaleLowerCase()) {\n        e.preventDefault(); // Ctrl+K would otherwise focus the browser's search box\n        toggle.current();\n      }\n    };\n    window.addEventListener(\"keydown\", onKey);\n    return () => window.removeEventListener(\"keydown\", onKey);\n  }, [shortcut]);\n\n  const { contains } = useFilter({ sensitivity: \"base\" });\n\n  return (\n    <ModalOverlay\n      isOpen={open}\n      onOpenChange={setOpen}\n      isDismissable\n      className={\n        \"fixed inset-0 z-50 flex items-start justify-center px-4 pt-[12vh] \" +\n        \"bg-[var(--rd-color-overlay-backdrop)] backdrop-blur-sm transition-opacity duration-150 \" +\n        \"data-[entering]:opacity-0 data-[exiting]:opacity-0 motion-reduce:transition-none\"\n      }\n    >\n      <Modal\n        className={cx(\n          \"w-full max-w-xl overflow-hidden rounded-[calc(var(--rd-radius-overlay)+4px)] border border-[var(--rd-color-border-default)] \" +\n            \"bg-[var(--rd-color-surface-raised)] text-[var(--rd-color-text-default)] \" +\n            \"shadow-[0_24px_64px_-12px_rgb(0_0_0/0.35),0_0_0_1px_rgb(0_0_0/0.04)] \" +\n            \"transition duration-150 ease-out data-[entering]:translate-y-1 data-[entering]:scale-[0.98] data-[entering]:opacity-0 \" +\n            \"data-[exiting]:scale-[0.98] data-[exiting]:opacity-0 motion-reduce:transition-none\",\n          className,\n        )}\n      >\n        <Dialog ref={ref} aria-label={label} className=\"flex flex-col outline-none\">\n          <Autocomplete filter={contains}>\n            <SearchField autoFocus aria-label={placeholder} className=\"flex items-center gap-3 border-b border-[var(--rd-color-border-default)] px-4\">\n              <SearchIcon className=\"size-5 shrink-0 text-[var(--rd-color-text-muted)]\" />\n              <Input\n                placeholder={placeholder}\n                className=\"h-14 min-w-0 flex-1 bg-transparent text-base text-[var(--rd-color-text-default)] outline-none placeholder:text-[var(--rd-color-text-muted)] [&::-webkit-search-cancel-button]:hidden\"\n              />\n              <Kbd size=\"sm\" aria-hidden=\"true\">\n                Esc\n              </Kbd>\n            </SearchField>\n            <Menu\n              aria-label={label}\n              onAction={(key: Key) => {\n                onAction?.(key);\n                setOpen(false);\n              }}\n              renderEmptyState={() => <p className=\"px-3 py-10 text-center text-sm text-[var(--rd-color-text-muted)]\">{emptyMessage}</p>}\n              className=\"max-h-[min(24rem,55vh)] overflow-y-auto p-2 outline-none\"\n            >\n              {children}\n            </Menu>\n          </Autocomplete>\n        </Dialog>\n      </Modal>\n    </ModalOverlay>\n  );\n});\n\nexport interface CommandGroupProps {\n  /** Heading of the group, e.g. \"Navigation\". */\n  title: string;\n  children: ReactNode;\n}\n\nexport function CommandGroup({ title, children }: CommandGroupProps) {\n  return (\n    <MenuSection className=\"flex flex-col pb-1 last:pb-0\">\n      <Header className=\"px-3 pt-2 pb-1 text-[11px] font-semibold tracking-wider text-[var(--rd-color-text-muted)] uppercase\">{title}</Header>\n      {children}\n    </MenuSection>\n  );\n}\n\nexport interface CommandItemProps {\n  /** Identifies the command in onAction. */\n  id: Key;\n  children: ReactNode;\n  /** Plain-text name for searching and screen readers. Needed when children isn't a string. */\n  textValue?: string;\n  /** Icon shown before the name. Decorative. */\n  icon?: ReactNode;\n  /** Shortcut hint, keys separated by spaces: \"G D\" or \"Ctrl N\". Display only: wire the shortcut yourself. */\n  shortcut?: string;\n  /** Extra words to match when searching, e.g. synonyms. */\n  keywords?: string;\n  onAction?: () => void;\n}\n\nexport function CommandItem({ id, children, textValue, icon, shortcut, keywords, onAction }: CommandItemProps) {\n  const text = textValue ?? (typeof children === \"string\" ? children : String(id));\n  return (\n    <MenuItem\n      id={id}\n      // Matching reads textValue, so synonyms ride along after the name.\n      textValue={keywords ? `${text} ${keywords}` : text}\n      aria-label={text}\n      onAction={onAction}\n      className={\n        \"flex cursor-default items-center gap-3 rounded-[var(--rd-radius-control)] px-3 py-2.5 text-sm outline-none \" +\n        \"text-[var(--rd-color-text-default)] data-[focused]:bg-[var(--rd-color-surface-subtle)] data-[pressed]:bg-[var(--rd-color-surface-selected)]\"\n      }\n    >\n      {icon && (\n        <span aria-hidden=\"true\" className=\"flex size-5 shrink-0 items-center justify-center text-[var(--rd-color-text-muted)] [&>svg]:size-5\">\n          {icon}\n        </span>\n      )}\n      <span className=\"min-w-0 flex-1 truncate\">{children}</span>\n      {shortcut && (\n        <span aria-hidden=\"true\" className=\"flex shrink-0 items-center gap-1\">\n          {shortcut.split(\" \").map((key, i) => (\n            <Kbd key={`${key}-${i}`} size=\"sm\">\n              {key}\n            </Kbd>\n          ))}\n        </span>\n      )}\n    </MenuItem>\n  );\n}\n"
+        },
+        {
+          "path": "generated/command-palette.types.ts",
+          "content": "// Generated by rdloom codegen from specs/command-palette.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nimport type { ReactNode } from \"react\";\n\n/** A search box in a dialog that finds and runs commands, jumps to pages and triggers actions from the keyboard. Opens with Ctrl or Cmd + K. Use CommandGroup and CommandItem for the results. */\nexport interface CommandPaletteSpecProps {\n  /**\n   * Accessible name of the dialog, e.g. \"Command palette\".\n   */\n  label: string;\n  /**\n   * CommandGroup and CommandItem elements.\n   */\n  children: ReactNode;\n  /**\n   * Controlled open state.\n   */\n  isOpen?: boolean;\n  /**\n   * Initial state when uncontrolled.\n   * @default false\n   */\n  defaultOpen?: boolean;\n  /**\n   * Called when it opens or closes.\n   */\n  onOpenChange?: (isOpen: boolean) => void;\n  /**\n   * Hint in the search box.\n   * @default \"Search commands…\"\n   */\n  placeholder?: string;\n  /**\n   * Shown when nothing matches.\n   * @default \"No results found.\"\n   */\n  emptyMessage?: string;\n  /**\n   * Letter that opens it with Ctrl (Windows, Linux) or Cmd (Mac) held. Set null to turn the shortcut off and open it yourself.\n   * @default \"k\"\n   */\n  shortcut?: string | null;\n  /**\n   * Called with the id of any command run, in addition to the command's own onAction.\n   */\n  onAction?: (key: import(\"react-aria-components\").Key) => void;\n}\n\nexport const commandPaletteDefaults = {\n  defaultOpen: false,\n  placeholder: \"Search commands…\",\n  emptyMessage: \"No results found.\",\n  shortcut: \"k\",\n} as const;\n\nexport const commandPaletteMeta = {\n  \"name\": \"CommandPalette\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"dialog\"\n} as const;\n"
+        }
+      ]
+    },
+    {
       "id": "data-grid",
       "spec": {
         "$schema": "./schema/component.schema.json",
@@ -2603,6 +2772,443 @@
         {
           "path": "generated/dialog.types.ts",
           "content": "// Generated by rdloom codegen from specs/dialog.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nimport type { ReactNode } from \"react\";\n\nexport const dialogSizeValues = [\"sm\", \"md\", \"lg\"] as const;\nexport const dialogRoleValues = [\"dialog\", \"alertdialog\"] as const;\n\n/** Modal window that asks for focus, such as a confirmation or a short form. Open it with DialogTrigger. */\nexport interface DialogSpecProps {\n  /**\n   * Heading, also used as the dialog's accessible name.\n   */\n  title: string;\n  /**\n   * Short supporting text under the title.\n   */\n  description?: string;\n  /**\n   * Maximum width.\n   * @default \"md\"\n   */\n  size?: \"sm\" | \"md\" | \"lg\";\n  /**\n   * Use alertdialog for destructive or urgent confirmations.\n   * @default \"dialog\"\n   */\n  role?: \"dialog\" | \"alertdialog\";\n  /**\n   * Closes on backdrop click. Esc always closes.\n   * @default true\n   */\n  isDismissable?: boolean;\n  /**\n   * Body and actions. A function receives close().\n   */\n  children?: ReactNode | ((opts: { close: () => void }) => ReactNode);\n}\n\nexport const dialogDefaults = {\n  size: \"md\",\n  role: \"dialog\",\n  isDismissable: true,\n} as const;\n\nexport const dialogMeta = {\n  \"name\": \"Dialog\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"dialog\"\n} as const;\n"
+        }
+      ]
+    },
+    {
+      "id": "empty-state",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "EmptyState",
+        "version": "0.1.0",
+        "category": "feedback",
+        "status": "experimental",
+        "description": "What to show when a list, table or page has nothing in it yet: a short explanation and the next step.",
+        "props": {
+          "title": {
+            "type": "string",
+            "description": "Short headline, e.g. \"No projects yet\".",
+            "required": true
+          },
+          "description": {
+            "type": "string",
+            "description": "One or two sentences on why it is empty and what to do."
+          },
+          "icon": {
+            "type": "node",
+            "description": "Optional illustration or icon, shown above the title. Decorative: it is hidden from screen readers."
+          },
+          "children": {
+            "type": "node",
+            "description": "Actions, usually one or two Buttons."
+          },
+          "headingLevel": {
+            "type": "number",
+            "description": "Heading level of the title, 2 to 6.",
+            "default": 3
+          },
+          "size": {
+            "type": "enum",
+            "values": [
+              "sm",
+              "md"
+            ],
+            "description": "sm for inside a card or table, md for a whole page or panel.",
+            "default": "md"
+          }
+        },
+        "variants": [
+          "size"
+        ],
+        "states": [
+          "default"
+        ],
+        "slots": [
+          "root",
+          "icon",
+          "title",
+          "description",
+          "actions"
+        ],
+        "tokens": [
+          "color.surface.subtle",
+          "color.border.default",
+          "color.text.default",
+          "color.text.muted",
+          "radius.overlay"
+        ],
+        "a11y": {
+          "role": "none",
+          "keyboard": [],
+          "requirements": [
+            "The title is a real heading at the level you choose",
+            "The icon is decorative (aria-hidden): the title and description carry the meaning",
+            "Actions are ordinary buttons or links in the normal tab order",
+            "It is not announced as an alert: it is the page's content, not an interruption"
+          ],
+          "screenReader": [
+            "Read in order: title, description, then the actions"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "A first-run screen, an empty list or a search with no results",
+            "Telling people the next step when there is no data"
+          ],
+          "avoid_when": [
+            "An error: use Alert",
+            "Data that is loading: use Skeleton"
+          ],
+          "anti_patterns": [
+            "Only a picture with no words",
+            "No next step",
+            "Using it for errors"
+          ]
+        },
+        "examples": [
+          "basic",
+          "no-results",
+          "compact"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {
+            "size": "Size"
+          }
+        }
+      },
+      "install": {
+        "command": "npx rdloom add empty-state",
+        "dependencies": [],
+        "registryDependencies": [
+          "tokens",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import { Button, EmptyState } from \"@rdloom/react\";\n\nconst FolderIcon = () => (\n  <svg viewBox=\"0 0 20 20\" fill=\"none\" aria-hidden=\"true\">\n    <path d=\"M2.75 5.5A1.5 1.5 0 0 1 4.25 4h3.4l1.6 1.75h6.5a1.5 1.5 0 0 1 1.5 1.5v6.75a1.5 1.5 0 0 1-1.5 1.5H4.25a1.5 1.5 0 0 1-1.5-1.5V5.5z\" stroke=\"currentColor\" strokeWidth=\"1.5\" strokeLinejoin=\"round\" />\n  </svg>\n);\n\nexport default function EmptyStateBasicExample() {\n  return (\n    <div className=\"w-[28rem] max-w-full\">\n      <EmptyState icon={<FolderIcon />} title=\"No projects yet\" description=\"Projects keep your files, tasks and people in one place. Create your first to get started.\">\n        <Button>Create project</Button>\n        <Button variant=\"ghost\">Import</Button>\n      </EmptyState>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "no-results",
+          "code": "import { Button, EmptyState } from \"@rdloom/react\";\n\nconst SearchIcon = () => (\n  <svg viewBox=\"0 0 20 20\" fill=\"none\" aria-hidden=\"true\">\n    <circle cx=\"9\" cy=\"9\" r=\"5.75\" stroke=\"currentColor\" strokeWidth=\"1.5\" />\n    <path d=\"M13.5 13.5L17 17\" stroke=\"currentColor\" strokeWidth=\"1.5\" strokeLinecap=\"round\" />\n  </svg>\n);\n\nexport default function EmptyStateNoResultsExample() {\n  return (\n    <div className=\"w-[28rem] max-w-full\">\n      <EmptyState icon={<SearchIcon />} title=\"No results for “invoice”\" description=\"Check the spelling or try a broader search.\">\n        <Button variant=\"secondary\">Clear search</Button>\n      </EmptyState>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "compact",
+          "code": "import { EmptyState } from \"@rdloom/react\";\n\nexport default function EmptyStateCompactExample() {\n  return (\n    <div className=\"w-72\">\n      <EmptyState size=\"sm\" headingLevel={4} title=\"No comments\" description=\"Be the first to reply.\" />\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "empty-state/empty-state.tsx",
+          "content": "import { forwardRef, type HTMLAttributes } from \"react\";\nimport { emptyStateDefaults, type EmptyStateSpecProps } from \"../generated/empty-state.types\";\nimport { cx } from \"../utils/cx\";\n\n// Plain markup with no hooks, so it also works in a React Server Component.\n\nexport interface EmptyStateProps\n  extends EmptyStateSpecProps,\n    Omit<HTMLAttributes<HTMLDivElement>, keyof EmptyStateSpecProps | \"className\" | \"title\"> {\n  className?: string;\n}\n\nconst sizes: Record<NonNullable<EmptyStateSpecProps[\"size\"]>, { box: string; icon: string; title: string }> = {\n  sm: { box: \"gap-2 px-4 py-6\", icon: \"size-10\", title: \"text-sm\" },\n  md: { box: \"gap-3 px-6 py-12\", icon: \"size-12\", title: \"text-base\" },\n};\n\nexport const EmptyState = forwardRef<HTMLDivElement, EmptyStateProps>(function EmptyState(\n  {\n    title,\n    description,\n    icon,\n    children,\n    headingLevel = emptyStateDefaults.headingLevel,\n    size = emptyStateDefaults.size,\n    className,\n    ...rest\n  },\n  ref,\n) {\n  const level = Math.min(6, Math.max(2, Math.round(headingLevel)));\n  const Heading = `h${level}` as \"h2\";\n  const look = sizes[size];\n  return (\n    <div\n      {...rest}\n      ref={ref}\n      className={cx(\n        \"flex flex-col items-center rounded-[var(--rd-radius-overlay)] border border-dashed border-[var(--rd-color-border-default)] text-center\",\n        look.box,\n        className,\n      )}\n    >\n      {icon && (\n        // A soft disc behind the icon: the picture is decoration, the words are the message.\n        <div\n          aria-hidden=\"true\"\n          className={cx(\n            \"flex items-center justify-center rounded-full bg-[var(--rd-color-surface-subtle)] text-[var(--rd-color-text-muted)] \" +\n              \"ring-1 ring-[var(--rd-color-border-default)] [&>svg]:size-1/2\",\n            look.icon,\n          )}\n        >\n          {icon}\n        </div>\n      )}\n      <div className=\"flex max-w-sm flex-col gap-1\">\n        <Heading className={cx(\"font-semibold tracking-tight text-[var(--rd-color-text-default)]\", look.title)}>{title}</Heading>\n        {description && <p className=\"text-sm text-balance text-[var(--rd-color-text-muted)]\">{description}</p>}\n      </div>\n      {children && <div className=\"mt-1 flex flex-wrap items-center justify-center gap-2\">{children}</div>}\n    </div>\n  );\n});\n"
+        },
+        {
+          "path": "generated/empty-state.types.ts",
+          "content": "// Generated by rdloom codegen from specs/empty-state.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nimport type { ReactNode } from \"react\";\n\nexport const emptyStateSizeValues = [\"sm\", \"md\"] as const;\n\n/** What to show when a list, table or page has nothing in it yet: a short explanation and the next step. */\nexport interface EmptyStateSpecProps {\n  /**\n   * Short headline, e.g. \"No projects yet\".\n   */\n  title: string;\n  /**\n   * One or two sentences on why it is empty and what to do.\n   */\n  description?: string;\n  /**\n   * Optional illustration or icon, shown above the title. Decorative: it is hidden from screen readers.\n   */\n  icon?: ReactNode;\n  /**\n   * Actions, usually one or two Buttons.\n   */\n  children?: ReactNode;\n  /**\n   * Heading level of the title, 2 to 6.\n   * @default 3\n   */\n  headingLevel?: number;\n  /**\n   * sm for inside a card or table, md for a whole page or panel.\n   * @default \"md\"\n   */\n  size?: \"sm\" | \"md\";\n}\n\nexport const emptyStateDefaults = {\n  headingLevel: 3,\n  size: \"md\",\n} as const;\n\nexport const emptyStateMeta = {\n  \"name\": \"EmptyState\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"none\"\n} as const;\n"
+        }
+      ]
+    },
+    {
+      "id": "file-upload",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "FileUpload",
+        "version": "0.1.0",
+        "category": "input",
+        "status": "experimental",
+        "description": "A drop zone and button for choosing files, with type, size and count limits and a list of the chosen files you can remove from. The component picks the files; you upload them.",
+        "props": {
+          "label": {
+            "type": "string",
+            "description": "What the files are for, e.g. \"Attachments\". It names the control.",
+            "required": true
+          },
+          "description": {
+            "type": "string",
+            "description": "Help text, e.g. the limits."
+          },
+          "accept": {
+            "type": "custom",
+            "tsType": "readonly string[]",
+            "description": "Allowed types: MIME types like \"image/png\" or \"image/*\", or extensions like \".pdf\". Others are rejected with a message."
+          },
+          "multiple": {
+            "type": "boolean",
+            "description": "Allow more than one file.",
+            "default": true
+          },
+          "maxSize": {
+            "type": "number",
+            "description": "Largest file in bytes. Bigger files are rejected."
+          },
+          "maxFiles": {
+            "type": "number",
+            "description": "Most files allowed in total."
+          },
+          "value": {
+            "type": "custom",
+            "tsType": "readonly File[]",
+            "description": "Controlled list of chosen files."
+          },
+          "defaultValue": {
+            "type": "custom",
+            "tsType": "readonly File[]",
+            "description": "Initial files when uncontrolled."
+          },
+          "onChange": {
+            "type": "callback",
+            "tsType": "(files: File[]) => void",
+            "description": "Called with the full list of files whenever it changes."
+          },
+          "onReject": {
+            "type": "callback",
+            "tsType": "(rejections: { file: File; reason: \"type\" | \"size\" | \"count\" }[]) => void",
+            "description": "Called with files that were refused, and why. The component also lists them."
+          },
+          "browseLabel": {
+            "type": "string",
+            "description": "Text of the button that opens the file picker.",
+            "default": "Browse files"
+          },
+          "isDisabled": {
+            "type": "boolean",
+            "description": "Prevents choosing, dropping and removing.",
+            "default": false
+          }
+        },
+        "variants": [
+          "isDisabled"
+        ],
+        "states": [
+          "default",
+          "hover",
+          "focus",
+          "disabled",
+          "invalid"
+        ],
+        "slots": [
+          "label",
+          "dropzone",
+          "button",
+          "description",
+          "list",
+          "file",
+          "remove",
+          "error"
+        ],
+        "tokens": [
+          "color.surface.default",
+          "color.surface.subtle",
+          "color.surface.selected",
+          "color.border.default",
+          "color.border.strong",
+          "color.action.primary",
+          "color.text.default",
+          "color.text.muted",
+          "color.feedback.danger",
+          "color.focus.ring",
+          "radius.overlay",
+          "radius.control"
+        ],
+        "a11y": {
+          "role": "group",
+          "keyboard": [
+            "Tab reaches the Browse files button; Enter or Space opens the file picker",
+            "Tab reaches each Remove button; Enter or Space removes that file"
+          ],
+          "requirements": [
+            "Dragging is an extra: everything can be done with the Browse files button and the keyboard",
+            "The group is named by its label and described by the description",
+            "Each Remove button names its file (Remove report.pdf)",
+            "Adding, removing and rejecting files are announced in a polite live region",
+            "Rejected files and the reason are written out, not only coloured",
+            "The drag-over highlight is also a change of text, not only of color"
+          ],
+          "screenReader": [
+            "The group is announced with its label and description",
+            "Adding files announces how many were added, e.g. \"2 files added\"",
+            "A rejected file is announced with its name and reason, e.g. \"photo.tiff not added: file type not allowed\"",
+            "Removing announces the file removed"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "Attachments, imports, avatars and documents",
+            "When people may have the files on their desktop to drag in"
+          ],
+          "avoid_when": [
+            "Uploading as a background process with progress: pair it with Progress and your own queue",
+            "Picking one value from a list"
+          ],
+          "anti_patterns": [
+            "A drop zone with no button",
+            "Limits that are only discovered after upload",
+            "Trusting accept or maxSize alone: check files on the server too"
+          ]
+        },
+        "examples": [
+          "basic",
+          "images",
+          "single"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {
+            "isDisabled": "Disabled"
+          }
+        }
+      },
+      "install": {
+        "command": "npx rdloom add file-upload",
+        "dependencies": [
+          "react-aria-components@^1.21.1"
+        ],
+        "registryDependencies": [
+          "tokens",
+          "button",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import { useState } from \"react\";\nimport { FileUpload } from \"@rdloom/react\";\n\nexport default function FileUploadBasicExample() {\n  const [files, setFiles] = useState<File[]>([]);\n  return (\n    <div className=\"w-[26rem] max-w-full\">\n      <FileUpload label=\"Attachments\" description=\"Up to 5 files, 5 MB each.\" maxFiles={5} maxSize={5 * 1024 * 1024} onChange={setFiles} />\n      <p className=\"mt-2 text-xs text-[var(--rd-color-text-muted)]\">{files.length} ready to upload</p>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "images",
+          "code": "import { FileUpload } from \"@rdloom/react\";\n\n// accept takes MIME types, wildcards and extensions. Check the files on your server too.\nexport default function FileUploadImagesExample() {\n  return (\n    <div className=\"w-[26rem] max-w-full\">\n      <FileUpload label=\"Photos\" description=\"PNG or JPEG, up to 2 MB each.\" accept={[\"image/png\", \"image/jpeg\"]} maxSize={2 * 1024 * 1024} browseLabel=\"Choose photos\" />\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "single",
+          "code": "import { FileUpload } from \"@rdloom/react\";\n\n// With multiple off, choosing a new file replaces the old one.\nexport default function FileUploadSingleExample() {\n  return (\n    <div className=\"w-[26rem] max-w-full\">\n      <FileUpload label=\"Resume\" description=\"A PDF, up to 10 MB.\" multiple={false} accept={[\".pdf\"]} maxSize={10 * 1024 * 1024} />\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "file-upload/file-upload.tsx",
+          "content": "\"use client\";\n\nimport { forwardRef, useId, useState } from \"react\";\nimport { Button as AriaButton, DropZone, FileTrigger, Text } from \"react-aria-components\";\nimport { Button } from \"../button/button\";\nimport { fileUploadDefaults, type FileUploadSpecProps } from \"../generated/file-upload.types\";\nimport { cx } from \"../utils/cx\";\nimport { CloseIcon, FileIcon, UploadIcon } from \"../utils/icons\";\n\nexport interface FileUploadProps extends FileUploadSpecProps {\n  className?: string;\n}\n\ntype Reason = \"type\" | \"size\" | \"count\";\n\n/** \"1.2 MB\", \"840 KB\", \"12 B\". */\nexport function formatBytes(bytes: number): string {\n  if (bytes < 1024) return `${bytes} B`;\n  const units = [\"KB\", \"MB\", \"GB\", \"TB\"];\n  let value = bytes / 1024;\n  let unit = 0;\n  while (value >= 1024 && unit < units.length - 1) {\n    value /= 1024;\n    unit++;\n  }\n  return `${value >= 10 || Number.isInteger(value) ? Math.round(value) : value.toFixed(1)} ${units[unit]}`;\n}\n\n/** Does `file` match an accept list of MIME types (\"image/png\", \"image/*\") and extensions (\".pdf\")? */\nexport function matchesAccept(file: { name: string; type: string }, accept?: readonly string[]): boolean {\n  if (!accept || accept.length === 0) return true;\n  const name = file.name.toLocaleLowerCase();\n  const type = file.type.toLocaleLowerCase();\n  return accept.some((rule) => {\n    const r = rule.trim().toLocaleLowerCase();\n    if (r.startsWith(\".\")) return name.endsWith(r);\n    if (r.endsWith(\"/*\")) return type.startsWith(r.slice(0, -1));\n    return type === r;\n  });\n}\n\nconst same = (a: File, b: File) => a.name === b.name && a.size === b.size && a.lastModified === b.lastModified;\n\nexport const FileUpload = forwardRef<HTMLDivElement, FileUploadProps>(function FileUpload(\n  {\n    label,\n    description,\n    accept,\n    multiple = fileUploadDefaults.multiple,\n    maxSize,\n    maxFiles,\n    value,\n    defaultValue,\n    onChange,\n    onReject,\n    browseLabel = fileUploadDefaults.browseLabel,\n    isDisabled = fileUploadDefaults.isDisabled,\n    className,\n  },\n  ref,\n) {\n  const id = useId();\n  const [inner, setInner] = useState<readonly File[]>(defaultValue ?? []);\n  const files = value ?? inner;\n  const [rejected, setRejected] = useState<{ file: File; reason: Reason }[]>([]);\n  const [notice, setNotice] = useState(\"\");\n\n  const commit = (next: File[]) => {\n    if (value === undefined) setInner(next);\n    onChange?.(next);\n  };\n\n  const reasonText = (reason: Reason) =>\n    reason === \"type\" ? \"file type not allowed\" : reason === \"size\" ? `larger than ${formatBytes(maxSize ?? 0)}` : `too many files (limit ${maxFiles})`;\n\n  const addFiles = (incoming: File[]) => {\n    if (isDisabled || incoming.length === 0) return;\n    const refusals: { file: File; reason: Reason }[] = [];\n    let next = multiple ? [...files] : [];\n    let added = 0;\n    for (const file of incoming) {\n      if (!matchesAccept(file, accept)) refusals.push({ file, reason: \"type\" });\n      else if (maxSize !== undefined && file.size > maxSize) refusals.push({ file, reason: \"size\" });\n      else if (next.some((f) => same(f, file))) continue; // the same file again: nothing to add\n      else if (multiple && maxFiles !== undefined && next.length >= maxFiles) refusals.push({ file, reason: \"count\" });\n      else {\n        next = multiple ? [...next, file] : [file];\n        added++;\n      }\n    }\n    setRejected(refusals);\n    if (added) commit(next);\n    onReject?.(refusals);\n    const said: string[] = [];\n    if (added) said.push(`${added} ${added === 1 ? \"file\" : \"files\"} added`);\n    for (const r of refusals) said.push(`${r.file.name} not added: ${reasonText(r.reason)}`);\n    setNotice(said.join(\". \"));\n  };\n\n  const remove = (file: File) => {\n    commit(files.filter((f) => f !== file));\n    setRejected([]);\n    setNotice(`${file.name} removed`);\n  };\n\n  const describedBy = [description && `${id}-d`, rejected.length > 0 && `${id}-e`].filter(Boolean).join(\" \") || undefined;\n\n  return (\n    <div ref={ref} role=\"group\" aria-labelledby={`${id}-l`} aria-describedby={describedBy} className={cx(\"flex flex-col gap-2\", className)}>\n      <span id={`${id}-l`} className=\"text-sm font-medium text-[var(--rd-color-text-default)]\">\n        {label}\n      </span>\n      <DropZone\n        isDisabled={isDisabled}\n        onDrop={async (e) => {\n          const dropped = await Promise.all(e.items.flatMap((item) => (item.kind === \"file\" ? [item.getFile()] : [])));\n          addFiles(dropped);\n        }}\n        className={\n          \"group flex flex-col items-center gap-3 rounded-[var(--rd-radius-overlay)] border border-dashed border-[var(--rd-color-border-strong)] \" +\n          \"bg-[var(--rd-color-surface-subtle)]/50 px-6 py-8 text-center outline-none transition-[background-color,border-color,box-shadow] duration-150 \" +\n          \"data-[hovered]:bg-[var(--rd-color-surface-subtle)] \" +\n          \"data-[drop-target]:border-[var(--rd-color-action-primary)] data-[drop-target]:bg-[var(--rd-color-surface-selected)] data-[drop-target]:ring-4 \" +\n          \"data-[drop-target]:ring-[color-mix(in_srgb,var(--rd-color-action-primary)_18%,transparent)] \" +\n          \"data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)] data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50\"\n        }\n      >\n        <span\n          aria-hidden=\"true\"\n          className=\"flex size-11 items-center justify-center rounded-full bg-[var(--rd-color-surface-default)] text-[var(--rd-color-text-muted)] ring-1 ring-[var(--rd-color-border-default)] shadow-sm transition-transform duration-150 group-data-[drop-target]:-translate-y-0.5 group-data-[drop-target]:text-[var(--rd-color-action-primary)] motion-reduce:transition-none\"\n        >\n          <UploadIcon className=\"size-5\" />\n        </span>\n        <div className=\"flex flex-col items-center gap-1\">\n          <Text slot=\"label\" className=\"text-sm text-[var(--rd-color-text-default)]\">\n            <span className=\"group-data-[drop-target]:hidden\">Drag files here, or</span>\n            <span className=\"hidden group-data-[drop-target]:inline\">Drop to add</span>\n          </Text>\n          <FileTrigger\n            acceptedFileTypes={accept ? [...accept] : undefined}\n            allowsMultiple={multiple}\n            onSelect={(list) => addFiles(list ? Array.from(list) : [])}\n          >\n            <Button variant=\"secondary\" size=\"sm\" isDisabled={isDisabled}>\n              {browseLabel}\n            </Button>\n          </FileTrigger>\n        </div>\n      </DropZone>\n      {description && (\n        <p id={`${id}-d`} className=\"text-xs text-[var(--rd-color-text-muted)]\">\n          {description}\n        </p>\n      )}\n      {rejected.length > 0 && (\n        <ul id={`${id}-e`} className=\"flex flex-col gap-0.5 text-xs text-[var(--rd-color-feedback-danger)]\">\n          {rejected.map((r, i) => (\n            <li key={`${r.file.name}-${i}`}>\n              {r.file.name} not added: {reasonText(r.reason)}\n            </li>\n          ))}\n        </ul>\n      )}\n      {files.length > 0 && (\n        <ul aria-label={`${label}, chosen files`} className=\"flex flex-col gap-1.5\">\n          {files.map((file) => (\n            <li\n              key={`${file.name}-${file.size}-${file.lastModified}`}\n              className=\"flex items-center gap-3 rounded-[var(--rd-radius-control)] border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-default)] py-2 ps-3 pe-2 text-sm shadow-[0_1px_2px_rgb(0_0_0/0.04)]\"\n            >\n              <FileIcon className=\"size-5 shrink-0 text-[var(--rd-color-text-muted)]\" />\n              <span className=\"min-w-0 flex-1 truncate text-[var(--rd-color-text-default)]\">{file.name}</span>\n              <span className=\"shrink-0 tabular-nums text-xs text-[var(--rd-color-text-muted)]\">{formatBytes(file.size)}</span>\n              <AriaButton\n                aria-label={`Remove ${file.name}`}\n                isDisabled={isDisabled}\n                onPress={() => remove(file)}\n                className={\n                  \"flex size-7 shrink-0 items-center justify-center rounded-[var(--rd-radius-control)] text-[var(--rd-color-text-muted)] outline-none \" +\n                  \"data-[hovered]:bg-[var(--rd-color-surface-subtle)] data-[hovered]:text-[var(--rd-color-text-default)] \" +\n                  \"data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)] data-[disabled]:opacity-50\"\n                }\n              >\n                <CloseIcon className=\"size-4\" />\n              </AriaButton>\n            </li>\n          ))}\n        </ul>\n      )}\n      <div aria-live=\"polite\" aria-atomic=\"true\" className=\"sr-only\">\n        {notice}\n      </div>\n    </div>\n  );\n});\n"
+        },
+        {
+          "path": "generated/file-upload.types.ts",
+          "content": "// Generated by rdloom codegen from specs/file-upload.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\n/** A drop zone and button for choosing files, with type, size and count limits and a list of the chosen files you can remove from. The component picks the files; you upload them. */\nexport interface FileUploadSpecProps {\n  /**\n   * What the files are for, e.g. \"Attachments\". It names the control.\n   */\n  label: string;\n  /**\n   * Help text, e.g. the limits.\n   */\n  description?: string;\n  /**\n   * Allowed types: MIME types like \"image/png\" or \"image/*\", or extensions like \".pdf\". Others are rejected with a message.\n   */\n  accept?: readonly string[];\n  /**\n   * Allow more than one file.\n   * @default true\n   */\n  multiple?: boolean;\n  /**\n   * Largest file in bytes. Bigger files are rejected.\n   */\n  maxSize?: number;\n  /**\n   * Most files allowed in total.\n   */\n  maxFiles?: number;\n  /**\n   * Controlled list of chosen files.\n   */\n  value?: readonly File[];\n  /**\n   * Initial files when uncontrolled.\n   */\n  defaultValue?: readonly File[];\n  /**\n   * Called with the full list of files whenever it changes.\n   */\n  onChange?: (files: File[]) => void;\n  /**\n   * Called with files that were refused, and why. The component also lists them.\n   */\n  onReject?: (rejections: { file: File; reason: \"type\" | \"size\" | \"count\" }[]) => void;\n  /**\n   * Text of the button that opens the file picker.\n   * @default \"Browse files\"\n   */\n  browseLabel?: string;\n  /**\n   * Prevents choosing, dropping and removing.\n   * @default false\n   */\n  isDisabled?: boolean;\n}\n\nexport const fileUploadDefaults = {\n  multiple: true,\n  browseLabel: \"Browse files\",\n  isDisabled: false,\n} as const;\n\nexport const fileUploadMeta = {\n  \"name\": \"FileUpload\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"group\"\n} as const;\n"
+        }
+      ]
+    },
+    {
+      "id": "kbd",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "Kbd",
+        "version": "0.1.0",
+        "category": "display",
+        "status": "experimental",
+        "description": "Shows a keyboard key or shortcut, like Ctrl or ⌘K, in a keycap style. Not interactive.",
+        "props": {
+          "children": {
+            "type": "node",
+            "description": "The key or keys, e.g. \"Esc\", \"⌘\" or \"Ctrl\". For a chord, use one Kbd per key.",
+            "required": true
+          },
+          "size": {
+            "type": "enum",
+            "values": [
+              "sm",
+              "md"
+            ],
+            "description": "Keycap size.",
+            "default": "md"
+          }
+        },
+        "variants": [
+          "size"
+        ],
+        "states": [
+          "default"
+        ],
+        "slots": [
+          "root"
+        ],
+        "tokens": [
+          "color.surface.subtle",
+          "color.border.default",
+          "color.border.strong",
+          "color.text.default",
+          "color.text.muted",
+          "radius.control"
+        ],
+        "a11y": {
+          "role": "text",
+          "keyboard": [],
+          "requirements": [
+            "Rendered with the kbd element, so assistive technology knows it is keyboard input",
+            "Symbols like ⌘ and ⌥ are not read consistently: write the key name in an aria-label or beside it when it matters",
+            "Text meets 4.5:1 against the keycap"
+          ],
+          "screenReader": [
+            "Read as inline text, e.g. \"Press Control K\""
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "Documenting shortcuts",
+            "Hints inside menus, tooltips and the command palette"
+          ],
+          "avoid_when": [
+            "Anything clickable: use a Button",
+            "Code: use a code element"
+          ],
+          "anti_patterns": [
+            "Showing only Mac symbols to everyone",
+            "Relying on the shortcut being visible as the only way to find a feature"
+          ]
+        },
+        "examples": [
+          "basic",
+          "chord",
+          "in-text"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {
+            "size": "Size"
+          }
+        }
+      },
+      "install": {
+        "command": "npx rdloom add kbd",
+        "dependencies": [],
+        "registryDependencies": [
+          "tokens",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import { Kbd } from \"@rdloom/react\";\n\nexport default function KbdBasicExample() {\n  return (\n    <div className=\"flex items-center gap-2\">\n      <Kbd>Esc</Kbd>\n      <Kbd>Enter</Kbd>\n      <Kbd>Tab</Kbd>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "chord",
+          "code": "import { Kbd } from \"@rdloom/react\";\n\n// One Kbd per key; the plus signs are plain text.\nexport default function KbdChordExample() {\n  return (\n    <div className=\"flex items-center gap-1 text-sm text-[var(--rd-color-text-muted)]\">\n      <Kbd>Ctrl</Kbd>+<Kbd>Shift</Kbd>+<Kbd>P</Kbd>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "in-text",
+          "code": "import { Kbd } from \"@rdloom/react\";\n\nexport default function KbdInTextExample() {\n  return (\n    <p className=\"max-w-sm text-sm\">\n      Press <Kbd size=\"sm\">?</Kbd> anywhere to see every shortcut, or <Kbd size=\"sm\">Esc</Kbd> to close this panel.\n    </p>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "kbd/kbd.tsx",
+          "content": "import { forwardRef, type HTMLAttributes } from \"react\";\nimport { kbdDefaults, type KbdSpecProps } from \"../generated/kbd.types\";\nimport { cx } from \"../utils/cx\";\n\n// Plain markup with no hooks, so it also works in a React Server Component.\n\nexport interface KbdProps extends KbdSpecProps, Omit<HTMLAttributes<HTMLElement>, keyof KbdSpecProps | \"className\"> {\n  className?: string;\n}\n\nconst sizes: Record<NonNullable<KbdSpecProps[\"size\"]>, string> = {\n  sm: \"h-5 min-w-5 px-1 text-[11px]\",\n  md: \"h-6 min-w-6 px-1.5 text-xs\",\n};\n\nexport const Kbd = forwardRef<HTMLElement, KbdProps>(function Kbd({ children, size = kbdDefaults.size, className, ...rest }, ref) {\n  return (\n    <kbd\n      {...rest}\n      ref={ref}\n      className={cx(\n        // A keycap: a hairline border with a slightly heavier bottom edge, like a key with depth.\n        \"inline-flex items-center justify-center rounded-md border border-b-2 border-[var(--rd-color-border-default)] border-b-[var(--rd-color-border-strong)] \" +\n          \"bg-[var(--rd-color-surface-subtle)] font-sans font-medium leading-none text-[var(--rd-color-text-muted)]\",\n        sizes[size],\n        className,\n      )}\n    >\n      {children}\n    </kbd>\n  );\n});\n"
+        },
+        {
+          "path": "generated/kbd.types.ts",
+          "content": "// Generated by rdloom codegen from specs/kbd.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nimport type { ReactNode } from \"react\";\n\nexport const kbdSizeValues = [\"sm\", \"md\"] as const;\n\n/** Shows a keyboard key or shortcut, like Ctrl or ⌘K, in a keycap style. Not interactive. */\nexport interface KbdSpecProps {\n  /**\n   * The key or keys, e.g. \"Esc\", \"⌘\" or \"Ctrl\". For a chord, use one Kbd per key.\n   */\n  children: ReactNode;\n  /**\n   * Keycap size.\n   * @default \"md\"\n   */\n  size?: \"sm\" | \"md\";\n}\n\nexport const kbdDefaults = {\n  size: \"md\",\n} as const;\n\nexport const kbdMeta = {\n  \"name\": \"Kbd\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"text\"\n} as const;\n"
         }
       ]
     },
@@ -4424,6 +5030,141 @@
       ]
     },
     {
+      "id": "steps",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "Steps",
+        "version": "0.1.0",
+        "category": "navigation",
+        "status": "experimental",
+        "description": "Shows where someone is in a multi-step process, such as checkout or setup: done, current and upcoming steps. It displays progress; you control the steps and buttons.",
+        "props": {
+          "children": {
+            "type": "node",
+            "description": "Step elements, in order.",
+            "required": true
+          },
+          "currentStep": {
+            "type": "number",
+            "description": "The step the person is on, starting at 1. Earlier steps show as done.",
+            "required": true
+          },
+          "orientation": {
+            "type": "enum",
+            "values": [
+              "horizontal",
+              "vertical"
+            ],
+            "description": "Lay the steps in a row or a column.",
+            "default": "horizontal"
+          },
+          "label": {
+            "type": "string",
+            "description": "Accessible name of the list, e.g. \"Checkout progress\".",
+            "default": "Progress"
+          }
+        },
+        "variants": [
+          "orientation"
+        ],
+        "states": [
+          "default"
+        ],
+        "slots": [
+          "list",
+          "step",
+          "marker",
+          "connector",
+          "title",
+          "description"
+        ],
+        "tokens": [
+          "color.action.primary",
+          "color.action.on-primary",
+          "color.border.default",
+          "color.border.strong",
+          "color.surface.default",
+          "color.surface.subtle",
+          "color.text.default",
+          "color.text.muted"
+        ],
+        "a11y": {
+          "role": "list",
+          "keyboard": [],
+          "requirements": [
+            "An ordered list with an accessible name; each step is a list item",
+            "The current step has aria-current=\"step\"",
+            "Each step also says its state in words for screen readers (Completed, Current step, Not started), not only with an icon or color",
+            "Completed steps use a check icon, the current one a filled number, upcoming ones an outline: shapes differ, not only colors",
+            "Not interactive: if people can click a step, make it a link or button yourself"
+          ],
+          "screenReader": [
+            "Announced as a list with the number of steps",
+            "Each item reads its number, title and state, e.g. \"Step 2, Payment, current step\""
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "Checkouts, onboarding and wizards with a known number of steps",
+            "Telling people how much is left"
+          ],
+          "avoid_when": [
+            "Steps that can be done in any order: use a checklist",
+            "Navigating between pages: use Tabs or Breadcrumbs"
+          ],
+          "anti_patterns": [
+            "More than about six steps",
+            "Using color alone to show the current step",
+            "Making steps clickable without keyboard access"
+          ]
+        },
+        "examples": [
+          "horizontal",
+          "vertical",
+          "with-descriptions"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {
+            "orientation": "Orientation"
+          }
+        }
+      },
+      "install": {
+        "command": "npx rdloom add steps",
+        "dependencies": [],
+        "registryDependencies": [
+          "tokens",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "horizontal",
+          "code": "import { Step, Steps } from \"@rdloom/react\";\n\nexport default function StepsHorizontalExample() {\n  return (\n    <div className=\"w-[34rem] max-w-full\">\n      <Steps label=\"Checkout progress\" currentStep={2}>\n        <Step title=\"Cart\" />\n        <Step title=\"Payment\" />\n        <Step title=\"Review\" />\n        <Step title=\"Done\" />\n      </Steps>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "vertical",
+          "code": "import { Step, Steps } from \"@rdloom/react\";\n\nexport default function StepsVerticalExample() {\n  return (\n    <Steps label=\"Setup\" orientation=\"vertical\" currentStep={3}>\n      <Step title=\"Create your account\" />\n      <Step title=\"Verify your email\" />\n      <Step title=\"Connect a data source\" />\n      <Step title=\"Invite your team\" />\n    </Steps>\n  );\n}\n"
+        },
+        {
+          "name": "with-descriptions",
+          "code": "import { Step, Steps } from \"@rdloom/react\";\n\nexport default function StepsWithDescriptionsExample() {\n  return (\n    <Steps label=\"Onboarding\" orientation=\"vertical\" currentStep={2}>\n      <Step title=\"Profile\" description=\"Your name and photo\" />\n      <Step title=\"Workspace\" description=\"Name it and pick a plan\" />\n      <Step title=\"Invite\" description=\"Add the people you work with\" />\n    </Steps>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "steps/steps.tsx",
+          "content": "\"use client\";\n\nimport { Children, createContext, forwardRef, isValidElement, useContext, type ReactNode } from \"react\";\nimport { stepsDefaults, type StepsSpecProps } from \"../generated/steps.types\";\nimport { cx } from \"../utils/cx\";\nimport { CheckIcon } from \"../utils/icons\";\n\nexport interface StepsProps extends StepsSpecProps {\n  className?: string;\n}\n\ninterface StepPosition {\n  number: number;\n  total: number;\n  currentStep: number;\n  orientation: \"horizontal\" | \"vertical\";\n}\n\nconst StepContext = createContext<StepPosition | null>(null);\n\nexport const Steps = forwardRef<HTMLOListElement, StepsProps>(function Steps(\n  { children, currentStep, orientation = stepsDefaults.orientation, label = stepsDefaults.label, className },\n  ref,\n) {\n  const steps = Children.toArray(children).filter(isValidElement);\n  return (\n    <ol\n      ref={ref}\n      aria-label={label}\n      className={cx(orientation === \"horizontal\" ? \"flex w-full items-start\" : \"flex flex-col\", className)}\n    >\n      {steps.map((step, index) => (\n        <StepContext.Provider key={step.key ?? index} value={{ number: index + 1, total: steps.length, currentStep, orientation }}>\n          {step}\n        </StepContext.Provider>\n      ))}\n    </ol>\n  );\n});\n\nexport interface StepProps {\n  title: ReactNode;\n  /** A line of detail under the title. */\n  description?: ReactNode;\n  className?: string;\n}\n\nexport function Step({ title, description, className }: StepProps) {\n  const position = useContext(StepContext);\n  if (!position) throw new Error(\"Step must be used inside Steps.\");\n  const { number, total, currentStep, orientation } = position;\n  const state = number < currentStep ? \"complete\" : number === currentStep ? \"current\" : \"upcoming\";\n  const last = number === total;\n  const horizontal = orientation === \"horizontal\";\n  const said = state === \"complete\" ? \"Completed\" : state === \"current\" ? \"Current step\" : \"Not started\";\n\n  const marker = (\n    <span\n      aria-hidden=\"true\"\n      className={cx(\n        \"relative z-[1] flex size-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold tabular-nums transition-colors\",\n        state === \"complete\" && \"bg-[var(--rd-color-action-primary)] text-[var(--rd-color-action-on-primary)]\",\n        // The current step is a filled ring with the number inside: a different shape, not only a different color.\n        state === \"current\" &&\n          \"bg-[var(--rd-color-surface-default)] text-[var(--rd-color-action-primary)] ring-2 ring-[var(--rd-color-action-primary)] ring-offset-2 ring-offset-[var(--rd-color-surface-default)]\",\n        state === \"upcoming\" && \"border border-[var(--rd-color-border-strong)] bg-[var(--rd-color-surface-default)] text-[var(--rd-color-text-muted)]\",\n      )}\n    >\n      {state === \"complete\" ? <CheckIcon className=\"size-4 text-[var(--rd-color-action-on-primary)]\" /> : number}\n    </span>\n  );\n  const connector = !last && (\n    <span\n      aria-hidden=\"true\"\n      className={cx(\n        \"absolute transition-colors\",\n        horizontal ? \"start-[calc(50%+1.25rem)] end-[calc(-50%+1.25rem)] top-3.5 h-px\" : \"start-[1.125rem] top-10 -bottom-1 w-px\",\n        state === \"complete\" ? \"bg-[var(--rd-color-action-primary)]\" : \"bg-[var(--rd-color-border-default)]\",\n      )}\n    />\n  );\n  const text = (\n    <span className={cx(\"flex min-w-0 flex-col\", horizontal ? \"items-center text-center\" : \"pb-8 pt-0.5\")}>\n      <span className=\"sr-only\">{`Step ${number} of ${total}, ${said}: `}</span>\n      <span className={cx(\"text-sm font-medium\", state === \"upcoming\" ? \"text-[var(--rd-color-text-muted)]\" : \"text-[var(--rd-color-text-default)]\")}>{title}</span>\n      {description && <span className=\"text-xs text-[var(--rd-color-text-muted)]\">{description}</span>}\n    </span>\n  );\n\n  return (\n    <li\n      aria-current={state === \"current\" ? \"step\" : undefined}\n      className={cx(\"relative flex\", horizontal ? \"flex-1 flex-col items-center gap-2\" : \"gap-4 ps-1\", className)}\n    >\n      {connector}\n      {marker}\n      {text}\n    </li>\n  );\n}\n"
+        },
+        {
+          "path": "generated/steps.types.ts",
+          "content": "// Generated by rdloom codegen from specs/steps.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nimport type { ReactNode } from \"react\";\n\nexport const stepsOrientationValues = [\"horizontal\", \"vertical\"] as const;\n\n/** Shows where someone is in a multi-step process, such as checkout or setup: done, current and upcoming steps. It displays progress; you control the steps and buttons. */\nexport interface StepsSpecProps {\n  /**\n   * Step elements, in order.\n   */\n  children: ReactNode;\n  /**\n   * The step the person is on, starting at 1. Earlier steps show as done.\n   */\n  currentStep: number;\n  /**\n   * Lay the steps in a row or a column.\n   * @default \"horizontal\"\n   */\n  orientation?: \"horizontal\" | \"vertical\";\n  /**\n   * Accessible name of the list, e.g. \"Checkout progress\".\n   * @default \"Progress\"\n   */\n  label?: string;\n}\n\nexport const stepsDefaults = {\n  orientation: \"horizontal\",\n  label: \"Progress\",\n} as const;\n\nexport const stepsMeta = {\n  \"name\": \"Steps\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"list\"\n} as const;\n"
+        }
+      ]
+    },
+    {
       "id": "switch",
       "spec": {
         "$schema": "./schema/component.schema.json",
@@ -4912,6 +5653,183 @@
       ]
     },
     {
+      "id": "tag-input",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "TagInput",
+        "version": "0.1.0",
+        "category": "input",
+        "status": "experimental",
+        "description": "A text field that turns what you type into removable tags when you press Enter or comma: for keywords, recipients and labels.",
+        "props": {
+          "label": {
+            "type": "string",
+            "description": "Visible label, also the accessible name.",
+            "required": true
+          },
+          "description": {
+            "type": "string",
+            "description": "Help text, e.g. \"Press Enter or comma to add\"."
+          },
+          "errorMessage": {
+            "type": "string",
+            "description": "Shown when the field is invalid."
+          },
+          "value": {
+            "type": "custom",
+            "tsType": "readonly string[]",
+            "description": "Controlled list of tags."
+          },
+          "defaultValue": {
+            "type": "custom",
+            "tsType": "readonly string[]",
+            "description": "Initial tags when uncontrolled."
+          },
+          "onChange": {
+            "type": "callback",
+            "tsType": "(tags: string[]) => void",
+            "description": "Called with the full list whenever it changes."
+          },
+          "placeholder": {
+            "type": "string",
+            "description": "Hint shown while there are no tags."
+          },
+          "maxTags": {
+            "type": "number",
+            "description": "Most tags allowed. The input is disabled once reached."
+          },
+          "allowDuplicates": {
+            "type": "boolean",
+            "description": "Allow the same tag twice.",
+            "default": false
+          },
+          "isDisabled": {
+            "type": "boolean",
+            "description": "Prevents interaction and dims the field.",
+            "default": false
+          },
+          "isInvalid": {
+            "type": "boolean",
+            "description": "Marks the field invalid.",
+            "default": false
+          }
+        },
+        "variants": [
+          "isDisabled",
+          "isInvalid"
+        ],
+        "states": [
+          "default",
+          "hover",
+          "focus",
+          "disabled",
+          "invalid"
+        ],
+        "slots": [
+          "label",
+          "field",
+          "tag",
+          "remove",
+          "input",
+          "description",
+          "error"
+        ],
+        "tokens": [
+          "color.surface.default",
+          "color.surface.subtle",
+          "color.border.default",
+          "color.border.strong",
+          "color.text.default",
+          "color.text.muted",
+          "color.feedback.danger",
+          "color.focus.ring",
+          "radius.control"
+        ],
+        "a11y": {
+          "role": "group",
+          "keyboard": [
+            "Type, then Enter or comma to add a tag; pasting a comma-separated list adds each",
+            "Backspace in an empty input removes the last tag",
+            "Left arrow from the start of the input moves into the tags; arrows move between tags",
+            "Delete or Backspace on a focused tag removes it, and focus moves to a neighbour"
+          ],
+          "requirements": [
+            "The group is named by the label; tags are a list, each with a Remove button named after it",
+            "Every add and remove is announced in a live region, e.g. \"design added, 3 tags\"",
+            "Duplicates and the maximum are explained in text when refused",
+            "The input keeps its own accessible name and description"
+          ],
+          "screenReader": [
+            "The input is announced with the label and description, and how many tags there are",
+            "Adding announces the tag and the new count; removing announces what was removed",
+            "Refusing a duplicate or hitting the limit is announced with the reason"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "Free-form keywords, labels and email recipients",
+            "Lists the person builds by typing"
+          ],
+          "avoid_when": [
+            "Choosing from a fixed list: use Combobox or checkboxes",
+            "A single value: use TextField"
+          ],
+          "anti_patterns": [
+            "No visible way to remove a tag with a mouse",
+            "Silently dropping duplicates",
+            "Needing a comma to submit the last tag with no Enter"
+          ]
+        },
+        "examples": [
+          "basic",
+          "limits",
+          "invalid"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {
+            "isDisabled": "Disabled",
+            "isInvalid": "Invalid"
+          }
+        }
+      },
+      "install": {
+        "command": "npx rdloom add tag-input",
+        "dependencies": [
+          "react-aria-components@^1.21.1"
+        ],
+        "registryDependencies": [
+          "tokens",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import { TagInput } from \"@rdloom/react\";\n\nexport default function TagInputBasicExample() {\n  return (\n    <div className=\"w-96 max-w-full\">\n      <TagInput label=\"Keywords\" description=\"Press Enter or comma to add a keyword.\" defaultValue={[\"design\", \"accessibility\"]} placeholder=\"Add a keyword\" />\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "limits",
+          "code": "import { useState } from \"react\";\nimport { TagInput } from \"@rdloom/react\";\n\nexport default function TagInputLimitsExample() {\n  const [tags, setTags] = useState<string[]>([\"ada@example.com\", \"grace@example.com\"]);\n  return (\n    <div className=\"w-96 max-w-full\">\n      <TagInput\n        label=\"Recipients\"\n        description={`${tags.length} of 4. Duplicates are ignored.`}\n        value={tags}\n        onChange={setTags}\n        maxTags={4}\n        placeholder=\"name@example.com\"\n      />\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "invalid",
+          "code": "import { TagInput } from \"@rdloom/react\";\n\nexport default function TagInputInvalidExample() {\n  return (\n    <div className=\"w-96 max-w-full\">\n      <TagInput label=\"Labels\" isInvalid errorMessage=\"Add at least one label.\" />\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "tag-input/tag-input.tsx",
+          "content": "\"use client\";\n\nimport { forwardRef, useId, useState, type ClipboardEvent, type KeyboardEvent } from \"react\";\nimport { Button, Tag, TagGroup, TagList, type Key } from \"react-aria-components\";\nimport { tagInputDefaults, type TagInputSpecProps } from \"../generated/tag-input.types\";\nimport { cx } from \"../utils/cx\";\nimport { CloseIcon } from \"../utils/icons\";\n\nexport interface TagInputProps extends TagInputSpecProps {\n  className?: string;\n}\n\nconst plural = (n: number) => `${n} ${n === 1 ? \"tag\" : \"tags\"}`;\n\nexport const TagInput = forwardRef<HTMLDivElement, TagInputProps>(function TagInput(\n  {\n    label,\n    description,\n    errorMessage,\n    value,\n    defaultValue,\n    onChange,\n    placeholder,\n    maxTags,\n    allowDuplicates = tagInputDefaults.allowDuplicates,\n    isDisabled = tagInputDefaults.isDisabled,\n    isInvalid = tagInputDefaults.isInvalid,\n    className,\n  },\n  ref,\n) {\n  const id = useId();\n  const [inner, setInner] = useState<readonly string[]>(defaultValue ?? []);\n  const tags = value ?? inner;\n  const [draft, setDraft] = useState(\"\");\n  const [notice, setNotice] = useState(\"\");\n  const full = maxTags !== undefined && tags.length >= maxTags;\n\n  const commit = (next: string[], message: string) => {\n    if (value === undefined) setInner(next);\n    onChange?.(next);\n    setNotice(message);\n  };\n\n  /** Adds each non-empty piece. Returns what was left over because it was refused. */\n  const add = (pieces: string[]) => {\n    const next = [...tags];\n    const added: string[] = [];\n    const refused: string[] = [];\n    for (const raw of pieces) {\n      const tag = raw.trim();\n      if (!tag) continue;\n      const duplicate = !allowDuplicates && next.some((t) => t.toLocaleLowerCase() === tag.toLocaleLowerCase());\n      if (duplicate || (maxTags !== undefined && next.length >= maxTags)) {\n        refused.push(tag);\n        continue;\n      }\n      next.push(tag);\n      added.push(tag);\n    }\n    if (added.length) commit(next, `${added.join(\", \")} added, ${plural(next.length)}`);\n    if (refused.length) {\n      const why = maxTags !== undefined && next.length >= maxTags && !refused.every((t) => next.includes(t)) ? `limit of ${plural(maxTags)} reached` : \"already added\";\n      setNotice((n) => `${n ? n + \". \" : \"\"}${refused.join(\", \")} not added: ${why}`);\n    }\n    return refused;\n  };\n\n  /** Tags are keyed by position, so two equal tags (allowDuplicates) stay separate. */\n  const remove = (keys: Set<Key>) => {\n    const next = tags.filter((_, i) => !keys.has(String(i)));\n    const gone = tags.filter((_, i) => keys.has(String(i)));\n    commit(next, `${gone.join(\", \")} removed, ${plural(next.length)}`);\n  };\n\n  const onKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {\n    if (e.key === \"Enter\" || e.key === \",\") {\n      if (e.key === \"Enter\" && !draft.trim()) return; // let an empty Enter submit the form\n      e.preventDefault();\n      setDraft(add([draft]).join(\"\"));\n    } else if (e.key === \"Backspace\" && draft === \"\" && tags.length > 0) {\n      remove(new Set([String(tags.length - 1)]));\n    }\n  };\n\n  const onPaste = (e: ClipboardEvent<HTMLInputElement>) => {\n    const text = e.clipboardData.getData(\"text\");\n    if (!/[,\\n]/.test(text)) return;\n    e.preventDefault();\n    add(text.split(/[,\\n]/));\n  };\n\n  const describedBy = [description && `${id}-d`, isInvalid && errorMessage && `${id}-e`].filter(Boolean).join(\" \") || undefined;\n\n  return (\n    <div ref={ref} role=\"group\" aria-labelledby={`${id}-l`} className={cx(\"flex flex-col gap-1.5\", className)}>\n      <label id={`${id}-l`} htmlFor={`${id}-i`} className=\"text-sm font-medium text-[var(--rd-color-text-default)]\">\n        {label}\n      </label>\n      <div\n        data-invalid={isInvalid || undefined}\n        data-disabled={isDisabled || undefined}\n        className={cx(\n          \"flex min-h-10 flex-wrap items-center gap-1.5 rounded-[var(--rd-radius-control)] border bg-[var(--rd-color-surface-default)] px-2 py-1.5 transition-colors\",\n          \"border-[var(--rd-color-border-default)] hover:border-[var(--rd-color-border-strong)]\",\n          \"focus-within:border-transparent focus-within:ring-2 focus-within:ring-[var(--rd-color-focus-ring)]\",\n          \"data-[invalid]:border-[var(--rd-color-feedback-danger)] data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50\",\n        )}\n      >\n        <TagGroup aria-label={`${label}, ${plural(tags.length)}`} onRemove={isDisabled ? undefined : remove} className=\"contents\">\n          <TagList items={tags.map((text, i) => ({ id: String(i), text }))} className=\"contents\">\n            {(item) => (\n              <Tag\n                id={item.id}\n                textValue={item.text}\n                className={\n                  \"group flex max-w-full items-center gap-1 rounded-full border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-subtle)] \" +\n                  \"py-0.5 ps-2.5 pe-1 text-sm text-[var(--rd-color-text-default)] outline-none \" +\n                  \"data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)]\"\n                }\n              >\n                <span className=\"truncate\">{item.text}</span>\n                <Button\n                  slot=\"remove\"\n                  className={\n                    \"flex size-5 items-center justify-center rounded-full text-[var(--rd-color-text-muted)] outline-none \" +\n                    \"data-[hovered]:bg-[var(--rd-color-border-default)] data-[hovered]:text-[var(--rd-color-text-default)] \" +\n                    \"data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)]\"\n                  }\n                >\n                  <CloseIcon className=\"size-3\" />\n                </Button>\n              </Tag>\n            )}\n          </TagList>\n        </TagGroup>\n        <input\n          id={`${id}-i`}\n          value={draft}\n          disabled={isDisabled || full}\n          placeholder={tags.length === 0 ? placeholder : full ? \"Limit reached\" : undefined}\n          aria-describedby={describedBy}\n          aria-invalid={isInvalid || undefined}\n          onChange={(e) => {\n            setDraft(e.target.value);\n            setNotice(\"\");\n          }}\n          onKeyDown={onKeyDown}\n          onPaste={onPaste}\n          onBlur={() => {\n            // Text left in the box isn't lost when focus moves on.\n            if (draft.trim()) setDraft(add([draft]).join(\"\"));\n          }}\n          className=\"h-7 min-w-24 flex-1 bg-transparent text-sm text-[var(--rd-color-text-default)] outline-none placeholder:text-[var(--rd-color-text-muted)]\"\n        />\n      </div>\n      {description && (\n        <p id={`${id}-d`} className=\"text-xs text-[var(--rd-color-text-muted)]\">\n          {description}\n        </p>\n      )}\n      {isInvalid && errorMessage && (\n        <p id={`${id}-e`} className=\"text-xs text-[var(--rd-color-feedback-danger)]\">\n          {errorMessage}\n        </p>\n      )}\n      <div aria-live=\"polite\" aria-atomic=\"true\" className=\"sr-only\">\n        {notice}\n      </div>\n    </div>\n  );\n});\n"
+        },
+        {
+          "path": "generated/tag-input.types.ts",
+          "content": "// Generated by rdloom codegen from specs/tag-input.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\n/** A text field that turns what you type into removable tags when you press Enter or comma: for keywords, recipients and labels. */\nexport interface TagInputSpecProps {\n  /**\n   * Visible label, also the accessible name.\n   */\n  label: string;\n  /**\n   * Help text, e.g. \"Press Enter or comma to add\".\n   */\n  description?: string;\n  /**\n   * Shown when the field is invalid.\n   */\n  errorMessage?: string;\n  /**\n   * Controlled list of tags.\n   */\n  value?: readonly string[];\n  /**\n   * Initial tags when uncontrolled.\n   */\n  defaultValue?: readonly string[];\n  /**\n   * Called with the full list whenever it changes.\n   */\n  onChange?: (tags: string[]) => void;\n  /**\n   * Hint shown while there are no tags.\n   */\n  placeholder?: string;\n  /**\n   * Most tags allowed. The input is disabled once reached.\n   */\n  maxTags?: number;\n  /**\n   * Allow the same tag twice.\n   * @default false\n   */\n  allowDuplicates?: boolean;\n  /**\n   * Prevents interaction and dims the field.\n   * @default false\n   */\n  isDisabled?: boolean;\n  /**\n   * Marks the field invalid.\n   * @default false\n   */\n  isInvalid?: boolean;\n}\n\nexport const tagInputDefaults = {\n  allowDuplicates: false,\n  isDisabled: false,\n  isInvalid: false,\n} as const;\n\nexport const tagInputMeta = {\n  \"name\": \"TagInput\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"group\"\n} as const;\n"
+        }
+      ]
+    },
+    {
       "id": "text-field",
       "spec": {
         "$schema": "./schema/component.schema.json",
@@ -5101,6 +6019,209 @@
         {
           "path": "generated/text-field.types.ts",
           "content": "// Generated by rdloom codegen from specs/text-field.spec.json (v0.1.1).\n// Do not edit. Change the spec and run `npm run gen`.\n\nexport const textFieldSizeValues = [\"sm\", \"md\", \"lg\"] as const;\n\n/** Single-line or multi-line text input with a label, help text and error message. */\nexport interface TextFieldSpecProps {\n  /**\n   * Visible label. Required so the field is always named.\n   */\n  label: string;\n  /**\n   * Help text shown under the input.\n   */\n  description?: string;\n  /**\n   * Shown when the field is invalid.\n   */\n  errorMessage?: string;\n  /**\n   * Example value. Never a replacement for the label.\n   */\n  placeholder?: string;\n  /**\n   * Height and font size.\n   * @default \"md\"\n   */\n  size?: \"sm\" | \"md\" | \"lg\";\n  /**\n   * Renders a textarea instead of an input.\n   * @default false\n   */\n  multiline?: boolean;\n  /**\n   * Prevents editing and dims the field.\n   * @default false\n   */\n  isDisabled?: boolean;\n  /**\n   * Marks the value as invalid and shows errorMessage.\n   * @default false\n   */\n  isInvalid?: boolean;\n  /**\n   * Marks the field as required for form submission.\n   * @default false\n   */\n  isRequired?: boolean;\n  /**\n   * Controlled value.\n   */\n  value?: string;\n  /**\n   * Initial value when uncontrolled.\n   */\n  defaultValue?: string;\n  /**\n   * Called with the new value on every edit.\n   */\n  onChange?: (value: string) => void;\n}\n\nexport const textFieldDefaults = {\n  size: \"md\",\n  multiline: false,\n  isDisabled: false,\n  isInvalid: false,\n  isRequired: false,\n} as const;\n\nexport const textFieldMeta = {\n  \"name\": \"TextField\",\n  \"version\": \"0.1.1\",\n  \"status\": \"experimental\",\n  \"role\": \"textbox\"\n} as const;\n"
+        }
+      ]
+    },
+    {
+      "id": "time-field",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "TimeField",
+        "version": "0.1.0",
+        "category": "input",
+        "status": "experimental",
+        "description": "A field for a time of day, with separate hour, minute and (optional) second segments that follow the visitor's locale and 12 or 24 hour clock.",
+        "props": {
+          "label": {
+            "type": "string",
+            "description": "Visible label, also the accessible name.",
+            "required": true
+          },
+          "description": {
+            "type": "string",
+            "description": "Help text under the field."
+          },
+          "errorMessage": {
+            "type": "string",
+            "description": "Shown when the value is invalid. Leave out to use the built-in message."
+          },
+          "value": {
+            "type": "custom",
+            "tsType": "import(\"react-aria-components\").TimeValue | null",
+            "description": "Controlled value."
+          },
+          "defaultValue": {
+            "type": "custom",
+            "tsType": "import(\"react-aria-components\").TimeValue | null",
+            "description": "Initial value when uncontrolled."
+          },
+          "onChange": {
+            "type": "callback",
+            "tsType": "(value: import(\"react-aria-components\").TimeValue | null) => void",
+            "description": "Called with the time, or null when it is cleared."
+          },
+          "granularity": {
+            "type": "enum",
+            "values": [
+              "hour",
+              "minute",
+              "second"
+            ],
+            "description": "Smallest unit shown and edited.",
+            "default": "minute"
+          },
+          "hourCycle": {
+            "type": "custom",
+            "tsType": "12 | 24",
+            "description": "Force a 12 or 24 hour clock. Leave out to follow the locale."
+          },
+          "minValue": {
+            "type": "custom",
+            "tsType": "import(\"react-aria-components\").TimeValue",
+            "description": "Earliest allowed time."
+          },
+          "maxValue": {
+            "type": "custom",
+            "tsType": "import(\"react-aria-components\").TimeValue",
+            "description": "Latest allowed time."
+          },
+          "size": {
+            "type": "enum",
+            "values": [
+              "sm",
+              "md",
+              "lg"
+            ],
+            "description": "Field height and text size.",
+            "default": "md"
+          },
+          "isDisabled": {
+            "type": "boolean",
+            "description": "Prevents interaction and dims the field.",
+            "default": false
+          },
+          "isInvalid": {
+            "type": "boolean",
+            "description": "Marks the field invalid. Leave undefined to let validation decide."
+          },
+          "isRequired": {
+            "type": "boolean",
+            "description": "Marks the field required and adds an asterisk.",
+            "default": false
+          }
+        },
+        "variants": [
+          "size",
+          "isDisabled",
+          "isInvalid"
+        ],
+        "states": [
+          "default",
+          "hover",
+          "focus",
+          "disabled",
+          "invalid"
+        ],
+        "slots": [
+          "label",
+          "group",
+          "segment",
+          "description",
+          "error"
+        ],
+        "tokens": [
+          "color.surface.default",
+          "color.surface.subtle",
+          "color.border.default",
+          "color.border.strong",
+          "color.text.default",
+          "color.text.muted",
+          "color.feedback.danger",
+          "color.focus.ring",
+          "radius.control",
+          "color.action.primary",
+          "color.action.on-primary"
+        ],
+        "a11y": {
+          "role": "group",
+          "keyboard": [
+            "Left and Right arrows (or Tab) move between hour, minute and AM/PM",
+            "Up and Down arrows change the focused segment; typing digits sets it",
+            "Backspace clears the focused segment"
+          ],
+          "requirements": [
+            "A labelled group of spin buttons: each segment is named (hours, minutes, AM/PM) and exposes its range",
+            "Digits typed move to the next segment on their own",
+            "Invalid state and the error message are linked to the field",
+            "The focused segment is highlighted with 3:1 contrast, not only by color"
+          ],
+          "screenReader": [
+            "Entering announces the label, then the first segment as \"hours, spin button\" with its value",
+            "Changing a segment announces the new value",
+            "The group is announced with the full time, e.g. \"9:30 AM\""
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "Opening hours, reminders, meeting times and schedules",
+            "Any time of day that is not tied to a date"
+          ],
+          "avoid_when": [
+            "A date and a time together: use DatePicker and TimeField side by side",
+            "A duration, such as 90 minutes: use NumberField"
+          ],
+          "anti_patterns": [
+            "Forcing a 24 hour clock on people who use 12 hour (leave hourCycle to the locale unless you must)",
+            "A free text field for times"
+          ]
+        },
+        "examples": [
+          "basic",
+          "seconds",
+          "range"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {
+            "size": "Size",
+            "isDisabled": "Disabled",
+            "isInvalid": "Invalid"
+          }
+        }
+      },
+      "install": {
+        "command": "npx rdloom add time-field",
+        "dependencies": [
+          "react-aria-components@^1.21.1"
+        ],
+        "registryDependencies": [
+          "tokens",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import { Time } from \"@internationalized/date\";\nimport { TimeField } from \"@rdloom/react\";\n\nexport default function TimeFieldBasicExample() {\n  return (\n    <div className=\"w-48\">\n      <TimeField label=\"Start time\" defaultValue={new Time(9, 30)} />\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "seconds",
+          "code": "import { Time } from \"@internationalized/date\";\nimport { TimeField } from \"@rdloom/react\";\n\nexport default function TimeFieldSecondsExample() {\n  return (\n    <div className=\"flex flex-col gap-4\">\n      <div className=\"w-56\">\n        <TimeField label=\"Timestamp\" granularity=\"second\" defaultValue={new Time(14, 5, 30)} />\n      </div>\n      <div className=\"w-48\">\n        <TimeField label=\"24 hour clock\" hourCycle={24} defaultValue={new Time(18, 0)} />\n      </div>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "range",
+          "code": "import { Time } from \"@internationalized/date\";\nimport { TimeField } from \"@rdloom/react\";\n\n// minValue and maxValue make times outside opening hours invalid.\nexport default function TimeFieldRangeExample() {\n  return (\n    <div className=\"w-64\">\n      <TimeField\n        label=\"Pickup time\"\n        description=\"We are open 9:00 to 17:00.\"\n        validationBehavior=\"aria\"\n        minValue={new Time(9)}\n        maxValue={new Time(17)}\n        defaultValue={new Time(20, 15)}\n        errorMessage=\"Pick a time between 9:00 and 17:00.\"\n      />\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "time-field/time-field.tsx",
+          "content": "\"use client\";\n\nimport { forwardRef } from \"react\";\nimport {\n  DateInput,\n  DateSegment,\n  FieldError,\n  Label,\n  Text,\n  TimeField as AriaTimeField,\n  type TimeFieldProps as AriaTimeFieldProps,\n  type TimeValue,\n} from \"react-aria-components\";\nimport { timeFieldDefaults, type TimeFieldSpecProps } from \"../generated/time-field.types\";\nimport { cx } from \"../utils/cx\";\nimport { fieldGroup, fieldGroupSizes, segment } from \"../utils/field\";\n\nexport interface TimeFieldProps\n  extends TimeFieldSpecProps,\n    Omit<AriaTimeFieldProps<TimeValue>, keyof TimeFieldSpecProps | \"className\" | \"children\"> {\n  className?: string;\n}\n\nexport const TimeField = forwardRef<HTMLDivElement, TimeFieldProps>(function TimeField(\n  {\n    label,\n    description,\n    errorMessage,\n    granularity = timeFieldDefaults.granularity,\n    size = timeFieldDefaults.size,\n    isDisabled = timeFieldDefaults.isDisabled,\n    // Left undefined unless passed: React Aria treats any defined isInvalid as\n    // controlled and would hide its own validation (min and max times, required).\n    isInvalid,\n    isRequired = timeFieldDefaults.isRequired,\n    className,\n    ...rest\n  },\n  ref,\n) {\n  return (\n    <AriaTimeField\n      {...rest}\n      ref={ref}\n      granularity={granularity}\n      isDisabled={isDisabled}\n      isInvalid={isInvalid}\n      isRequired={isRequired}\n      className={cx(\"flex flex-col gap-1.5\", className)}\n    >\n      <Label className=\"text-sm font-medium text-[var(--rd-color-text-default)]\">\n        {label}\n        {isRequired && <span aria-hidden=\"true\" className=\"text-[var(--rd-color-feedback-danger)]\"> *</span>}\n      </Label>\n      <DateInput className={cx(fieldGroup, fieldGroupSizes[size], \"tabular-nums\")}>\n        {(seg) => <DateSegment segment={seg} className={segment} />}\n      </DateInput>\n      {description && (\n        <Text slot=\"description\" className=\"text-xs text-[var(--rd-color-text-muted)]\">\n          {description}\n        </Text>\n      )}\n      <FieldError className=\"text-xs text-[var(--rd-color-feedback-danger)]\">{errorMessage}</FieldError>\n    </AriaTimeField>\n  );\n});\n"
+        },
+        {
+          "path": "generated/time-field.types.ts",
+          "content": "// Generated by rdloom codegen from specs/time-field.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nexport const timeFieldGranularityValues = [\"hour\", \"minute\", \"second\"] as const;\nexport const timeFieldSizeValues = [\"sm\", \"md\", \"lg\"] as const;\n\n/** A field for a time of day, with separate hour, minute and (optional) second segments that follow the visitor's locale and 12 or 24 hour clock. */\nexport interface TimeFieldSpecProps {\n  /**\n   * Visible label, also the accessible name.\n   */\n  label: string;\n  /**\n   * Help text under the field.\n   */\n  description?: string;\n  /**\n   * Shown when the value is invalid. Leave out to use the built-in message.\n   */\n  errorMessage?: string;\n  /**\n   * Controlled value.\n   */\n  value?: import(\"react-aria-components\").TimeValue | null;\n  /**\n   * Initial value when uncontrolled.\n   */\n  defaultValue?: import(\"react-aria-components\").TimeValue | null;\n  /**\n   * Called with the time, or null when it is cleared.\n   */\n  onChange?: (value: import(\"react-aria-components\").TimeValue | null) => void;\n  /**\n   * Smallest unit shown and edited.\n   * @default \"minute\"\n   */\n  granularity?: \"hour\" | \"minute\" | \"second\";\n  /**\n   * Force a 12 or 24 hour clock. Leave out to follow the locale.\n   */\n  hourCycle?: 12 | 24;\n  /**\n   * Earliest allowed time.\n   */\n  minValue?: import(\"react-aria-components\").TimeValue;\n  /**\n   * Latest allowed time.\n   */\n  maxValue?: import(\"react-aria-components\").TimeValue;\n  /**\n   * Field height and text size.\n   * @default \"md\"\n   */\n  size?: \"sm\" | \"md\" | \"lg\";\n  /**\n   * Prevents interaction and dims the field.\n   * @default false\n   */\n  isDisabled?: boolean;\n  /**\n   * Marks the field invalid. Leave undefined to let validation decide.\n   */\n  isInvalid?: boolean;\n  /**\n   * Marks the field required and adds an asterisk.\n   * @default false\n   */\n  isRequired?: boolean;\n}\n\nexport const timeFieldDefaults = {\n  granularity: \"minute\",\n  size: \"md\",\n  isDisabled: false,\n  isRequired: false,\n} as const;\n\nexport const timeFieldMeta = {\n  \"name\": \"TimeField\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"group\"\n} as const;\n"
         }
       ]
     },
@@ -5365,6 +6486,183 @@
           "content": "// Generated by rdloom codegen from specs/tooltip.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nimport type { ReactNode } from \"react\";\n\nexport const tooltipPlacementValues = [\"top\", \"bottom\", \"start\", \"end\"] as const;\n\n/** Short text label shown on hover or keyboard focus. Wrap the trigger and tooltip in TooltipTrigger. */\nexport interface TooltipSpecProps {\n  /**\n   * Tooltip text. Keep it short and non-interactive.\n   */\n  children: ReactNode;\n  /**\n   * Preferred side of the trigger.\n   * @default \"top\"\n   */\n  placement?: \"top\" | \"bottom\" | \"start\" | \"end\";\n  /**\n   * Shows an arrow pointing at the trigger.\n   * @default true\n   */\n  showArrow?: boolean;\n}\n\nexport const tooltipDefaults = {\n  placement: \"top\",\n  showArrow: true,\n} as const;\n\nexport const tooltipMeta = {\n  \"name\": \"Tooltip\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"tooltip\"\n} as const;\n"
         }
       ]
+    },
+    {
+      "id": "tree",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "Tree",
+        "version": "0.1.0",
+        "category": "data",
+        "status": "experimental",
+        "description": "An expandable hierarchy such as folders and files or a nested menu, with keyboard navigation and optional selection. Build it from nested TreeItem elements.",
+        "props": {
+          "label": {
+            "type": "string",
+            "description": "Accessible name of the tree, e.g. \"Files\".",
+            "required": true
+          },
+          "children": {
+            "type": "node",
+            "description": "TreeItem elements. Nest TreeItems inside a TreeItem to make children.",
+            "required": true
+          },
+          "selectionMode": {
+            "type": "enum",
+            "values": [
+              "none",
+              "single",
+              "multiple"
+            ],
+            "description": "Whether items can be selected.",
+            "default": "none"
+          },
+          "selectedKeys": {
+            "type": "custom",
+            "tsType": "\"all\" | Iterable<import(\"react-aria-components\").Key>",
+            "description": "Controlled selection, by item id."
+          },
+          "defaultSelectedKeys": {
+            "type": "custom",
+            "tsType": "\"all\" | Iterable<import(\"react-aria-components\").Key>",
+            "description": "Initial selection when uncontrolled."
+          },
+          "onSelectionChange": {
+            "type": "callback",
+            "tsType": "(keys: \"all\" | Set<import(\"react-aria-components\").Key>) => void",
+            "description": "Called with the selected item ids."
+          },
+          "expandedKeys": {
+            "type": "custom",
+            "tsType": "Iterable<import(\"react-aria-components\").Key>",
+            "description": "Controlled set of expanded items, by id."
+          },
+          "defaultExpandedKeys": {
+            "type": "custom",
+            "tsType": "Iterable<import(\"react-aria-components\").Key>",
+            "description": "Items expanded at first."
+          },
+          "onExpandedChange": {
+            "type": "callback",
+            "tsType": "(keys: Set<import(\"react-aria-components\").Key>) => void",
+            "description": "Called when items are expanded or collapsed."
+          },
+          "onAction": {
+            "type": "callback",
+            "tsType": "(key: import(\"react-aria-components\").Key) => void",
+            "description": "Called when an item is activated with Enter or a double-click."
+          }
+        },
+        "variants": [
+          "selectionMode"
+        ],
+        "states": [
+          "default",
+          "hover",
+          "focus",
+          "selected"
+        ],
+        "slots": [
+          "tree",
+          "item",
+          "chevron",
+          "label"
+        ],
+        "tokens": [
+          "color.surface.default",
+          "color.surface.subtle",
+          "color.surface.selected",
+          "color.border.default",
+          "color.text.default",
+          "color.text.muted",
+          "color.focus.ring",
+          "radius.control"
+        ],
+        "a11y": {
+          "role": "tree",
+          "keyboard": [
+            "Tab moves into the tree, on one item, and out again",
+            "Up and Down arrows move between visible items",
+            "Right arrow expands a collapsed item, or moves to its first child; Left arrow collapses, or moves to its parent",
+            "Home and End jump to the first and last visible item",
+            "Enter activates the item (onAction); Space selects it when selection is on",
+            "Typing a letter jumps to the next item starting with it"
+          ],
+          "requirements": [
+            "A named tree whose items expose aria-level, aria-expanded (when they have children) and aria-selected (when selectable)",
+            "Only one item is in the tab order at a time (roving tabindex)",
+            "The chevron is decorative for assistive technology: expanding is done from the keyboard and with the item itself",
+            "Selection is shown by a filled row and aria-selected, not only color"
+          ],
+          "screenReader": [
+            "Entering announces the tree name, the item, its level and position, and whether it is expanded",
+            "Expanding or collapsing announces the new state",
+            "Moving to a child announces its level"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "Folders and files, categories, outlines and settings groups",
+            "Navigation with more than one level"
+          ],
+          "avoid_when": [
+            "Flat lists: use ListBox or a menu",
+            "Tabular data with columns: use Table or DataGrid",
+            "Hierarchical rows with several columns of data: DataGrid tree data"
+          ],
+          "anti_patterns": [
+            "Trees deeper than four levels",
+            "Loading every branch up front when there are thousands",
+            "Using a tree for page navigation without links inside"
+          ]
+        },
+        "examples": [
+          "basic",
+          "selectable",
+          "controlled"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {
+            "selectionMode": "Selection"
+          }
+        }
+      },
+      "install": {
+        "command": "npx rdloom add tree",
+        "dependencies": [
+          "react-aria-components@^1.21.1"
+        ],
+        "registryDependencies": [
+          "tokens",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import { Tree, TreeItem } from \"@rdloom/react\";\n\nexport default function TreeBasicExample() {\n  return (\n    <div className=\"w-72\">\n      <Tree label=\"Files\" defaultExpandedKeys={[\"src\"]}>\n        <TreeItem id=\"src\" title=\"src\">\n          <TreeItem id=\"components\" title=\"components\">\n            <TreeItem id=\"button\" title=\"button.tsx\" />\n            <TreeItem id=\"menu\" title=\"menu.tsx\" />\n          </TreeItem>\n          <TreeItem id=\"index\" title=\"index.ts\" />\n        </TreeItem>\n        <TreeItem id=\"docs\" title=\"docs\">\n          <TreeItem id=\"readme\" title=\"README.md\" />\n        </TreeItem>\n        <TreeItem id=\"package\" title=\"package.json\" />\n      </Tree>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "selectable",
+          "code": "import { Tree, TreeItem } from \"@rdloom/react\";\n\nexport default function TreeSelectableExample() {\n  return (\n    <div className=\"w-72\">\n      <Tree label=\"Categories\" selectionMode=\"multiple\" defaultExpandedKeys={[\"fruit\"]} defaultSelectedKeys={[\"apple\"]}>\n        <TreeItem id=\"fruit\" title=\"Fruit\">\n          <TreeItem id=\"apple\" title=\"Apple\" />\n          <TreeItem id=\"pear\" title=\"Pear\" />\n        </TreeItem>\n        <TreeItem id=\"veg\" title=\"Vegetables\">\n          <TreeItem id=\"carrot\" title=\"Carrot\" />\n        </TreeItem>\n      </Tree>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "controlled",
+          "code": "import { useState } from \"react\";\nimport { Tree, TreeItem } from \"@rdloom/react\";\n\nexport default function TreeControlledExample() {\n  const [expanded, setExpanded] = useState<Set<string>>(new Set([\"a\"]));\n  return (\n    <div className=\"flex w-72 flex-col gap-2 text-sm\">\n      <Tree label=\"Outline\" expandedKeys={expanded} onExpandedChange={(keys) => setExpanded(new Set([...keys].map(String)))}>\n        <TreeItem id=\"a\" title=\"Chapter 1\">\n          <TreeItem id=\"a1\" title=\"Section 1.1\" />\n          <TreeItem id=\"a2\" title=\"Section 1.2\" />\n        </TreeItem>\n        <TreeItem id=\"b\" title=\"Chapter 2\">\n          <TreeItem id=\"b1\" title=\"Section 2.1\" />\n        </TreeItem>\n      </Tree>\n      <p aria-live=\"polite\">Expanded: {[...expanded].join(\", \") || \"none\"}</p>\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "tree/tree.tsx",
+          "content": "\"use client\";\n\nimport { forwardRef, type ReactNode } from \"react\";\nimport {\n  Button,\n  Tree as AriaTree,\n  TreeItem as AriaTreeItem,\n  TreeItemContent,\n  type Key,\n  type TreeProps as AriaTreeProps,\n} from \"react-aria-components\";\nimport { treeDefaults, type TreeSpecProps } from \"../generated/tree.types\";\nimport { cx } from \"../utils/cx\";\nimport { ChevronRightIcon } from \"../utils/icons\";\n\nexport interface TreeProps extends TreeSpecProps, Omit<AriaTreeProps<object>, keyof TreeSpecProps | \"className\" | \"children\" | \"aria-label\"> {\n  className?: string;\n}\n\nexport const Tree = forwardRef<HTMLDivElement, TreeProps>(function Tree(\n  { label, children, selectionMode = treeDefaults.selectionMode, className, ...rest },\n  ref,\n) {\n  return (\n    <AriaTree\n      {...rest}\n      ref={ref}\n      aria-label={label}\n      selectionMode={selectionMode === \"none\" ? undefined : selectionMode}\n      className={cx(\n        \"flex flex-col gap-0.5 rounded-[var(--rd-radius-overlay)] border border-[var(--rd-color-border-default)] \" +\n          \"bg-[var(--rd-color-surface-default)] p-1.5 text-sm text-[var(--rd-color-text-default)] outline-none\",\n        className,\n      )}\n    >\n      {children}\n    </AriaTree>\n  );\n});\n\nexport interface TreeItemProps {\n  /** Identifies the item in selectedKeys, expandedKeys and onAction. */\n  id: Key;\n  /** What the item shows. */\n  title: ReactNode;\n  /** Plain-text name, used for typeahead and by screen readers. Needed when title isn't a string. */\n  textValue?: string;\n  /** Nested TreeItems. */\n  children?: ReactNode;\n  className?: string;\n}\n\nconst INDENT_PX = 18;\n\nexport function TreeItem({ id, title, textValue, children, className }: TreeItemProps) {\n  return (\n    <AriaTreeItem\n      id={id}\n      textValue={textValue ?? (typeof title === \"string\" ? title : String(id))}\n      className={cx(\n        \"rounded-[var(--rd-radius-control)] outline-none transition-colors \" +\n          \"data-[hovered]:bg-[var(--rd-color-surface-subtle)] \" +\n          \"data-[selected]:bg-[var(--rd-color-surface-selected)] \" +\n          \"data-[focus-visible]:ring-2 data-[focus-visible]:ring-inset data-[focus-visible]:ring-[var(--rd-color-focus-ring)]\",\n        className,\n      )}\n    >\n      <TreeItemContent>\n        {({ hasChildItems, isExpanded, level }) => (\n          <div className=\"flex min-h-8 items-center gap-1 pe-2\" style={{ paddingInlineStart: (level - 1) * INDENT_PX + 4 }}>\n            {hasChildItems ? (\n              // Decorative for screen readers: aria-expanded on the item says the same thing.\n              <Button slot=\"chevron\" className=\"flex size-6 shrink-0 items-center justify-center rounded text-[var(--rd-color-text-muted)] outline-none\">\n                <ChevronRightIcon className={cx(\"size-4 transition-transform duration-150 motion-reduce:transition-none rtl:-scale-x-100\", isExpanded && \"rotate-90 rtl:-rotate-90\")} />\n              </Button>\n            ) : (\n              <span aria-hidden=\"true\" className=\"size-6 shrink-0\" />\n            )}\n            <span className=\"truncate\">{title}</span>\n          </div>\n        )}\n      </TreeItemContent>\n      {children}\n    </AriaTreeItem>\n  );\n}\n"
+        },
+        {
+          "path": "generated/tree.types.ts",
+          "content": "// Generated by rdloom codegen from specs/tree.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nimport type { ReactNode } from \"react\";\n\nexport const treeSelectionModeValues = [\"none\", \"single\", \"multiple\"] as const;\n\n/** An expandable hierarchy such as folders and files or a nested menu, with keyboard navigation and optional selection. Build it from nested TreeItem elements. */\nexport interface TreeSpecProps {\n  /**\n   * Accessible name of the tree, e.g. \"Files\".\n   */\n  label: string;\n  /**\n   * TreeItem elements. Nest TreeItems inside a TreeItem to make children.\n   */\n  children: ReactNode;\n  /**\n   * Whether items can be selected.\n   * @default \"none\"\n   */\n  selectionMode?: \"none\" | \"single\" | \"multiple\";\n  /**\n   * Controlled selection, by item id.\n   */\n  selectedKeys?: \"all\" | Iterable<import(\"react-aria-components\").Key>;\n  /**\n   * Initial selection when uncontrolled.\n   */\n  defaultSelectedKeys?: \"all\" | Iterable<import(\"react-aria-components\").Key>;\n  /**\n   * Called with the selected item ids.\n   */\n  onSelectionChange?: (keys: \"all\" | Set<import(\"react-aria-components\").Key>) => void;\n  /**\n   * Controlled set of expanded items, by id.\n   */\n  expandedKeys?: Iterable<import(\"react-aria-components\").Key>;\n  /**\n   * Items expanded at first.\n   */\n  defaultExpandedKeys?: Iterable<import(\"react-aria-components\").Key>;\n  /**\n   * Called when items are expanded or collapsed.\n   */\n  onExpandedChange?: (keys: Set<import(\"react-aria-components\").Key>) => void;\n  /**\n   * Called when an item is activated with Enter or a double-click.\n   */\n  onAction?: (key: import(\"react-aria-components\").Key) => void;\n}\n\nexport const treeDefaults = {\n  selectionMode: \"none\",\n} as const;\n\nexport const treeMeta = {\n  \"name\": \"Tree\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"tree\"\n} as const;\n"
+        }
+      ]
     }
   ],
   "tokens": [
@@ -5478,28 +6776,28 @@
       "cssVar": "--rd-color-feedback-danger-subtle",
       "type": "color",
       "light": "#fef2f2",
-      "dark": "#450a0a"
+      "dark": "#2a1a1d"
     },
     {
       "path": "color.feedback.success-subtle",
       "cssVar": "--rd-color-feedback-success-subtle",
       "type": "color",
       "light": "#f0fdf4",
-      "dark": "#052e16"
+      "dark": "#15271f"
     },
     {
       "path": "color.feedback.warning-subtle",
       "cssVar": "--rd-color-feedback-warning-subtle",
       "type": "color",
       "light": "#fffbeb",
-      "dark": "#451a03"
+      "dark": "#2a2314"
     },
     {
       "path": "color.feedback.info-subtle",
       "cssVar": "--rd-color-feedback-info-subtle",
       "type": "color",
       "light": "#eff6ff",
-      "dark": "#172554"
+      "dark": "#18202e"
     },
     {
       "path": "color.overlay.backdrop",
@@ -5557,7 +6855,7 @@
       "files": [
         {
           "path": "@tokens",
-          "content": "/* Generated by rdloom codegen. Do not edit; change /tokens instead. */\n\n:root {\n  --rd-color-neutral-0: #ffffff;\n  --rd-color-neutral-50: #f7f7f8;\n  --rd-color-neutral-100: #eeeef1;\n  --rd-color-neutral-200: #dcdce2;\n  --rd-color-neutral-400: #9696a3;\n  --rd-color-neutral-500: #8a8a97;\n  --rd-color-neutral-600: #5b5b68;\n  --rd-color-neutral-800: #2a2a33;\n  --rd-color-neutral-900: #18181d;\n  --rd-color-neutral-950: #0e0e12;\n  --rd-color-indigo-50: #eef0ff;\n  --rd-color-indigo-300: #a5a8ff;\n  --rd-color-indigo-400: #8386f7;\n  --rd-color-indigo-500: #6366f1;\n  --rd-color-indigo-600: #4f46e5;\n  --rd-color-indigo-700: #4338ca;\n  --rd-color-indigo-950: #1f1d4d;\n  --rd-color-green-50: #f0fdf4;\n  --rd-color-green-400: #4ade80;\n  --rd-color-green-600: #16a34a;\n  --rd-color-green-700: #15803d;\n  --rd-color-green-950: #052e16;\n  --rd-color-red-50: #fef2f2;\n  --rd-color-red-300: #fca5a5;\n  --rd-color-red-400: #f87171;\n  --rd-color-red-600: #dc2626;\n  --rd-color-red-700: #b91c1c;\n  --rd-color-red-950: #450a0a;\n  --rd-color-amber-50: #fffbeb;\n  --rd-color-amber-400: #fbbf24;\n  --rd-color-amber-700: #b45309;\n  --rd-color-amber-950: #451a03;\n  --rd-color-blue-50: #eff6ff;\n  --rd-color-blue-400: #60a5fa;\n  --rd-color-blue-600: #2563eb;\n  --rd-color-blue-950: #172554;\n  --rd-radius-sm: 4px;\n  --rd-radius-md: 8px;\n  --rd-radius-lg: 12px;\n  --rd-space-1: 4px;\n  --rd-space-2: 8px;\n  --rd-space-3: 12px;\n  --rd-space-4: 16px;\n  --rd-space-5: 20px;\n  --rd-color-action-primary: #4f46e5;\n  --rd-color-action-primary-hover: #4338ca;\n  --rd-color-action-on-primary: #ffffff;\n  --rd-color-action-danger: #dc2626;\n  --rd-color-action-danger-hover: #b91c1c;\n  --rd-color-surface-default: #ffffff;\n  --rd-color-surface-subtle: #eeeef1;\n  --rd-color-surface-raised: #ffffff;\n  --rd-color-surface-selected: #eef0ff;\n  --rd-color-border-default: #dcdce2;\n  --rd-color-border-strong: #8a8a97;\n  --rd-color-feedback-danger: #dc2626;\n  --rd-color-feedback-success: #16a34a;\n  --rd-color-feedback-warning: #b45309;\n  --rd-color-feedback-info: #2563eb;\n  --rd-color-feedback-danger-subtle: #fef2f2;\n  --rd-color-feedback-success-subtle: #f0fdf4;\n  --rd-color-feedback-warning-subtle: #fffbeb;\n  --rd-color-feedback-info-subtle: #eff6ff;\n  --rd-color-overlay-backdrop: rgb(14 14 18 / 0.5);\n  --rd-color-text-default: #18181d;\n  --rd-color-text-muted: #5b5b68;\n  --rd-color-focus-ring: #6366f1;\n  --rd-radius-control: 8px;\n  --rd-radius-overlay: 12px;\n  --rd-space-control-x: 16px;\n}\n\n@media (prefers-color-scheme: dark) {\n  :root:not([data-theme=\"light\"]) {\n    --rd-color-action-primary: #8386f7;\n    --rd-color-action-primary-hover: #a5a8ff;\n    --rd-color-action-on-primary: #0e0e12;\n    --rd-color-action-danger: #f87171;\n    --rd-color-action-danger-hover: #fca5a5;\n    --rd-color-surface-default: #0e0e12;\n    --rd-color-surface-subtle: #2a2a33;\n    --rd-color-surface-raised: #18181d;\n    --rd-color-surface-selected: #1f1d4d;\n    --rd-color-border-default: #2a2a33;\n    --rd-color-border-strong: #8a8a97;\n    --rd-color-feedback-danger: #f87171;\n    --rd-color-feedback-success: #4ade80;\n    --rd-color-feedback-warning: #fbbf24;\n    --rd-color-feedback-info: #60a5fa;\n    --rd-color-feedback-danger-subtle: #450a0a;\n    --rd-color-feedback-success-subtle: #052e16;\n    --rd-color-feedback-warning-subtle: #451a03;\n    --rd-color-feedback-info-subtle: #172554;\n    --rd-color-overlay-backdrop: rgb(0 0 0 / 0.6);\n    --rd-color-text-default: #f7f7f8;\n    --rd-color-text-muted: #9696a3;\n    --rd-color-focus-ring: #a5a8ff;\n  }\n}\n\n:root[data-theme=\"dark\"] {\n  --rd-color-action-primary: #8386f7;\n  --rd-color-action-primary-hover: #a5a8ff;\n  --rd-color-action-on-primary: #0e0e12;\n  --rd-color-action-danger: #f87171;\n  --rd-color-action-danger-hover: #fca5a5;\n  --rd-color-surface-default: #0e0e12;\n  --rd-color-surface-subtle: #2a2a33;\n  --rd-color-surface-raised: #18181d;\n  --rd-color-surface-selected: #1f1d4d;\n  --rd-color-border-default: #2a2a33;\n  --rd-color-border-strong: #8a8a97;\n  --rd-color-feedback-danger: #f87171;\n  --rd-color-feedback-success: #4ade80;\n  --rd-color-feedback-warning: #fbbf24;\n  --rd-color-feedback-info: #60a5fa;\n  --rd-color-feedback-danger-subtle: #450a0a;\n  --rd-color-feedback-success-subtle: #052e16;\n  --rd-color-feedback-warning-subtle: #451a03;\n  --rd-color-feedback-info-subtle: #172554;\n  --rd-color-overlay-backdrop: rgb(0 0 0 / 0.6);\n  --rd-color-text-default: #f7f7f8;\n  --rd-color-text-muted: #9696a3;\n  --rd-color-focus-ring: #a5a8ff;\n}\n\n"
+          "content": "/* Generated by rdloom codegen. Do not edit; change /tokens instead. */\n\n:root {\n  --rd-color-neutral-0: #ffffff;\n  --rd-color-neutral-50: #f7f7f8;\n  --rd-color-neutral-100: #eeeef1;\n  --rd-color-neutral-200: #dcdce2;\n  --rd-color-neutral-400: #9696a3;\n  --rd-color-neutral-500: #8a8a97;\n  --rd-color-neutral-600: #5b5b68;\n  --rd-color-neutral-800: #2a2a33;\n  --rd-color-neutral-900: #18181d;\n  --rd-color-neutral-950: #0e0e12;\n  --rd-color-indigo-50: #eef0ff;\n  --rd-color-indigo-300: #a5a8ff;\n  --rd-color-indigo-400: #8386f7;\n  --rd-color-indigo-500: #6366f1;\n  --rd-color-indigo-600: #4f46e5;\n  --rd-color-indigo-700: #4338ca;\n  --rd-color-indigo-950: #1f1d4d;\n  --rd-color-green-50: #f0fdf4;\n  --rd-color-green-400: #4ade80;\n  --rd-color-green-600: #16a34a;\n  --rd-color-green-700: #15803d;\n  --rd-color-green-950: #15271f;\n  --rd-color-red-50: #fef2f2;\n  --rd-color-red-300: #fca5a5;\n  --rd-color-red-400: #f87171;\n  --rd-color-red-600: #dc2626;\n  --rd-color-red-700: #b91c1c;\n  --rd-color-red-950: #2a1a1d;\n  --rd-color-amber-50: #fffbeb;\n  --rd-color-amber-400: #fbbf24;\n  --rd-color-amber-700: #b45309;\n  --rd-color-amber-950: #2a2314;\n  --rd-color-blue-50: #eff6ff;\n  --rd-color-blue-400: #60a5fa;\n  --rd-color-blue-600: #2563eb;\n  --rd-color-blue-950: #18202e;\n  --rd-radius-sm: 4px;\n  --rd-radius-md: 8px;\n  --rd-radius-lg: 12px;\n  --rd-space-1: 4px;\n  --rd-space-2: 8px;\n  --rd-space-3: 12px;\n  --rd-space-4: 16px;\n  --rd-space-5: 20px;\n  --rd-color-action-primary: #4f46e5;\n  --rd-color-action-primary-hover: #4338ca;\n  --rd-color-action-on-primary: #ffffff;\n  --rd-color-action-danger: #dc2626;\n  --rd-color-action-danger-hover: #b91c1c;\n  --rd-color-surface-default: #ffffff;\n  --rd-color-surface-subtle: #eeeef1;\n  --rd-color-surface-raised: #ffffff;\n  --rd-color-surface-selected: #eef0ff;\n  --rd-color-border-default: #dcdce2;\n  --rd-color-border-strong: #8a8a97;\n  --rd-color-feedback-danger: #dc2626;\n  --rd-color-feedback-success: #16a34a;\n  --rd-color-feedback-warning: #b45309;\n  --rd-color-feedback-info: #2563eb;\n  --rd-color-feedback-danger-subtle: #fef2f2;\n  --rd-color-feedback-success-subtle: #f0fdf4;\n  --rd-color-feedback-warning-subtle: #fffbeb;\n  --rd-color-feedback-info-subtle: #eff6ff;\n  --rd-color-overlay-backdrop: rgb(14 14 18 / 0.5);\n  --rd-color-text-default: #18181d;\n  --rd-color-text-muted: #5b5b68;\n  --rd-color-focus-ring: #6366f1;\n  --rd-radius-control: 8px;\n  --rd-radius-overlay: 12px;\n  --rd-space-control-x: 16px;\n}\n\n@media (prefers-color-scheme: dark) {\n  :root:not([data-theme=\"light\"]) {\n    --rd-color-action-primary: #8386f7;\n    --rd-color-action-primary-hover: #a5a8ff;\n    --rd-color-action-on-primary: #0e0e12;\n    --rd-color-action-danger: #f87171;\n    --rd-color-action-danger-hover: #fca5a5;\n    --rd-color-surface-default: #0e0e12;\n    --rd-color-surface-subtle: #2a2a33;\n    --rd-color-surface-raised: #18181d;\n    --rd-color-surface-selected: #1f1d4d;\n    --rd-color-border-default: #2a2a33;\n    --rd-color-border-strong: #8a8a97;\n    --rd-color-feedback-danger: #f87171;\n    --rd-color-feedback-success: #4ade80;\n    --rd-color-feedback-warning: #fbbf24;\n    --rd-color-feedback-info: #60a5fa;\n    --rd-color-feedback-danger-subtle: #2a1a1d;\n    --rd-color-feedback-success-subtle: #15271f;\n    --rd-color-feedback-warning-subtle: #2a2314;\n    --rd-color-feedback-info-subtle: #18202e;\n    --rd-color-overlay-backdrop: rgb(0 0 0 / 0.6);\n    --rd-color-text-default: #f7f7f8;\n    --rd-color-text-muted: #9696a3;\n    --rd-color-focus-ring: #a5a8ff;\n  }\n}\n\n:root[data-theme=\"dark\"] {\n  --rd-color-action-primary: #8386f7;\n  --rd-color-action-primary-hover: #a5a8ff;\n  --rd-color-action-on-primary: #0e0e12;\n  --rd-color-action-danger: #f87171;\n  --rd-color-action-danger-hover: #fca5a5;\n  --rd-color-surface-default: #0e0e12;\n  --rd-color-surface-subtle: #2a2a33;\n  --rd-color-surface-raised: #18181d;\n  --rd-color-surface-selected: #1f1d4d;\n  --rd-color-border-default: #2a2a33;\n  --rd-color-border-strong: #8a8a97;\n  --rd-color-feedback-danger: #f87171;\n  --rd-color-feedback-success: #4ade80;\n  --rd-color-feedback-warning: #fbbf24;\n  --rd-color-feedback-info: #60a5fa;\n  --rd-color-feedback-danger-subtle: #2a1a1d;\n  --rd-color-feedback-success-subtle: #15271f;\n  --rd-color-feedback-warning-subtle: #2a2314;\n  --rd-color-feedback-info-subtle: #18202e;\n  --rd-color-overlay-backdrop: rgb(0 0 0 / 0.6);\n  --rd-color-text-default: #f7f7f8;\n  --rd-color-text-muted: #9696a3;\n  --rd-color-focus-ring: #a5a8ff;\n}\n\n"
         }
       ]
     },
@@ -5578,7 +6876,7 @@
         },
         {
           "path": "utils/icons.tsx",
-          "content": "export function CheckIcon() {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 16 16\" className=\"size-4 shrink-0 text-[var(--rd-color-action-primary)]\" fill=\"none\">\n      <path d=\"M3.5 8.5l3 3 6-7\" stroke=\"currentColor\" strokeWidth=\"2\" strokeLinecap=\"round\" strokeLinejoin=\"round\" />\n    </svg>\n  );\n}\n\nexport function ChevronDownIcon() {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 16 16\" className=\"size-4 shrink-0 text-[var(--rd-color-text-muted)]\" fill=\"none\">\n      <path d=\"M4 6l4 4 4-4\" stroke=\"currentColor\" strokeWidth=\"1.5\" strokeLinecap=\"round\" strokeLinejoin=\"round\" />\n    </svg>\n  );\n}\n\nexport function CloseIcon({ className = \"size-3\" }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 16 16\" className={className} fill=\"none\">\n      <path d=\"M4 4l8 8M12 4l-8 8\" stroke=\"currentColor\" strokeWidth=\"1.75\" strokeLinecap=\"round\" />\n    </svg>\n  );\n}\n\nexport function Spinner({ className = \"size-4\" }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 24 24\" className={`${className} animate-spin`} fill=\"none\">\n      <circle cx=\"12\" cy=\"12\" r=\"10\" stroke=\"currentColor\" strokeWidth=\"3\" opacity=\"0.25\" />\n      <path d=\"M22 12a10 10 0 0 0-10-10\" stroke=\"currentColor\" strokeWidth=\"3\" strokeLinecap=\"round\" />\n    </svg>\n  );\n}\n\nexport function CalendarIcon() {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 16 16\" className=\"size-4\" fill=\"none\">\n      <rect x=\"2.5\" y=\"3.5\" width=\"11\" height=\"10\" rx=\"1.5\" stroke=\"currentColor\" strokeWidth=\"1.3\" />\n      <path d=\"M2.5 6.5h11M5.5 2v3M10.5 2v3\" stroke=\"currentColor\" strokeWidth=\"1.3\" strokeLinecap=\"round\" />\n    </svg>\n  );\n}\n\n// Status icons for Alert. Each tone has its own shape (circle with i, check,\n// triangle, octagon) so the tone never depends on color alone.\nconst statusIcon = \"size-5 shrink-0\";\n\nexport function InfoIcon({ className = statusIcon }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 20 20\" className={className} fill=\"none\">\n      <circle cx=\"10\" cy=\"10\" r=\"8\" stroke=\"currentColor\" strokeWidth=\"1.6\" />\n      <path d=\"M10 9v5M10 6.25v.01\" stroke=\"currentColor\" strokeWidth=\"1.8\" strokeLinecap=\"round\" />\n    </svg>\n  );\n}\n\nexport function SuccessIcon({ className = statusIcon }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 20 20\" className={className} fill=\"none\">\n      <circle cx=\"10\" cy=\"10\" r=\"8\" stroke=\"currentColor\" strokeWidth=\"1.6\" />\n      <path d=\"M6.5 10.25l2.5 2.5 4.5-5\" stroke=\"currentColor\" strokeWidth=\"1.8\" strokeLinecap=\"round\" strokeLinejoin=\"round\" />\n    </svg>\n  );\n}\n\nexport function WarningIcon({ className = statusIcon }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 20 20\" className={className} fill=\"none\">\n      <path d=\"M10 2.75l8 14H2l8-14z\" stroke=\"currentColor\" strokeWidth=\"1.6\" strokeLinejoin=\"round\" />\n      <path d=\"M10 8v4M10 14.25v.01\" stroke=\"currentColor\" strokeWidth=\"1.8\" strokeLinecap=\"round\" />\n    </svg>\n  );\n}\n\nexport function ErrorIcon({ className = statusIcon }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 20 20\" className={className} fill=\"none\">\n      <path d=\"M7 2.5h6l4.5 4.5v6L13 17.5H7L2.5 13V7L7 2.5z\" stroke=\"currentColor\" strokeWidth=\"1.6\" strokeLinejoin=\"round\" />\n      <path d=\"M7.5 7.5l5 5M12.5 7.5l-5 5\" stroke=\"currentColor\" strokeWidth=\"1.8\" strokeLinecap=\"round\" />\n    </svg>\n  );\n}\n"
+          "content": "export function CheckIcon({ className = \"size-4 shrink-0 text-[var(--rd-color-action-primary)]\" }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 16 16\" className={className} fill=\"none\">\n      <path d=\"M3.5 8.5l3 3 6-7\" stroke=\"currentColor\" strokeWidth=\"2\" strokeLinecap=\"round\" strokeLinejoin=\"round\" />\n    </svg>\n  );\n}\n\nexport function ChevronDownIcon() {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 16 16\" className=\"size-4 shrink-0 text-[var(--rd-color-text-muted)]\" fill=\"none\">\n      <path d=\"M4 6l4 4 4-4\" stroke=\"currentColor\" strokeWidth=\"1.5\" strokeLinecap=\"round\" strokeLinejoin=\"round\" />\n    </svg>\n  );\n}\n\nexport function CloseIcon({ className = \"size-3\" }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 16 16\" className={className} fill=\"none\">\n      <path d=\"M4 4l8 8M12 4l-8 8\" stroke=\"currentColor\" strokeWidth=\"1.75\" strokeLinecap=\"round\" />\n    </svg>\n  );\n}\n\nexport function Spinner({ className = \"size-4\" }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 24 24\" className={`${className} animate-spin`} fill=\"none\">\n      <circle cx=\"12\" cy=\"12\" r=\"10\" stroke=\"currentColor\" strokeWidth=\"3\" opacity=\"0.25\" />\n      <path d=\"M22 12a10 10 0 0 0-10-10\" stroke=\"currentColor\" strokeWidth=\"3\" strokeLinecap=\"round\" />\n    </svg>\n  );\n}\n\nexport function CalendarIcon() {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 16 16\" className=\"size-4\" fill=\"none\">\n      <rect x=\"2.5\" y=\"3.5\" width=\"11\" height=\"10\" rx=\"1.5\" stroke=\"currentColor\" strokeWidth=\"1.3\" />\n      <path d=\"M2.5 6.5h11M5.5 2v3M10.5 2v3\" stroke=\"currentColor\" strokeWidth=\"1.3\" strokeLinecap=\"round\" />\n    </svg>\n  );\n}\n\n// Status icons for Alert. Each tone has its own shape (circle with i, check,\n// triangle, octagon) so the tone never depends on color alone.\nconst statusIcon = \"size-5 shrink-0\";\n\nexport function InfoIcon({ className = statusIcon }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 20 20\" className={className} fill=\"none\">\n      <circle cx=\"10\" cy=\"10\" r=\"8\" stroke=\"currentColor\" strokeWidth=\"1.6\" />\n      <path d=\"M10 9v5M10 6.25v.01\" stroke=\"currentColor\" strokeWidth=\"1.8\" strokeLinecap=\"round\" />\n    </svg>\n  );\n}\n\nexport function SuccessIcon({ className = statusIcon }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 20 20\" className={className} fill=\"none\">\n      <circle cx=\"10\" cy=\"10\" r=\"8\" stroke=\"currentColor\" strokeWidth=\"1.6\" />\n      <path d=\"M6.5 10.25l2.5 2.5 4.5-5\" stroke=\"currentColor\" strokeWidth=\"1.8\" strokeLinecap=\"round\" strokeLinejoin=\"round\" />\n    </svg>\n  );\n}\n\nexport function WarningIcon({ className = statusIcon }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 20 20\" className={className} fill=\"none\">\n      <path d=\"M10 2.75l8 14H2l8-14z\" stroke=\"currentColor\" strokeWidth=\"1.6\" strokeLinejoin=\"round\" />\n      <path d=\"M10 8v4M10 14.25v.01\" stroke=\"currentColor\" strokeWidth=\"1.8\" strokeLinecap=\"round\" />\n    </svg>\n  );\n}\n\nexport function ErrorIcon({ className = statusIcon }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 20 20\" className={className} fill=\"none\">\n      <path d=\"M7 2.5h6l4.5 4.5v6L13 17.5H7L2.5 13V7L7 2.5z\" stroke=\"currentColor\" strokeWidth=\"1.6\" strokeLinejoin=\"round\" />\n      <path d=\"M7.5 7.5l5 5M12.5 7.5l-5 5\" stroke=\"currentColor\" strokeWidth=\"1.8\" strokeLinecap=\"round\" />\n    </svg>\n  );\n}\n\nexport function SearchIcon({ className = \"size-5 shrink-0\" }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 20 20\" className={className} fill=\"none\">\n      <circle cx=\"9\" cy=\"9\" r=\"5.75\" stroke=\"currentColor\" strokeWidth=\"1.6\" />\n      <path d=\"M13.5 13.5L17 17\" stroke=\"currentColor\" strokeWidth=\"1.6\" strokeLinecap=\"round\" />\n    </svg>\n  );\n}\n\nexport function UploadIcon({ className = \"size-5 shrink-0\" }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 20 20\" className={className} fill=\"none\">\n      <path d=\"M10 13V3.5M6.25 7L10 3.25 13.75 7\" stroke=\"currentColor\" strokeWidth=\"1.6\" strokeLinecap=\"round\" strokeLinejoin=\"round\" />\n      <path d=\"M3.5 12.5v2.25c0 .83.67 1.5 1.5 1.5h10c.83 0 1.5-.67 1.5-1.5V12.5\" stroke=\"currentColor\" strokeWidth=\"1.6\" strokeLinecap=\"round\" />\n    </svg>\n  );\n}\n\nexport function FileIcon({ className = \"size-5 shrink-0\" }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 20 20\" className={className} fill=\"none\">\n      <path d=\"M5.5 2.75h5.25L15 7v9.5a.75.75 0 0 1-.75.75h-8.5A.75.75 0 0 1 5 16.5v-13a.75.75 0 0 1 .5-.75z\" stroke=\"currentColor\" strokeWidth=\"1.5\" strokeLinejoin=\"round\" />\n      <path d=\"M10.5 2.75V7H15\" stroke=\"currentColor\" strokeWidth=\"1.5\" strokeLinejoin=\"round\" />\n    </svg>\n  );\n}\n\nexport function ChevronRightIcon({ className = \"size-4 shrink-0\" }: { className?: string }) {\n  return (\n    <svg aria-hidden=\"true\" viewBox=\"0 0 16 16\" className={className} fill=\"none\">\n      <path d=\"M6 3.5l4.5 4.5L6 12.5\" stroke=\"currentColor\" strokeWidth=\"1.6\" strokeLinecap=\"round\" strokeLinejoin=\"round\" />\n    </svg>\n  );\n}\n"
         },
         {
           "path": "utils/use-media-query.ts",

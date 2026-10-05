@@ -1,0 +1,101 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "EmptyState",
+  "version": "0.1.0",
+  "category": "feedback",
+  "status": "experimental",
+  "description": "What to show when a list, table or page has nothing in it yet: a short explanation and the next step.",
+  "props": {
+    "title": {
+      "type": "string",
+      "description": "Short headline, e.g. \"No projects yet\".",
+      "required": true
+    },
+    "description": {
+      "type": "string",
+      "description": "One or two sentences on why it is empty and what to do."
+    },
+    "icon": {
+      "type": "node",
+      "description": "Optional illustration or icon, shown above the title. Decorative: it is hidden from screen readers."
+    },
+    "children": {
+      "type": "node",
+      "description": "Actions, usually one or two Buttons."
+    },
+    "headingLevel": {
+      "type": "number",
+      "description": "Heading level of the title, 2 to 6.",
+      "default": 3
+    },
+    "size": {
+      "type": "enum",
+      "values": [
+        "sm",
+        "md"
+      ],
+      "description": "sm for inside a card or table, md for a whole page or panel.",
+      "default": "md"
+    }
+  },
+  "variants": [
+    "size"
+  ],
+  "states": [
+    "default"
+  ],
+  "slots": [
+    "root",
+    "icon",
+    "title",
+    "description",
+    "actions"
+  ],
+  "tokens": [
+    "color.surface.subtle",
+    "color.border.default",
+    "color.text.default",
+    "color.text.muted",
+    "radius.overlay"
+  ],
+  "a11y": {
+    "role": "none",
+    "keyboard": [],
+    "requirements": [
+      "The title is a real heading at the level you choose",
+      "The icon is decorative (aria-hidden): the title and description carry the meaning",
+      "Actions are ordinary buttons or links in the normal tab order",
+      "It is not announced as an alert: it is the page's content, not an interruption"
+    ],
+    "screenReader": [
+      "Read in order: title, description, then the actions"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "A first-run screen, an empty list or a search with no results",
+      "Telling people the next step when there is no data"
+    ],
+    "avoid_when": [
+      "An error: use Alert",
+      "Data that is loading: use Skeleton"
+    ],
+    "anti_patterns": [
+      "Only a picture with no words",
+      "No next step",
+      "Using it for errors"
+    ]
+  },
+  "examples": [
+    "basic",
+    "no-results",
+    "compact"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {
+      "size": "Size"
+    }
+  }
+}

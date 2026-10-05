@@ -1,0 +1,149 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "FileUpload",
+  "version": "0.1.0",
+  "category": "input",
+  "status": "experimental",
+  "description": "A drop zone and button for choosing files, with type, size and count limits and a list of the chosen files you can remove from. The component picks the files; you upload them.",
+  "props": {
+    "label": {
+      "type": "string",
+      "description": "What the files are for, e.g. \"Attachments\". It names the control.",
+      "required": true
+    },
+    "description": {
+      "type": "string",
+      "description": "Help text, e.g. the limits."
+    },
+    "accept": {
+      "type": "custom",
+      "tsType": "readonly string[]",
+      "description": "Allowed types: MIME types like \"image/png\" or \"image/*\", or extensions like \".pdf\". Others are rejected with a message."
+    },
+    "multiple": {
+      "type": "boolean",
+      "description": "Allow more than one file.",
+      "default": true
+    },
+    "maxSize": {
+      "type": "number",
+      "description": "Largest file in bytes. Bigger files are rejected."
+    },
+    "maxFiles": {
+      "type": "number",
+      "description": "Most files allowed in total."
+    },
+    "value": {
+      "type": "custom",
+      "tsType": "readonly File[]",
+      "description": "Controlled list of chosen files."
+    },
+    "defaultValue": {
+      "type": "custom",
+      "tsType": "readonly File[]",
+      "description": "Initial files when uncontrolled."
+    },
+    "onChange": {
+      "type": "callback",
+      "tsType": "(files: File[]) => void",
+      "description": "Called with the full list of files whenever it changes."
+    },
+    "onReject": {
+      "type": "callback",
+      "tsType": "(rejections: { file: File; reason: \"type\" | \"size\" | \"count\" }[]) => void",
+      "description": "Called with files that were refused, and why. The component also lists them."
+    },
+    "browseLabel": {
+      "type": "string",
+      "description": "Text of the button that opens the file picker.",
+      "default": "Browse files"
+    },
+    "isDisabled": {
+      "type": "boolean",
+      "description": "Prevents choosing, dropping and removing.",
+      "default": false
+    }
+  },
+  "variants": [
+    "isDisabled"
+  ],
+  "states": [
+    "default",
+    "hover",
+    "focus",
+    "disabled",
+    "invalid"
+  ],
+  "slots": [
+    "label",
+    "dropzone",
+    "button",
+    "description",
+    "list",
+    "file",
+    "remove",
+    "error"
+  ],
+  "tokens": [
+    "color.surface.default",
+    "color.surface.subtle",
+    "color.surface.selected",
+    "color.border.default",
+    "color.border.strong",
+    "color.action.primary",
+    "color.text.default",
+    "color.text.muted",
+    "color.feedback.danger",
+    "color.focus.ring",
+    "radius.overlay",
+    "radius.control"
+  ],
+  "a11y": {
+    "role": "group",
+    "keyboard": [
+      "Tab reaches the Browse files button; Enter or Space opens the file picker",
+      "Tab reaches each Remove button; Enter or Space removes that file"
+    ],
+    "requirements": [
+      "Dragging is an extra: everything can be done with the Browse files button and the keyboard",
+      "The group is named by its label and described by the description",
+      "Each Remove button names its file (Remove report.pdf)",
+      "Adding, removing and rejecting files are announced in a polite live region",
+      "Rejected files and the reason are written out, not only coloured",
+      "The drag-over highlight is also a change of text, not only of color"
+    ],
+    "screenReader": [
+      "The group is announced with its label and description",
+      "Adding files announces how many were added, e.g. \"2 files added\"",
+      "A rejected file is announced with its name and reason, e.g. \"photo.tiff not added: file type not allowed\"",
+      "Removing announces the file removed"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "Attachments, imports, avatars and documents",
+      "When people may have the files on their desktop to drag in"
+    ],
+    "avoid_when": [
+      "Uploading as a background process with progress: pair it with Progress and your own queue",
+      "Picking one value from a list"
+    ],
+    "anti_patterns": [
+      "A drop zone with no button",
+      "Limits that are only discovered after upload",
+      "Trusting accept or maxSize alone: check files on the server too"
+    ]
+  },
+  "examples": [
+    "basic",
+    "images",
+    "single"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {
+      "isDisabled": "Disabled"
+    }
+  }
+}

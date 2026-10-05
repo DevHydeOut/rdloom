@@ -69,3 +69,18 @@ export {
   type TableColumnProps,
   type TableProps,
 } from "./table/table";
+export {
+  CommandGroup,
+  CommandItem,
+  CommandPalette,
+  type CommandGroupProps,
+  type CommandItemProps,
+  type CommandPaletteProps,
+} from "./command-palette/command-palette";
+export { EmptyState, type EmptyStateProps } from "./empty-state/empty-state";
+export { FileUpload, formatBytes, matchesAccept, type FileUploadProps } from "./file-upload/file-upload";
+export { Kbd, type KbdProps } from "./kbd/kbd";
+export { Step, Steps, type StepProps, type StepsProps } from "./steps/steps";
+export { TagInput, type TagInputProps } from "./tag-input/tag-input";
+export { TimeField, type TimeFieldProps } from "./time-field/time-field";
+export { Tree, TreeItem, type TreeItemProps, type TreeProps } from "./tree/tree";

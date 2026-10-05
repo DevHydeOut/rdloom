@@ -1,0 +1,100 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Steps",
+  "version": "0.1.0",
+  "category": "navigation",
+  "status": "experimental",
+  "description": "Shows where someone is in a multi-step process, such as checkout or setup: done, current and upcoming steps. It displays progress; you control the steps and buttons.",
+  "props": {
+    "children": {
+      "type": "node",
+      "description": "Step elements, in order.",
+      "required": true
+    },
+    "currentStep": {
+      "type": "number",
+      "description": "The step the person is on, starting at 1. Earlier steps show as done.",
+      "required": true
+    },
+    "orientation": {
+      "type": "enum",
+      "values": [
+        "horizontal",
+        "vertical"
+      ],
+      "description": "Lay the steps in a row or a column.",
+      "default": "horizontal"
+    },
+    "label": {
+      "type": "string",
+      "description": "Accessible name of the list, e.g. \"Checkout progress\".",
+      "default": "Progress"
+    }
+  },
+  "variants": [
+    "orientation"
+  ],
+  "states": [
+    "default"
+  ],
+  "slots": [
+    "list",
+    "step",
+    "marker",
+    "connector",
+    "title",
+    "description"
+  ],
+  "tokens": [
+    "color.action.primary",
+    "color.action.on-primary",
+    "color.border.default",
+    "color.border.strong",
+    "color.surface.default",
+    "color.surface.subtle",
+    "color.text.default",
+    "color.text.muted"
+  ],
+  "a11y": {
+    "role": "list",
+    "keyboard": [],
+    "requirements": [
+      "An ordered list with an accessible name; each step is a list item",
+      "The current step has aria-current=\"step\"",
+      "Each step also says its state in words for screen readers (Completed, Current step, Not started), not only with an icon or color",
+      "Completed steps use a check icon, the current one a filled number, upcoming ones an outline: shapes differ, not only colors",
+      "Not interactive: if people can click a step, make it a link or button yourself"
+    ],
+    "screenReader": [
+      "Announced as a list with the number of steps",
+      "Each item reads its number, title and state, e.g. \"Step 2, Payment, current step\""
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "Checkouts, onboarding and wizards with a known number of steps",
+      "Telling people how much is left"
+    ],
+    "avoid_when": [
+      "Steps that can be done in any order: use a checklist",
+      "Navigating between pages: use Tabs or Breadcrumbs"
+    ],
+    "anti_patterns": [
+      "More than about six steps",
+      "Using color alone to show the current step",
+      "Making steps clickable without keyboard access"
+    ]
+  },
+  "examples": [
+    "horizontal",
+    "vertical",
+    "with-descriptions"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {
+      "orientation": "Orientation"
+    }
+  }
+}

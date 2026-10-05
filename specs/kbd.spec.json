@@ -1,0 +1,79 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Kbd",
+  "version": "0.1.0",
+  "category": "display",
+  "status": "experimental",
+  "description": "Shows a keyboard key or shortcut, like Ctrl or ⌘K, in a keycap style. Not interactive.",
+  "props": {
+    "children": {
+      "type": "node",
+      "description": "The key or keys, e.g. \"Esc\", \"⌘\" or \"Ctrl\". For a chord, use one Kbd per key.",
+      "required": true
+    },
+    "size": {
+      "type": "enum",
+      "values": [
+        "sm",
+        "md"
+      ],
+      "description": "Keycap size.",
+      "default": "md"
+    }
+  },
+  "variants": [
+    "size"
+  ],
+  "states": [
+    "default"
+  ],
+  "slots": [
+    "root"
+  ],
+  "tokens": [
+    "color.surface.subtle",
+    "color.border.default",
+    "color.border.strong",
+    "color.text.default",
+    "color.text.muted",
+    "radius.control"
+  ],
+  "a11y": {
+    "role": "text",
+    "keyboard": [],
+    "requirements": [
+      "Rendered with the kbd element, so assistive technology knows it is keyboard input",
+      "Symbols like ⌘ and ⌥ are not read consistently: write the key name in an aria-label or beside it when it matters",
+      "Text meets 4.5:1 against the keycap"
+    ],
+    "screenReader": [
+      "Read as inline text, e.g. \"Press Control K\""
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "Documenting shortcuts",
+      "Hints inside menus, tooltips and the command palette"
+    ],
+    "avoid_when": [
+      "Anything clickable: use a Button",
+      "Code: use a code element"
+    ],
+    "anti_patterns": [
+      "Showing only Mac symbols to everyone",
+      "Relying on the shortcut being visible as the only way to find a feature"
+    ]
+  },
+  "examples": [
+    "basic",
+    "chord",
+    "in-text"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {
+      "size": "Size"
+    }
+  }
+}

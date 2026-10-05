@@ -347,6 +347,124 @@ const blueprints: Record<string, Blueprint> = {
     return field("Quantity", c, [text("1", FONT[size] ?? 14, "color.text.default", "Regular", "fill"), text("−", 16, "color.text.muted"), text("+", 16, "color.text.muted")]);
   },
 
+  CommandPalette: () =>
+    frame({ name: "command palette", dir: "col", w: 560, fill: "color.surface.raised", stroke: "color.border.default", radius: "radius.overlay" }, [
+      frame({ name: "search", dir: "row", gap: 12, pad: [0, 16], h: 56, w: "fill", cross: "center" }, [
+        box(18, 18, { stroke: "color.text.muted", radius: 999, name: "search icon" }),
+        text("Search commands…", 16, "color.text.muted", "Regular", "fill"),
+        text("Esc", 12, "color.text.muted"),
+      ]),
+      box("fill", 1, { fill: "color.border.default", name: "divider" }),
+      frame({ name: "results", dir: "col", gap: 2, pad: 8, w: "fill" }, [
+        text("Go to", 11, "color.text.muted", "Semi Bold"),
+        frame({ name: "item selected", dir: "row", gap: 12, pad: [10, 12], w: "fill", cross: "center", fill: "color.surface.subtle", radius: "radius.control" }, [
+          text("Projects", 14, "color.text.default", "Regular", "fill"),
+          text("G P", 12, "color.text.muted"),
+        ]),
+        frame({ name: "item", dir: "row", gap: 12, pad: [10, 12], w: "fill", cross: "center", radius: "radius.control" }, [
+          text("Settings", 14, "color.text.default", "Regular", "fill"),
+          text("G S", 12, "color.text.muted"),
+        ]),
+      ]),
+    ]),
+
+  FileUpload: (c) =>
+    frame({ name: "file upload", dir: "col", gap: 8, w: 400, opacity: on(c, "isDisabled") ? 0.5 : undefined }, [
+      text("Attachments", 14, "color.text.default", "Medium"),
+      frame({ name: "dropzone", dir: "col", gap: 12, pad: 32, w: "fill", align: "center", cross: "center", fill: "color.surface.subtle", stroke: "color.border.strong", radius: "radius.overlay" }, [
+        box(44, 44, { fill: "color.surface.default", stroke: "color.border.default", radius: 999, name: "icon" }),
+        text("Drag files here, or", 14, "color.text.default"),
+        button("Browse files", "secondary", "sm"),
+      ]),
+      text("Up to 5 files, 5 MB each.", 12, "color.text.muted"),
+    ]),
+
+  TimeField: (c) => {
+    const size = c.size ?? "md";
+    return field("Start time", c, [text("09", FONT[size] ?? 14), text(":", FONT[size] ?? 14, "color.text.muted"), text("30", FONT[size] ?? 14), text("AM", FONT[size] ?? 14, "color.text.muted")]);
+  },
+
+  TagInput: (c) => {
+    const tag = (label: string) =>
+      frame({ name: "tag", dir: "row", gap: 4, pad: [2, 10], cross: "center", fill: "color.surface.subtle", stroke: "color.border.default", radius: 999 }, [
+        text(label, 14),
+        text("×", 14, "color.text.muted"),
+      ]);
+    return frame({ name: "tag input", dir: "col", gap: 6, w: 360, opacity: on(c, "isDisabled") ? 0.5 : undefined }, [
+      text("Keywords", 14, "color.text.default", "Medium"),
+      frame(
+        { name: "field", dir: "row", gap: 6, pad: 6, w: "fill", cross: "center", fill: "color.surface.default", stroke: on(c, "isInvalid") ? "color.feedback.danger" : "color.border.default", radius: "radius.control" },
+        [tag("design"), tag("accessibility"), text("Add a keyword", 14, "color.text.muted")],
+      ),
+      ...(on(c, "isInvalid") ? [text("Error message", 12, "color.feedback.danger")] : []),
+    ]);
+  },
+
+  Steps: (c) => {
+    const vertical = c.orientation === "vertical";
+    const marker = (n: string, state: "done" | "current" | "todo") =>
+      frame(
+        {
+          name: `step ${state}`,
+          dir: "row",
+          w: 28,
+          h: 28,
+          align: "center",
+          cross: "center",
+          fill: state === "done" ? "color.action.primary" : "color.surface.default",
+          stroke: state === "done" ? undefined : state === "current" ? "color.action.primary" : "color.border.strong",
+          radius: 999,
+        },
+        [text(state === "done" ? "✓" : n, 12, state === "done" ? "color.action.on-primary" : state === "current" ? "color.action.primary" : "color.text.muted", "Semi Bold")],
+      );
+    const step = (n: string, title: string, state: "done" | "current" | "todo") =>
+      frame({ name: "step", dir: vertical ? "row" : "col", gap: vertical ? 12 : 8, cross: "center" }, [
+        marker(n, state),
+        text(title, 14, state === "todo" ? "color.text.muted" : "color.text.default", "Medium"),
+      ]);
+    return frame({ name: "steps", dir: vertical ? "col" : "row", gap: vertical ? 20 : 48 }, [
+      step("1", "Cart", "done"),
+      step("2", "Payment", "current"),
+      step("3", "Review", "todo"),
+    ]);
+  },
+
+  Tree: (c) => {
+    const item = (label: string, depth: number, opts: { open?: boolean; selected?: boolean; parent?: boolean } = {}) =>
+      frame(
+        { name: "item", dir: "row", gap: 4, pad: [0, 8], h: 32, w: "fill", cross: "center", fill: opts.selected ? "color.surface.selected" : undefined, radius: "radius.control" },
+        [
+          box(depth * 18, 1, { name: "indent" }),
+          text(opts.parent ? (opts.open ? "⌄" : "›") : " ", 14, "color.text.muted"),
+          text(label, 14),
+        ],
+      );
+    return frame({ name: "tree", dir: "col", gap: 2, pad: 6, w: 280, fill: "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, [
+      item("src", 0, { parent: true, open: true }),
+      item("components", 1, { parent: true, open: true }),
+      item("button.tsx", 2, { selected: c.selectionMode !== undefined && c.selectionMode !== "none" }),
+      item("index.ts", 1),
+      item("package.json", 0),
+    ]);
+  },
+
+  EmptyState: (c) => {
+    const sm = c.size === "sm";
+    return frame({ name: "empty state", dir: "col", gap: sm ? 8 : 12, pad: sm ? [24, 16] : [48, 24], w: sm ? 288 : 448, align: "center", cross: "center", stroke: "color.border.default", radius: "radius.overlay" }, [
+      box(sm ? 40 : 48, sm ? 40 : 48, { fill: "color.surface.subtle", stroke: "color.border.default", radius: 999, name: "icon" }),
+      text("No projects yet", sm ? 14 : 16, "color.text.default", "Semi Bold"),
+      text("Create your first to get started.", 14, "color.text.muted"),
+      ...(sm ? [] : [button("Create project", "primary")]),
+    ]);
+  },
+
+  Kbd: (c) => {
+    const sm = c.size === "sm";
+    return frame({ name: "kbd", dir: "row", w: sm ? 20 : 24, h: sm ? 20 : 24, align: "center", cross: "center", fill: "color.surface.subtle", stroke: "color.border.default", radius: "radius.control" }, [
+      text("K", sm ? 11 : 12, "color.text.muted", "Medium"),
+    ]);
+  },
+
   RadioGroup: (c) => {
     const invalid = on(c, "isInvalid");
     const radio = (label: string, selected: boolean) =>

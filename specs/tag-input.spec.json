@@ -1,0 +1,140 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "TagInput",
+  "version": "0.1.0",
+  "category": "input",
+  "status": "experimental",
+  "description": "A text field that turns what you type into removable tags when you press Enter or comma: for keywords, recipients and labels.",
+  "props": {
+    "label": {
+      "type": "string",
+      "description": "Visible label, also the accessible name.",
+      "required": true
+    },
+    "description": {
+      "type": "string",
+      "description": "Help text, e.g. \"Press Enter or comma to add\"."
+    },
+    "errorMessage": {
+      "type": "string",
+      "description": "Shown when the field is invalid."
+    },
+    "value": {
+      "type": "custom",
+      "tsType": "readonly string[]",
+      "description": "Controlled list of tags."
+    },
+    "defaultValue": {
+      "type": "custom",
+      "tsType": "readonly string[]",
+      "description": "Initial tags when uncontrolled."
+    },
+    "onChange": {
+      "type": "callback",
+      "tsType": "(tags: string[]) => void",
+      "description": "Called with the full list whenever it changes."
+    },
+    "placeholder": {
+      "type": "string",
+      "description": "Hint shown while there are no tags."
+    },
+    "maxTags": {
+      "type": "number",
+      "description": "Most tags allowed. The input is disabled once reached."
+    },
+    "allowDuplicates": {
+      "type": "boolean",
+      "description": "Allow the same tag twice.",
+      "default": false
+    },
+    "isDisabled": {
+      "type": "boolean",
+      "description": "Prevents interaction and dims the field.",
+      "default": false
+    },
+    "isInvalid": {
+      "type": "boolean",
+      "description": "Marks the field invalid.",
+      "default": false
+    }
+  },
+  "variants": [
+    "isDisabled",
+    "isInvalid"
+  ],
+  "states": [
+    "default",
+    "hover",
+    "focus",
+    "disabled",
+    "invalid"
+  ],
+  "slots": [
+    "label",
+    "field",
+    "tag",
+    "remove",
+    "input",
+    "description",
+    "error"
+  ],
+  "tokens": [
+    "color.surface.default",
+    "color.surface.subtle",
+    "color.border.default",
+    "color.border.strong",
+    "color.text.default",
+    "color.text.muted",
+    "color.feedback.danger",
+    "color.focus.ring",
+    "radius.control"
+  ],
+  "a11y": {
+    "role": "group",
+    "keyboard": [
+      "Type, then Enter or comma to add a tag; pasting a comma-separated list adds each",
+      "Backspace in an empty input removes the last tag",
+      "Left arrow from the start of the input moves into the tags; arrows move between tags",
+      "Delete or Backspace on a focused tag removes it, and focus moves to a neighbour"
+    ],
+    "requirements": [
+      "The group is named by the label; tags are a list, each with a Remove button named after it",
+      "Every add and remove is announced in a live region, e.g. \"design added, 3 tags\"",
+      "Duplicates and the maximum are explained in text when refused",
+      "The input keeps its own accessible name and description"
+    ],
+    "screenReader": [
+      "The input is announced with the label and description, and how many tags there are",
+      "Adding announces the tag and the new count; removing announces what was removed",
+      "Refusing a duplicate or hitting the limit is announced with the reason"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "Free-form keywords, labels and email recipients",
+      "Lists the person builds by typing"
+    ],
+    "avoid_when": [
+      "Choosing from a fixed list: use Combobox or checkboxes",
+      "A single value: use TextField"
+    ],
+    "anti_patterns": [
+      "No visible way to remove a tag with a mouse",
+      "Silently dropping duplicates",
+      "Needing a comma to submit the last tag with no Enter"
+    ]
+  },
+  "examples": [
+    "basic",
+    "limits",
+    "invalid"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {
+      "isDisabled": "Disabled",
+      "isInvalid": "Invalid"
+    }
+  }
+}

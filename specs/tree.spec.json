@@ -1,0 +1,140 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Tree",
+  "version": "0.1.0",
+  "category": "data",
+  "status": "experimental",
+  "description": "An expandable hierarchy such as folders and files or a nested menu, with keyboard navigation and optional selection. Build it from nested TreeItem elements.",
+  "props": {
+    "label": {
+      "type": "string",
+      "description": "Accessible name of the tree, e.g. \"Files\".",
+      "required": true
+    },
+    "children": {
+      "type": "node",
+      "description": "TreeItem elements. Nest TreeItems inside a TreeItem to make children.",
+      "required": true
+    },
+    "selectionMode": {
+      "type": "enum",
+      "values": [
+        "none",
+        "single",
+        "multiple"
+      ],
+      "description": "Whether items can be selected.",
+      "default": "none"
+    },
+    "selectedKeys": {
+      "type": "custom",
+      "tsType": "\"all\" | Iterable<import(\"react-aria-components\").Key>",
+      "description": "Controlled selection, by item id."
+    },
+    "defaultSelectedKeys": {
+      "type": "custom",
+      "tsType": "\"all\" | Iterable<import(\"react-aria-components\").Key>",
+      "description": "Initial selection when uncontrolled."
+    },
+    "onSelectionChange": {
+      "type": "callback",
+      "tsType": "(keys: \"all\" | Set<import(\"react-aria-components\").Key>) => void",
+      "description": "Called with the selected item ids."
+    },
+    "expandedKeys": {
+      "type": "custom",
+      "tsType": "Iterable<import(\"react-aria-components\").Key>",
+      "description": "Controlled set of expanded items, by id."
+    },
+    "defaultExpandedKeys": {
+      "type": "custom",
+      "tsType": "Iterable<import(\"react-aria-components\").Key>",
+      "description": "Items expanded at first."
+    },
+    "onExpandedChange": {
+      "type": "callback",
+      "tsType": "(keys: Set<import(\"react-aria-components\").Key>) => void",
+      "description": "Called when items are expanded or collapsed."
+    },
+    "onAction": {
+      "type": "callback",
+      "tsType": "(key: import(\"react-aria-components\").Key) => void",
+      "description": "Called when an item is activated with Enter or a double-click."
+    }
+  },
+  "variants": [
+    "selectionMode"
+  ],
+  "states": [
+    "default",
+    "hover",
+    "focus",
+    "selected"
+  ],
+  "slots": [
+    "tree",
+    "item",
+    "chevron",
+    "label"
+  ],
+  "tokens": [
+    "color.surface.default",
+    "color.surface.subtle",
+    "color.surface.selected",
+    "color.border.default",
+    "color.text.default",
+    "color.text.muted",
+    "color.focus.ring",
+    "radius.control"
+  ],
+  "a11y": {
+    "role": "tree",
+    "keyboard": [
+      "Tab moves into the tree, on one item, and out again",
+      "Up and Down arrows move between visible items",
+      "Right arrow expands a collapsed item, or moves to its first child; Left arrow collapses, or moves to its parent",
+      "Home and End jump to the first and last visible item",
+      "Enter activates the item (onAction); Space selects it when selection is on",
+      "Typing a letter jumps to the next item starting with it"
+    ],
+    "requirements": [
+      "A named tree whose items expose aria-level, aria-expanded (when they have children) and aria-selected (when selectable)",
+      "Only one item is in the tab order at a time (roving tabindex)",
+      "The chevron is decorative for assistive technology: expanding is done from the keyboard and with the item itself",
+      "Selection is shown by a filled row and aria-selected, not only color"
+    ],
+    "screenReader": [
+      "Entering announces the tree name, the item, its level and position, and whether it is expanded",
+      "Expanding or collapsing announces the new state",
+      "Moving to a child announces its level"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "Folders and files, categories, outlines and settings groups",
+      "Navigation with more than one level"
+    ],
+    "avoid_when": [
+      "Flat lists: use ListBox or a menu",
+      "Tabular data with columns: use Table or DataGrid",
+      "Hierarchical rows with several columns of data: DataGrid tree data"
+    ],
+    "anti_patterns": [
+      "Trees deeper than four levels",
+      "Loading every branch up front when there are thousands",
+      "Using a tree for page navigation without links inside"
+    ]
+  },
+  "examples": [
+    "basic",
+    "selectable",
+    "controlled"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {
+      "selectionMode": "Selection"
+    }
+  }
+}

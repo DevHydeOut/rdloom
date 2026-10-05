@@ -127,7 +127,7 @@
       "cssVar": "--rd-color-feedback-danger-subtle",
       "type": "COLOR",
       "light": "#fef2f2",
-      "dark": "#450a0a"
+      "dark": "#2a1a1d"
     },
     {
       "name": "color/feedback/success-subtle",
@@ -135,7 +135,7 @@
       "cssVar": "--rd-color-feedback-success-subtle",
       "type": "COLOR",
       "light": "#f0fdf4",
-      "dark": "#052e16"
+      "dark": "#15271f"
     },
     {
       "name": "color/feedback/warning-subtle",
@@ -143,7 +143,7 @@
       "cssVar": "--rd-color-feedback-warning-subtle",
       "type": "COLOR",
       "light": "#fffbeb",
-      "dark": "#451a03"
+      "dark": "#2a2314"
     },
     {
       "name": "color/feedback/info-subtle",
@@ -151,7 +151,7 @@
       "cssVar": "--rd-color-feedback-info-subtle",
       "type": "COLOR",
       "light": "#eff6ff",
-      "dark": "#172554"
+      "dark": "#18202e"
     },
     {
       "name": "color/overlay/backdrop",
@@ -475,6 +475,13 @@
       ]
     },
     {
+      "name": "CommandPalette",
+      "id": "command-palette",
+      "version": "0.1.0",
+      "description": "A search box in a dialog that finds and runs commands, jumps to pages and triggers actions from the keyboard. Opens with Ctrl or Cmd + K. Use CommandGroup and CommandItem for the results.",
+      "properties": []
+    },
+    {
       "name": "DataGrid",
       "id": "data-grid",
       "version": "0.9.0",
@@ -598,6 +605,57 @@
             "alertdialog"
           ],
           "default": "dialog"
+        }
+      ]
+    },
+    {
+      "name": "EmptyState",
+      "id": "empty-state",
+      "version": "0.1.0",
+      "description": "What to show when a list, table or page has nothing in it yet: a short explanation and the next step.",
+      "properties": [
+        {
+          "prop": "size",
+          "name": "Size",
+          "values": [
+            "sm",
+            "md"
+          ],
+          "default": "md"
+        }
+      ]
+    },
+    {
+      "name": "FileUpload",
+      "id": "file-upload",
+      "version": "0.1.0",
+      "description": "A drop zone and button for choosing files, with type, size and count limits and a list of the chosen files you can remove from. The component picks the files; you upload them.",
+      "properties": [
+        {
+          "prop": "isDisabled",
+          "name": "Disabled",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
+      "name": "Kbd",
+      "id": "kbd",
+      "version": "0.1.0",
+      "description": "Shows a keyboard key or shortcut, like Ctrl or ⌘K, in a keycap style. Not interactive.",
+      "properties": [
+        {
+          "prop": "size",
+          "name": "Size",
+          "values": [
+            "sm",
+            "md"
+          ],
+          "default": "md"
         }
       ]
     },
@@ -907,6 +965,23 @@
       ]
     },
     {
+      "name": "Steps",
+      "id": "steps",
+      "version": "0.1.0",
+      "description": "Shows where someone is in a multi-step process, such as checkout or setup: done, current and upcoming steps. It displays progress; you control the steps and buttons.",
+      "properties": [
+        {
+          "prop": "orientation",
+          "name": "Orientation",
+          "values": [
+            "horizontal",
+            "vertical"
+          ],
+          "default": "horizontal"
+        }
+      ]
+    },
+    {
       "name": "Switch",
       "id": "switch",
       "version": "0.1.0",
@@ -987,6 +1062,32 @@
       ]
     },
     {
+      "name": "TagInput",
+      "id": "tag-input",
+      "version": "0.1.0",
+      "description": "A text field that turns what you type into removable tags when you press Enter or comma: for keywords, recipients and labels.",
+      "properties": [
+        {
+          "prop": "isDisabled",
+          "name": "Disabled",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        },
+        {
+          "prop": "isInvalid",
+          "name": "Invalid",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
       "name": "TextField",
       "id": "text-field",
       "version": "0.1.1",
@@ -1010,6 +1111,42 @@
             "true"
           ],
           "default": "false"
+        },
+        {
+          "prop": "isDisabled",
+          "name": "Disabled",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        },
+        {
+          "prop": "isInvalid",
+          "name": "Invalid",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
+      "name": "TimeField",
+      "id": "time-field",
+      "version": "0.1.0",
+      "description": "A field for a time of day, with separate hour, minute and (optional) second segments that follow the visitor's locale and 12 or 24 hour clock.",
+      "properties": [
+        {
+          "prop": "size",
+          "name": "Size",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "default": "md"
         },
         {
           "prop": "isDisabled",
@@ -1074,6 +1211,24 @@
             "true"
           ],
           "default": "true"
+        }
+      ]
+    },
+    {
+      "name": "Tree",
+      "id": "tree",
+      "version": "0.1.0",
+      "description": "An expandable hierarchy such as folders and files or a nested menu, with keyboard navigation and optional selection. Build it from nested TreeItem elements.",
+      "properties": [
+        {
+          "prop": "selectionMode",
+          "name": "Selection",
+          "values": [
+            "none",
+            "single",
+            "multiple"
+          ],
+          "default": "none"
         }
       ]
     }

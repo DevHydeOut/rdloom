@@ -14,25 +14,25 @@ export interface AlertProps
 
 const tones: Record<NonNullable<AlertSpecProps["variant"]>, { box: string; icon: string; Icon: typeof InfoIcon; say: string }> = {
   info: {
-    box: "bg-[var(--rd-color-feedback-info-subtle)] border-s-[var(--rd-color-feedback-info)]",
+    box: "bg-[var(--rd-color-feedback-info-subtle)] border-[color-mix(in_srgb,var(--rd-color-feedback-info)_32%,transparent)]",
     icon: "text-[var(--rd-color-feedback-info)]",
     Icon: InfoIcon,
     say: "Information",
   },
   success: {
-    box: "bg-[var(--rd-color-feedback-success-subtle)] border-s-[var(--rd-color-feedback-success)]",
+    box: "bg-[var(--rd-color-feedback-success-subtle)] border-[color-mix(in_srgb,var(--rd-color-feedback-success)_32%,transparent)]",
     icon: "text-[var(--rd-color-feedback-success)]",
     Icon: SuccessIcon,
     say: "Success",
   },
   warning: {
-    box: "bg-[var(--rd-color-feedback-warning-subtle)] border-s-[var(--rd-color-feedback-warning)]",
+    box: "bg-[var(--rd-color-feedback-warning-subtle)] border-[color-mix(in_srgb,var(--rd-color-feedback-warning)_32%,transparent)]",
     icon: "text-[var(--rd-color-feedback-warning)]",
     Icon: WarningIcon,
     say: "Warning",
   },
   danger: {
-    box: "bg-[var(--rd-color-feedback-danger-subtle)] border-s-[var(--rd-color-feedback-danger)]",
+    box: "bg-[var(--rd-color-feedback-danger-subtle)] border-[color-mix(in_srgb,var(--rd-color-feedback-danger)_32%,transparent)]",
     icon: "text-[var(--rd-color-feedback-danger)]",
     Icon: ErrorIcon,
     say: "Error",
@@ -61,8 +61,8 @@ export const Alert = forwardRef<HTMLDivElement, AlertProps>(function Alert(
       ref={ref}
       role={urgent ? "alert" : "status"}
       className={cx(
-        "flex items-start gap-3 rounded-[var(--rd-radius-overlay)] border border-s-4 border-[var(--rd-color-border-default)] p-3 " +
-          "text-sm text-[var(--rd-color-text-default)]",
+        "flex items-start gap-3 rounded-[var(--rd-radius-overlay)] border p-3.5 " +
+          "text-sm leading-relaxed text-[var(--rd-color-text-default)] shadow-[0_1px_2px_rgb(0_0_0/0.04)]",
         tone.box,
         className,
       )}

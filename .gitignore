@@ -18,3 +18,4 @@ packages/*/LICENSE
 
 # Local dev-server config, not part of the library
 .claude/
+.shots/

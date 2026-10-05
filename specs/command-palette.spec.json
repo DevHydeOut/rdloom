@@ -1,0 +1,131 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "CommandPalette",
+  "version": "0.1.0",
+  "category": "overlay",
+  "status": "experimental",
+  "description": "A search box in a dialog that finds and runs commands, jumps to pages and triggers actions from the keyboard. Opens with Ctrl or Cmd + K. Use CommandGroup and CommandItem for the results.",
+  "props": {
+    "label": {
+      "type": "string",
+      "description": "Accessible name of the dialog, e.g. \"Command palette\".",
+      "required": true
+    },
+    "children": {
+      "type": "node",
+      "description": "CommandGroup and CommandItem elements.",
+      "required": true
+    },
+    "isOpen": {
+      "type": "boolean",
+      "description": "Controlled open state."
+    },
+    "defaultOpen": {
+      "type": "boolean",
+      "description": "Initial state when uncontrolled.",
+      "default": false
+    },
+    "onOpenChange": {
+      "type": "callback",
+      "tsType": "(isOpen: boolean) => void",
+      "description": "Called when it opens or closes."
+    },
+    "placeholder": {
+      "type": "string",
+      "description": "Hint in the search box.",
+      "default": "Search commands…"
+    },
+    "emptyMessage": {
+      "type": "string",
+      "description": "Shown when nothing matches.",
+      "default": "No results found."
+    },
+    "shortcut": {
+      "type": "custom",
+      "tsType": "string | null",
+      "description": "Letter that opens it with Ctrl (Windows, Linux) or Cmd (Mac) held. Set null to turn the shortcut off and open it yourself.",
+      "default": "k"
+    },
+    "onAction": {
+      "type": "callback",
+      "tsType": "(key: import(\"react-aria-components\").Key) => void",
+      "description": "Called with the id of any command run, in addition to the command's own onAction."
+    }
+  },
+  "variants": [],
+  "states": [
+    "default",
+    "open"
+  ],
+  "slots": [
+    "overlay",
+    "dialog",
+    "input",
+    "list",
+    "group",
+    "item",
+    "shortcut",
+    "empty"
+  ],
+  "tokens": [
+    "color.surface.raised",
+    "color.surface.subtle",
+    "color.overlay.backdrop",
+    "color.border.default",
+    "color.text.default",
+    "color.text.muted",
+    "color.focus.ring",
+    "radius.overlay",
+    "radius.control"
+  ],
+  "a11y": {
+    "role": "dialog",
+    "keyboard": [
+      "Ctrl+K (Cmd+K on Mac) opens it, and closes it when open",
+      "Typing filters the commands as you type",
+      "Up and Down arrows move through the results; Home and End jump to the first and last",
+      "Enter runs the highlighted command and closes the palette",
+      "Esc closes it and returns focus to where you were"
+    ],
+    "requirements": [
+      "A modal dialog with an accessible name; focus moves into the search box when it opens and is restored on close",
+      "The search box stays focused while arrows move a highlight through the results (an active descendant), so typing never stops working",
+      "Groups have visible headings that are also read to screen readers",
+      "When nothing matches, the empty message is announced",
+      "Shortcut hints on commands are display only, read after the command name",
+      "The backdrop blur is decoration; the dialog meets 4.5:1 contrast without it"
+    ],
+    "screenReader": [
+      "Opening announces the dialog name and the search box",
+      "Moving through results announces each command with its group and position",
+      "Typing announces the number of results, or that there are none",
+      "Running a command closes the dialog and focus returns to the page"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "Apps with many actions or pages, where search is faster than menus",
+      "Power users who prefer the keyboard"
+    ],
+    "avoid_when": [
+      "A short list of actions: use Menu",
+      "Choosing a value for a form field: use Combobox",
+      "The only way to reach important features"
+    ],
+    "anti_patterns": [
+      "Hiding essential navigation behind it",
+      "Commands whose names are not words people would search for",
+      "Not telling people the shortcut exists"
+    ]
+  },
+  "examples": [
+    "basic",
+    "grouped",
+    "controlled"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {}
+  }
+}
