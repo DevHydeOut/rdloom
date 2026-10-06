@@ -18,9 +18,9 @@ export default function DashboardShellCollapsedExample() {
   const [collapsed, setCollapsed] = useState(true);
   const [current, setCurrent] = useState("home");
   return (
-    <div className="h-[28rem] w-full overflow-hidden rounded-xl border border-[var(--rd-color-border-default)]">
+    <div className="h-full w-full">
       <DashboardShell navigation={navigation} currentId={current} onNavigate={(item) => setCurrent(item.id)} isCollapsed={collapsed} onCollapsedChange={setCollapsed} brand="Acme Cloud">
-        <DashboardPage title="Home" description={collapsed ? "The sidebar is folded. Open it with the button at its top." : "The sidebar is open. Fold it with the button at its top."} />
+        <DashboardPage title="Home" description={collapsed ? "The sidebar is folded. Open it with the button in the top bar." : "The sidebar is open. Fold it with the button in the top bar."} />
       </DashboardShell>
     </div>
   );

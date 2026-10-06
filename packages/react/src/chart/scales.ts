@@ -52,3 +52,91 @@ export function sectorPath(cx: number, cy: number, outer: number, inner: number,
   const [x3, y3] = polar(cx, cy, inner, from);
   return `M${x0} ${y0}A${outer} ${outer} 0 ${large} 1 ${x1} ${y1}L${x2} ${y2}A${inner} ${inner} 0 ${large} 0 ${x3} ${y3}Z`;
 }
+
+export type Curve = "smooth" | "linear";
+export type Pt = readonly [number, number];
+
+const r3 = (v: number) => Number(v.toFixed(3));
+
+/** Rough width of text at a font size, from character classes. Good enough to keep labels apart. */
+export function textWidth(text: string, size = 12): number {
+  let units = 0;
+  for (const ch of text) {
+    if ("iljtf.,:;|!' ".includes(ch)) units += 0.3;
+    else if ("mwMW@%".includes(ch)) units += 0.85;
+    else if (/[A-Z0-9]/.test(ch)) units += 0.62;
+    else units += 0.54;
+  }
+  return units * size;
+}
+
+/** A straight-segment path through the points. Points that are not finite are skipped. */
+export function linearPath(points: readonly Pt[]): string {
+  const pts = points.filter(([px, py]) => Number.isFinite(px) && Number.isFinite(py));
+  return pts.map(([px, py], i) => `${i === 0 ? "M" : "L"}${r3(px)} ${r3(py)}`).join("");
+}
+
+/**
+ * A smooth path through the points using monotone cubic interpolation (Fritsch-Carlson). Between two
+ * points the curve never goes above the higher one or below the lower one, so it cannot invent a peak.
+ * The x values must increase.
+ */
+export function monotonePath(points: readonly Pt[]): string {
+  const pts = points.filter(([px, py]) => Number.isFinite(px) && Number.isFinite(py));
+  const n = pts.length;
+  if (n < 3) return linearPath(pts);
+  const dx: number[] = [];
+  const d: number[] = [];
+  for (let i = 0; i < n - 1; i++) {
+    dx[i] = pts[i + 1][0] - pts[i][0];
+    d[i] = dx[i] === 0 ? 0 : (pts[i + 1][1] - pts[i][1]) / dx[i];
+  }
+  const m: number[] = new Array(n).fill(0);
+  m[0] = d[0];
+  m[n - 1] = d[n - 2];
+  for (let i = 1; i < n - 1; i++) m[i] = d[i - 1] * d[i] <= 0 ? 0 : (d[i - 1] + d[i]) / 2;
+  for (let i = 0; i < n - 1; i++) {
+    if (d[i] === 0) {
+      m[i] = 0;
+      m[i + 1] = 0;
+      continue;
+    }
+    if (m[i] / d[i] < 0) m[i] = 0;
+    if (m[i + 1] / d[i] < 0) m[i + 1] = 0;
+    const a = m[i] / d[i];
+    const b = m[i + 1] / d[i];
+    const s = a * a + b * b;
+    if (s > 9) {
+      const t = 3 / Math.sqrt(s);
+      m[i] = t * a * d[i];
+      m[i + 1] = t * b * d[i];
+    }
+  }
+  let out = `M${r3(pts[0][0])} ${r3(pts[0][1])}`;
+  for (let i = 0; i < n - 1; i++) {
+    const [x0, y0] = pts[i];
+    const [x1, y1] = pts[i + 1];
+    const h = dx[i] / 3;
+    out += `C${r3(x0 + h)} ${r3(y0 + m[i] * h)} ${r3(x1 - h)} ${r3(y1 - m[i + 1] * h)} ${r3(x1)} ${r3(y1)}`;
+  }
+  return out;
+}
+
+export const curvePath = (points: readonly Pt[], curve: Curve = "smooth") => (curve === "linear" ? linearPath(points) : monotonePath(points));
+
+/** A closed shape between an upper and a lower edge, both drawn with the same curve. */
+export function areaPath(upper: readonly Pt[], lower: readonly Pt[], curve: Curve = "smooth"): string {
+  if (upper.length === 0) return "";
+  const top = curvePath(upper, curve);
+  const back = curvePath([...lower].reverse(), curve).replace(/^M/, "L");
+  return `${top}${back}Z`;
+}
+
+/** A bar with rounded corners on one side only: the top, the bottom, or none. */
+export function barPath(x: number, y: number, w: number, h: number, radius: number, round: "top" | "bottom" | "none" = "top"): string {
+  const r = round === "none" ? 0 : Math.max(0, Math.min(radius, w / 2, h));
+  const R = (v: number) => r3(v);
+  if (r === 0) return `M${R(x)} ${R(y)}h${R(w)}v${R(h)}h${R(-w)}Z`;
+  if (round === "top") return `M${R(x)} ${R(y + h)}V${R(y + r)}Q${R(x)} ${R(y)} ${R(x + r)} ${R(y)}H${R(x + w - r)}Q${R(x + w)} ${R(y)} ${R(x + w)} ${R(y + r)}V${R(y + h)}Z`;
+  return `M${R(x)} ${R(y)}H${R(x + w)}V${R(y + h - r)}Q${R(x + w)} ${R(y + h)} ${R(x + w - r)} ${R(y + h)}H${R(x + r)}Q${R(x)} ${R(y + h)} ${R(x)} ${R(y + h - r)}Z`;
+}

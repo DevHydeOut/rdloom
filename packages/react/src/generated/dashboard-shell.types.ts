@@ -18,6 +18,18 @@ export interface DashboardShellSpecProps {
    */
   brand?: ReactNode;
   /**
+   * The organisation or workspace shown at the top of the sidebar, with its logo and a second line such as the plan. Replaces brand there.
+   */
+  team?: import("../dashboard-shell/nav").ShellTeam;
+  /**
+   * Other workspaces to switch to. With two or more the team becomes a menu.
+   */
+  teams?: import("../dashboard-shell/nav").ShellTeam[];
+  /**
+   * Called with the workspace the person chose.
+   */
+  onTeamChange?: (team: import("../dashboard-shell/nav").ShellTeam) => void;
+  /**
    * The signed-in person: shown at the bottom of the sidebar with an account menu.
    */
   user?: import("../dashboard-shell/nav").ShellUser;

@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { renderToString } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { Chart } from "../src/chart/chart";
-import { niceRange, percentages } from "../src/chart/scales";
+import { areaPath, barPath, linearPath, monotonePath, niceRange, percentages, textWidth } from "../src/chart/scales";
 import { axeViolations } from "./axe";
 
 const data = {
@@ -48,10 +48,10 @@ describe("Chart marks", () => {
   it("stacks bars so the top edge is the total", () => {
     const { container } = render(<Chart title="T" stacked data={data} height={300} />);
     const bars = [...marks(container, "bar")];
-    const first = bars[0].getAttribute("y")!;
-    const second = bars[3].getAttribute("y")!;
-    const h1 = Number(bars[0].getAttribute("height"));
-    const h2 = Number(bars[3].getAttribute("height"));
+    const first = bars[0].getAttribute("data-y")!;
+    const second = bars[3].getAttribute("data-y")!;
+    const h1 = Number(bars[0].getAttribute("data-height"));
+    const h2 = Number(bars[3].getAttribute("data-height"));
     expect(Number(second) + h2).toBeCloseTo(Number(first), 5);
     expect(h1).toBeGreaterThan(h2 * 0 + 0);
     expect(container.querySelectorAll('[data-label="total"]')).toHaveLength(3);
@@ -61,8 +61,8 @@ describe("Chart marks", () => {
   it("draws negative values below the zero line", () => {
     const { container } = render(<Chart title="T" data={{ labels: ["A", "B"], series: [{ name: "Net", values: [40, -20] }] }} />);
     const [up, down] = [...marks(container, "bar")];
-    expect(Number(up.getAttribute("y")) + Number(up.getAttribute("height"))).toBeCloseTo(Number(down.getAttribute("y")), 5);
-    expect(Number(down.getAttribute("height"))).toBeGreaterThan(0);
+    expect(Number(up.getAttribute("data-y")) + Number(up.getAttribute("data-height"))).toBeCloseTo(Number(down.getAttribute("data-y")), 5);
+    expect(Number(down.getAttribute("data-height"))).toBeGreaterThan(0);
     const ticks = [...container.querySelectorAll('[data-axis="y"]')].map((t) => t.textContent);
     expect(ticks.some((t) => t!.includes("-") || t!.includes("−"))).toBe(true);
   });
@@ -413,6 +413,166 @@ describe("Chart accessibility", () => {
 
   it("has no axe violations when stacked", async () => {
     const { container } = render(<Chart title="T" stacked data={data} />);
+    expect(await axeViolations(container)).toEqual([]);
+  });
+});
+
+function curveYs(path: string) {
+  return [...path.matchAll(/C([-\d.]+) ([-\d.]+) ([-\d.]+) ([-\d.]+) ([-\d.]+) ([-\d.]+)/g)].map((m) => m.slice(1).map(Number));
+}
+
+describe("monotonePath", () => {
+  const sets: number[][] = [
+    [0, 10, 0, 10, 0],
+    [1, 2, 3, 4, 5],
+    [5, 5, 5, 5],
+    [0, 0, 100, 0, 0],
+    [3, 9, 9.5, 40, 41, 2, 80],
+    [10, 0, 0, 10],
+    Array.from({ length: 40 }, (_, i) => Math.round(50 + 40 * Math.sin(i / 3) * Math.cos(i / 7) + (i % 5) * 3)),
+  ];
+  it.each(sets.map((s, i) => [i, s] as const))("never overshoots data set %i", (_, values) => {
+    const pts = values.map((v, i) => [i * 20, 200 - v] as const);
+    const segs = curveYs(monotonePath(pts));
+    expect(segs).toHaveLength(values.length - 1);
+    segs.forEach(([, c1, , c2, , y1], i) => {
+      const lo = Math.min(pts[i][1], pts[i + 1][1]) - 0.01;
+      const hi = Math.max(pts[i][1], pts[i + 1][1]) + 0.01;
+      for (const v of [c1, c2, y1]) {
+        expect(v).toBeGreaterThanOrEqual(lo);
+        expect(v).toBeLessThanOrEqual(hi);
+      }
+    });
+  });
+
+  it("starts at the first point and ends at the last", () => {
+    const path = monotonePath([[0, 5], [10, 20], [20, 8], [30, 9]]);
+    expect(path.startsWith("M0 5")).toBe(true);
+    expect(path.endsWith("30 9")).toBe(true);
+  });
+
+  it("handles 0, 1, 2 and 3 points", () => {
+    expect(monotonePath([])).toBe("");
+    expect(monotonePath([[1, 2]])).toBe("M1 2");
+    expect(monotonePath([[0, 0], [10, 5]])).toBe("M0 0L10 5");
+    expect(monotonePath([[0, 0], [10, 5], [20, 0]])).toContain("C");
+  });
+
+  it("skips points that are not finite and never writes NaN", () => {
+    const path = monotonePath([[0, 1], [10, Number.NaN], [20, 3], [30, 2]]);
+    expect(path).not.toContain("NaN");
+    expect(path.startsWith("M0 1")).toBe(true);
+  });
+
+  it("linear fallback uses straight segments", () => {
+    expect(linearPath([[0, 0], [10, 5], [20, 1]])).toBe("M0 0L10 5L20 1");
+    expect(areaPath([[0, 5], [10, 2]], [[0, 10], [10, 10]], "linear")).toBe("M0 5L10 2L10 10L0 10Z");
+  });
+
+  it("rounds only the chosen end of a bar", () => {
+    expect(barPath(0, 0, 10, 20, 4, "top")).toContain("Q");
+    expect(barPath(0, 0, 10, 20, 4, "none")).not.toContain("Q");
+    expect(barPath(0, 0, 10, 2, 4, "top")).not.toContain("NaN");
+  });
+
+  it("measures wide text as wider than narrow text", () => {
+    expect(textWidth("MMMM")).toBeGreaterThan(textWidth("iiii"));
+  });
+});
+
+describe("Chart curves and gradients", () => {
+  it("draws smooth curves by default and straight segments when asked", () => {
+    const { container, rerender } = render(<Chart title="T" type="line" data={data} />);
+    expect(marks(container, "line")[0].getAttribute("d")).toContain("C");
+    rerender(<Chart title="T" type="line" curve="linear" data={data} />);
+    expect(marks(container, "line")[0].getAttribute("d")).not.toContain("C");
+  });
+
+  it("fills an area with a gradient defined under a safe id", () => {
+    const { container } = render(<Chart title="T" type="area" data={data} />);
+    const fill = marks(container, "area")[0].getAttribute("fill")!;
+    const id = fill.match(/^url\(#([A-Za-z0-9_-]+)\)$/)![1];
+    const gradient = container.querySelector(`linearGradient[id="${id}"]`)!;
+    expect(gradient).not.toBeNull();
+    const stops = gradient.querySelectorAll("stop");
+    expect(stops).toHaveLength(2);
+    expect(stops[0]).toHaveAttribute("stop-opacity", "0.32");
+    expect(stops[1]).toHaveAttribute("stop-opacity", "0.02");
+  });
+
+  it("gives each stacked area its own gradient", () => {
+    const { container } = render(<Chart title="T" type="area" stacked data={data} />);
+    const fills = [...marks(container, "area")].map((a) => a.getAttribute("fill"));
+    expect(new Set(fills).size).toBe(2);
+    expect(container.querySelectorAll("linearGradient")).toHaveLength(2);
+  });
+
+  it("has no dots for long lines, and a ring on the active point", () => {
+    const labels = Array.from({ length: 40 }, (_, i) => `D${i}`);
+    const { container } = render(<Chart title="T" type="line" data={{ labels, series: [{ name: "V", values: labels.map((_, i) => i) }] }} />);
+    expect(marks(container, "point")).toHaveLength(0);
+    fireEvent.mouseMove(plot(), { clientX: 300, clientY: 60 });
+    expect(marks(container, "point")).toHaveLength(1);
+    expect(marks(container, "guide")).toHaveLength(1);
+  });
+
+  it("rounds the top of bars", () => {
+    const { container } = render(<Chart title="T" data={data} />);
+    expect(marks(container, "bar")[0].getAttribute("d")).toContain("Q");
+  });
+
+  it("highlights the hovered bar band with the subtle surface", () => {
+    const { container } = render(<Chart title="T" data={data} />);
+    fireEvent.mouseMove(plot(), { clientX: 330, clientY: 60 });
+    expect(marks(container, "highlight")[0]).toHaveAttribute("fill", "var(--rd-color-surface-subtle)");
+  });
+
+  it("draws a dashed grid", () => {
+    const { container } = render(<Chart title="T" data={data} />);
+    expect(container.querySelectorAll("line[stroke-dasharray]").length).toBeGreaterThan(0);
+  });
+});
+
+describe("Chart header", () => {
+  it("shows a description and keeps the summary for assistive technology", () => {
+    render(<Chart title="T" description="Last 3 months" summary="Up a lot." data={data} />);
+    expect(screen.getByText("Last 3 months")).not.toHaveClass("sr-only");
+    expect(screen.getByText("Up a lot.")).toHaveClass("sr-only");
+    expect(document.getElementById(plot().getAttribute("aria-describedby")!)).toHaveTextContent("Up a lot.");
+  });
+
+  it("shows the summary when there is no description", () => {
+    render(<Chart title="T" summary="Up a lot." data={data} />);
+    expect(screen.getByText("Up a lot.")).not.toHaveClass("sr-only");
+  });
+
+  it("renders actions next to the table switch in a wrapping container", () => {
+    const { container } = render(<Chart title="T" actions={<button type="button">Last 7 days</button>} data={data} />);
+    const actions = container.querySelector<HTMLElement>('[data-slot="actions"]')!;
+    expect(actions.className).toContain("flex-wrap");
+    expect(within(actions).getByRole("button", { name: "Last 7 days" })).toBeInTheDocument();
+    expect(within(actions).getByRole("button", { name: "View as table" })).toBeInTheDocument();
+    expect(container.querySelector("figcaption")!.className).toContain("flex-col");
+  });
+
+  it("keeps actions while loading", () => {
+    render(<Chart title="T" isLoading actions={<button type="button">Filter</button>} data={data} />);
+    expect(screen.getByRole("button", { name: "Filter" })).toBeInTheDocument();
+  });
+
+  it("uses the numeric font variable with tabular numbers for numbers", () => {
+    const { container } = render(<Chart title="T" data={data} />);
+    const axis = container.querySelector('[data-axis="y"]')!;
+    expect(axis.getAttribute("class")).toContain("[font-family:var(--rd-font-numeric,inherit)]");
+    expect(axis.getAttribute("class")).toContain("tabular-nums");
+    fireEvent.mouseMove(plot(), { clientX: 330, clientY: 60 });
+    expect(container.querySelector('[data-slot="tooltip"]')!.innerHTML).toContain("[font-family:var(--rd-font-numeric,inherit)]");
+    const d = render(<Chart title="T" type="donut" data={one} />);
+    expect(d.container.querySelector("[data-total]")!.getAttribute("class")).toContain("tabular-nums");
+  });
+
+  it("has no axe violations with a description and actions", async () => {
+    const { container } = render(<Chart title="T" type="area" description="Desc" actions={<button type="button">Range</button>} data={data} />);
     expect(await axeViolations(container)).toEqual([]);
   });
 });

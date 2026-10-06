@@ -212,3 +212,46 @@ describe("Sparkline: area, extremes and average", () => {
     expect(container.querySelector("svg")).toHaveAttribute("aria-hidden", "true");
   });
 });
+
+describe("Stat: the card look", () => {
+  const reading = (c: HTMLElement) => c.querySelector(".sr-only")!.textContent ?? "";
+
+  it("puts the trend pill at the top right, the number big, then a headline and a note", () => {
+    const { container } = render(<Stat variant="card" label="Total revenue" value="$1,250.00" trend={{ change: 12.5 }} summary="Trending up this month" description="Visitors for the last 6 months" />);
+    const card = container.firstElementChild as HTMLElement;
+    expect(card.className).toContain("rounded-2xl");
+    const visible = [...card.querySelectorAll("[aria-hidden=true]")].map((n) => n.textContent);
+    expect(visible.some((t) => t?.includes("Total revenue") && t.includes("+12.5%"))).toBe(true);
+    expect(visible).toContain("Trending up this month");
+    expect(visible).toContain("Visitors for the last 6 months");
+  });
+
+  it("reads as one sentence, with the headline included, and says the direction in words", () => {
+    const { container } = render(<Stat variant="card" label="New customers" value={1234} trend={{ change: -20 }} summary="Down 20% this period" description="Acquisition needs attention" />);
+    expect(reading(container)).toBe("New customers: 1,234. Down 20%. Down 20% this period. Acquisition needs attention");
+  });
+
+  it("uses a neutral bordered pill: the arrow's shape tells the direction, not a color", () => {
+    const up = render(<Stat variant="card" label="A" value={1} trend={{ change: 5 }} />);
+    const down = render(<Stat variant="card" label="B" value={1} trend={{ change: -5 }} />);
+    const pill = (c: HTMLElement) => c.querySelector("span.rounded-full")!;
+    expect(pill(up.container).className).not.toMatch(/success-subtle|danger-subtle/);
+    expect(pill(up.container).querySelector("svg")!.innerHTML).not.toBe(pill(down.container).querySelector("svg")!.innerHTML);
+  });
+
+  it("keeps its frame while loading", () => {
+    const { container } = render(<Stat variant="card" label="Revenue" value={1} isLoading />);
+    expect((container.firstElementChild as HTMLElement).className).toContain("rounded-2xl");
+    expect(container.firstElementChild).toHaveAttribute("aria-busy", "true");
+  });
+
+  it("sets big numbers in the numeric font when the page offers one, and inherits otherwise", () => {
+    const { container } = render(<Stat label="Revenue" value="$48,200" />);
+    expect(container.innerHTML).toContain("font-family:var(--rd-font-numeric,inherit)");
+  });
+
+  it("has no axe violations", async () => {
+    const { container } = render(<Stat variant="card" label="Revenue" value="$1" trend={{ change: 3 }} summary="Up" description="d" data={[1, 2, 3]} />);
+    expect(await axeViolations(container)).toEqual([]);
+  });
+});

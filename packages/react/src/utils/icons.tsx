@@ -120,6 +120,30 @@ export function ArrowDownIcon({ className = "size-4 shrink-0", strokeWidth }: Ic
   );
 }
 
+export function TrendUpIcon({ className = "size-4 shrink-0", strokeWidth }: IconProps) {
+  return (
+    <Icon className={className} strokeWidth={strokeWidth}>
+      <P d="M2 11.5l4-4 2.5 2.5L14 4.5M10 4.5h4v4" />
+    </Icon>
+  );
+}
+
+export function TrendDownIcon({ className = "size-4 shrink-0", strokeWidth }: IconProps) {
+  return (
+    <Icon className={className} strokeWidth={strokeWidth}>
+      <P d="M2 4.5l4 4 2.5-2.5L14 11.5M10 11.5h4v-4" />
+    </Icon>
+  );
+}
+
+export function ChevronsUpDownIcon({ className = "size-4 shrink-0", strokeWidth }: IconProps) {
+  return (
+    <Icon className={className} strokeWidth={strokeWidth}>
+      <P d="M5 6l3-3 3 3M5 10l3 3 3-3" />
+    </Icon>
+  );
+}
+
 // --- Things
 
 export function SearchIcon({ className = "size-5 shrink-0", strokeWidth }: IconProps) {

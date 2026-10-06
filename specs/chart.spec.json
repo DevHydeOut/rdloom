@@ -21,6 +21,20 @@
       "type": "string",
       "description": "A sentence that tells the story of the chart. Defaults to a sentence written from the data."
     },
+    "description": {
+      "type": "string",
+      "description": "A line of muted text under the title. When given it is shown instead of the visible summary, which stays available to assistive technology."
+    },
+    "actions": {
+      "type": "node",
+      "description": "Controls placed at the right of the header, for example a SegmentedControl that switches the time range. They wrap under the title on narrow widths."
+    },
+    "curve": {
+      "type": "enum",
+      "description": "How a line or area joins its points: a smooth curve that never overshoots the data, or straight segments. Ignored for bar and donut.",
+      "values": ["smooth", "linear"],
+      "default": "smooth"
+    },
     "type": {
       "type": "enum",
       "description": "Bars, a line, a filled area or a donut.",
@@ -70,7 +84,7 @@
   },
   "variants": ["type"],
   "states": ["default", "focus", "loading"],
-  "slots": ["root", "title", "summary", "plot", "axis", "grid", "legend", "tooltip", "table"],
+  "slots": ["root", "title", "description", "actions", "summary", "plot", "axis", "grid", "legend", "tooltip", "table"],
   "tokens": [
     "color.text.default",
     "color.text.muted",
@@ -83,6 +97,7 @@
     "color.border.default",
     "color.border.strong",
     "color.surface.default",
+    "color.surface.subtle",
     "color.surface.raised",
     "color.focus.ring",
     "radius.control",
@@ -134,7 +149,7 @@
       "Hard-coding series colors instead of the chart color tokens"
     ]
   },
-  "examples": ["bar", "stacked", "line", "area", "donut", "interactive", "loading-and-empty"],
+  "examples": ["bar", "stacked", "line", "area", "donut", "interactive", "with-filters", "loading-and-empty"],
   "figma": {
     "componentKey": null,
     "variantMap": {

@@ -8,8 +8,8 @@ import { Menu, MenuItem, MenuTrigger } from "../menu/menu";
 import { Sheet } from "../sheet/sheet";
 import { Tooltip, TooltipTrigger } from "../tooltip/tooltip";
 import { cx } from "../utils/cx";
-import { ChevronDownIcon, MenuIcon, SearchIcon, SidebarIcon } from "../utils/icons";
-import { badgeText, currentTopLevel, initialOf, type NavGroup, type NavItem, type ShellUser } from "./nav";
+import { ChevronDownIcon, ChevronsUpDownIcon, MenuIcon, SearchIcon, SidebarIcon } from "../utils/icons";
+import { badgeText, currentTopLevel, initialOf, type NavGroup, type NavItem, type ShellTeam, type ShellUser } from "./nav";
 
 export interface DashboardShellProps extends DashboardShellSpecProps {
   className?: string;
@@ -171,6 +171,49 @@ function NavList(props: NavProps) {
   );
 }
 
+function TeamLogo({ team }: { team: ShellTeam }) {
+  return (
+    <span aria-hidden="true" className="flex size-8 shrink-0 items-center justify-center rounded-[var(--rd-radius-control)] bg-[var(--rd-color-text-default)] text-sm font-semibold text-[var(--rd-color-surface-default)]">
+      {team.logo ?? initialOf(team.name)}
+    </span>
+  );
+}
+
+/** The name of the organisation or workspace at the top of the sidebar. With several to choose from it is a menu. */
+function TeamSwitcher({ team, teams, onSelect, collapsed }: { team: ShellTeam; teams?: ShellTeam[]; onSelect?: (team: ShellTeam) => void; collapsed: boolean }) {
+  const body = (
+    <>
+      <TeamLogo team={team} />
+      {!collapsed && (
+        <span className="flex min-w-0 flex-1 flex-col text-start leading-tight">
+          <span className="truncate text-sm font-semibold text-[var(--rd-color-text-default)]">{team.name}</span>
+          {team.description && <span className="truncate text-xs text-[var(--rd-color-text-muted)]">{team.description}</span>}
+        </span>
+      )}
+      {!collapsed && teams && teams.length > 1 && <ChevronsUpDownIcon className="size-4 shrink-0 text-[var(--rd-color-text-muted)]" />}
+    </>
+  );
+  const classes = cx(
+    "flex w-full items-center gap-2.5 rounded-[var(--rd-radius-control)] p-1.5 outline-none data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)]",
+    collapsed && "justify-center",
+  );
+  if (!teams || teams.length < 2) return <div className={classes}>{body}</div>;
+  return (
+    <MenuTrigger>
+      <AriaButton aria-label={`Switch workspace, current: ${team.name}`} className={cx(classes, "data-[hovered]:bg-[var(--rd-color-surface-subtle)]")}>
+        {body}
+      </AriaButton>
+      <Menu placement="bottom start" aria-label="Workspaces">
+        {teams.map((t) => (
+          <MenuItem key={t.id ?? t.name} id={t.id ?? t.name} textValue={t.name} onAction={() => onSelect?.(t)}>
+            {t.name}
+          </MenuItem>
+        ))}
+      </Menu>
+    </MenuTrigger>
+  );
+}
+
 function AccountMenu({ user, collapsed }: { user: ShellUser; collapsed: boolean }) {
   const trigger = (
     <AriaButton
@@ -219,6 +262,9 @@ export const DashboardShell = forwardRef<HTMLDivElement, DashboardShellProps>(fu
     navigation,
     currentId,
     brand,
+    team,
+    teams,
+    onTeamChange,
     user,
     header,
     actions,
@@ -288,16 +334,12 @@ export const DashboardShell = forwardRef<HTMLDivElement, DashboardShellProps>(fu
           collapsed ? "w-[4.5rem]" : "w-64",
         )}
       >
-        <div className={cx("flex h-14 shrink-0 items-center gap-2 px-4", collapsed && "justify-center px-0")}>
-          {!collapsed && <div className="min-w-0 flex-1 truncate text-[15px] font-semibold">{brand}</div>}
-          <AriaButton
-            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-            aria-expanded={!collapsed}
-            onPress={() => setCollapsed(!collapsed)}
-            className="flex size-8 shrink-0 items-center justify-center rounded-[var(--rd-radius-control)] text-[var(--rd-color-text-muted)] outline-none data-[hovered]:bg-[var(--rd-color-surface-subtle)] data-[hovered]:text-[var(--rd-color-text-default)] data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)]"
-          >
-            <SidebarIcon className="size-[18px]" />
-          </AriaButton>
+        <div className={cx("flex h-14 shrink-0 items-center px-3", collapsed && "justify-center")}>
+          {team ? (
+            <TeamSwitcher team={team} teams={teams} onSelect={onTeamChange} collapsed={collapsed} />
+          ) : (
+            !collapsed && <div className="min-w-0 flex-1 truncate px-1 text-[15px] font-semibold">{brand}</div>
+          )}
         </div>
         <NavList {...nav} collapsed={collapsed} onExpand={() => setCollapsed(false)} />
         {user && <AccountMenu user={user} collapsed={collapsed} />}
@@ -323,6 +365,18 @@ export const DashboardShell = forwardRef<HTMLDivElement, DashboardShellProps>(fu
                 )}
               </Sheet>
             </DialogTrigger>
+          </div>
+          {/* Fold or open the sidebar from the top bar, next to what you are looking at. */}
+          <div className="hidden items-center gap-3 md:flex group-data-[compact]/shell:!hidden">
+            <AriaButton
+              aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+              aria-expanded={!collapsed}
+              onPress={() => setCollapsed(!collapsed)}
+              className="flex size-8 shrink-0 items-center justify-center rounded-[var(--rd-radius-control)] text-[var(--rd-color-text-muted)] outline-none data-[hovered]:bg-[var(--rd-color-surface-subtle)] data-[hovered]:text-[var(--rd-color-text-default)] data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)]"
+            >
+              <SidebarIcon className="size-[18px]" />
+            </AriaButton>
+            <span aria-hidden="true" className="h-4 w-px bg-[var(--rd-color-border-default)]" />
           </div>
           <div className="flex min-w-0 flex-1 items-center">{header}</div>
           {onSearch && (

@@ -2,7 +2,6 @@
 
 import { forwardRef, useId } from "react";
 import { dashboardPageDefaults, type DashboardPageSpecProps } from "../generated/dashboard-page.types";
-import { Card } from "../card/card";
 import { Stat } from "../stat/stat";
 import { cx } from "../utils/cx";
 
@@ -35,12 +34,10 @@ export const DashboardPage = forwardRef<HTMLDivElement, DashboardPageProps>(func
           <h2 id={statsId} className="sr-only">
             Key numbers
           </h2>
-          {/* Columns that share the space equally: a long number can't widen one and push the rest off screen. */}
-          <div className="grid grid-cols-[repeat(2,minmax(0,1fr))] gap-4 lg:grid-cols-[repeat(4,minmax(0,1fr))]">
+          {/* As many columns as fit, each at least 10rem: four across on a wide page, two on a tablet or a phone. They follow the space the page has, not the screen. */}
+          <div className="grid grid-cols-[repeat(auto-fit,minmax(min(10rem,100%),1fr))] gap-4">
             {stats.map((s) => (
-              <Card key={s.label} padding="md">
-                <Stat label={s.label} value={s.value} trend={s.trend} data={s.data} description={s.description} size="sm" isLoading={isLoading} />
-              </Card>
+              <Stat key={s.label} variant="card" label={s.label} value={s.value} trend={s.trend} data={s.data} description={s.description} summary={s.summary} isLoading={isLoading} />
             ))}
           </div>
         </section>

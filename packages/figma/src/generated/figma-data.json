@@ -1439,6 +1439,15 @@
       "description": "A key number with its label and context: a value, an optional change over time and an optional small trend graphic. Unframed: place it in a Card or a grid.",
       "properties": [
         {
+          "prop": "variant",
+          "name": "Variant",
+          "values": [
+            "plain",
+            "card"
+          ],
+          "default": "plain"
+        },
+        {
           "prop": "size",
           "name": "Size",
           "values": [

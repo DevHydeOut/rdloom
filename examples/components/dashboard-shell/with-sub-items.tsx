@@ -27,8 +27,8 @@ const navigation: NavGroup[] = [
 export default function DashboardShellWithSubItemsExample() {
   const [current, setCurrent] = useState("retention");
   return (
-    <div className="h-[32rem] w-full overflow-hidden rounded-xl border border-[var(--rd-color-border-default)]">
-      <DashboardShell navigation={navigation} currentId={current} onNavigate={(item) => setCurrent(item.id)} brand="Acme Cloud">
+    <div className="h-full w-full">
+      <DashboardShell navigation={navigation} currentId={current} onNavigate={(item) => setCurrent(item.id)} brand="Acme Cloud" team={{ name: "Acme Cloud", description: "Pro plan" }}>
         <DashboardPage title={findNavItem(navigation, current)?.label ?? "Home"} description="The sidebar marks the page you are on, and opens the list that holds it." />
       </DashboardShell>
     </div>

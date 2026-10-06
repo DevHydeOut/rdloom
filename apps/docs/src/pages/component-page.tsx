@@ -406,6 +406,8 @@ function BlockExample({ component, example }: { component: DocComponent; example
   const [size, setSize] = useState<"desktop" | "tablet" | "phone">("desktop");
   const [view, setView] = useState<"preview" | "code">("preview");
   const widths = { desktop: "max-w-full", tablet: "max-w-[768px]", phone: "max-w-[390px]" } as const;
+  // Blocks that are a whole application screen fill a frame; the rest take the height of their content.
+  const tall = component.id === "dashboard-shell";
   const seg = (active: boolean) =>
     `h-7 rounded-md px-2.5 text-xs font-medium outline-none transition-colors focus-visible:ring-2 focus-visible:ring-[var(--rd-color-focus-ring)] ${active ? "bg-[var(--site-bg)] text-[var(--site-fg)] shadow-sm" : "text-[var(--site-muted)] hover:text-[var(--site-fg)]"}`;
   return (
@@ -444,8 +446,13 @@ function BlockExample({ component, example }: { component: DocComponent; example
           </a>
         </div>
         {view === "preview" ? (
-          <div data-block-preview className="bg-[var(--site-subtle)] p-3 sm:p-6">
-            <div className={`mx-auto w-full transition-[max-width] duration-300 motion-reduce:transition-none ${widths[size]}`}>
+          <div data-block-preview className={`bg-[var(--site-subtle)] ${tall && size === "desktop" ? "p-0" : "p-3 sm:p-6"}`}>
+            {/* A whole screen gets a tall frame (nearly the height of a laptop screen), so you see the real layout and scroll inside it. */}
+            <div
+              className={`mx-auto w-full overflow-hidden transition-[max-width] duration-300 motion-reduce:transition-none ${widths[size]} ${
+                tall ? `h-[min(52rem,calc(100dvh-8rem))] min-h-[32rem] bg-[var(--rd-color-surface-default)] ${size === "desktop" ? "" : "rounded-xl border border-[var(--site-border)]"}` : ""
+              }`}
+            >
               <Live component={component} example={example} />
             </div>
           </div>

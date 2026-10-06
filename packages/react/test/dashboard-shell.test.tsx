@@ -218,6 +218,28 @@ describe("DashboardShell", () => {
     expect(screen.getByRole("button", { name: "Create" })).toBeInTheDocument();
   });
 
+  it("shows the workspace at the top, and lets you switch when there are several", async () => {
+    const onTeamChange = vi.fn();
+    const teams = [{ id: "a", name: "Acme Inc", description: "Enterprise" }, { id: "b", name: "Monsters Ltd" }];
+    shell({ team: teams[0], teams, onTeamChange });
+    const trigger = screen.getAllByRole("button", { name: "Switch workspace, current: Acme Inc" })[0];
+    expect(trigger).toHaveTextContent("Enterprise");
+    await userEvent.click(trigger);
+    await userEvent.click(await screen.findByRole("menuitem", { name: "Monsters Ltd" }));
+    expect(onTeamChange).toHaveBeenCalledWith(teams[1]);
+  });
+
+  it("shows a single workspace as plain text, and a letter when it has no logo", () => {
+    shell({ team: { name: "Acme Inc", description: "Free" } });
+    expect(screen.queryByRole("button", { name: /Switch workspace/ })).toBeNull();
+    expect(screen.getAllByText("Acme Inc").length).toBeGreaterThan(0);
+  });
+
+  it("puts the fold button in the top bar", () => {
+    shell();
+    expect(within(screen.getByRole("banner")).getByRole("button", { name: "Collapse sidebar" })).toBeInTheDocument();
+  });
+
   it("has the same navigation as a slide-in menu, which closes when you choose something", async () => {
     const onNavigate = vi.fn();
     shell({ onNavigate });

@@ -31,6 +31,16 @@ export interface ShellUser {
   menu?: Array<{ id: string; label: string; onSelect: () => void; variant?: "default" | "danger" }>;
 }
 
+/** An organisation, workspace or project the person can switch between. */
+export interface ShellTeam {
+  id?: string;
+  name: string;
+  /** A second line, e.g. the plan: "Enterprise". */
+  description?: string;
+  /** Your logo, 20 px or so. Without one the first letter of the name is shown. */
+  logo?: ReactNode;
+}
+
 /** Every item in order, sub-items included. */
 export function flattenNav(groups: NavGroup[]): NavItem[] {
   return groups.flatMap((g) => g.items.flatMap((i) => [i, ...(i.children ?? [])]));

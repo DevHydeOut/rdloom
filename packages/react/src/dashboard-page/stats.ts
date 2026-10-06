@@ -7,4 +7,6 @@ export interface DashboardStat {
   /** A short history, drawn as a small line under the number. */
   data?: number[];
   description?: string;
+  /** A short headline in the card, e.g. "Trending up this month". */
+  summary?: string;
 }

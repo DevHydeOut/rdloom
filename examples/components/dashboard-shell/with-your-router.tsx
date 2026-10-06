@@ -32,7 +32,7 @@ export default function DashboardShellWithYourRouterExample() {
   );
 
   return (
-    <div className="h-[28rem] w-full overflow-hidden rounded-xl border border-[var(--rd-color-border-default)]">
+    <div className="h-full w-full">
       <DashboardShell
         navigation={navigation}
         currentId={path}

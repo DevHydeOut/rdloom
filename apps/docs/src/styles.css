@@ -91,6 +91,8 @@ pre {
   overflow-x: clip;
   font-family: "Instrument Sans Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   font-optical-sizing: auto;
+  /* The font for big numbers (stat cards, chart values). A component only reads this variable; without it numbers use the page font. */
+  --rd-font-numeric: "Plus Jakarta Sans Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
 .docs code,

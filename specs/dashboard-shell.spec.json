@@ -20,6 +20,21 @@
       "type": "node",
       "description": "Your logo or product name, at the top of the sidebar and the title of the phone menu."
     },
+    "team": {
+      "type": "custom",
+      "description": "The organisation or workspace shown at the top of the sidebar, with its logo and a second line such as the plan. Replaces brand there.",
+      "tsType": "import(\"../dashboard-shell/nav\").ShellTeam"
+    },
+    "teams": {
+      "type": "custom",
+      "description": "Other workspaces to switch to. With two or more the team becomes a menu.",
+      "tsType": "import(\"../dashboard-shell/nav\").ShellTeam[]"
+    },
+    "onTeamChange": {
+      "type": "callback",
+      "description": "Called with the workspace the person chose.",
+      "tsType": "(team: import(\"../dashboard-shell/nav\").ShellTeam) => void"
+    },
     "user": {
       "type": "custom",
       "description": "The signed-in person: shown at the bottom of the sidebar with an account menu.",
@@ -91,7 +106,6 @@
     "root",
     "skip-link",
     "sidebar",
-    "brand",
     "collapse",
     "nav",
     "group",
@@ -102,7 +116,8 @@
     "search",
     "actions",
     "main",
-    "menu-sheet"
+    "menu-sheet",
+    "team-switcher"
   ],
   "tokens": [
     "color.surface.default",
@@ -132,10 +147,11 @@
       "The current page is marked with aria-current=\"page\" and also shown by a tinted background, an accent-colored icon and a heavier label, never by color alone",
       "An item with sub-items is a button with aria-expanded and aria-controls; the sub-list is hidden when closed",
       "A badge is read after the label (\"Inbox, 3\") and drawn as a pill; in the folded sidebar it becomes a dot but is still read",
-      "The folded sidebar keeps every item's name for assistive technology and shows it in a tooltip on hover and focus; the collapse button says what it will do (Collapse sidebar, Expand sidebar) and has aria-expanded",
+      "The folded sidebar keeps every item's name for assistive technology and shows it in a tooltip on hover and focus; the collapse button (in the top bar) says what it will do (Collapse sidebar, Expand sidebar) and has aria-expanded",
       "On a phone, or when the shell is in a space narrower than 768 px, the sidebar is replaced by a button that opens the same navigation in a sheet; only one of the two is in the accessibility tree at a time",
       "Sidebar width changes stop for visitors who prefer reduced motion",
-      "The account button is named with the person's name; the menu is a real menu"
+      "The account button is named with the person's name; the menu is a real menu",
+      "A workspace switcher is a menu button named with the current workspace (\"Switch workspace, current: Acme Inc\"); with only one workspace it is plain text"
     ],
     "screenReader": [
       "\"Skip to main content, link\" is the first thing reached with Tab",

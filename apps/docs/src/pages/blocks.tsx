@@ -21,7 +21,7 @@ export function BlocksIndex() {
               {/* A small picture of the real block: it is shrunk, and nothing in it can be pressed or read twice. */}
               <div aria-hidden="true" className="relative h-56 overflow-hidden border-b border-[var(--site-border)] bg-[var(--site-subtle)]">
                 {first && (
-                  <div inert className="pointer-events-none absolute start-4 top-4 w-[1100px] origin-top-left scale-[0.34] select-none">
+                  <div inert className={`pointer-events-none absolute start-4 top-4 w-[1100px] origin-top-left scale-[0.34] select-none ${c.id === "dashboard-shell" ? "h-[760px]" : ""}`}>
                     <Live component={c} example={first} />
                   </div>
                 )}
@@ -60,7 +60,7 @@ export function FullScreenPage({ id, name }: { id: string; name: string }) {
       </div>
       <a
         href={`/blocks/${id}`}
-        className="fixed end-3 bottom-3 z-40 rounded-full border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-raised)] px-3 py-1.5 text-xs font-medium text-[var(--rd-color-text-default)] [box-shadow:var(--rd-elevation-floating)] outline-none focus-visible:ring-2 focus-visible:ring-[var(--rd-color-focus-ring)]"
+        className="fixed end-3 bottom-3 z-40 hidden rounded-full sm:block border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-raised)] px-3 py-1.5 text-xs font-medium text-[var(--rd-color-text-default)] [box-shadow:var(--rd-elevation-floating)] outline-none focus-visible:ring-2 focus-visible:ring-[var(--rd-color-focus-ring)]"
       >
         Back to the docs
       </a>

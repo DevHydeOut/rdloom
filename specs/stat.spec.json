@@ -6,23 +6,86 @@
   "status": "experimental",
   "description": "A key number with its label and context: a value, an optional change over time and an optional small trend graphic. Unframed: place it in a Card or a grid.",
   "props": {
-    "label": { "type": "string", "required": true, "description": "What the number measures, e.g. \"Monthly revenue\"." },
-    "value": { "type": "custom", "tsType": "string | number", "required": true, "description": "The number. A number is formatted with toLocaleString unless format is given; a string is shown as is." },
-    "format": { "type": "callback", "tsType": "(value: number) => string", "description": "Formats a numeric value, e.g. as currency." },
-    "unit": { "type": "string", "description": "A small unit after the value, such as % or /mo." },
+    "label": {
+      "type": "string",
+      "required": true,
+      "description": "What the number measures, e.g. \"Monthly revenue\"."
+    },
+    "value": {
+      "type": "custom",
+      "tsType": "string | number",
+      "required": true,
+      "description": "The number. A number is formatted with toLocaleString unless format is given; a string is shown as is."
+    },
+    "format": {
+      "type": "callback",
+      "tsType": "(value: number) => string",
+      "description": "Formats a numeric value, e.g. as currency."
+    },
+    "unit": {
+      "type": "string",
+      "description": "A small unit after the value, such as % or /mo."
+    },
     "trend": {
       "type": "custom",
       "tsType": "{ change: number; label?: string; goodWhen?: \"up\" | \"down\" }",
       "description": "The change over time. change is signed; label says what it is compared with (\"vs last month\"); goodWhen says which direction is an improvement (default up)."
     },
-    "data": { "type": "custom", "tsType": "number[]", "description": "Recent values, drawn as a small Sparkline beside the value." },
-    "description": { "type": "string", "description": "A short line of extra context under the value." },
-    "size": { "type": "enum", "values": ["sm", "md", "lg"], "default": "md", "description": "Size of the value text." },
-    "isLoading": { "type": "boolean", "default": false, "description": "Shows placeholder blocks and announces loading." }
+    "data": {
+      "type": "custom",
+      "tsType": "number[]",
+      "description": "Recent values, drawn as a small Sparkline beside the value."
+    },
+    "description": {
+      "type": "string",
+      "description": "A short line of extra context under the value."
+    },
+    "summary": {
+      "type": "string",
+      "description": "A short headline under the number in the card look, e.g. \"Trending up this month\". It also gets a small trend icon."
+    },
+    "variant": {
+      "type": "enum",
+      "values": [
+        "plain",
+        "card"
+      ],
+      "description": "plain has no frame. card is a soft rounded surface with the trend as a pill at the top right, the number big, then the summary and a note.",
+      "default": "plain"
+    },
+    "size": {
+      "type": "enum",
+      "values": [
+        "sm",
+        "md",
+        "lg"
+      ],
+      "default": "md",
+      "description": "Size of the value text."
+    },
+    "isLoading": {
+      "type": "boolean",
+      "default": false,
+      "description": "Shows placeholder blocks and announces loading."
+    }
   },
-  "variants": ["size"],
-  "states": ["default", "loading"],
-  "slots": ["root", "label", "value", "unit", "trend", "sparkline", "description"],
+  "variants": [
+    "variant",
+    "size"
+  ],
+  "states": [
+    "default",
+    "loading"
+  ],
+  "slots": [
+    "root",
+    "label",
+    "value",
+    "unit",
+    "trend",
+    "sparkline",
+    "description"
+  ],
   "tokens": [
     "color.text.default",
     "color.text.muted",
@@ -49,13 +112,34 @@
     "wcag": "2.2 AA"
   },
   "usage": {
-    "use_when": ["Dashboards and summaries that lead with a few key numbers", "Showing a number with how it changed"],
-    "avoid_when": ["Many numbers that need comparing: use a Table", "A value that changes live and must be announced: use a live region"],
-    "anti_patterns": ["Showing a change as only a green or red color", "Long sentences as the label", "Putting more than a handful of stats in one row"]
+    "use_when": [
+      "Dashboards and summaries that lead with a few key numbers",
+      "Showing a number with how it changed"
+    ],
+    "avoid_when": [
+      "Many numbers that need comparing: use a Table",
+      "A value that changes live and must be announced: use a live region"
+    ],
+    "anti_patterns": [
+      "Showing a change as only a green or red color",
+      "Long sentences as the label",
+      "Putting more than a handful of stats in one row"
+    ]
   },
-  "examples": ["basic", "with-trend", "with-sparkline", "loading", "row"],
+  "examples": [
+    "basic",
+    "with-trend",
+    "with-sparkline",
+    "card",
+    "cards-row",
+    "loading",
+    "row"
+  ],
   "figma": {
     "componentKey": null,
-    "variantMap": { "size": "Size" }
+    "variantMap": {
+      "variant": "Variant",
+      "size": "Size"
+    }
   }
 }

@@ -136,7 +136,7 @@ describe("fonts", () => {
   it("components never set a font: they use the font of the app they are in", () => {
     for (const file of [...componentFiles(), path.join(root, "src", "utils", "field.ts")]) {
       const text = fs.readFileSync(file, "utf8");
-      expect(text, path.relative(root, file)).not.toMatch(/font-(sans|serif)\b|font-family:(?!inherit)/);
+      expect(text, path.relative(root, file)).not.toMatch(/font-(sans|serif)\b|font-family:(?!inherit|var\(--rd-font-numeric,inherit\))/);
     }
     expect(css).not.toMatch(/font-family|--rd-font/);
   });

@@ -7,7 +7,6 @@ import { Alert } from "../alert/alert";
 import { Avatar } from "../avatar/avatar";
 import { Badge } from "../badge/badge";
 import { Button } from "../button/button";
-import { Card } from "../card/card";
 import { Chart } from "../chart/chart";
 import { EmptyState } from "../empty-state/empty-state";
 import { Pagination } from "../pagination/pagination";
@@ -215,15 +214,13 @@ export const CustomerTable = forwardRef<HTMLElement, CustomerTableProps>(functio
     <section ref={ref} aria-label={label} aria-busy={isLoading || undefined} className={cx("flex flex-col gap-6", className)}>
       {shownInsights && (
         <div className="flex min-w-0 flex-col gap-4">
-          <div className="grid grid-cols-[repeat(2,minmax(0,1fr))] gap-4 sm:grid-cols-[repeat(4,minmax(0,1fr))]">
+          <div className="grid grid-cols-[repeat(auto-fit,minmax(min(10rem,100%),1fr))] gap-4">
             {shownInsights.stats.map((s) => (
-              <Card key={s.label} padding="md">
-                <Stat label={s.label} value={s.value} trend={s.trend} data={s.data} description={s.description} size="sm" isLoading={isLoading} />
-              </Card>
+              <Stat key={s.label} variant="card" label={s.label} value={s.value} trend={s.trend} data={s.data} description={s.description} summary={s.summary} isLoading={isLoading} />
             ))}
           </div>
           {shownInsights.chart && (
-            <Card padding="md">
+            <div className="rounded-2xl border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-default)] p-5 [box-shadow:var(--rd-elevation-raised)]">
               <Chart
                 title={shownInsights.chart.title}
                 summary={shownInsights.chart.summary}
@@ -233,7 +230,7 @@ export const CustomerTable = forwardRef<HTMLElement, CustomerTableProps>(functio
                 isLoading={isLoading}
                 height={220}
               />
-            </Card>
+            </div>
           )}
         </div>
       )}
