@@ -176,13 +176,13 @@ export function CommandBlock({ commands, label = "Command" }: { commands: Record
 // --- Previews ----------------------------------------------------------------
 
 /** A live example in a card, with its code folded underneath until asked for. */
-export function Preview({ children, code, label, tall = false, motion = false }: { children: ReactNode; code: string; label: string; tall?: boolean; /** Animated example: offer a Still toggle. */ motion?: boolean }) {
+export function Preview({ children, code, label, tall = false, motion = false, flush = false }: { children: ReactNode; code: string; label: string; tall?: boolean; /** Animated example: offer a Still toggle. */ motion?: boolean; /** A whole screen (a block): less padding, and the example may fill the width. */ flush?: boolean }) {
   const [open, setOpen] = useState(false);
   const [still, setStill] = useState(false);
   const id = useId();
   return (
     <div className="overflow-hidden rounded-xl border border-[var(--site-border)]">
-      <div className={`relative flex ${tall ? "min-h-[22rem]" : "min-h-48"} min-w-0 items-center justify-center overflow-x-auto bg-[var(--rd-color-surface-default)] p-8 ${still ? "rdm-still" : ""}`}>
+      <div className={`relative flex ${tall ? "min-h-[22rem]" : "min-h-48"} min-w-0 items-center justify-center overflow-x-auto bg-[var(--rd-color-surface-default)] ${flush ? "p-3" : "p-8"} ${still ? "rdm-still" : ""}`}>
         {motion && (
           // The same switch the components honour for visitors who prefer reduced motion.
           <button
@@ -194,7 +194,7 @@ export function Preview({ children, code, label, tall = false, motion = false }:
             {still ? "Still: on" : "Still"}
           </button>
         )}
-        <div className="flex min-w-0 max-w-full flex-wrap items-center justify-center gap-4">{children}</div>
+        <div className={`flex min-w-0 max-w-full flex-wrap items-center justify-center gap-4 ${flush ? "w-full" : ""}`}>{children}</div>
       </div>
       <div className="relative border-t border-[var(--site-border)] bg-[var(--site-subtle)]">
         <div id={id} className={open ? "" : "max-h-[8.5rem] overflow-hidden"} inert={!open}>

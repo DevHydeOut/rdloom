@@ -57,6 +57,12 @@ for part in customer-table chart stat sparkline table pagination select badge av
 done
 test -e src/components/rdloom/customer-table/query.ts || { echo "✗ the customer table logic (query.ts) was not installed"; exit 1; }
 echo "✓ customer table and its parts installed"
+npx rdloom add dashboard-shell dashboard-page --install
+for part in dashboard-shell dashboard-page sheet tooltip menu avatar; do
+  test -e "src/components/rdloom/$part/$part.tsx" || { echo "✗ rdloom add dashboard-shell did not bring $part"; exit 1; }
+done
+test -e src/components/rdloom/dashboard-shell/nav.ts || { echo "✗ the dashboard navigation helpers (nav.ts) were not installed"; exit 1; }
+echo "✓ dashboard shell and its parts installed"
 
 step "Typecheck and production build"
 npm run build --silent

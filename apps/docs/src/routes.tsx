@@ -36,6 +36,8 @@ export interface Route {
   page: ReactNode;
   /** Pages with their own layout width (the home page). */
   wide?: boolean;
+  /** A wider column for pages whose examples are whole screens (blocks). */
+  roomy?: boolean;
   notFound?: boolean;
 }
 
@@ -70,6 +72,7 @@ export function routeFor(rawPath: string): Route {
       title: `${displayName(spec.name)}: accessible React ${spec.name === "DataGrid" ? "data grid" : "component"} · rdloom`,
       description: `${spec.description} Keyboard and screen reader support, ${component.examples.length} tested examples, and source you own.`,
       page: <ComponentPage key={component.id} component={component} />,
+      roomy: component.spec.category === "block",
     };
   }
 

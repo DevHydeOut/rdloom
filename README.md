@@ -6,7 +6,7 @@
 
 Every component is defined once, as a JSON spec. That spec generates the TypeScript types, the design tokens, the Figma library, the documentation and the AI-agent context, so design, code and AI tools never drift apart.
 
-> Status: 65 components built and tested, including a 100,000-row DataGrid, a command palette, file upload, DateRangePicker, Combobox and Table. The CLI (`rdloom`) and the MCP server (`@rdloom/mcp`) are on npm; the docs site is not hosted yet.
+> Status: 67 components built and tested, including a 100,000-row DataGrid, a command palette, file upload, DateRangePicker, Combobox and Table. The CLI (`rdloom`) and the MCP server (`@rdloom/mcp`) are on npm; the docs site is not hosted yet.
 
 ## How it works
 
@@ -368,6 +368,7 @@ Eleven components for building an assistant, copilot or agent screen: `Chat`, `M
 
 - **Chart** draws bars, stacked bars, lines, areas and donuts in plain SVG, with no chart library. It is one tab stop: the arrow keys move between values, a tooltip and a polite announcement say what is selected, and "View as table" swaps the drawing for the same numbers as a real table. Series colors come from six chart tokens (`--rd-color-chart-1` to `-6`), tested for contrast in light and dark, and series are told apart by shape and label as well as color.
 - **Stat** is a key number with a trend (an arrow and a signed value, said in words for screen readers) and an optional **Sparkline**.
+- **DashboardShell** is the frame of a dashboard or admin app: a sidebar of navigation that folds down to icons (each item keeps its name and shows it in a tooltip), sub-items, badges, an account menu, a top bar with search and actions, and a skip link. In a narrow space, a phone or just a small frame, the sidebar becomes a menu that slides in. It has no router: items are links (`href`, or your router's link through `renderLink`) or buttons. **DashboardPage** is one page inside it: the h1, actions, and a row of key numbers.
 - **CustomerTable** is a block: a ready-made piece built from the library's own parts. Give it customers and it has search, status and plan filters, sorting, pages, CSV export, loading rows, an empty state, an error with retry, and cards instead of a table on a phone. Above it, totals and a chart follow the filters. For a large list set `serverSide`: the table shows exactly what you pass and asks for more through `onQueryChange` (search waits for typing to pause). It never fetches anything itself.
 
 ## Renaming the library

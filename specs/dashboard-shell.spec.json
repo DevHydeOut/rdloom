@@ -1,0 +1,173 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "DashboardShell",
+  "version": "0.1.0",
+  "category": "block",
+  "status": "experimental",
+  "description": "The frame of a dashboard or admin app: a sidebar of navigation that folds down to icons, a top bar with search and actions, an account menu, and the page. On a phone, or in any narrow space, the sidebar becomes a menu that slides in.",
+  "props": {
+    "navigation": {
+      "type": "custom",
+      "description": "The navigation as groups of items. An item may hold one level of sub-items.",
+      "required": true,
+      "tsType": "import(\"../dashboard-shell/nav\").NavGroup[]"
+    },
+    "currentId": {
+      "type": "string",
+      "description": "The id of the page you are on. It is marked as the current page (aria-current) and its parent opens."
+    },
+    "brand": {
+      "type": "node",
+      "description": "Your logo or product name, at the top of the sidebar and the title of the phone menu."
+    },
+    "user": {
+      "type": "custom",
+      "description": "The signed-in person: shown at the bottom of the sidebar with an account menu.",
+      "tsType": "import(\"../dashboard-shell/nav\").ShellUser"
+    },
+    "header": {
+      "type": "node",
+      "description": "Content for the left of the top bar, such as breadcrumbs or the page title."
+    },
+    "actions": {
+      "type": "node",
+      "description": "Controls for the right of the top bar, such as a theme switch or a Create button."
+    },
+    "onSearch": {
+      "type": "callback",
+      "description": "Shows a search button in the top bar and calls this when it is pressed, e.g. to open a command palette.",
+      "tsType": "() => void"
+    },
+    "searchLabel": {
+      "type": "string",
+      "description": "Text and accessible name of the search button.",
+      "default": "Search"
+    },
+    "label": {
+      "type": "string",
+      "description": "Accessible name of the navigation.",
+      "default": "Main navigation"
+    },
+    "skipLabel": {
+      "type": "string",
+      "description": "Text of the skip link, the first thing a keyboard user can press.",
+      "default": "Skip to main content"
+    },
+    "onNavigate": {
+      "type": "callback",
+      "description": "Called with the item when one is chosen. Items without an href use this to do their work.",
+      "tsType": "(item: import(\"../dashboard-shell/nav\").NavItem) => void"
+    },
+    "renderLink": {
+      "type": "custom",
+      "description": "Draw items as your router's link. Return the link with the given className and children; call onClick when chosen. Without it, items with an href are plain links.",
+      "tsType": "(props: { item: import(\"../dashboard-shell/nav\").NavItem; className: string; children: import(\"react\").ReactNode; isCurrent: boolean; onClick: () => void }) => import(\"react\").ReactNode"
+    },
+    "isCollapsed": {
+      "type": "boolean",
+      "description": "Controlled: whether the sidebar is folded down to icons."
+    },
+    "defaultCollapsed": {
+      "type": "boolean",
+      "description": "Start folded down.",
+      "default": false
+    },
+    "onCollapsedChange": {
+      "type": "callback",
+      "description": "Called when the person folds or opens the sidebar. Save it if you want it remembered.",
+      "tsType": "(collapsed: boolean) => void"
+    },
+    "children": {
+      "type": "node",
+      "description": "The page.",
+      "required": true
+    }
+  },
+  "states": [
+    "default",
+    "focus"
+  ],
+  "slots": [
+    "root",
+    "skip-link",
+    "sidebar",
+    "brand",
+    "collapse",
+    "nav",
+    "group",
+    "item",
+    "sub-list",
+    "account",
+    "header",
+    "search",
+    "actions",
+    "main",
+    "menu-sheet"
+  ],
+  "tokens": [
+    "color.surface.default",
+    "color.surface.subtle",
+    "color.surface.selected",
+    "color.surface.raised",
+    "color.border.default",
+    "color.text.default",
+    "color.text.muted",
+    "color.action.primary",
+    "color.focus.ring",
+    "radius.control",
+    "elevation.floating",
+    "size.control-sm"
+  ],
+  "a11y": {
+    "role": "navigation",
+    "keyboard": [
+      "Tab: the skip link first, then the sidebar (collapse button, items, account menu), the top bar, then the page",
+      "Enter or Space: follows a link or presses an item; on an item with sub-items, opens and closes its list",
+      "In the account menu: arrow keys move, Enter chooses, Escape closes",
+      "In the phone menu: Escape closes it, and focus stays inside until it is closed, then returns to the menu button"
+    ],
+    "requirements": [
+      "A skip link is the first focusable thing and moves focus to the page (a main landmark that can take focus)",
+      "The sidebar is a named navigation landmark; there is one main landmark and one header landmark",
+      "The current page is marked with aria-current=\"page\" and also shown by a bar on its edge, a tinted background and a heavier label, never by color alone",
+      "An item with sub-items is a button with aria-expanded and aria-controls; the sub-list is hidden when closed",
+      "A badge is read after the label (\"Inbox, 3\") and drawn as a pill; in the folded sidebar it becomes a dot but is still read",
+      "The folded sidebar keeps every item's name for assistive technology and shows it in a tooltip on hover and focus; the collapse button says what it will do (Collapse sidebar, Expand sidebar) and has aria-expanded",
+      "On a phone, or when the shell is in a space narrower than 768 px, the sidebar is replaced by a button that opens the same navigation in a sheet; only one of the two is in the accessibility tree at a time",
+      "Sidebar width changes stop for visitors who prefer reduced motion",
+      "The account button is named with the person's name; the menu is a real menu"
+    ],
+    "screenReader": [
+      "\"Skip to main content, link\" is the first thing reached with Tab",
+      "\"Main navigation, navigation\", then each item; the current one reads \"Customers, current page\"",
+      "\"Reports, button, collapsed\" for an item with sub-items, \"expanded\" once opened",
+      "\"Account menu, Ada Lovelace, menu button\""
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "An admin, billing, analytics or internal tool with several sections",
+      "You want the navigation, top bar and page frame without building each"
+    ],
+    "avoid_when": [
+      "A marketing site or a one-page app: a top navigation bar is enough",
+      "Navigation that changes with the page content: build it from Menu and Tabs"
+    ],
+    "anti_patterns": [
+      "Putting the shell inside another shell",
+      "Hiding the only way to a section behind the folded sidebar's tooltip: give every item an icon people can tell apart",
+      "More than about 7 top-level items in one group without headings"
+    ]
+  },
+  "examples": [
+    "basic",
+    "with-sub-items",
+    "collapsed",
+    "with-your-router"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {}
+  }
+}

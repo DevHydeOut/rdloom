@@ -642,6 +642,20 @@
       "properties": []
     },
     {
+      "name": "DashboardPage",
+      "id": "dashboard-page",
+      "version": "0.1.0",
+      "description": "One page of a dashboard: a title with its actions, a row of key numbers, then your content. It sits inside DashboardShell but works anywhere. The title is the page's h1.",
+      "properties": []
+    },
+    {
+      "name": "DashboardShell",
+      "id": "dashboard-shell",
+      "version": "0.1.0",
+      "description": "The frame of a dashboard or admin app: a sidebar of navigation that folds down to icons, a top bar with search and actions, an account menu, and the page. On a phone, or in any narrow space, the sidebar becomes a menu that slides in.",
+      "properties": []
+    },
+    {
       "name": "DataGrid",
       "id": "data-grid",
       "version": "0.9.0",

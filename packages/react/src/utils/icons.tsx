@@ -195,6 +195,87 @@ export function SortIcon({ direction, className = "size-3.5 shrink-0" }: { direc
   );
 }
 
+export function HomeIcon({ className = "size-4 shrink-0", strokeWidth }: IconProps) {
+  return (
+    <Icon className={className} strokeWidth={strokeWidth}>
+      <P d="M2.5 7.25L8 2.75l5.5 4.5V13a.75.75 0 0 1-.75.75H3.25A.75.75 0 0 1 2.5 13V7.25z" />
+      <P d="M6.5 13.75V9.5h3v4.25" />
+    </Icon>
+  );
+}
+
+export function UsersIcon({ className = "size-4 shrink-0", strokeWidth }: IconProps) {
+  return (
+    <Icon className={className} strokeWidth={strokeWidth}>
+      <C cx={6} cy={5.5} r={2.5} />
+      <P d="M1.75 13.25c.4-2.25 2.1-3.5 4.25-3.5s3.85 1.25 4.25 3.5" />
+      <P d="M10.5 3.2a2.5 2.5 0 0 1 0 4.6M12 9.9c1.2.5 2 1.6 2.25 3.35" />
+    </Icon>
+  );
+}
+
+export function ChartIcon({ className = "size-4 shrink-0", strokeWidth }: IconProps) {
+  return (
+    <Icon className={className} strokeWidth={strokeWidth}>
+      <P d="M2.5 2.5v11h11" />
+      <P d="M5.5 10.5V8M8.25 10.5V5.5M11 10.5V7" />
+    </Icon>
+  );
+}
+
+export function SettingsIcon({ className = "size-4 shrink-0", strokeWidth }: IconProps) {
+  return (
+    <Icon className={className} strokeWidth={strokeWidth}>
+      <C cx={8} cy={8} r={2} />
+      <P d="M8 1.75v1.5M8 12.75v1.5M1.75 8h1.5M12.75 8h1.5M3.6 3.6l1.05 1.05M11.35 11.35l1.05 1.05M3.6 12.4l1.05-1.05M11.35 4.65l1.05-1.05" />
+    </Icon>
+  );
+}
+
+export function InboxIcon({ className = "size-4 shrink-0", strokeWidth }: IconProps) {
+  return (
+    <Icon className={className} strokeWidth={strokeWidth}>
+      <P d="M2.5 9.25l1.6-5.2a1 1 0 0 1 .95-.7h5.9a1 1 0 0 1 .95.7l1.6 5.2" />
+      <P d="M2.5 9.25V12a1 1 0 0 0 1 1h9a1 1 0 0 0 1-1V9.25h-3.25L9.75 10.75h-3.5L5.75 9.25H2.5z" />
+    </Icon>
+  );
+}
+
+export function CreditCardIcon({ className = "size-4 shrink-0", strokeWidth }: IconProps) {
+  return (
+    <Icon className={className} strokeWidth={strokeWidth}>
+      <R x={1.75} y={3.5} width={12.5} height={9} rx={2} />
+      <P d="M1.75 6.75h12.5M4.5 10h2.5" />
+    </Icon>
+  );
+}
+
+export function BellIcon({ className = "size-4 shrink-0", strokeWidth }: IconProps) {
+  return (
+    <Icon className={className} strokeWidth={strokeWidth}>
+      <P d="M3.75 11.25h8.5l-1.1-1.6V6.5a3.15 3.15 0 0 0-6.3 0v3.15l-1.1 1.6z" />
+      <P d="M6.75 13.25a1.4 1.4 0 0 0 2.5 0" />
+    </Icon>
+  );
+}
+
+export function MenuIcon({ className = "size-4 shrink-0", strokeWidth }: IconProps) {
+  return (
+    <Icon className={className} strokeWidth={strokeWidth}>
+      <P d="M2.5 4.5h11M2.5 8h11M2.5 11.5h11" />
+    </Icon>
+  );
+}
+
+export function SidebarIcon({ className = "size-4 shrink-0", strokeWidth }: IconProps) {
+  return (
+    <Icon className={className} strokeWidth={strokeWidth}>
+      <R x={1.75} y={2.75} width={12.5} height={10.5} rx={2} />
+      <P d="M6 2.75v10.5" />
+    </Icon>
+  );
+}
+
 // --- Drag and more
 
 export function DotsIcon({ className = "size-4" }: Pick<IconProps, "className">) {

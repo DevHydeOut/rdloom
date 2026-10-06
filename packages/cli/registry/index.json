@@ -128,6 +128,18 @@
       "description": "A ready-to-use customer list: search, filters, sorting, pages, CSV export, loading rows, an empty state, an error with retry, cards on a phone, and totals with a chart above that follow the filters. Give it customers and it works."
     },
     {
+      "name": "dashboard-page",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "One page of a dashboard: a title with its actions, a row of key numbers, then your content. It sits inside DashboardShell but works anywhere. The title is the page's h1."
+    },
+    {
+      "name": "dashboard-shell",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "The frame of a dashboard or admin app: a sidebar of navigation that folds down to icons, a top bar with search and actions, an account menu, and the page. On a phone, or in any narrow space, the sidebar becomes a menu that slides in."
+    },
+    {
       "name": "data-grid",
       "type": "registry:ui",
       "version": "0.9.0",

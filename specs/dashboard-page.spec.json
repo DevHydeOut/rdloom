@@ -1,0 +1,94 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "DashboardPage",
+  "version": "0.1.0",
+  "category": "block",
+  "status": "experimental",
+  "description": "One page of a dashboard: a title with its actions, a row of key numbers, then your content. It sits inside DashboardShell but works anywhere. The title is the page's h1.",
+  "props": {
+    "title": {
+      "type": "string",
+      "description": "The page's title, shown as its h1.",
+      "required": true
+    },
+    "description": {
+      "type": "string",
+      "description": "One or two sentences under the title."
+    },
+    "actions": {
+      "type": "node",
+      "description": "Buttons for the right of the title, e.g. Export and Add customer."
+    },
+    "stats": {
+      "type": "custom",
+      "description": "The key numbers shown in a row of cards under the title: label, value, and optionally a trend, a small history and a note.",
+      "tsType": "import(\"../dashboard-page/stats\").DashboardStat[]"
+    },
+    "isLoading": {
+      "type": "boolean",
+      "description": "Show the key numbers as skeletons and mark the page busy.",
+      "default": false
+    },
+    "children": {
+      "type": "node",
+      "description": "The rest of the page: charts, tables, forms."
+    }
+  },
+  "states": [
+    "default",
+    "loading"
+  ],
+  "slots": [
+    "root",
+    "header",
+    "title",
+    "description",
+    "actions",
+    "stats",
+    "stat",
+    "content"
+  ],
+  "tokens": [
+    "color.text.default",
+    "color.text.muted",
+    "color.surface.default",
+    "color.border.default"
+  ],
+  "a11y": {
+    "role": "none",
+    "keyboard": [
+      "Tab: moves through the actions, then the page content"
+    ],
+    "requirements": [
+      "The title is the page's only h1, so there is one clear heading to jump to",
+      "The key numbers are a labelled section (heading \"Key numbers\", read only by screen readers) and each one reads as a sentence",
+      "Columns share the width equally, so a long number never pushes the others off screen; two columns on a phone, four on a wide screen",
+      "While loading the page is marked busy and numbers are skeletons, never made-up values"
+    ],
+    "screenReader": [
+      "\"Customers, heading level 1\"",
+      "\"Key numbers\" section, then \"Monthly revenue: $48,200. Up 12% compared with last month.\""
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "The top of any page inside a dashboard"
+    ],
+    "avoid_when": [
+      "Pages with a long form as the main content: use a plain heading and the form"
+    ],
+    "anti_patterns": [
+      "More than one h1 on a page",
+      "Showing placeholder numbers while data loads"
+    ]
+  },
+  "examples": [
+    "basic",
+    "loading"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {}
+  }
+}

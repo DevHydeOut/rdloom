@@ -640,6 +640,49 @@ const blueprints: Record<string, Blueprint> = {
     ]);
   },
 
+  DashboardShell: () => {
+    const item = (label: string, current = false, badge?: string) =>
+      frame({ name: current ? "item current" : "item", dir: "row", gap: 12, pad: [0, 12], w: "fill", h: 36, cross: "center", fill: current ? "color.surface.selected" : undefined, radius: "radius.control" }, [
+        box(16, 16, { stroke: current ? "color.action.primary" : "color.text.muted", radius: 4, name: "icon" }),
+        text(label, 14, current ? "color.text.default" : "color.text.muted", current ? "Medium" : "Regular", "fill"),
+        ...(badge ? [frame({ name: "badge", dir: "row", pad: [0, 6], cross: "center", fill: "color.surface.subtle", radius: 999 }, [text(badge, 11, "color.text.default", "Medium")])] : []),
+      ]);
+    return frame({ name: "dashboard shell", dir: "row", w: 880, h: 480, fill: "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, [
+      frame({ name: "sidebar", dir: "col", gap: 4, pad: 12, w: 240, h: 480, stroke: "color.border.default" }, [
+        frame({ name: "brand", dir: "row", w: "fill", h: 44, pad: [0, 4], align: "between", cross: "center" }, [text("Acme Cloud", 15, "color.text.default", "Semi Bold"), box(28, 28, { stroke: "color.border.default", radius: "radius.control", name: "collapse" })]),
+        item("Overview", true),
+        item("Customers", false, "24"),
+        item("Revenue"),
+        item("Inbox", false, "3"),
+        frame({ name: "spacer", dir: "col", w: "fill", h: 150 }, []),
+        frame({ name: "account", dir: "row", gap: 10, pad: 8, w: "fill", cross: "center", stroke: "color.border.default", radius: "radius.control" }, [
+          box(28, 28, { fill: "color.surface.subtle", radius: 999, name: "avatar" }),
+          frame({ name: "who", dir: "col" }, [text("Ada Lovelace", 14, "color.text.default", "Medium"), text("ada@example.com", 12, "color.text.muted")]),
+        ]),
+      ]),
+      frame({ name: "main", dir: "col", w: "fill", h: 480 }, [
+        frame({ name: "header", dir: "row", gap: 12, pad: [0, 16], w: "fill", h: 56, cross: "center", stroke: "color.border.default" }, [
+          text("Overview", 15, "color.text.default", "Semi Bold", "fill"),
+          frame({ name: "search", dir: "row", pad: [0, 12], w: 200, h: 36, cross: "center", stroke: "color.border.default", radius: "radius.control" }, [text("Search", 14, "color.text.muted")]),
+          button("New report", "primary", "sm"),
+        ]),
+        frame({ name: "page", dir: "col", gap: 16, pad: 24, w: "fill" }, [
+          text("Overview", 24, "color.text.default", "Semi Bold"),
+          frame({ name: "stats", dir: "row", gap: 12, w: "fill" }, [0, 1, 2].map(() => frame({ name: "stat card", dir: "col", gap: 4, pad: 14, w: "fill", fill: "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, [text("Monthly revenue", 12, "color.text.muted"), text("$48,200", 22, "color.text.default", "Semi Bold")]))),
+        ]),
+      ]),
+    ]);
+  },
+
+  DashboardPage: () =>
+    frame({ name: "dashboard page", dir: "col", gap: 20, pad: 24, w: 720 }, [
+      frame({ name: "title", dir: "row", w: "fill", align: "between", cross: "start" }, [
+        frame({ name: "text", dir: "col", gap: 4 }, [text("Customers", 24, "color.text.default", "Semi Bold"), text("Everyone on a plan, with what they pay.", 14, "color.text.muted")]),
+        frame({ name: "actions", dir: "row", gap: 8 }, [button("Export", "secondary"), button("Add customer", "primary")]),
+      ]),
+      frame({ name: "stats", dir: "row", gap: 12, w: "fill" }, [0, 1, 2, 3].map(() => frame({ name: "stat card", dir: "col", gap: 4, pad: 14, w: "fill", fill: "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, [text("Customers", 12, "color.text.muted"), text("1,284", 22, "color.text.default", "Semi Bold")]))),
+    ]),
+
   Steps: (c) => {
     const vertical = c.orientation === "vertical";
     const marker = (n: string, state: "done" | "current" | "todo") =>

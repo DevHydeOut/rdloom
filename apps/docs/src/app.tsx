@@ -339,7 +339,7 @@ function Shell() {
             <Nav />
           </div>
           <main id="main" className="min-w-0 flex-1 py-10 pb-24">
-            <div className="thread mx-auto max-w-[44rem]">{route.page}</div>
+            <div className={`thread mx-auto ${route.roomy ? "max-w-[58rem]" : "max-w-[44rem]"}`}>{route.page}</div>
           </main>
           <div className="sticky top-14 hidden h-[calc(100vh-3.5rem)] w-52 shrink-0 overflow-y-auto py-10 xl:block thin-scroll">
             <Toc path={path} />

@@ -430,7 +430,7 @@ export function ComponentPage({ component }: { component: DocComponent }) {
       {spec.category === "block" && <BlockNote />}
 
       {hero && (
-        <Preview code={hero.code} label={`${title(hero.name)} code`} tall={id === "data-grid" || id === "calendar"} motion={spec.category === "motion"}>
+        <Preview code={hero.code} label={`${title(hero.name)} code`} tall={id === "data-grid" || id === "calendar"} motion={spec.category === "motion"} flush={spec.category === "block"}>
           <Live component={component} example={hero} />
         </Preview>
       )}
@@ -446,7 +446,7 @@ export function ComponentPage({ component }: { component: DocComponent }) {
           <H2 id={`example-${e.name}`} label={title(e.name)}>
             {title(e.name)}
           </H2>
-          <Preview code={e.code} label={`${title(e.name)} code`} motion={spec.category === "motion"}>
+          <Preview code={e.code} label={`${title(e.name)} code`} motion={spec.category === "motion"} flush={spec.category === "block"}>
             <Live component={component} example={e} />
           </Preview>
         </section>

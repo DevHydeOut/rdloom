@@ -161,5 +161,9 @@ export {
   type CustomerStatInput,
   type CustomerSummary,
 } from "./customer-table/query";
+export { DashboardShell, type DashboardShellProps } from "./dashboard-shell/dashboard-shell";
+export { currentTopLevel, findNavItem, flattenNav, trailOf, type NavGroup, type NavItem, type ShellUser } from "./dashboard-shell/nav";
+export { DashboardPage, type DashboardPageProps } from "./dashboard-page/dashboard-page";
+export type { DashboardStat } from "./dashboard-page/stats";
 // The icon family the components use, for your own buttons and menu entries.
 export * from "./utils/icons";

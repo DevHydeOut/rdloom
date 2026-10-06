@@ -176,6 +176,36 @@ test.describe("component page", () => {
     await expect(chart.getByRole("table")).toBeVisible();
   });
 
+  test("the dashboard shell folds its sidebar, opens sub-items and marks the current page", async ({ page }) => {
+    await page.goto("/components/dashboard-shell");
+    await page.waitForLoadState("networkidle");
+    const demo = page.locator("main .rounded-xl.overflow-hidden:has(> div.relative.flex)").nth(1);
+    const nav = demo.getByRole("navigation", { name: "Main navigation" });
+    await expect(nav.getByRole("link", { name: /Customers/ }).or(nav.getByRole("button", { name: /Customers/ })).first()).toBeVisible();
+    await expect(nav.locator("[aria-current=page]")).toHaveCount(1);
+    await nav.getByRole("button", { name: /Customers/ }).click();
+    await expect(nav.locator("[aria-current=page]")).toContainText("Customers");
+    await demo.getByRole("button", { name: "Collapse sidebar" }).click();
+    await expect(demo.getByRole("button", { name: "Expand sidebar" })).toHaveAttribute("aria-expanded", "false");
+    // the folded sidebar still gives every item its name
+    await expect(nav.getByRole("button", { name: /Customers/ })).toBeVisible();
+  });
+
+  test("on a phone the shell's sidebar becomes a menu that slides in and closes after a choice", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 800 });
+    await page.goto("/components/dashboard-shell");
+    await page.waitForLoadState("networkidle");
+    const demo = page.locator("main .rounded-xl.overflow-hidden:has(> div.relative.flex)").nth(1);
+    await demo.getByRole("button", { name: "Open navigation" }).click();
+    const dialog = page.getByRole("dialog");
+    await expect(dialog.getByRole("navigation", { name: "Main navigation" })).toBeVisible();
+    await dialog.getByRole("button", { name: /Customers/ }).click();
+    await expect(dialog).toBeHidden();
+    await expect(demo.getByRole("heading", { level: 1, name: "Customers" })).toBeVisible();
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    expect(overflow).toBeLessThanOrEqual(0);
+  });
+
   test("steps to the neighbouring components", async ({ page }) => {
     await page.goto("/components/alert");
     await page.getByRole("link", { name: "Next: Approval Box" }).click();
@@ -254,7 +284,7 @@ test.describe("small screens", () => {
     expect(overflow).toBeLessThanOrEqual(0);
   });
 
-  for (const path of ["/", "/components", "/docs/getting-started", "/components/data-grid", "/components/chat", "/components/generated-chart", "/docs/ai", "/components/customer-table", "/components/chart", "/components/stat"]) {
+  for (const path of ["/", "/components", "/docs/getting-started", "/components/data-grid", "/components/chat", "/components/generated-chart", "/docs/ai", "/components/customer-table", "/components/chart", "/components/stat", "/components/dashboard-shell"]) {
     test(`${path} doesn't scroll sideways`, async ({ page }) => {
       await page.goto(path);
       await page.waitForLoadState("networkidle");
