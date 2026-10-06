@@ -86,6 +86,12 @@
       "description": "A bordered container that groups related content under an optional heading, with an optional footer for actions."
     },
     {
+      "name": "chart",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A bar, line, area or donut chart drawn in plain SVG without a chart library. It fits its container, can be explored with a pointer or the arrow keys, and always comes with a written summary and a View as table switch that shows the same numbers."
+    },
+    {
       "name": "chat",
       "type": "registry:ui",
       "version": "0.1.0",
@@ -114,6 +120,12 @@
       "type": "registry:ui",
       "version": "0.1.0",
       "description": "A search box in a dialog that finds and runs commands, jumps to pages and triggers actions from the keyboard. Opens with Ctrl or Cmd + K. Use CommandGroup and CommandItem for the results."
+    },
+    {
+      "name": "customer-table",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A ready-to-use customer list: search, filters, sorting, pages, CSV export, loading rows, an empty state, an error with retry, cards on a phone, and totals with a chart above that follow the filters. Give it customers and it works."
     },
     {
       "name": "data-grid",
@@ -312,6 +324,18 @@
       "type": "registry:ui",
       "version": "0.1.0",
       "description": "The numbered list of sources a reply drew on, with title, site and a short excerpt. Each entry is where a Citation marker lands."
+    },
+    {
+      "name": "sparkline",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A tiny line or bar graphic that shows the shape of a trend, without axes. Decoration unless it has a label."
+    },
+    {
+      "name": "stat",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A key number with its label and context: a value, an optional change over time and an optional small trend graphic. Unframed: place it in a Card or a grid."
     },
     {
       "name": "steps",

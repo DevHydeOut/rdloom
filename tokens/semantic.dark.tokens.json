@@ -37,6 +37,14 @@
     },
     "focus": {
       "ring": { "$value": "{color.ember.300}" }
+    },
+    "chart": {
+      "1": { "$value": "#fb923c" },
+      "2": { "$value": "#60a5fa" },
+      "3": { "$value": "#4ade80" },
+      "4": { "$value": "#a78bfa" },
+      "5": { "$value": "#22d3ee" },
+      "6": { "$value": "#f472b6" }
     }
   },
   "elevation": {

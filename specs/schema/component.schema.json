@@ -10,7 +10,7 @@
     "$schema": { "type": "string" },
     "name": { "type": "string", "pattern": "^[A-Z][A-Za-z0-9]*$" },
     "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
-    "category": { "enum": ["action", "input", "overlay", "navigation", "feedback", "layout", "data", "display", "motion", "ai"] },
+    "category": { "enum": ["action", "input", "overlay", "navigation", "feedback", "layout", "data", "display", "motion", "ai", "block"] },
     "status": { "enum": ["experimental", "beta", "stable", "deprecated"], "default": "experimental" },
     "description": { "type": "string", "minLength": 10 },
     "props": {

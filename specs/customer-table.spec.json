@@ -1,0 +1,184 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "CustomerTable",
+  "version": "0.1.0",
+  "category": "block",
+  "status": "experimental",
+  "description": "A ready-to-use customer list: search, filters, sorting, pages, CSV export, loading rows, an empty state, an error with retry, cards on a phone, and totals with a chart above that follow the filters. Give it customers and it works.",
+  "props": {
+    "customers": {
+      "type": "custom",
+      "description": "The customers to show. With serverSide, only the current page.",
+      "required": true,
+      "tsType": "import(\"../customer-table/query\").Customer[]"
+    },
+    "label": {
+      "type": "string",
+      "description": "Accessible name of the table and the section, e.g. \"Customers\".",
+      "default": "Customers"
+    },
+    "pageSize": {
+      "type": "number",
+      "description": "Customers per page.",
+      "default": 10
+    },
+    "currency": {
+      "type": "string",
+      "description": "ISO currency code for revenue, e.g. \"USD\" or \"EUR\".",
+      "default": "USD"
+    },
+    "locale": {
+      "type": "string",
+      "description": "Locale for numbers and dates, e.g. \"en-GB\". Defaults to the visitor's."
+    },
+    "isLoading": {
+      "type": "boolean",
+      "description": "Show loading rows and skeleton cards, disable the controls, and mark the section busy.",
+      "default": false
+    },
+    "error": {
+      "type": "string",
+      "description": "A message to show instead of the list when loading failed."
+    },
+    "onRetry": {
+      "type": "callback",
+      "description": "Adds a Try again button to the error message.",
+      "tsType": "() => void"
+    },
+    "insights": {
+      "type": "custom",
+      "description": "The totals and chart above the table. \"auto\" works them out from the customers and follows the filters (not with serverSide); \"none\" hides them; or pass your own numbers.",
+      "default": "auto",
+      "tsType": "\"auto\" | \"none\" | import(\"../customer-table/query\").CustomerInsights"
+    },
+    "serverSide": {
+      "type": "boolean",
+      "description": "The list lives on a server. The table then shows exactly the customers you pass, and asks for new ones through onQueryChange when the search, a filter, the sort or the page changes.",
+      "default": false
+    },
+    "totalCount": {
+      "type": "number",
+      "description": "With serverSide: how many customers match in all, so the pages and the count are right."
+    },
+    "onQueryChange": {
+      "type": "callback",
+      "description": "With serverSide: called with the new query (search, status, plan, sort, page, pageSize). Typing in the search waits for a short pause first.",
+      "tsType": "(query: import(\"../customer-table/query\").CustomerQuery) => void"
+    },
+    "defaultQuery": {
+      "type": "custom",
+      "description": "Start with a search, filters, a sort or a page already set.",
+      "tsType": "Partial<import(\"../customer-table/query\").CustomerQuery>"
+    },
+    "onExport": {
+      "type": "callback",
+      "description": "Replaces the built-in CSV download. It gets the customers that match (all pages when the list is in memory). With serverSide the Export button is shown only when you provide this.",
+      "tsType": "(customers: import(\"../customer-table/query\").Customer[], query: import(\"../customer-table/query\").CustomerQuery) => void"
+    },
+    "onOpenCustomer": {
+      "type": "callback",
+      "description": "Makes each name a button and calls this with the customer, e.g. to open a details panel.",
+      "tsType": "(customer: import(\"../customer-table/query\").Customer) => void"
+    },
+    "statusTones": {
+      "type": "custom",
+      "description": "Which badge color a status gets. The defaults are active green, trial blue, overdue amber, churned red; anything else is neutral.",
+      "tsType": "Record<string, \"neutral\" | \"info\" | \"success\" | \"warning\" | \"danger\">"
+    },
+    "density": {
+      "type": "enum",
+      "description": "Row spacing of the table.",
+      "values": [
+        "compact",
+        "standard",
+        "comfortable"
+      ],
+      "default": "standard"
+    }
+  },
+  "states": [
+    "default",
+    "loading"
+  ],
+  "slots": [
+    "root",
+    "insights",
+    "stat",
+    "chart",
+    "toolbar",
+    "search",
+    "filters",
+    "export",
+    "table",
+    "cards",
+    "empty",
+    "error",
+    "footer",
+    "pagination"
+  ],
+  "tokens": [
+    "color.surface.default",
+    "color.border.default",
+    "color.border.strong",
+    "color.text.default",
+    "color.text.muted",
+    "color.focus.ring",
+    "radius.control",
+    "radius.overlay",
+    "elevation.raised",
+    "size.control-md"
+  ],
+  "a11y": {
+    "role": "region",
+    "keyboard": [
+      "Tab: moves through the search, the filters, Export, the table (one stop), the names when onOpenCustomer is set, and the page buttons",
+      "In the table: arrow keys move between cells; Enter or Space on a column header sorts",
+      "In a filter: Enter or Space opens the list, arrow keys choose, Escape closes",
+      "Escape in the search box clears it"
+    ],
+    "requirements": [
+      "A labelled region around everything; the table and the phone cards have their own names",
+      "A real table with a row header (the customer), sortable column headers that expose their sort direction, and right-aligned money in tabular numerals",
+      "The count of matching customers is a polite status message, so filtering is announced; so is an export (\"Exported 24 customers to customers.csv\")",
+      "Search and filters each have a name (read, not drawn); the status of a customer is always text in a badge, never a color alone",
+      "Loading marks the region busy and shows skeletons instead of fake numbers; the controls are disabled while loading",
+      "An empty list says why (nothing yet, or nothing matches) and offers Clear filters; an error is an alert with a retry button",
+      "Below tablet width the table is replaced by cards (a list); only one of the two is in the accessibility tree at a time",
+      "The totals and chart come from the Stat and Chart components, so they are readable, keyboard-reachable and have a table view",
+      "CSV export neutralises cells that start with = + - or @ so a spreadsheet can't run them as formulas"
+    ],
+    "screenReader": [
+      "\"Customers, region\" then the totals, then \"Search customers, search edit text\"",
+      "After typing: \"3 customers\" (polite)",
+      "The table reads as \"Customers, table, 24 rows, 5 columns\"; a cell reads its row header, column and value",
+      "A sort reads \"Monthly revenue, column header, sorted descending\""
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "An admin or billing screen that lists people or accounts with a plan, a status and revenue",
+      "You want search, filters, sorting, paging and export without wiring each one"
+    ],
+    "avoid_when": [
+      "Tens of thousands of rows you must scroll or edit like a spreadsheet: use DataGrid",
+      "A list with different columns: build it from Table, Pagination and the other parts, as this block does"
+    ],
+    "anti_patterns": [
+      "Loading every customer into the browser when there are many thousands: use serverSide",
+      "Showing the totals of one page of a server's list as if they were the totals of all customers"
+    ]
+  },
+  "examples": [
+    "basic",
+    "server-side",
+    "loading-and-empty",
+    "custom-insights",
+    "without-insights",
+    "row-action"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {}
+  }
+}

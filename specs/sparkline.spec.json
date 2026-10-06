@@ -1,0 +1,51 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Sparkline",
+  "version": "0.1.0",
+  "category": "data",
+  "status": "experimental",
+  "description": "A tiny line or bar graphic that shows the shape of a trend, without axes. Decoration unless it has a label.",
+  "props": {
+    "data": { "type": "custom", "tsType": "number[]", "required": true, "description": "The values, oldest first. Non-numbers are ignored." },
+    "type": { "type": "enum", "values": ["line", "bar"], "default": "line", "description": "A line, or thin bars from a zero baseline." },
+    "label": { "type": "string", "description": "A text description, e.g. \"Revenue, last 12 months: from 21K to 48K\". Without it the graphic is hidden from assistive technology." },
+    "width": { "type": "number", "default": 96, "description": "Width in pixels." },
+    "height": { "type": "number", "default": 32, "description": "Height in pixels." },
+    "color": { "type": "enum", "values": ["primary", "success", "danger", "muted"], "default": "primary", "description": "Color of the line or bars." },
+    "showLast": { "type": "boolean", "default": true, "description": "Marks the last point of a line with a dot." }
+  },
+  "variants": ["type", "color"],
+  "states": ["default"],
+  "slots": ["root"],
+  "tokens": [
+    "color.chart.1",
+    "color.feedback.success",
+    "color.feedback.danger",
+    "color.text.muted"
+  ],
+  "a11y": {
+    "role": "img",
+    "keyboard": [],
+    "requirements": [
+      "With a label it is an image with that name; the label should state the range and direction, not just the topic",
+      "Without a label it is hidden from assistive technology: the surrounding text must already say what the number did",
+      "The shape is never the only way to get the information; put the figures in text nearby",
+      "Not interactive: no focus, no tooltip"
+    ],
+    "screenReader": [
+      "With a label: announced as an image, e.g. \"Revenue, last 12 months: from 21K to 48K, image\"",
+      "Without a label: not announced"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["Showing the recent shape of a number inside a Stat, table row or sentence", "Where space is too tight for a full chart"],
+    "avoid_when": ["People need to read exact values: use a Chart or a Table", "The trend is the main content of the page"],
+    "anti_patterns": ["Leaving out the label when no nearby text describes the trend", "Using it as the only source of the figures", "Comparing sparklines drawn on different scales as if they were equal"]
+  },
+  "examples": ["line", "bar", "in-a-sentence"],
+  "figma": {
+    "componentKey": null,
+    "variantMap": { "type": "Type", "color": "Color" }
+  }
+}

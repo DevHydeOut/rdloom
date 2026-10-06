@@ -555,6 +555,91 @@ const blueprints: Record<string, Blueprint> = {
       ]),
     ]),
 
+  // --- Charts, stats and the customer block ------------------------------------
+
+  Chart: (c) => {
+    const bars = [90, 130, 110, 160, 190, 150];
+    const donut = c.type === "donut";
+    return frame({ name: "chart", dir: "col", gap: 8, w: 440 }, [
+      frame({ name: "title", dir: "row", w: "fill", align: "between", cross: "start" }, [
+        frame({ name: "text", dir: "col", gap: 2 }, [text("Revenue by month", 14, "color.text.default", "Semi Bold"), text("Revenue grew every month but April.", 12, "color.text.muted")]),
+        button("View as table", "secondary", "sm"),
+      ]),
+      frame(
+        { name: "plot", dir: "row", gap: 12, pad: 12, w: "fill", h: 240, cross: "end", align: donut ? "center" : undefined, fill: "color.surface.default", stroke: "color.border.default", radius: "radius.control" },
+        donut
+          ? [box(160, 160, { stroke: "color.chart.1", radius: 999, name: "donut" })]
+          : c.type === "line" || c.type === "area"
+            ? [box(10, 10, { fill: "color.chart.1", radius: 999 }), box(10, 10, { fill: "color.chart.1", radius: 999 }), box(10, 10, { fill: "color.chart.1", radius: 999 }), box(10, 10, { fill: "color.chart.1", radius: 999 })]
+            : bars.map((h) => box(44, h, { fill: "color.chart.1", radius: 3, name: "bar" })),
+      ),
+      frame({ name: "legend", dir: "row", gap: 16 }, [
+        frame({ name: "series 1", dir: "row", gap: 6, cross: "center" }, [box(10, 10, { fill: "color.chart.1", radius: 2 }), text("Revenue", 12)]),
+        frame({ name: "series 2", dir: "row", gap: 6, cross: "center" }, [box(10, 10, { fill: "color.chart.2", radius: 2 }), text("Cost", 12)]),
+      ]),
+    ]);
+  },
+
+  Sparkline: (c) =>
+    frame({ name: "sparkline", dir: "row", gap: 3, w: 96, h: 32, cross: "end" },
+      c.type === "bar"
+        ? [10, 16, 12, 22, 18, 26, 30].map((h) => box(8, h, { fill: "color.chart.1", radius: 2, name: "bar" }))
+        : [box(10, 10, { fill: "color.chart.1", radius: 999 }), box(10, 14, { fill: "color.chart.1", radius: 999 }), box(10, 22, { fill: "color.chart.1", radius: 999 }), box(10, 28, { fill: "color.chart.1", radius: 999 })]),
+
+  Stat: (c) => {
+    const big = c.size === "lg" ? 36 : c.size === "sm" ? 22 : 28;
+    return frame({ name: "stat", dir: "col", gap: 6, w: 220 }, [
+      text("Monthly revenue", 13, "color.text.muted"),
+      text("$48,200", big, "color.text.default", "Semi Bold"),
+      frame({ name: "trend", dir: "row", gap: 6, pad: [2, 8], cross: "center", fill: "color.feedback.success-subtle", radius: 999 }, [
+        text("↑ +12%", 12, "color.text.default", "Medium"),
+        text("vs last month", 12, "color.text.muted"),
+      ]),
+    ]);
+  },
+
+  CustomerTable: () => {
+    const cell = (label: string, w: number | "fill", head = false, right = false) =>
+      frame({ name: head ? "head" : "cell", dir: "row", w, pad: [10, 12], align: right ? "end" : "start", cross: "center" }, [text(label, head ? 12 : 14, head ? "color.text.muted" : "color.text.default", head ? "Semi Bold" : "Regular", right ? undefined : undefined)]);
+    const row = (name: string, plan: string, status: string, tone: string, mrr: string) =>
+      frame({ name: "row", dir: "row", w: "fill", cross: "center", stroke: "color.border.default" }, [
+        frame({ name: "customer", dir: "row", gap: 10, w: 220, pad: [10, 12], cross: "center" }, [
+          box(28, 28, { fill: "color.surface.subtle", radius: 999, name: "avatar" }),
+          frame({ name: "who", dir: "col" }, [text(name, 14, "color.text.default", "Medium"), text("name@example.com", 12, "color.text.muted")]),
+        ]),
+        cell(plan, 90),
+        frame({ name: "status", dir: "row", w: 110, pad: [10, 12], cross: "center" }, [
+          frame({ name: "badge", dir: "row", gap: 6, pad: [2, 8], cross: "center", fill: `color.feedback.${tone}-subtle`, radius: 999 }, [box(6, 6, { fill: `color.feedback.${tone}`, radius: 999 }), text(status, 12, "color.text.default", "Medium")]),
+        ]),
+        cell(mrr, "fill", false, true),
+      ]);
+    return frame({ name: "customer table", dir: "col", gap: 16, w: 720 }, [
+      frame({ name: "insights", dir: "row", gap: 12, w: "fill" }, [
+        frame({ name: "stat card", dir: "col", gap: 6, pad: 16, w: 160, fill: "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, [text("Customers", 13, "color.text.muted"), text("24", 28, "color.text.default", "Semi Bold")]),
+        frame({ name: "stat card", dir: "col", gap: 6, pad: 16, w: 160, fill: "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, [text("Monthly revenue", 13, "color.text.muted"), text("$2,376", 28, "color.text.default", "Semi Bold")]),
+        frame({ name: "chart card", dir: "row", gap: 10, pad: 16, w: "fill", h: 96, cross: "end", fill: "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, [
+          box(36, 40, { fill: "color.chart.1", radius: 3 }),
+          box(36, 64, { fill: "color.chart.1", radius: 3 }),
+          box(36, 50, { fill: "color.chart.1", radius: 3 }),
+        ]),
+      ]),
+      frame({ name: "toolbar", dir: "row", gap: 8, w: "fill", cross: "center" }, [
+        frame({ name: "search", dir: "row", gap: 8, pad: [0, 12], w: "fill", h: 40, cross: "center", fill: "color.surface.default", stroke: "color.border.default", radius: "radius.control" }, [text("Search by name, email or company", 14, "color.text.muted")]),
+        frame({ name: "filter", dir: "row", gap: 8, pad: [0, 12], w: 140, h: 40, cross: "center", fill: "color.surface.default", stroke: "color.border.default", radius: "radius.control" }, [text("All statuses", 14, "color.text.muted")]),
+        frame({ name: "filter", dir: "row", gap: 8, pad: [0, 12], w: 140, h: 40, cross: "center", fill: "color.surface.default", stroke: "color.border.default", radius: "radius.control" }, [text("All plans", 14, "color.text.muted")]),
+        button("Export CSV", "secondary"),
+      ]),
+      frame({ name: "table", dir: "col", w: "fill", fill: "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, [
+        frame({ name: "header", dir: "row", w: "fill", fill: "color.surface.subtle" }, [cell("CUSTOMER", 220, true), cell("PLAN", 90, true), cell("STATUS", 110, true), cell("MONTHLY REVENUE", "fill", true, true)]),
+        row("Ada Lovelace", "Pro", "active", "success", "$99"),
+        row("Grace Hopper", "Team", "active", "success", "$499"),
+        row("Alan Turing", "Free", "trial", "info", "$0"),
+        row("Margaret Hamilton", "Team", "overdue", "warning", "$499"),
+      ]),
+      frame({ name: "footer", dir: "row", w: "fill", align: "between", cross: "center" }, [text("Showing 1 to 4 of 24", 14, "color.text.muted"), button("1  2  3  ›", "secondary", "sm")]),
+    ]);
+  },
+
   Steps: (c) => {
     const vertical = c.orientation === "vertical";
     const marker = (n: string, state: "done" | "current" | "todo") =>

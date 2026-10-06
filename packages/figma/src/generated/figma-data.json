@@ -186,6 +186,54 @@
       "dark": "#fdba74"
     },
     {
+      "name": "color/chart/1",
+      "token": "color.chart.1",
+      "cssVar": "--rd-color-chart-1",
+      "type": "COLOR",
+      "light": "#c2410c",
+      "dark": "#fb923c"
+    },
+    {
+      "name": "color/chart/2",
+      "token": "color.chart.2",
+      "cssVar": "--rd-color-chart-2",
+      "type": "COLOR",
+      "light": "#2563eb",
+      "dark": "#60a5fa"
+    },
+    {
+      "name": "color/chart/3",
+      "token": "color.chart.3",
+      "cssVar": "--rd-color-chart-3",
+      "type": "COLOR",
+      "light": "#15803d",
+      "dark": "#4ade80"
+    },
+    {
+      "name": "color/chart/4",
+      "token": "color.chart.4",
+      "cssVar": "--rd-color-chart-4",
+      "type": "COLOR",
+      "light": "#7c3aed",
+      "dark": "#a78bfa"
+    },
+    {
+      "name": "color/chart/5",
+      "token": "color.chart.5",
+      "cssVar": "--rd-color-chart-5",
+      "type": "COLOR",
+      "light": "#0e7490",
+      "dark": "#22d3ee"
+    },
+    {
+      "name": "color/chart/6",
+      "token": "color.chart.6",
+      "cssVar": "--rd-color-chart-6",
+      "type": "COLOR",
+      "light": "#be185d",
+      "dark": "#f472b6"
+    },
+    {
       "name": "radius/control",
       "token": "radius.control",
       "cssVar": "--rd-radius-control",
@@ -467,6 +515,25 @@
       ]
     },
     {
+      "name": "Chart",
+      "id": "chart",
+      "version": "0.1.0",
+      "description": "A bar, line, area or donut chart drawn in plain SVG without a chart library. It fits its container, can be explored with a pointer or the arrow keys, and always comes with a written summary and a View as table switch that shows the same numbers.",
+      "properties": [
+        {
+          "prop": "type",
+          "name": "Type",
+          "values": [
+            "bar",
+            "line",
+            "area",
+            "donut"
+          ],
+          "default": "bar"
+        }
+      ]
+    },
+    {
       "name": "Chat",
       "id": "chat",
       "version": "0.1.0",
@@ -565,6 +632,13 @@
       "id": "command-palette",
       "version": "0.1.0",
       "description": "A search box in a dialog that finds and runs commands, jumps to pages and triggers actions from the keyboard. Opens with Ctrl or Cmd + K. Use CommandGroup and CommandItem for the results.",
+      "properties": []
+    },
+    {
+      "name": "CustomerTable",
+      "id": "customer-table",
+      "version": "0.1.0",
+      "description": "A ready-to-use customer list: search, filters, sorting, pages, CSV export, loading rows, an empty state, an error with retry, cards on a phone, and totals with a chart above that follow the filters. Give it customers and it works.",
       "properties": []
     },
     {
@@ -1314,6 +1388,52 @@
       "version": "0.1.0",
       "description": "The numbered list of sources a reply drew on, with title, site and a short excerpt. Each entry is where a Citation marker lands.",
       "properties": []
+    },
+    {
+      "name": "Sparkline",
+      "id": "sparkline",
+      "version": "0.1.0",
+      "description": "A tiny line or bar graphic that shows the shape of a trend, without axes. Decoration unless it has a label.",
+      "properties": [
+        {
+          "prop": "type",
+          "name": "Type",
+          "values": [
+            "line",
+            "bar"
+          ],
+          "default": "line"
+        },
+        {
+          "prop": "color",
+          "name": "Color",
+          "values": [
+            "primary",
+            "success",
+            "danger",
+            "muted"
+          ],
+          "default": "primary"
+        }
+      ]
+    },
+    {
+      "name": "Stat",
+      "id": "stat",
+      "version": "0.1.0",
+      "description": "A key number with its label and context: a value, an optional change over time and an optional small trend graphic. Unframed: place it in a Card or a grid.",
+      "properties": [
+        {
+          "prop": "size",
+          "name": "Size",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "default": "md"
+        }
+      ]
     },
     {
       "name": "Steps",

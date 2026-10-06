@@ -96,12 +96,14 @@ export const componentGroupDefs: Array<{ id: string; label: string; ids: string[
   { id: "choice", label: "Choices and toggles", ids: ["select", "checkbox", "radio-group", "switch", "slider", "segmented-control"] },
   { id: "date-time", label: "Dates and times", ids: ["calendar", "date-picker", "date-range-picker", "time-field"] },
   { id: "data", label: "Tables and data", ids: ["data-grid", "table", "tree", "pagination"] },
+  { id: "charts", label: "Charts and stats", ids: ["chart", "sparkline", "stat"] },
   { id: "navigation", label: "Navigation", ids: ["tabs", "breadcrumbs", "steps", "menu"] },
   { id: "overlays", label: "Dialogs and popovers", ids: ["dialog", "sheet", "popover", "tooltip"] },
   { id: "feedback", label: "Feedback and status", ids: ["alert", "toast", "progress", "skeleton", "empty-state", "badge"] },
   { id: "display", label: "Content and layout", ids: ["card", "accordion", "avatar", "kbd"] },
   { id: "ai", label: "AI chat and agents", ids: ["chat", "message", "prompt-input", "response", "tool-call", "agent-activity", "approval-box", "citation", "sources", "generated-table", "generated-chart"] },
   { id: "motion", label: "Motion and effects", ids: ["text-shimmer", "gradient-text", "blur-fade", "shine-border", "shuttle-border", "ripple"] },
+  { id: "blocks", label: "Blocks", ids: ["customer-table"] },
 ];
 
 export interface ComponentGroup {
@@ -171,4 +173,4 @@ export function neighbours(id: string) {
 /** "DataGrid" -> "Data Grid": the name people read, while code keeps the real one. */
 export const displayName = (name: string) => name.replace(/([a-z0-9])([A-Z])/g, "$1 $2");
 
-export const categoryLabel = (category: string) => (category === "ai" ? "AI" : category[0].toUpperCase() + category.slice(1));
+export const categoryLabel = (category: string) => (category === "ai" ? "AI" : category === "block" ? "Block" : category[0].toUpperCase() + category.slice(1));

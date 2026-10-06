@@ -1,0 +1,144 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Chart",
+  "version": "0.1.0",
+  "category": "data",
+  "status": "experimental",
+  "description": "A bar, line, area or donut chart drawn in plain SVG without a chart library. It fits its container, can be explored with a pointer or the arrow keys, and always comes with a written summary and a View as table switch that shows the same numbers.",
+  "props": {
+    "data": {
+      "type": "custom",
+      "description": "The labels along the bottom and one or more named series of values. A donut draws the first series only.",
+      "required": true,
+      "tsType": "import(\"../utils/ai\").ChartData"
+    },
+    "title": {
+      "type": "string",
+      "description": "The name of the figure.",
+      "required": true
+    },
+    "summary": {
+      "type": "string",
+      "description": "A sentence that tells the story of the chart. Defaults to a sentence written from the data."
+    },
+    "type": {
+      "type": "enum",
+      "description": "Bars, a line, a filled area or a donut.",
+      "values": ["bar", "line", "area", "donut"],
+      "default": "bar"
+    },
+    "stacked": {
+      "type": "boolean",
+      "description": "Add the series up instead of drawing them side by side. Applies to bar and area.",
+      "default": false
+    },
+    "height": {
+      "type": "number",
+      "description": "Height of the drawing in pixels. The width follows the container.",
+      "default": 280
+    },
+    "showLegend": {
+      "type": "boolean",
+      "description": "Name each series (or each donut slice) below the drawing. Hidden for a single series except in a donut.",
+      "default": true
+    },
+    "showGrid": {
+      "type": "boolean",
+      "description": "Draw grid lines behind bar, line and area charts.",
+      "default": true
+    },
+    "valueFormat": {
+      "type": "callback",
+      "description": "Turns a value into text for the axis, the tooltip, the labels and the table. Defaults to compact numbers with the data unit.",
+      "tsType": "(value: number) => string"
+    },
+    "onSelect": {
+      "type": "callback",
+      "description": "Called when a point is clicked, or when Enter or Space is pressed on the active point.",
+      "tsType": "(point: { index: number; label: string; series: string; value: number }) => void"
+    },
+    "isLoading": {
+      "type": "boolean",
+      "description": "Show a placeholder the size of the chart instead of the drawing.",
+      "default": false
+    },
+    "emptyMessage": {
+      "type": "string",
+      "description": "Shown when there is nothing to chart.",
+      "default": "No data to chart."
+    }
+  },
+  "variants": ["type"],
+  "states": ["default", "focus", "loading"],
+  "slots": ["root", "title", "summary", "plot", "axis", "grid", "legend", "tooltip", "table"],
+  "tokens": [
+    "color.text.default",
+    "color.text.muted",
+    "color.chart.1",
+    "color.chart.2",
+    "color.chart.3",
+    "color.chart.4",
+    "color.chart.5",
+    "color.chart.6",
+    "color.border.default",
+    "color.border.strong",
+    "color.surface.default",
+    "color.surface.raised",
+    "color.focus.ring",
+    "radius.control",
+    "elevation.floating"
+  ],
+  "a11y": {
+    "role": "figure",
+    "keyboard": [
+      "Tab: moves to the plot, which is one tab stop",
+      "ArrowLeft / ArrowRight: move to the previous or next value (ArrowUp / ArrowDown on a donut)",
+      "Home / End: jump to the first or last value",
+      "Escape: clears the active value",
+      "Enter / Space: selects the active value (calls onSelect)"
+    ],
+    "requirements": [
+      "The drawing is decoration; the title, the written summary and the data table carry the meaning",
+      "The plot is a single focusable group named by the title, described by the summary, with a visible focus ring",
+      "Moving with the keyboard announces the active value as text, for example \"Feb: Revenue $26,500, Cost $12,000\"",
+      "View as table swaps in the same data as an accessible table (aria-pressed on the switch)",
+      "Series differ by marker shape or label as well as color; the legend repeats the same marks",
+      "A donut names each slice with its percentage; slices are separated by a gap",
+      "Colors come only from the chart color tokens and text stays at 4.5:1",
+      "Loading is marked with aria-busy and shows no invented numbers",
+      "Empty data shows a message instead of an empty frame"
+    ],
+    "screenReader": [
+      "Announced as a figure named by the title, then the summary text",
+      "\"Revenue by month. Use the left and right arrow keys to move between values, group\"",
+      "Each arrow key press reads the active value, such as \"Feb: Revenue $26,500, Cost $12,000\"",
+      "\"View as table, toggle button, not pressed\"",
+      "The table reads every value under its row and column headers"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "Showing trends, comparisons or shares of a whole in a product screen",
+      "Letting people point at a value to read it exactly"
+    ],
+    "avoid_when": [
+      "Dashboards with many linked, zoomable charts: use a charting library",
+      "Exact numbers matter most: show a table",
+      "A single number with a trend: use Stat with a Sparkline"
+    ],
+    "anti_patterns": [
+      "A chart with no summary",
+      "Telling series apart by color only",
+      "A donut with many slices or with several series (it draws the first series only)",
+      "Hard-coding series colors instead of the chart color tokens"
+    ]
+  },
+  "examples": ["bar", "stacked", "line", "area", "donut", "interactive", "loading-and-empty"],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {
+      "type": "Type"
+    }
+  }
+}

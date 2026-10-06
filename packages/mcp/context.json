@@ -1558,6 +1558,235 @@
       ]
     },
     {
+      "id": "chart",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "Chart",
+        "version": "0.1.0",
+        "category": "data",
+        "status": "experimental",
+        "description": "A bar, line, area or donut chart drawn in plain SVG without a chart library. It fits its container, can be explored with a pointer or the arrow keys, and always comes with a written summary and a View as table switch that shows the same numbers.",
+        "props": {
+          "data": {
+            "type": "custom",
+            "description": "The labels along the bottom and one or more named series of values. A donut draws the first series only.",
+            "required": true,
+            "tsType": "import(\"../utils/ai\").ChartData"
+          },
+          "title": {
+            "type": "string",
+            "description": "The name of the figure.",
+            "required": true
+          },
+          "summary": {
+            "type": "string",
+            "description": "A sentence that tells the story of the chart. Defaults to a sentence written from the data."
+          },
+          "type": {
+            "type": "enum",
+            "description": "Bars, a line, a filled area or a donut.",
+            "values": [
+              "bar",
+              "line",
+              "area",
+              "donut"
+            ],
+            "default": "bar"
+          },
+          "stacked": {
+            "type": "boolean",
+            "description": "Add the series up instead of drawing them side by side. Applies to bar and area.",
+            "default": false
+          },
+          "height": {
+            "type": "number",
+            "description": "Height of the drawing in pixels. The width follows the container.",
+            "default": 280
+          },
+          "showLegend": {
+            "type": "boolean",
+            "description": "Name each series (or each donut slice) below the drawing. Hidden for a single series except in a donut.",
+            "default": true
+          },
+          "showGrid": {
+            "type": "boolean",
+            "description": "Draw grid lines behind bar, line and area charts.",
+            "default": true
+          },
+          "valueFormat": {
+            "type": "callback",
+            "description": "Turns a value into text for the axis, the tooltip, the labels and the table. Defaults to compact numbers with the data unit.",
+            "tsType": "(value: number) => string"
+          },
+          "onSelect": {
+            "type": "callback",
+            "description": "Called when a point is clicked, or when Enter or Space is pressed on the active point.",
+            "tsType": "(point: { index: number; label: string; series: string; value: number }) => void"
+          },
+          "isLoading": {
+            "type": "boolean",
+            "description": "Show a placeholder the size of the chart instead of the drawing.",
+            "default": false
+          },
+          "emptyMessage": {
+            "type": "string",
+            "description": "Shown when there is nothing to chart.",
+            "default": "No data to chart."
+          }
+        },
+        "variants": [
+          "type"
+        ],
+        "states": [
+          "default",
+          "focus",
+          "loading"
+        ],
+        "slots": [
+          "root",
+          "title",
+          "summary",
+          "plot",
+          "axis",
+          "grid",
+          "legend",
+          "tooltip",
+          "table"
+        ],
+        "tokens": [
+          "color.text.default",
+          "color.text.muted",
+          "color.chart.1",
+          "color.chart.2",
+          "color.chart.3",
+          "color.chart.4",
+          "color.chart.5",
+          "color.chart.6",
+          "color.border.default",
+          "color.border.strong",
+          "color.surface.default",
+          "color.surface.raised",
+          "color.focus.ring",
+          "radius.control",
+          "elevation.floating"
+        ],
+        "a11y": {
+          "role": "figure",
+          "keyboard": [
+            "Tab: moves to the plot, which is one tab stop",
+            "ArrowLeft / ArrowRight: move to the previous or next value (ArrowUp / ArrowDown on a donut)",
+            "Home / End: jump to the first or last value",
+            "Escape: clears the active value",
+            "Enter / Space: selects the active value (calls onSelect)"
+          ],
+          "requirements": [
+            "The drawing is decoration; the title, the written summary and the data table carry the meaning",
+            "The plot is a single focusable group named by the title, described by the summary, with a visible focus ring",
+            "Moving with the keyboard announces the active value as text, for example \"Feb: Revenue $26,500, Cost $12,000\"",
+            "View as table swaps in the same data as an accessible table (aria-pressed on the switch)",
+            "Series differ by marker shape or label as well as color; the legend repeats the same marks",
+            "A donut names each slice with its percentage; slices are separated by a gap",
+            "Colors come only from the chart color tokens and text stays at 4.5:1",
+            "Loading is marked with aria-busy and shows no invented numbers",
+            "Empty data shows a message instead of an empty frame"
+          ],
+          "screenReader": [
+            "Announced as a figure named by the title, then the summary text",
+            "\"Revenue by month. Use the left and right arrow keys to move between values, group\"",
+            "Each arrow key press reads the active value, such as \"Feb: Revenue $26,500, Cost $12,000\"",
+            "\"View as table, toggle button, not pressed\"",
+            "The table reads every value under its row and column headers"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "Showing trends, comparisons or shares of a whole in a product screen",
+            "Letting people point at a value to read it exactly"
+          ],
+          "avoid_when": [
+            "Dashboards with many linked, zoomable charts: use a charting library",
+            "Exact numbers matter most: show a table",
+            "A single number with a trend: use Stat with a Sparkline"
+          ],
+          "anti_patterns": [
+            "A chart with no summary",
+            "Telling series apart by color only",
+            "A donut with many slices or with several series (it draws the first series only)",
+            "Hard-coding series colors instead of the chart color tokens"
+          ]
+        },
+        "examples": [
+          "bar",
+          "stacked",
+          "line",
+          "area",
+          "donut",
+          "interactive",
+          "loading-and-empty"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {
+            "type": "Type"
+          }
+        }
+      },
+      "install": {
+        "command": "npx rdloom add chart",
+        "dependencies": [],
+        "registryDependencies": [
+          "tokens",
+          "button",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "bar",
+          "code": "import { Chart } from \"@rdloom/react\";\n\nexport default function ChartBarExample() {\n  return (\n    <div className=\"w-[36rem] max-w-full\">\n      <Chart\n        title=\"Revenue by month\"\n        summary=\"Revenue grew every month except April, reaching $48K in June.\"\n        data={{\n          labels: [\"Jan\", \"Feb\", \"Mar\", \"Apr\", \"May\", \"Jun\"],\n          series: [{ name: \"Revenue\", values: [21000, 26500, 31000, 29000, 41000, 48000] }],\n          unit: \"$\",\n        }}\n      />\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "stacked",
+          "code": "import { Chart } from \"@rdloom/react\";\n\nexport default function ChartStackedExample() {\n  return (\n    <div className=\"w-[36rem] max-w-full\">\n      <Chart\n        stacked\n        title=\"Tickets by channel\"\n        data={{\n          labels: [\"Jan\", \"Feb\", \"Mar\", \"Apr\", \"May\", \"Jun\"],\n          series: [\n            { name: \"Email\", values: [120, 140, 135, 160, 150, 170] },\n            { name: \"Chat\", values: [80, 95, 110, 105, 130, 140] },\n            { name: \"Phone\", values: [40, 35, 30, 38, 25, 22] },\n          ],\n        }}\n      />\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "line",
+          "code": "import { Chart } from \"@rdloom/react\";\n\nexport default function ChartLineExample() {\n  return (\n    <div className=\"w-[36rem] max-w-full\">\n      <Chart\n        type=\"line\"\n        title=\"Revenue and cost\"\n        data={{\n          labels: [\"Jan\", \"Feb\", \"Mar\", \"Apr\", \"May\", \"Jun\"],\n          series: [\n            { name: \"Revenue\", values: [21000, 26500, 31000, 29000, 41000, 48000] },\n            { name: \"Cost\", values: [14000, 12000, 15500, 16000, 18000, 19500] },\n          ],\n          unit: \"$\",\n        }}\n      />\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "area",
+          "code": "import { Chart } from \"@rdloom/react\";\n\nexport default function ChartAreaExample() {\n  return (\n    <div className=\"w-[36rem] max-w-full\">\n      <Chart\n        type=\"area\"\n        stacked\n        title=\"Active users by plan\"\n        data={{\n          labels: [\"Jan\", \"Feb\", \"Mar\", \"Apr\", \"May\", \"Jun\"],\n          series: [\n            { name: \"Free\", values: [900, 980, 1050, 1100, 1200, 1280] },\n            { name: \"Team\", values: [300, 340, 380, 420, 470, 520] },\n          ],\n        }}\n      />\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "donut",
+          "code": "import { Chart } from \"@rdloom/react\";\n\nexport default function ChartDonutExample() {\n  return (\n    <div className=\"w-[26rem] max-w-full\">\n      <Chart\n        type=\"donut\"\n        title=\"Traffic by source\"\n        data={{\n          labels: [\"Search\", \"Direct\", \"Referral\", \"Social\"],\n          series: [{ name: \"Visits\", values: [5200, 3100, 1400, 900] }],\n        }}\n      />\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "interactive",
+          "code": "import { useState } from \"react\";\nimport { Chart } from \"@rdloom/react\";\n\n// Click a bar, or move with the arrow keys and press Enter.\nexport default function ChartInteractiveExample() {\n  const [picked, setPicked] = useState<string>(\"Nothing picked yet.\");\n  return (\n    <div className=\"flex w-[36rem] max-w-full flex-col gap-3\">\n      <Chart\n        title=\"Signups by month\"\n        data={{\n          labels: [\"Jan\", \"Feb\", \"Mar\", \"Apr\", \"May\", \"Jun\"],\n          series: [{ name: \"Signups\", values: [320, 410, 380, 520, 610, 580] }],\n        }}\n        onSelect={(point) => setPicked(`${point.label}: ${point.series} ${point.value}`)}\n      />\n      <p role=\"status\" className=\"text-sm text-[var(--rd-color-text-muted)]\">\n        {picked}\n      </p>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "loading-and-empty",
+          "code": "import { Chart } from \"@rdloom/react\";\n\nexport default function ChartLoadingAndEmptyExample() {\n  return (\n    <div className=\"flex w-[36rem] max-w-full flex-col gap-6\">\n      <Chart isLoading title=\"Revenue by month\" height={160} data={{ labels: [], series: [] }} />\n      <Chart title=\"Revenue by month\" height={160} data={{ labels: [], series: [] }} emptyMessage=\"No sales yet this year.\" />\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "chart/chart.tsx",
+          "content": "\"use client\";\n\nimport { forwardRef, useEffect, useId, useRef, useState, type KeyboardEvent, type MouseEvent } from \"react\";\nimport { Button } from \"../button/button\";\nimport { chartDefaults, type ChartSpecProps } from \"../generated/chart.types\";\nimport type { ChartData } from \"../utils/ai\";\nimport { cx } from \"../utils/cx\";\nimport { compact, exactNumber, niceRange, percentages, polar, sectorPath, withUnit } from \"./scales\";\n\nexport interface ChartProps extends ChartSpecProps {\n  className?: string;\n}\n\nexport interface ChartPoint {\n  index: number;\n  label: string;\n  series: string;\n  value: number;\n}\n\n// The drawing is for people who can see it. The summary, the announcements and the table carry the\n// same data for everyone else. Series differ by marker shape as well as color.\nconst SHAPES = [\"circle\", \"square\", \"triangle\", \"diamond\", \"triangle-down\", \"cross\"] as const;\ntype Shape = (typeof SHAPES)[number];\nexport const chartColor = (index: number) => `var(--rd-color-chart-${(index % 6) + 1})`;\nconst FALLBACK_WIDTH = 640;\nconst PAD = { top: 16, right: 16, bottom: 32 };\nconst TIP_WIDTH = 176;\n\nfunction Marker({ shape, x, y, color, size = 4.5, mark }: { shape: number; x: number; y: number; color: string; size?: number; mark?: string }) {\n  const kind: Shape = SHAPES[shape % SHAPES.length];\n  const common = { fill: color, stroke: \"var(--rd-color-surface-default)\", strokeWidth: 1.5, \"data-shape\": kind, \"data-mark\": mark };\n  const s = size + 0.5;\n  switch (kind) {\n    case \"circle\":\n      return <circle cx={x} cy={y} r={size} {...common} />;\n    case \"square\":\n      return <rect x={x - size} y={y - size} width={size * 2} height={size * 2} {...common} />;\n    case \"triangle\":\n      return <path d={`M${x} ${y - s - 1}L${x + s + 1} ${y + s}L${x - s - 1} ${y + s}Z`} {...common} />;\n    case \"triangle-down\":\n      return <path d={`M${x} ${y + s + 1}L${x + s + 1} ${y - s}L${x - s - 1} ${y - s}Z`} {...common} />;\n    case \"diamond\":\n      return <path d={`M${x} ${y - s - 1}L${x + s + 1} ${y}L${x} ${y + s + 1}L${x - s - 1} ${y}Z`} {...common} />;\n    default: {\n      const a = s * 0.45;\n      return (\n        <path\n          d={`M${x - a} ${y - s}h${a * 2}v${s - a}h${s - a}v${a * 2}h${-(s - a)}v${s - a}h${-a * 2}v${-(s - a)}h${-(s - a)}v${-a * 2}h${s - a}Z`}\n          {...common}\n        />\n      );\n    }\n  }\n}\n\nfunction seriesValues(data: ChartData, i: number) {\n  return data.labels.map((_, k) => {\n    const v = data.series[i].values[k];\n    return Number.isFinite(v) ? v : 0;\n  });\n}\n\n/** A short sentence for the summary when the sender didn't write one. */\nfunction describe(data: ChartData, type: \"bar\" | \"line\" | \"area\" | \"donut\", stacked: boolean, fmt: (v: number) => string): string {\n  const { labels, series } = data;\n  if (labels.length === 0 || series.length === 0) return \"No data\";\n  const values = seriesValues(data, 0);\n  if (type === \"donut\") {\n    const total = values.reduce((a, b) => a + Math.max(0, b), 0);\n    const pct = percentages(values.map((v) => Math.max(0, v)));\n    const top = values.indexOf(Math.max(...values));\n    return `Donut chart of ${series[0].name} across ${labels.length} parts, ${fmt(total)} in all. ${labels[top]} is the largest at ${pct[top]}%.`;\n  }\n  const high = Math.max(...values);\n  const low = Math.min(...values);\n  const kind = `${stacked && type !== \"line\" ? \"Stacked \" : \"\"}${type === \"bar\" ? \"bar\" : type} chart`;\n  const lead = `${kind[0].toUpperCase()}${kind.slice(1)} of ${series.map((s) => s.name).join(\", \")} across ${labels.length} ${labels.length === 1 ? \"point\" : \"points\"}.`;\n  return `${lead} ${series[0].name} is highest at ${fmt(high)} (${labels[values.indexOf(high)]}) and lowest at ${fmt(low)} (${labels[values.indexOf(low)]}).`;\n}\n\n/**\n * A bar, line, area or donut chart in plain SVG, no chart library. It draws at the real width of its\n * container, can be explored with a pointer or the arrow keys, and always has a written summary and a\n * \"View as table\" switch that swaps the drawing for the same data.\n */\nexport const Chart = forwardRef<HTMLElement, ChartProps>(function Chart(\n  {\n    data,\n    title,\n    summary,\n    type = chartDefaults.type,\n    stacked = chartDefaults.stacked,\n    height = chartDefaults.height,\n    showLegend = chartDefaults.showLegend,\n    showGrid = chartDefaults.showGrid,\n    valueFormat,\n    onSelect,\n    isLoading = chartDefaults.isLoading,\n    emptyMessage = chartDefaults.emptyMessage,\n    className,\n  },\n  ref,\n) {\n  const [asTable, setAsTable] = useState(false);\n  const [width, setWidth] = useState(FALLBACK_WIDTH);\n  const [active, setActive] = useState<number | null>(null);\n  const [pointer, setPointer] = useState<{ x: number; y: number } | null>(null);\n  const [announcement, setAnnouncement] = useState(\"\");\n  const wrapRef = useRef<HTMLDivElement>(null);\n  const plotRef = useRef<HTMLDivElement>(null);\n  const titleId = useId();\n  const summaryId = useId();\n  const tableId = useId();\n\n  const { labels, series, unit } = data;\n  const n = labels.length;\n  const empty = n === 0 || series.length === 0;\n  const donut = type === \"donut\";\n  const exact = valueFormat ?? ((v: number) => withUnit(exactNumber(v), unit));\n  const axisFormat = valueFormat ?? ((v: number) => withUnit(compact(v), unit));\n  const text = summary ?? describe(data, type, stacked, exact);\n  const showingPlot = !isLoading && !empty && !asTable;\n\n  // Draw at the real pixel width so text never scales. Without ResizeObserver (SSR, jsdom) keep the fallback.\n  useEffect(() => {\n    const el = wrapRef.current;\n    if (!el) return;\n    const read = () => {\n      const w = Math.round(el.getBoundingClientRect().width);\n      if (w > 0) setWidth(w);\n    };\n    read();\n    if (typeof ResizeObserver === \"undefined\") return;\n    const observer = new ResizeObserver(read);\n    observer.observe(el);\n    return () => observer.disconnect();\n  }, [showingPlot]);\n\n  const act = active !== null && active < n ? active : null;\n  const vals = empty ? [] : series.map((_, i) => seriesValues(data, i));\n\n  // Donut: the first series only, negatives count as zero.\n  const donutValues = donut && !empty ? vals[0].map((v) => Math.max(0, v)) : [];\n  const donutTotal = donutValues.reduce((a, b) => a + b, 0);\n  const pct = percentages(donutValues);\n\n  // Cartesian geometry: per series and category, the lowest and highest drawn value.\n  const stackedMode = stacked && (type === \"bar\" || type === \"area\");\n  const lo: number[][] = [];\n  const hi: number[][] = [];\n  const edge: number[][] = [];\n  if (!empty && !donut) {\n    const pos = new Array(n).fill(0);\n    const neg = new Array(n).fill(0);\n    const cum = new Array(n).fill(0);\n    vals.forEach((row, si) => {\n      lo[si] = [];\n      hi[si] = [];\n      edge[si] = [];\n      row.forEach((v, i) => {\n        if (type === \"bar\") {\n          if (!stackedMode) {\n            lo[si][i] = Math.min(0, v);\n            hi[si][i] = Math.max(0, v);\n          } else if (v >= 0) {\n            lo[si][i] = pos[i];\n            hi[si][i] = pos[i] += v;\n          } else {\n            hi[si][i] = neg[i];\n            lo[si][i] = neg[i] += v;\n          }\n          edge[si][i] = v;\n        } else if (type === \"area\" && stackedMode) {\n          lo[si][i] = cum[i];\n          hi[si][i] = cum[i] += v;\n          edge[si][i] = cum[i];\n        } else if (type === \"area\") {\n          lo[si][i] = 0;\n          hi[si][i] = v;\n          edge[si][i] = v;\n        } else {\n          lo[si][i] = v;\n          hi[si][i] = v;\n          edge[si][i] = v;\n        }\n      });\n    });\n  }\n  const flatLo = lo.flat();\n  const flatHi = hi.flat();\n  const range = niceRange(flatLo.length ? Math.min(...flatLo, ...flatHi) : 0, flatHi.length ? Math.max(...flatLo, ...flatHi) : 0);\n  const padLeft = Math.max(36, Math.ceil(Math.max(...range.ticks.map((t) => axisFormat(t).length)) * 6.5) + 16);\n  const plotW = Math.max(10, width - padLeft - PAD.right);\n  const plotH = Math.max(10, height - PAD.top - PAD.bottom);\n  const y = (v: number) => PAD.top + plotH - ((v - range.min) / (range.max - range.min)) * plotH;\n  const band = n > 0 ? plotW / n : plotW;\n  const x = (i: number) => padLeft + band * i + band / 2;\n  const count = series.length || 1;\n  const groupW = stackedMode || type !== \"bar\" ? Math.min(band * 0.7, 64) : Math.min(band * 0.7, 48 * count);\n  const barW = stackedMode ? groupW : groupW / count;\n  const direct = type === \"bar\" && (stackedMode ? n <= 12 : n * count <= 12);\n  const maxLabels = Math.max(1, Math.floor(plotW / 48));\n  const labelStep = Math.ceil(n / maxLabels);\n  const maxChars = Math.max(3, Math.floor((band * labelStep) / 6.5));\n  const y0 = y(0);\n\n  // Donut geometry.\n  const size = Math.min(width, height);\n  const dcx = width / 2;\n  const dcy = height / 2;\n  const outer = Math.max(20, size / 2 - 10);\n  const inner = outer * 0.62;\n  const live = donutValues.filter((v) => v > 0).length;\n  const gap = live > 1 ? 0.03 : 0;\n  const slices: { from: number; to: number; mid: number }[] = [];\n  {\n    let start = 0;\n    donutValues.forEach((v) => {\n      const sweep = donutTotal > 0 ? (v / donutTotal) * Math.PI * 2 : 0;\n      slices.push({ from: start + gap / 2, to: Math.min(start + sweep - gap / 2, start + Math.PI * 2 - 0.0001), mid: start + sweep / 2 });\n      start += sweep;\n    });\n  }\n\n  const sentence = (i: number) => {\n    if (donut) return `${labels[i]}: ${exact(vals[0][i])}, ${pct[i]}%`;\n    return `${labels[i]}: ${series.map((s, si) => `${s.name} ${exact(vals[si][i])}`).join(\", \")}`;\n  };\n\n  const move = (next: number | null, byKeyboard: boolean) => {\n    setActive(next);\n    if (byKeyboard) {\n      setPointer(null);\n      setAnnouncement(next === null ? \"\" : sentence(next));\n    }\n  };\n\n  const pick = (index: number, si: number) => {\n    if (!onSelect || index < 0 || index >= n) return;\n    onSelect({ index, label: labels[index], series: series[si].name, value: vals[si][index] });\n  };\n\n  const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {\n    if (n === 0) return;\n    const forward = event.key === \"ArrowRight\" || (donut && event.key === \"ArrowDown\");\n    const backward = event.key === \"ArrowLeft\" || (donut && event.key === \"ArrowUp\");\n    if (forward) move(act === null ? 0 : Math.min(n - 1, act + 1), true);\n    else if (backward) move(act === null ? n - 1 : Math.max(0, act - 1), true);\n    else if (event.key === \"Home\") move(0, true);\n    else if (event.key === \"End\") move(n - 1, true);\n    else if (event.key === \"Escape\") move(null, true);\n    else if (event.key === \"Enter\" || event.key === \" \") {\n      if (act !== null) pick(act, 0);\n    } else return;\n    event.preventDefault();\n  };\n\n  const local = (event: MouseEvent) => {\n    const rect = plotRef.current?.getBoundingClientRect();\n    return { x: event.clientX - (rect?.left ?? 0), y: event.clientY - (rect?.top ?? 0) };\n  };\n  const indexAt = (px: number) => Math.min(n - 1, Math.max(0, Math.floor((px - padLeft) / band)));\n\n  const onMove = (event: MouseEvent) => {\n    if (donut || n === 0) return;\n    const p = local(event);\n    setActive(indexAt(p.x));\n    setPointer(p);\n  };\n  const onClick = (event: MouseEvent) => {\n    if (donut || n === 0) return;\n    const p = local(event);\n    const i = indexAt(p.x);\n    const si = type === \"bar\" && !stackedMode ? Math.min(count - 1, Math.max(0, Math.floor((p.x - (x(i) - groupW / 2)) / barW))) : 0;\n    pick(i, si);\n  };\n  const clear = () => {\n    setActive(null);\n    setPointer(null);\n  };\n\n  // The tooltip follows the pointer, or sits at the active mark for the keyboard, and stays inside the chart.\n  let tip: { left: number; top: number } | null = null;\n  if (act !== null && showingPlot) {\n    const slice = slices[act];\n    const [sx, sy] = donut && slice ? polar(dcx, dcy, (outer + inner) / 2, slice.mid) : [x(act), PAD.top + 8];\n    const ax = pointer?.x ?? sx;\n    const ay = pointer?.y ?? sy;\n    const rows = donut ? 1 : series.length;\n    const tipH = 30 + rows * 18;\n    const left = ax + 14 + TIP_WIDTH > width ? ax - 14 - TIP_WIDTH : ax + 14;\n    tip = { left: Math.max(0, left), top: Math.min(Math.max(0, ay - 8), Math.max(0, height - tipH)) };\n  }\n\n  return (\n    <figure ref={ref} aria-labelledby={titleId} aria-busy={isLoading || undefined} className={cx(\"flex min-w-0 flex-col gap-2\", className)}>\n      <figcaption className=\"flex flex-wrap items-start justify-between gap-2\">\n        <div className=\"flex min-w-0 flex-col gap-0.5\">\n          <span id={titleId} className=\"text-sm font-semibold text-[var(--rd-color-text-default)]\">\n            {title}\n          </span>\n          {!isLoading && !empty && (\n            <span id={summaryId} className=\"max-w-prose text-xs text-[var(--rd-color-text-muted)]\">\n              {text}\n            </span>\n          )}\n        </div>\n        {!isLoading && !empty && (\n          <Button variant=\"secondary\" size=\"sm\" aria-pressed={asTable} aria-controls={tableId} onPress={() => { setAsTable((v) => !v); clear(); setAnnouncement(\"\"); }}>\n            {asTable ? \"View as chart\" : \"View as table\"}\n          </Button>\n        )}\n      </figcaption>\n\n      {isLoading ? (\n        <div aria-busy=\"true\">\n          <div className=\"animate-pulse rounded-[var(--rd-radius-control)] bg-[var(--rd-color-border-default)] motion-reduce:animate-none\" style={{ height }} />\n          <span role=\"status\" className=\"sr-only\">\n            Loading chart\n          </span>\n        </div>\n      ) : empty ? (\n        <p className=\"rounded-[var(--rd-radius-control)] border border-dashed border-[var(--rd-color-border-strong)] p-6 text-center text-sm text-[var(--rd-color-text-muted)]\">{emptyMessage}</p>\n      ) : (\n        <div id={tableId} ref={wrapRef} className=\"relative w-full min-w-0\">\n          {asTable ? (\n            <div className=\"overflow-x-auto rounded-[var(--rd-radius-control)] border border-[var(--rd-color-border-default)]\" tabIndex={0} role=\"region\" aria-label={`${title}, data table`}>\n              <table className=\"w-full border-collapse text-sm\">\n                <caption className=\"sr-only\">{title}</caption>\n                <thead>\n                  <tr>\n                    <th scope=\"col\" className=\"border-b border-[var(--rd-color-border-strong)] px-3 py-2 text-start font-medium text-[var(--rd-color-text-muted)]\">\n                      <span className=\"sr-only\">Category</span>\n                    </th>\n                    {series.map((s) => (\n                      <th key={s.name} scope=\"col\" className=\"border-b border-[var(--rd-color-border-strong)] px-3 py-2 text-end font-medium text-[var(--rd-color-text-muted)]\">\n                        {s.name}\n                      </th>\n                    ))}\n                  </tr>\n                </thead>\n                <tbody>\n                  {labels.map((label, i) => (\n                    <tr key={`${label}-${i}`}>\n                      <th scope=\"row\" className=\"border-b border-[var(--rd-color-border-default)] px-3 py-2 text-start font-medium text-[var(--rd-color-text-default)]\">\n                        {label}\n                      </th>\n                      {series.map((s) => (\n                        <td key={s.name} className=\"border-b border-[var(--rd-color-border-default)] px-3 py-2 text-end tabular-nums text-[var(--rd-color-text-default)]\">\n                          {s.values[i] === undefined ? \"\" : exact(s.values[i])}\n                        </td>\n                      ))}\n                    </tr>\n                  ))}\n                </tbody>\n              </table>\n            </div>\n          ) : (\n            <div\n              ref={plotRef}\n              role=\"group\"\n              tabIndex={0}\n              aria-label={`${title}. Use the left and right arrow keys to move between values.`}\n              aria-describedby={summaryId}\n              onKeyDown={onKeyDown}\n              onMouseMove={onMove}\n              onMouseLeave={clear}\n              onClick={onClick}\n              onBlur={() => {\n                clear();\n                setAnnouncement(\"\");\n              }}\n              className=\"relative rounded-[var(--rd-radius-control)] outline-none focus-visible:ring-2 focus-visible:ring-[var(--rd-color-focus-ring)]\"\n              style={{ height }}\n            >\n              <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} aria-hidden=\"true\" focusable=\"false\" role=\"presentation\" className=\"block\" fontSize=\"12\">\n                {donut ? (\n                  <g>\n                    {donutTotal === 0 ? (\n                      <path data-mark=\"empty-ring\" d={sectorPath(dcx, dcy, outer, inner, 0, Math.PI * 2 - 0.0001)} fill=\"var(--rd-color-border-default)\" />\n                    ) : (\n                      slices.map((s, i) => {\n                        if (!(donutValues[i] > 0)) return null;\n                        const [dx, dy] = act === i ? [Math.sin(s.mid) * 6, -Math.cos(s.mid) * 6] : [0, 0];\n                        return (\n                          <path\n                            key={`${labels[i]}-${i}`}\n                            data-mark=\"slice\"\n                            d={sectorPath(dcx, dcy, outer, inner, s.from, s.to)}\n                            fill={chartColor(i)}\n                            transform={`translate(${dx} ${dy})`}\n                            className=\"motion-reduce:transition-none\"\n                            onMouseMove={(event) => {\n                              setActive(i);\n                              setPointer(local(event));\n                            }}\n                            onClick={() => pick(i, 0)}\n                          />\n                        );\n                      })\n                    )}\n                    <text x={dcx} y={dcy - 2} textAnchor=\"middle\" fontSize=\"20\" fontWeight=\"600\" fill=\"var(--rd-color-text-default)\" data-total=\"\">\n                      {axisFormat(donutTotal)}\n                    </text>\n                    <text x={dcx} y={dcy + 16} textAnchor=\"middle\" fill=\"var(--rd-color-text-muted)\">\n                      Total\n                    </text>\n                  </g>\n                ) : (\n                  <g>\n                    {range.ticks.map((tick) => (\n                      <g key={tick}>\n                        {(showGrid || tick === 0) && (\n                          <line x1={padLeft} x2={width - PAD.right} y1={y(tick)} y2={y(tick)} stroke=\"var(--rd-color-border-default)\" strokeWidth={tick === 0 ? 1.5 : 1} />\n                        )}\n                        <text x={padLeft - 8} y={y(tick)} textAnchor=\"end\" dominantBaseline=\"middle\" fill=\"var(--rd-color-text-muted)\" data-axis=\"y\">\n                          {axisFormat(tick)}\n                        </text>\n                      </g>\n                    ))}\n                    {labels.map((label, i) =>\n                      i % labelStep === 0 ? (\n                        <text key={`${label}-${i}`} x={x(i)} y={height - PAD.bottom + 18} textAnchor=\"middle\" fill=\"var(--rd-color-text-muted)\" data-axis=\"x\">\n                          {label.length > maxChars ? `${label.slice(0, maxChars - 1)}…` : label}\n                        </text>\n                      ) : null,\n                    )}\n\n                    {act !== null && type === \"bar\" && <rect data-mark=\"highlight\" x={padLeft + band * act} y={PAD.top} width={band} height={plotH} fill=\"var(--rd-color-border-default)\" opacity={0.45} />}\n                    {act !== null && type !== \"bar\" && <line data-mark=\"guide\" x1={x(act)} x2={x(act)} y1={PAD.top} y2={PAD.top + plotH} stroke=\"var(--rd-color-text-muted)\" strokeWidth={1} />}\n\n                    {type === \"bar\" &&\n                      series.map((s, si) =>\n                        vals[si].map((value, i) => {\n                          const left = stackedMode ? x(i) - groupW / 2 : x(i) - groupW / 2 + si * barW;\n                          const top = y(hi[si][i]);\n                          const bottom = y(lo[si][i]);\n                          return (\n                            <g key={`${s.name}-${i}`}>\n                              <rect\n                                data-mark=\"bar\"\n                                x={left + 1}\n                                y={top}\n                                width={Math.max(1, barW - 2)}\n                                height={Math.max(0, bottom - top)}\n                                rx=\"2\"\n                                fill={chartColor(si)}\n                                stroke={stackedMode ? \"var(--rd-color-surface-default)\" : undefined}\n                                strokeWidth={stackedMode ? 1 : undefined}\n                                className=\"motion-reduce:transition-none\"\n                              />\n                              {direct && !stackedMode && (\n                                <text x={left + barW / 2} y={value >= 0 ? top - 5 : bottom + 14} textAnchor=\"middle\" fill=\"var(--rd-color-text-default)\" data-label=\"value\">\n                                  {axisFormat(value)}\n                                </text>\n                              )}\n                            </g>\n                          );\n                        }),\n                      )}\n                    {direct &&\n                      stackedMode &&\n                      labels.map((label, i) => {\n                        const total = vals.reduce((sum, row) => sum + row[i], 0);\n                        const topEdge = Math.max(...hi.map((row) => row[i]));\n                        return (\n                          <text key={`${label}-${i}`} x={x(i)} y={y(topEdge) - 5} textAnchor=\"middle\" fill=\"var(--rd-color-text-default)\" data-label=\"total\">\n                            {axisFormat(total)}\n                          </text>\n                        );\n                      })}\n\n                    {type === \"area\" &&\n                      series.map((s, si) => {\n                        const upper = edge[si].map((v, i) => `${x(i)} ${y(v)}`);\n                        const lower = lo[si].map((v, i) => `${x(i)} ${y(v)}`).reverse();\n                        return <path key={s.name} data-mark=\"area\" d={`M${upper.join(\"L\")}L${lower.join(\"L\")}Z`} fill={chartColor(si)} fillOpacity={0.22} stroke=\"none\" />;\n                      })}\n\n                    {(type === \"line\" || type === \"area\") &&\n                      series.map((s, si) => {\n                        const color = chartColor(si);\n                        const points = edge[si].map((v, i) => [x(i), y(v)] as const);\n                        return (\n                          <g key={s.name}>\n                            <polyline data-mark=\"line\" points={points.map((p) => p.join(\",\")).join(\" \")} fill=\"none\" stroke={color} strokeWidth=\"2.25\" strokeLinejoin=\"round\" strokeLinecap=\"round\" />\n                            {(n <= 40 || act !== null) &&\n                              points.map(([px, py], i) =>\n                                n <= 40 || i === act ? <Marker key={i} mark=\"point\" shape={si} x={px} y={py} color={color} size={i === act ? 6 : 4.5} /> : null,\n                              )}\n                          </g>\n                        );\n                      })}\n                  </g>\n                )}\n              </svg>\n\n              {tip && act !== null && (\n                <div\n                  role=\"presentation\"\n                  aria-hidden=\"true\"\n                  data-slot=\"tooltip\"\n                  className=\"pointer-events-none absolute z-10 w-max max-w-[11rem] rounded-[var(--rd-radius-control)] border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-raised)] px-2.5 py-1.5 text-xs text-[var(--rd-color-text-default)] [box-shadow:var(--rd-elevation-floating)]\"\n                  style={{ left: tip.left, top: tip.top }}\n                >\n                  <div className=\"mb-1 font-semibold\">{labels[act]}</div>\n                  <ul className=\"flex flex-col gap-0.5\">\n                    {(donut ? [0] : series.map((_, si) => si)).map((si) => (\n                      <li key={si} className=\"flex items-center gap-1.5\">\n                        <svg aria-hidden=\"true\" viewBox=\"0 0 14 14\" className=\"size-3.5 shrink-0\" focusable=\"false\">\n                          {donut ? <rect x=\"1\" y=\"1\" width=\"12\" height=\"12\" rx=\"2\" fill={chartColor(act)} /> : <Marker shape={si} x={7} y={7} color={chartColor(si)} size={4} />}\n                        </svg>\n                        <span className=\"min-w-0 flex-1 truncate text-[var(--rd-color-text-muted)]\">{series[si].name}</span>\n                        <span className=\"tabular-nums\">{exact(vals[si][act])}</span>\n                        {donut && <span className=\"tabular-nums text-[var(--rd-color-text-muted)]\">{pct[act]}%</span>}\n                      </li>\n                    ))}\n                  </ul>\n                </div>\n              )}\n            </div>\n          )}\n        </div>\n      )}\n\n      {showingPlot && showLegend && (donut || series.length > 1) && (\n        <ul aria-label=\"Legend\" className=\"flex flex-wrap gap-x-4 gap-y-1 text-xs text-[var(--rd-color-text-default)]\">\n          {donut\n            ? labels.map((label, i) => (\n                <li key={`${label}-${i}`} className=\"inline-flex items-center gap-1.5\">\n                  <svg aria-hidden=\"true\" viewBox=\"0 0 14 14\" className=\"size-3.5\" focusable=\"false\">\n                    <rect x=\"1\" y=\"1\" width=\"12\" height=\"12\" rx=\"2\" fill={chartColor(i)} data-shape=\"square\" />\n                  </svg>\n                  {label} <span className=\"tabular-nums text-[var(--rd-color-text-muted)]\">{pct[i]}%</span>\n                </li>\n              ))\n            : series.map((s, si) => (\n                <li key={s.name} className=\"inline-flex items-center gap-1.5\">\n                  <svg aria-hidden=\"true\" viewBox=\"0 0 14 14\" className=\"size-3.5\" focusable=\"false\">\n                    {type === \"bar\" ? <rect x=\"1\" y=\"1\" width=\"12\" height=\"12\" rx=\"2\" fill={chartColor(si)} data-shape=\"square\" /> : <Marker shape={si} x={7} y={7} color={chartColor(si)} size={4.5} />}\n                  </svg>\n                  {s.name}\n                </li>\n              ))}\n        </ul>\n      )}\n\n      {!isLoading && !empty && (\n        <div role=\"status\" className=\"sr-only\">\n          {announcement}\n        </div>\n      )}\n    </figure>\n  );\n});\n"
+        },
+        {
+          "path": "chart/scales.ts",
+          "content": "/** A round range that always includes zero, with evenly spaced ticks: -50, 0, 50, 100 and not -37, 0, 74. */\nexport function niceRange(min: number, max: number, wanted = 4): { min: number; max: number; ticks: number[] } {\n  const lo = Math.min(0, Number.isFinite(min) ? min : 0);\n  const hi = Math.max(0, Number.isFinite(max) ? max : 0);\n  if (hi === lo) return { min: 0, max: 1, ticks: [0, 1] };\n  const rough = (hi - lo) / wanted;\n  const magnitude = 10 ** Math.floor(Math.log10(rough));\n  const step = [1, 2, 2.5, 5, 10].map((m) => m * magnitude).find((s) => s >= rough) ?? 10 * magnitude;\n  const bottom = Math.floor(lo / step) * step;\n  const top = Math.ceil(hi / step) * step;\n  const count = Math.round((top - bottom) / step);\n  const ticks = Array.from({ length: count + 1 }, (_, i) => Number((bottom + i * step).toFixed(10)));\n  return { min: Number(bottom.toFixed(10)), max: Number(top.toFixed(10)), ticks };\n}\n\n/** 12400 -> \"12.4K\" for the axis; exact values stay in the tooltip and the table. */\nexport const compact = (value: number) => new Intl.NumberFormat(undefined, { notation: \"compact\", maximumFractionDigits: 1 }).format(value);\n\nexport function withUnit(text: string, unit?: string) {\n  if (!unit) return text;\n  return /^[$€£¥₹]$/.test(unit) ? `${unit}${text}` : `${text}${/^[%‰]$/.test(unit) ? \"\" : \" \"}${unit}`;\n}\n\nexport const exactNumber = (value: number) => value.toLocaleString(undefined, { maximumFractionDigits: 3 });\n\n/** Whole percentages that add up to exactly 100 (largest remainder), so a legend never reads 99% or 101%. */\nexport function percentages(values: number[]): number[] {\n  const total = values.reduce((a, b) => a + b, 0);\n  if (total <= 0) return values.map(() => 0);\n  const raw = values.map((v) => (v / total) * 100);\n  const floors = raw.map(Math.floor);\n  let left = 100 - floors.reduce((a, b) => a + b, 0);\n  const order = raw.map((r, i) => [r - Math.floor(r), i] as const).sort((a, b) => b[0] - a[0]);\n  for (const [, i] of order) {\n    if (left <= 0) break;\n    floors[i] += 1;\n    left -= 1;\n  }\n  return floors;\n}\n\n/** Angles run clockwise from the top. */\nexport function polar(cx: number, cy: number, r: number, angle: number): [number, number] {\n  return [cx + r * Math.sin(angle), cy - r * Math.cos(angle)];\n}\n\nexport function sectorPath(cx: number, cy: number, outer: number, inner: number, from: number, to: number): string {\n  const large = to - from > Math.PI ? 1 : 0;\n  const [x0, y0] = polar(cx, cy, outer, from);\n  const [x1, y1] = polar(cx, cy, outer, to);\n  const [x2, y2] = polar(cx, cy, inner, to);\n  const [x3, y3] = polar(cx, cy, inner, from);\n  return `M${x0} ${y0}A${outer} ${outer} 0 ${large} 1 ${x1} ${y1}L${x2} ${y2}A${inner} ${inner} 0 ${large} 0 ${x3} ${y3}Z`;\n}\n"
+        },
+        {
+          "path": "generated/chart.types.ts",
+          "content": "// Generated by rdloom codegen from specs/chart.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nexport const chartTypeValues = [\"bar\", \"line\", \"area\", \"donut\"] as const;\n\n/** A bar, line, area or donut chart drawn in plain SVG without a chart library. It fits its container, can be explored with a pointer or the arrow keys, and always comes with a written summary and a View as table switch that shows the same numbers. */\nexport interface ChartSpecProps {\n  /**\n   * The labels along the bottom and one or more named series of values. A donut draws the first series only.\n   */\n  data: import(\"../utils/ai\").ChartData;\n  /**\n   * The name of the figure.\n   */\n  title: string;\n  /**\n   * A sentence that tells the story of the chart. Defaults to a sentence written from the data.\n   */\n  summary?: string;\n  /**\n   * Bars, a line, a filled area or a donut.\n   * @default \"bar\"\n   */\n  type?: \"bar\" | \"line\" | \"area\" | \"donut\";\n  /**\n   * Add the series up instead of drawing them side by side. Applies to bar and area.\n   * @default false\n   */\n  stacked?: boolean;\n  /**\n   * Height of the drawing in pixels. The width follows the container.\n   * @default 280\n   */\n  height?: number;\n  /**\n   * Name each series (or each donut slice) below the drawing. Hidden for a single series except in a donut.\n   * @default true\n   */\n  showLegend?: boolean;\n  /**\n   * Draw grid lines behind bar, line and area charts.\n   * @default true\n   */\n  showGrid?: boolean;\n  /**\n   * Turns a value into text for the axis, the tooltip, the labels and the table. Defaults to compact numbers with the data unit.\n   */\n  valueFormat?: (value: number) => string;\n  /**\n   * Called when a point is clicked, or when Enter or Space is pressed on the active point.\n   */\n  onSelect?: (point: { index: number; label: string; series: string; value: number }) => void;\n  /**\n   * Show a placeholder the size of the chart instead of the drawing.\n   * @default false\n   */\n  isLoading?: boolean;\n  /**\n   * Shown when there is nothing to chart.\n   * @default \"No data to chart.\"\n   */\n  emptyMessage?: string;\n}\n\nexport const chartDefaults = {\n  type: \"bar\",\n  stacked: false,\n  height: 280,\n  showLegend: true,\n  showGrid: true,\n  isLoading: false,\n  emptyMessage: \"No data to chart.\",\n} as const;\n\nexport const chartMeta = {\n  \"name\": \"Chart\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"figure\"\n} as const;\n"
+        }
+      ]
+    },
+    {
       "id": "chat",
       "spec": {
         "$schema": "./schema/component.schema.json",
@@ -2450,6 +2679,255 @@
         {
           "path": "generated/command-palette.types.ts",
           "content": "// Generated by rdloom codegen from specs/command-palette.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nimport type { ReactNode } from \"react\";\n\n/** A search box in a dialog that finds and runs commands, jumps to pages and triggers actions from the keyboard. Opens with Ctrl or Cmd + K. Use CommandGroup and CommandItem for the results. */\nexport interface CommandPaletteSpecProps {\n  /**\n   * Accessible name of the dialog, e.g. \"Command palette\".\n   */\n  label: string;\n  /**\n   * CommandGroup and CommandItem elements.\n   */\n  children: ReactNode;\n  /**\n   * Controlled open state.\n   */\n  isOpen?: boolean;\n  /**\n   * Initial state when uncontrolled.\n   * @default false\n   */\n  defaultOpen?: boolean;\n  /**\n   * Called when it opens or closes.\n   */\n  onOpenChange?: (isOpen: boolean) => void;\n  /**\n   * Hint in the search box.\n   * @default \"Search commands…\"\n   */\n  placeholder?: string;\n  /**\n   * Shown when nothing matches.\n   * @default \"No results found.\"\n   */\n  emptyMessage?: string;\n  /**\n   * Letter that opens it with Ctrl (Windows, Linux) or Cmd (Mac) held. Set null to turn the shortcut off and open it yourself.\n   * @default \"k\"\n   */\n  shortcut?: string | null;\n  /**\n   * Called with the id of any command run, in addition to the command's own onAction.\n   */\n  onAction?: (key: import(\"react-aria-components\").Key) => void;\n}\n\nexport const commandPaletteDefaults = {\n  defaultOpen: false,\n  placeholder: \"Search commands…\",\n  emptyMessage: \"No results found.\",\n  shortcut: \"k\",\n} as const;\n\nexport const commandPaletteMeta = {\n  \"name\": \"CommandPalette\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"dialog\"\n} as const;\n"
+        }
+      ]
+    },
+    {
+      "id": "customer-table",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "CustomerTable",
+        "version": "0.1.0",
+        "category": "block",
+        "status": "experimental",
+        "description": "A ready-to-use customer list: search, filters, sorting, pages, CSV export, loading rows, an empty state, an error with retry, cards on a phone, and totals with a chart above that follow the filters. Give it customers and it works.",
+        "props": {
+          "customers": {
+            "type": "custom",
+            "description": "The customers to show. With serverSide, only the current page.",
+            "required": true,
+            "tsType": "import(\"../customer-table/query\").Customer[]"
+          },
+          "label": {
+            "type": "string",
+            "description": "Accessible name of the table and the section, e.g. \"Customers\".",
+            "default": "Customers"
+          },
+          "pageSize": {
+            "type": "number",
+            "description": "Customers per page.",
+            "default": 10
+          },
+          "currency": {
+            "type": "string",
+            "description": "ISO currency code for revenue, e.g. \"USD\" or \"EUR\".",
+            "default": "USD"
+          },
+          "locale": {
+            "type": "string",
+            "description": "Locale for numbers and dates, e.g. \"en-GB\". Defaults to the visitor's."
+          },
+          "isLoading": {
+            "type": "boolean",
+            "description": "Show loading rows and skeleton cards, disable the controls, and mark the section busy.",
+            "default": false
+          },
+          "error": {
+            "type": "string",
+            "description": "A message to show instead of the list when loading failed."
+          },
+          "onRetry": {
+            "type": "callback",
+            "description": "Adds a Try again button to the error message.",
+            "tsType": "() => void"
+          },
+          "insights": {
+            "type": "custom",
+            "description": "The totals and chart above the table. \"auto\" works them out from the customers and follows the filters (not with serverSide); \"none\" hides them; or pass your own numbers.",
+            "default": "auto",
+            "tsType": "\"auto\" | \"none\" | import(\"../customer-table/query\").CustomerInsights"
+          },
+          "serverSide": {
+            "type": "boolean",
+            "description": "The list lives on a server. The table then shows exactly the customers you pass, and asks for new ones through onQueryChange when the search, a filter, the sort or the page changes.",
+            "default": false
+          },
+          "totalCount": {
+            "type": "number",
+            "description": "With serverSide: how many customers match in all, so the pages and the count are right."
+          },
+          "onQueryChange": {
+            "type": "callback",
+            "description": "With serverSide: called with the new query (search, status, plan, sort, page, pageSize). Typing in the search waits for a short pause first.",
+            "tsType": "(query: import(\"../customer-table/query\").CustomerQuery) => void"
+          },
+          "defaultQuery": {
+            "type": "custom",
+            "description": "Start with a search, filters, a sort or a page already set.",
+            "tsType": "Partial<import(\"../customer-table/query\").CustomerQuery>"
+          },
+          "onExport": {
+            "type": "callback",
+            "description": "Replaces the built-in CSV download. It gets the customers that match (all pages when the list is in memory). With serverSide the Export button is shown only when you provide this.",
+            "tsType": "(customers: import(\"../customer-table/query\").Customer[], query: import(\"../customer-table/query\").CustomerQuery) => void"
+          },
+          "onOpenCustomer": {
+            "type": "callback",
+            "description": "Makes each name a button and calls this with the customer, e.g. to open a details panel.",
+            "tsType": "(customer: import(\"../customer-table/query\").Customer) => void"
+          },
+          "statusTones": {
+            "type": "custom",
+            "description": "Which badge color a status gets. The defaults are active green, trial blue, overdue amber, churned red; anything else is neutral.",
+            "tsType": "Record<string, \"neutral\" | \"info\" | \"success\" | \"warning\" | \"danger\">"
+          },
+          "density": {
+            "type": "enum",
+            "description": "Row spacing of the table.",
+            "values": [
+              "compact",
+              "standard",
+              "comfortable"
+            ],
+            "default": "standard"
+          }
+        },
+        "states": [
+          "default",
+          "loading"
+        ],
+        "slots": [
+          "root",
+          "insights",
+          "stat",
+          "chart",
+          "toolbar",
+          "search",
+          "filters",
+          "export",
+          "table",
+          "cards",
+          "empty",
+          "error",
+          "footer",
+          "pagination"
+        ],
+        "tokens": [
+          "color.surface.default",
+          "color.border.default",
+          "color.border.strong",
+          "color.text.default",
+          "color.text.muted",
+          "color.focus.ring",
+          "radius.control",
+          "radius.overlay",
+          "elevation.raised",
+          "size.control-md"
+        ],
+        "a11y": {
+          "role": "region",
+          "keyboard": [
+            "Tab: moves through the search, the filters, Export, the table (one stop), the names when onOpenCustomer is set, and the page buttons",
+            "In the table: arrow keys move between cells; Enter or Space on a column header sorts",
+            "In a filter: Enter or Space opens the list, arrow keys choose, Escape closes",
+            "Escape in the search box clears it"
+          ],
+          "requirements": [
+            "A labelled region around everything; the table and the phone cards have their own names",
+            "A real table with a row header (the customer), sortable column headers that expose their sort direction, and right-aligned money in tabular numerals",
+            "The count of matching customers is a polite status message, so filtering is announced; so is an export (\"Exported 24 customers to customers.csv\")",
+            "Search and filters each have a name (read, not drawn); the status of a customer is always text in a badge, never a color alone",
+            "Loading marks the region busy and shows skeletons instead of fake numbers; the controls are disabled while loading",
+            "An empty list says why (nothing yet, or nothing matches) and offers Clear filters; an error is an alert with a retry button",
+            "Below tablet width the table is replaced by cards (a list); only one of the two is in the accessibility tree at a time",
+            "The totals and chart come from the Stat and Chart components, so they are readable, keyboard-reachable and have a table view",
+            "CSV export neutralises cells that start with = + - or @ so a spreadsheet can't run them as formulas"
+          ],
+          "screenReader": [
+            "\"Customers, region\" then the totals, then \"Search customers, search edit text\"",
+            "After typing: \"3 customers\" (polite)",
+            "The table reads as \"Customers, table, 24 rows, 5 columns\"; a cell reads its row header, column and value",
+            "A sort reads \"Monthly revenue, column header, sorted descending\""
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "An admin or billing screen that lists people or accounts with a plan, a status and revenue",
+            "You want search, filters, sorting, paging and export without wiring each one"
+          ],
+          "avoid_when": [
+            "Tens of thousands of rows you must scroll or edit like a spreadsheet: use DataGrid",
+            "A list with different columns: build it from Table, Pagination and the other parts, as this block does"
+          ],
+          "anti_patterns": [
+            "Loading every customer into the browser when there are many thousands: use serverSide",
+            "Showing the totals of one page of a server's list as if they were the totals of all customers"
+          ]
+        },
+        "examples": [
+          "basic",
+          "server-side",
+          "loading-and-empty",
+          "custom-insights",
+          "without-insights",
+          "row-action"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {}
+        }
+      },
+      "install": {
+        "command": "npx rdloom add customer-table",
+        "dependencies": [
+          "react-aria-components@^1.21.1"
+        ],
+        "registryDependencies": [
+          "tokens",
+          "alert",
+          "avatar",
+          "badge",
+          "button",
+          "card",
+          "chart",
+          "empty-state",
+          "pagination",
+          "select",
+          "skeleton",
+          "stat",
+          "table",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import { CustomerTable, type Customer } from \"@rdloom/react\";\n\nconst people = [\n  [\"Ada Lovelace\", \"Analytical Co\"], [\"Grace Hopper\", \"Compiler Labs\"], [\"Katherine Johnson\", \"Orbit Systems\"], [\"Alan Turing\", \"Enigma Works\"],\n  [\"Margaret Hamilton\", \"Apollo Software\"], [\"Dennis Ritchie\", \"Bell Studio\"], [\"Barbara Liskov\", \"Substitution Inc\"], [\"Edsger Dijkstra\", \"Shortest Path\"],\n  [\"Radia Perlman\", \"Spanning Tree\"], [\"Donald Knuth\", \"Literate Press\"], [\"Frances Allen\", \"Optimise Ltd\"], [\"Linus Torvalds\", \"Kernel House\"],\n  [\"Hedy Lamarr\", \"Spread Spectrum\"], [\"Tim Berners-Lee\", \"Web Works\"], [\"Annie Easley\", \"Rocket Code\"], [\"Ken Thompson\", \"Pipe Dream\"],\n  [\"Shafi Goldwasser\", \"Zero Knowledge\"], [\"Vint Cerf\", \"Packet Co\"], [\"Mary Jackson\", \"Wind Tunnel\"], [\"John McCarthy\", \"Lisp Labs\"],\n  [\"Sophie Wilson\", \"Instruction Set\"], [\"Guido van Rossum\", \"Indent Inc\"], [\"Evelyn Boyd Granville\", \"Orbit Maths\"], [\"Niklaus Wirth\", \"Pascal Press\"],\n];\nconst plans = [\"Free\", \"Pro\", \"Team\", \"Enterprise\"];\nconst price = [0, 29, 99, 499];\nconst statuses = [\"active\", \"active\", \"trial\", \"overdue\", \"active\", \"churned\", \"active\"];\n\n// Every customer has a plan, a status, monthly revenue and a join date. The block does the rest.\nconst customers: Customer[] = people.map(([name, company], i) => {\n  const plan = i % 4;\n  return {\n    id: `c${i + 1}`,\n    name,\n    company,\n    email: `${name.split(\" \")[0].toLowerCase()}@example.com`,\n    plan: plans[plan],\n    status: statuses[i % statuses.length],\n    mrr: price[plan],\n    joinedAt: `2026-${String(1 + (i % 9)).padStart(2, \"0\")}-${String(3 + ((i * 5) % 24)).padStart(2, \"0\")}`,\n  };\n});\n\nexport default function CustomerTableBasicExample() {\n  return (\n    <div className=\"w-[60rem] max-w-full\">\n      <CustomerTable customers={customers} pageSize={8} />\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "server-side",
+          "code": "import { useEffect, useRef, useState } from \"react\";\nimport { CustomerTable, applyCustomerQuery, type Customer, type CustomerQuery } from \"@rdloom/react\";\n\nconst all: Customer[] = Array.from({ length: 240 }, (_, i) => ({\n  id: `c${i + 1}`,\n  name: `Customer ${String(i + 1).padStart(3, \"0\")}`,\n  email: `customer${i + 1}@example.com`,\n  plan: [\"Free\", \"Pro\", \"Team\"][i % 3],\n  status: [\"active\", \"trial\", \"overdue\", \"churned\"][i % 4],\n  mrr: [0, 29, 99][i % 3],\n  joinedAt: `2026-0${1 + (i % 9)}-${String(1 + (i % 27)).padStart(2, \"0\")}`,\n}));\n\n// A stand-in for your API: it answers after a short wait. In your app, send the query to the server and\n// return that page and the number of matches. (applyCustomerQuery is the same logic the table uses in memory.)\nconst fetchCustomers = (query: CustomerQuery) =>\n  new Promise<{ rows: Customer[]; total: number }>((resolve) => {\n    const { rows, total } = applyCustomerQuery(all, query);\n    setTimeout(() => resolve({ rows, total }), 600);\n  });\n\nexport default function CustomerTableServerSideExample() {\n  const [page, setPage] = useState<{ rows: Customer[]; total: number }>({ rows: [], total: 0 });\n  const [loading, setLoading] = useState(true);\n  const [error, setError] = useState<string>();\n  const last = useRef<CustomerQuery | undefined>(undefined);\n\n  const load = (query: CustomerQuery) => {\n    last.current = query;\n    setLoading(true);\n    setError(undefined);\n    fetchCustomers(query)\n      .then((result) => last.current === query && setPage(result)) // ignore an answer that arrives late\n      .catch(() => setError(\"The server did not answer.\"))\n      .finally(() => last.current === query && setLoading(false));\n  };\n  useEffect(() => load({ search: \"\", status: [], plan: [], sort: null, page: 1, pageSize: 8 }), []);\n\n  return (\n    <div className=\"w-[60rem] max-w-full\">\n      <CustomerTable\n        customers={page.rows}\n        totalCount={page.total}\n        pageSize={8}\n        serverSide\n        isLoading={loading}\n        error={error}\n        onRetry={() => last.current && load(last.current)}\n        onQueryChange={load}\n        // The cards above the table would only describe this one page: leave them out, or pass the totals your API returns.\n        insights=\"none\"\n        onExport={(rows) => console.log(`Export ${rows.length} customers`)}\n      />\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "loading-and-empty",
+          "code": "import { useState } from \"react\";\nimport { Button, CustomerTable } from \"@rdloom/react\";\n\n// While data is on its way pass isLoading: rows turn into skeletons and the controls wait.\n// With no customers the table says so in words and, when a filter hides everyone, offers to clear it.\nexport default function CustomerTableLoadingAndEmptyExample() {\n  const [state, setState] = useState<\"loading\" | \"empty\" | \"error\">(\"loading\");\n  return (\n    <div className=\"flex w-[60rem] max-w-full flex-col gap-4\">\n      <div role=\"group\" aria-label=\"State to show\" className=\"flex gap-2\">\n        {([\"loading\", \"empty\", \"error\"] as const).map((s) => (\n          <Button key={s} size=\"sm\" variant={state === s ? \"primary\" : \"secondary\"} onPress={() => setState(s)}>\n            {s[0].toUpperCase() + s.slice(1)}\n          </Button>\n        ))}\n      </div>\n      <CustomerTable\n        customers={[]}\n        insights=\"none\"\n        isLoading={state === \"loading\"}\n        error={state === \"error\" ? \"The server did not answer.\" : undefined}\n        onRetry={() => setState(\"loading\")}\n      />\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "custom-insights",
+          "code": "import { CustomerTable, type Customer, type CustomerInsights } from \"@rdloom/react\";\n\nconst customers: Customer[] = [\n  { id: \"1\", name: \"Ada Lovelace\", email: \"ada@example.com\", plan: \"Pro\", status: \"active\", mrr: 99, joinedAt: \"2026-01-14\" },\n  { id: \"2\", name: \"Grace Hopper\", email: \"grace@example.com\", plan: \"Team\", status: \"active\", mrr: 499, joinedAt: \"2026-02-02\" },\n  { id: \"3\", name: \"Alan Turing\", email: \"alan@example.com\", plan: \"Pro\", status: \"trial\", mrr: 0, joinedAt: \"2026-03-09\" },\n  { id: \"4\", name: \"Margaret Hamilton\", email: \"margaret@example.com\", plan: \"Team\", status: \"overdue\", mrr: 499, joinedAt: \"2026-03-21\" },\n];\n\n// Your own numbers, with a trend and a small history, and any chart type. The cards use Stat, the chart uses Chart.\nconst insights: CustomerInsights = {\n  stats: [\n    { label: \"Monthly revenue\", value: \"$48,200\", trend: { change: 12, label: \"vs last month\" }, data: [31, 34, 33, 38, 41, 44, 48] },\n    { label: \"New customers\", value: 128, trend: { change: -4, label: \"vs last month\" }, data: [22, 30, 28, 26, 24, 27, 25] },\n    { label: \"Churn\", value: \"1.8%\", trend: { change: -0.4, label: \"vs last month\", goodWhen: \"down\" } },\n    { label: \"Trials\", value: 36, description: \"9 end this week\" },\n  ],\n  chart: {\n    title: \"Revenue, last 7 months\",\n    type: \"area\",\n    data: { labels: [\"Apr\", \"May\", \"Jun\", \"Jul\", \"Aug\", \"Sep\", \"Oct\"], series: [{ name: \"Revenue\", values: [31000, 34000, 33000, 38000, 41000, 44000, 48200] }] },\n  },\n};\n\nexport default function CustomerTableCustomInsightsExample() {\n  return (\n    <div className=\"w-[60rem] max-w-full\">\n      <CustomerTable customers={customers} insights={insights} />\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "without-insights",
+          "code": "import { CustomerTable, type Customer } from \"@rdloom/react\";\n\nconst customers: Customer[] = [\n  { id: \"1\", name: \"Ada Lovelace\", email: \"ada@example.com\", company: \"Analytical Co\", plan: \"Pro\", status: \"active\", mrr: 99, joinedAt: \"2026-01-14\" },\n  { id: \"2\", name: \"Grace Hopper\", email: \"grace@example.com\", company: \"Compiler Labs\", plan: \"Team\", status: \"active\", mrr: 499, joinedAt: \"2026-02-02\" },\n  { id: \"3\", name: \"Alan Turing\", email: \"alan@example.com\", plan: \"Free\", status: \"trial\", mrr: 0, joinedAt: \"2026-03-09\" },\n  { id: \"4\", name: \"Margaret Hamilton\", email: \"margaret@example.com\", plan: \"Team\", status: \"overdue\", mrr: 499, joinedAt: \"2026-03-21\" },\n  { id: \"5\", name: \"Dennis Ritchie\", email: \"dennis@example.com\", plan: \"Pro\", status: \"churned\", mrr: 99, joinedAt: \"2025-11-30\" },\n];\n\n// Just the list: no totals or chart, euros, a British date format, and a custom color for one status.\nexport default function CustomerTableWithoutInsightsExample() {\n  return (\n    <div className=\"w-[56rem] max-w-full\">\n      <CustomerTable customers={customers} insights=\"none\" currency=\"EUR\" locale=\"en-GB\" density=\"compact\" statusTones={{ trial: \"warning\", overdue: \"danger\" }} />\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "row-action",
+          "code": "import { useState } from \"react\";\nimport { Alert, CustomerTable, type Customer } from \"@rdloom/react\";\n\nconst customers: Customer[] = [\n  { id: \"1\", name: \"Ada Lovelace\", email: \"ada@example.com\", company: \"Analytical Co\", plan: \"Pro\", status: \"active\", mrr: 99, joinedAt: \"2026-01-14\" },\n  { id: \"2\", name: \"Grace Hopper\", email: \"grace@example.com\", company: \"Compiler Labs\", plan: \"Team\", status: \"active\", mrr: 499, joinedAt: \"2026-02-02\" },\n  { id: \"3\", name: \"Alan Turing\", email: \"alan@example.com\", plan: \"Free\", status: \"trial\", mrr: 0, joinedAt: \"2026-03-09\" },\n];\n\n// onOpenCustomer turns each name into a button. What it opens (a panel, a page, a dialog) is up to you.\nexport default function CustomerTableRowActionExample() {\n  const [open, setOpen] = useState<Customer | null>(null);\n  return (\n    <div className=\"flex w-[56rem] max-w-full flex-col gap-4\">\n      {open && (\n        <Alert title={open.name} onDismiss={() => setOpen(null)}>\n          {open.email}, on the {open.plan} plan.\n        </Alert>\n      )}\n      <CustomerTable customers={customers} insights=\"none\" onOpenCustomer={setOpen} />\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "customer-table/customer-table.tsx",
+          "content": "\"use client\";\n\nimport { forwardRef, useEffect, useMemo, useRef, useState } from \"react\";\nimport { Button as AriaButton, Input, Label, SearchField } from \"react-aria-components\";\nimport { customerTableDefaults, type CustomerTableSpecProps } from \"../generated/customer-table.types\";\nimport { Alert } from \"../alert/alert\";\nimport { Avatar } from \"../avatar/avatar\";\nimport { Badge } from \"../badge/badge\";\nimport { Button } from \"../button/button\";\nimport { Card } from \"../card/card\";\nimport { Chart } from \"../chart/chart\";\nimport { EmptyState } from \"../empty-state/empty-state\";\nimport { Pagination } from \"../pagination/pagination\";\nimport { Select, SelectItem } from \"../select/select\";\nimport { Skeleton } from \"../skeleton/skeleton\";\nimport { Stat } from \"../stat/stat\";\nimport { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from \"../table/table\";\nimport { cx } from \"../utils/cx\";\nimport { CloseIcon, SearchIcon } from \"../utils/icons\";\nimport {\n  applyQuery,\n  customersToCsv,\n  distinct,\n  emptyQuery,\n  formatDate,\n  formatMoney,\n  isFiltered,\n  pageCountOf,\n  summarize,\n  type Customer,\n  type CustomerInsights,\n  type CustomerQuery,\n  type CustomerSortColumn,\n} from \"./query\";\n\nexport interface CustomerTableProps extends CustomerTableSpecProps {\n  className?: string;\n}\n\ntype Tone = \"neutral\" | \"info\" | \"success\" | \"warning\" | \"danger\";\nconst defaultTones: Record<string, Tone> = { active: \"success\", trial: \"info\", overdue: \"warning\", churned: \"danger\" };\n\nconst SORTS: Array<{ id: string; label: string; sort: CustomerQuery[\"sort\"] }> = [\n  { id: \"default\", label: \"Default order\", sort: null },\n  { id: \"joined-desc\", label: \"Newest first\", sort: { column: \"joinedAt\", direction: \"descending\" } },\n  { id: \"joined-asc\", label: \"Oldest first\", sort: { column: \"joinedAt\", direction: \"ascending\" } },\n  { id: \"mrr-desc\", label: \"Highest revenue\", sort: { column: \"mrr\", direction: \"descending\" } },\n  { id: \"mrr-asc\", label: \"Lowest revenue\", sort: { column: \"mrr\", direction: \"ascending\" } },\n  { id: \"name-asc\", label: \"Name, A to Z\", sort: { column: \"name\", direction: \"ascending\" } },\n  { id: \"name-desc\", label: \"Name, Z to A\", sort: { column: \"name\", direction: \"descending\" } },\n];\nconst sortId = (sort: CustomerQuery[\"sort\"]) => SORTS.find((s) => s.sort?.column === sort?.column && s.sort?.direction === sort?.direction)?.id ?? \"default\";\n\nconst control =\n  \"h-[var(--rd-size-control-md)] w-full rounded-[var(--rd-radius-control)] border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-default)] \" +\n  \"ps-9 pe-9 text-sm text-[var(--rd-color-text-default)] [box-shadow:var(--rd-elevation-raised)] outline-none transition-colors \" +\n  \"placeholder:text-[var(--rd-color-text-muted)] data-[hovered]:border-[var(--rd-color-border-strong)] \" +\n  \"data-[focused]:border-[var(--rd-color-focus-ring)] data-[focused]:ring-2 data-[focused]:ring-[var(--rd-color-focus-ring)] [&::-webkit-search-cancel-button]:hidden\";\n\n/**\n * A ready-to-use customer list: search, filter by status and plan, sort, pages, CSV export,\n * loading rows, an empty state, an error with retry, and cards instead of a table on a phone.\n * Above it, a few totals and a chart that follow the filters. Give it the customers and it\n * works; for a large list from a server, set `serverSide` and answer `onQueryChange`.\n */\nexport const CustomerTable = forwardRef<HTMLElement, CustomerTableProps>(function CustomerTable(\n  {\n    customers,\n    label = customerTableDefaults.label,\n    pageSize = customerTableDefaults.pageSize,\n    currency = customerTableDefaults.currency,\n    locale,\n    isLoading = customerTableDefaults.isLoading,\n    error,\n    onRetry,\n    insights = \"auto\",\n    serverSide = customerTableDefaults.serverSide,\n    totalCount,\n    onQueryChange,\n    defaultQuery,\n    onExport,\n    onOpenCustomer,\n    statusTones,\n    density = customerTableDefaults.density,\n    className,\n  },\n  ref,\n) {\n  const [query, setQuery] = useState<CustomerQuery>(() => ({ ...emptyQuery(pageSize), ...defaultQuery, pageSize }));\n  const [searchText, setSearchText] = useState(query.search);\n  const [notice, setNotice] = useState(\"\");\n  const debounce = useRef<ReturnType<typeof setTimeout>>(undefined);\n  useEffect(() => () => clearTimeout(debounce.current), []);\n\n  // A delayed search must change the query as it is then, not as it was when the key was pressed.\n  const latest = useRef(query);\n  latest.current = query;\n  const update = (patch: Partial<CustomerQuery>) => {\n    const next = { ...latest.current, ...patch, page: patch.page ?? 1 };\n    latest.current = next;\n    setQuery(next);\n    if (serverSide) onQueryChange?.(next);\n  };\n  const onSearch = (text: string) => {\n    setSearchText(text);\n    clearTimeout(debounce.current);\n    // A server is asked once typing pauses; a list in memory is filtered at every key.\n    if (serverSide) debounce.current = setTimeout(() => update({ search: text }), 250);\n    else update({ search: text });\n  };\n\n  // --- The rows\n  const client = useMemo(() => (serverSide ? null : applyQuery(customers, query)), [serverSide, customers, query]);\n  const total = serverSide ? (totalCount ?? customers.length) : client!.total;\n  const pageCount = pageCountOf(total, query.pageSize);\n  const page = Math.min(query.page, pageCount);\n  const rows = serverSide ? customers : client!.rows;\n  const filtered = isFiltered(query);\n  const options = useMemo(() => ({ status: distinct(customers, \"status\"), plan: distinct(customers, \"plan\") }), [customers]);\n  const tones = { ...defaultTones, ...statusTones };\n  const toneOf = (status: string): Tone => tones[status.toLowerCase()] ?? \"neutral\";\n\n  // --- Totals and chart above the table: they follow the filters\n  const shownInsights: CustomerInsights | null = useMemo(() => {\n    if (insights === \"none\") return null;\n    if (insights !== \"auto\") return insights;\n    if (serverSide) return null; // a page of a server's list says nothing about the whole: pass `insights` yourself\n    const s = summarize(client!.filtered);\n    return {\n      stats: [\n        { label: \"Customers\", value: s.total },\n        { label: \"Active\", value: s.active, description: s.total ? `${Math.round((s.active / s.total) * 100)}% of customers` : undefined },\n        { label: \"Monthly revenue\", value: formatMoney(s.mrr, currency, locale) },\n        { label: \"Churned\", value: s.churned },\n      ],\n      chart: s.byPlan.length\n        ? {\n            title: \"Monthly revenue by plan\",\n            data: { labels: s.byPlan.map((p) => p.plan), series: [{ name: \"Monthly revenue\", values: s.byPlan.map((p) => p.mrr) }] },\n            summary: `Monthly revenue split across ${s.byPlan.length} plan${s.byPlan.length === 1 ? \"\" : \"s\"}, ${formatMoney(s.mrr, currency, locale)} in all.`,\n          }\n        : undefined,\n    };\n  }, [insights, serverSide, client, currency, locale]);\n\n  // --- Export\n  const canExport = !!onExport || !serverSide;\n  const exportRows = () => {\n    const all = serverSide ? customers : client!.filtered;\n    if (onExport) {\n      onExport(all, query);\n      return;\n    }\n    const url = URL.createObjectURL(new Blob([\"﻿\" + customersToCsv(all)], { type: \"text/csv;charset=utf-8\" }));\n    const link = document.createElement(\"a\");\n    link.href = url;\n    link.download = \"customers.csv\";\n    link.click();\n    URL.revokeObjectURL(url);\n    setNotice(`Exported ${all.length} customer${all.length === 1 ? \"\" : \"s\"} to customers.csv`);\n  };\n\n  const clearFilters = () => {\n    setSearchText(\"\");\n    clearTimeout(debounce.current);\n    update({ search: \"\", status: [], plan: [] });\n  };\n\n  const first = total === 0 ? 0 : (page - 1) * query.pageSize + 1;\n  const last = Math.min(page * query.pageSize, total);\n  const money = (n: number) => formatMoney(n, currency, locale);\n\n  const filterSelect = (name: \"status\" | \"plan\", all: string, values: string[]) => (\n    <Select\n      label={name === \"status\" ? \"Status\" : \"Plan\"}\n      placeholder={all}\n      size=\"md\"\n      className=\"min-w-0 sm:w-40 [&>span:first-of-type]:sr-only\"\n      selectedKey={query[name][0]?.toLowerCase() ?? \"all\"}\n      onSelectionChange={(key) => update({ [name]: key === \"all\" || key === null ? [] : [values.find((v) => v.toLowerCase() === String(key)) ?? String(key)] })}\n      isDisabled={isLoading}\n    >\n      <SelectItem id=\"all\">{all}</SelectItem>\n      {values.map((v) => (\n        <SelectItem key={v} id={v.toLowerCase()} textValue={v}>\n          {v}\n        </SelectItem>\n      ))}\n    </Select>\n  );\n\n  const customerCell = (c: Customer) => (\n    <span className=\"flex min-w-0 items-center gap-3\">\n      <Avatar name={c.name} src={c.avatarUrl} size=\"sm\" decorative />\n      <span className=\"flex min-w-0 flex-col\">\n        {onOpenCustomer ? (\n          <AriaButton\n            onPress={() => onOpenCustomer(c)}\n            className=\"w-fit max-w-full truncate rounded text-start font-medium text-[var(--rd-color-text-default)] underline-offset-2 outline-none data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)] data-[hovered]:underline\"\n          >\n            {c.name}\n          </AriaButton>\n        ) : (\n          <span className=\"truncate font-medium text-[var(--rd-color-text-default)]\">{c.name}</span>\n        )}\n        <span className=\"truncate text-xs text-[var(--rd-color-text-muted)]\">{c.company ? `${c.email} · ${c.company}` : c.email}</span>\n      </span>\n    </span>\n  );\n\n  const showTable = !error && (isLoading || rows.length > 0);\n  const empty = !error && !isLoading && rows.length === 0;\n\n  return (\n    <section ref={ref} aria-label={label} aria-busy={isLoading || undefined} className={cx(\"flex flex-col gap-6\", className)}>\n      {shownInsights && (\n        <div className=\"flex min-w-0 flex-col gap-4\">\n          <div className=\"grid grid-cols-[repeat(2,minmax(0,1fr))] gap-4 sm:grid-cols-[repeat(4,minmax(0,1fr))]\">\n            {shownInsights.stats.map((s) => (\n              <Card key={s.label} padding=\"md\">\n                <Stat label={s.label} value={s.value} trend={s.trend} data={s.data} description={s.description} size=\"sm\" isLoading={isLoading} />\n              </Card>\n            ))}\n          </div>\n          {shownInsights.chart && (\n            <Card padding=\"md\">\n              <Chart\n                title={shownInsights.chart.title}\n                summary={shownInsights.chart.summary}\n                type={shownInsights.chart.type ?? \"bar\"}\n                data={shownInsights.chart.data}\n                valueFormat={(v) => formatMoney(v, currency, locale)}\n                isLoading={isLoading}\n                height={220}\n              />\n            </Card>\n          )}\n        </div>\n      )}\n\n      <div className=\"flex flex-col gap-3\">\n        {/* Search, filters and export */}\n        <div className=\"flex flex-wrap items-center gap-2\">\n          <SearchField\n            value={searchText}\n            onChange={onSearch}\n            onClear={() => onSearch(\"\")}\n            className=\"group relative min-w-0 flex-1 basis-56\"\n            isDisabled={isLoading && customers.length === 0}\n          >\n            <Label className=\"sr-only\">Search customers</Label>\n            <SearchIcon className=\"pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-[var(--rd-color-text-muted)]\" />\n            <Input placeholder=\"Search by name, email or company\" className={control} />\n            <AriaButton\n              aria-label=\"Clear search\"\n              className=\"absolute end-2 top-1/2 flex size-6 -translate-y-1/2 items-center justify-center rounded-full text-[var(--rd-color-text-muted)] outline-none group-data-[empty]:hidden data-[hovered]:bg-[var(--rd-color-surface-subtle)] data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)]\"\n            >\n              <CloseIcon className=\"size-3\" />\n            </AriaButton>\n          </SearchField>\n          {filterSelect(\"status\", \"All statuses\", options.status)}\n          {filterSelect(\"plan\", \"All plans\", options.plan)}\n          <Select\n            label=\"Sort by\"\n            size=\"md\"\n            className=\"min-w-0 basis-full sm:w-44 sm:basis-auto md:hidden [&>span:first-of-type]:sr-only\"\n            selectedKey={sortId(query.sort)}\n            onSelectionChange={(key) => update({ sort: SORTS.find((s) => s.id === key)?.sort ?? null })}\n          >\n            {SORTS.map((s) => (\n              <SelectItem key={s.id} id={s.id}>\n                {s.label}\n              </SelectItem>\n            ))}\n          </Select>\n          {filtered && (\n            <Button variant=\"ghost\" onPress={clearFilters}>\n              Clear filters\n            </Button>\n          )}\n          <div className=\"ms-auto flex items-center gap-3\">\n            <p role=\"status\" className=\"text-sm whitespace-nowrap text-[var(--rd-color-text-muted)]\">\n              {isLoading ? \"Loading customers\" : `${total.toLocaleString(locale)} customer${total === 1 ? \"\" : \"s\"}`}\n            </p>\n            {canExport && (\n              <Button variant=\"secondary\" onPress={exportRows} isDisabled={isLoading || total === 0}>\n                Export CSV\n              </Button>\n            )}\n          </div>\n        </div>\n\n        {error && (\n          <Alert variant=\"danger\" title=\"Couldn't load customers\">\n            <span className=\"flex flex-wrap items-center gap-3\">\n              {error}\n              {onRetry && (\n                <Button variant=\"secondary\" size=\"sm\" onPress={onRetry}>\n                  Try again\n                </Button>\n              )}\n            </span>\n          </Alert>\n        )}\n\n        {showTable && (\n          <>\n            {/* A table where there is room for one */}\n            <div className=\"hidden md:block\">\n              <Table\n                label={label}\n                density={density}\n                sortDescriptor={query.sort ?? undefined}\n                onSortChange={(d) => update({ sort: { column: d.column as CustomerSortColumn, direction: d.direction } })}\n              >\n                <TableHeader>\n                  <TableColumn id=\"name\" isRowHeader allowsSorting>\n                    Customer\n                  </TableColumn>\n                  <TableColumn id=\"plan\" allowsSorting>\n                    Plan\n                  </TableColumn>\n                  <TableColumn id=\"status\" allowsSorting>\n                    Status\n                  </TableColumn>\n                  <TableColumn id=\"mrr\" allowsSorting className=\"!text-end\">\n                    Monthly revenue\n                  </TableColumn>\n                  <TableColumn id=\"joinedAt\" allowsSorting>\n                    Joined\n                  </TableColumn>\n                </TableHeader>\n                <TableBody items={isLoading ? Array.from({ length: Math.min(query.pageSize, 5) }, (_, i) => ({ id: `loading-${i}` })) : rows}>\n                  {(row: { id: string } | Customer) =>\n                    \"name\" in row ? (\n                      <TableRow id={row.id}>\n                        <TableCell>{customerCell(row)}</TableCell>\n                        <TableCell>{row.plan}</TableCell>\n                        <TableCell>\n                          <Badge variant={toneOf(row.status)} size=\"sm\">\n                            {row.status}\n                          </Badge>\n                        </TableCell>\n                        <TableCell className=\"!text-end tabular-nums\">{money(row.mrr)}</TableCell>\n                        <TableCell className=\"whitespace-nowrap text-[var(--rd-color-text-muted)]\">{formatDate(row.joinedAt, locale)}</TableCell>\n                      </TableRow>\n                    ) : (\n                      <TableRow id={row.id}>\n                        <TableCell>\n                          {/* A row header with nothing in it would be an empty header for a screen reader. */}\n                          <span className=\"sr-only\">Loading customer</span>\n                          <Skeleton variant=\"text\" width=\"70%\" />\n                        </TableCell>\n                        <TableCell>\n                          <Skeleton variant=\"text\" width=\"50%\" />\n                        </TableCell>\n                        <TableCell>\n                          <Skeleton variant=\"text\" width=\"60%\" />\n                        </TableCell>\n                        <TableCell>\n                          <Skeleton variant=\"text\" width=\"40%\" className=\"ms-auto\" />\n                        </TableCell>\n                        <TableCell>\n                          <Skeleton variant=\"text\" width=\"55%\" />\n                        </TableCell>\n                      </TableRow>\n                    )\n                  }\n                </TableBody>\n              </Table>\n            </div>\n\n            {/* Cards where there is not */}\n            <ul aria-label={`${label}, as a list`} className=\"flex flex-col gap-3 md:hidden\">\n              {isLoading\n                ? Array.from({ length: 3 }, (_, i) => (\n                    <li key={i} className=\"rounded-[var(--rd-radius-overlay)] border border-[var(--rd-color-border-default)] p-4\">\n                      <Skeleton variant=\"text\" lines={3} />\n                    </li>\n                  ))\n                : rows.map((c) => (\n                    <li\n                      key={c.id}\n                      className=\"flex flex-col gap-3 rounded-[var(--rd-radius-overlay)] border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-default)] p-4 [box-shadow:var(--rd-elevation-raised)]\"\n                    >\n                      <div className=\"flex items-start justify-between gap-3\">\n                        {customerCell(c)}\n                        <Badge variant={toneOf(c.status)} size=\"sm\">\n                          {c.status}\n                        </Badge>\n                      </div>\n                      <dl className=\"grid grid-cols-3 gap-2 text-sm\">\n                        <div>\n                          <dt className=\"text-xs text-[var(--rd-color-text-muted)]\">Plan</dt>\n                          <dd>{c.plan}</dd>\n                        </div>\n                        <div>\n                          <dt className=\"text-xs text-[var(--rd-color-text-muted)]\">Revenue</dt>\n                          <dd className=\"tabular-nums\">{money(c.mrr)}</dd>\n                        </div>\n                        <div>\n                          <dt className=\"text-xs text-[var(--rd-color-text-muted)]\">Joined</dt>\n                          <dd>{formatDate(c.joinedAt, locale)}</dd>\n                        </div>\n                      </dl>\n                    </li>\n                  ))}\n            </ul>\n          </>\n        )}\n\n        {empty && (\n          <EmptyState\n            size=\"md\"\n            title={filtered ? \"No customers match\" : \"No customers yet\"}\n            description={filtered ? \"Try a different search, or clear the filters to see everyone.\" : \"People appear here once they sign up.\"}\n          >\n            {filtered && (\n              <Button variant=\"secondary\" onPress={clearFilters}>\n                Clear filters\n              </Button>\n            )}\n          </EmptyState>\n        )}\n\n        {/* Where you are, and the pages */}\n        {!error && !isLoading && total > 0 && (\n          <div className=\"flex flex-wrap items-center justify-between gap-3\">\n            <p className=\"text-sm text-[var(--rd-color-text-muted)]\">\n              Showing {first.toLocaleString(locale)} to {last.toLocaleString(locale)} of {total.toLocaleString(locale)}\n            </p>\n            {pageCount > 1 && <Pagination pageCount={pageCount} page={page} onChange={(p) => update({ page: p })} size=\"sm\" label={`${label} pages`} />}\n          </div>\n        )}\n      </div>\n\n      <span role=\"status\" className=\"sr-only\">\n        {notice}\n      </span>\n    </section>\n  );\n});\n"
+        },
+        {
+          "path": "customer-table/query.ts",
+          "content": "// The plain logic behind CustomerTable: no React in here, so it is easy to test and to reuse on a server.\n\nexport interface Customer {\n  id: string;\n  name: string;\n  email: string;\n  company?: string;\n  /** The plan they are on, e.g. \"Free\", \"Pro\", \"Team\". Any text: the filter lists what is in your data. */\n  plan: string;\n  /** Where they are, e.g. \"active\", \"trial\", \"overdue\", \"churned\". Any text. */\n  status: string;\n  /** Monthly recurring revenue, in the table's currency. */\n  mrr: number;\n  /** When they joined: a date such as \"2026-03-12\". */\n  joinedAt: string;\n  avatarUrl?: string;\n}\n\nexport type CustomerSortColumn = \"name\" | \"plan\" | \"status\" | \"mrr\" | \"joinedAt\";\n\nexport interface CustomerQuery {\n  /** Text to look for in name, email and company. */\n  search: string;\n  /** Show only these statuses. Empty means all. */\n  status: string[];\n  /** Show only these plans. Empty means all. */\n  plan: string[];\n  sort: { column: CustomerSortColumn; direction: \"ascending\" | \"descending\" } | null;\n  /** The page, starting at 1. */\n  page: number;\n  pageSize: number;\n}\n\nexport const emptyQuery = (pageSize = 10): CustomerQuery => ({ search: \"\", status: [], plan: [], sort: null, page: 1, pageSize });\n\nexport const isFiltered = (query: Pick<CustomerQuery, \"search\" | \"status\" | \"plan\">) => query.search.trim() !== \"\" || query.status.length > 0 || query.plan.length > 0;\n\nconst same = (a: string, b: string) => a.localeCompare(b, undefined, { sensitivity: \"base\" }) === 0;\n\n/** The customers that match the search and the filters. */\nexport function filterCustomers(customers: Customer[], query: Pick<CustomerQuery, \"search\" | \"status\" | \"plan\">): Customer[] {\n  const needle = query.search.trim().toLowerCase();\n  return customers.filter((c) => {\n    if (needle && !`${c.name} ${c.email} ${c.company ?? \"\"}`.toLowerCase().includes(needle)) return false;\n    if (query.status.length && !query.status.some((s) => same(s, c.status))) return false;\n    if (query.plan.length && !query.plan.some((p) => same(p, c.plan))) return false;\n    return true;\n  });\n}\n\n/** Sorted copy. Text sorts in natural order (\"Plan 2\" before \"Plan 10\"), money by value, dates by time. Equal rows keep their order. */\nexport function sortCustomers(customers: Customer[], sort: CustomerQuery[\"sort\"]): Customer[] {\n  if (!sort) return customers;\n  const direction = sort.direction === \"descending\" ? -1 : 1;\n  const text = (a: string, b: string) => a.localeCompare(b, undefined, { numeric: true, sensitivity: \"base\" });\n  const compare = (a: Customer, b: Customer): number => {\n    switch (sort.column) {\n      case \"mrr\":\n        return a.mrr - b.mrr;\n      case \"joinedAt\":\n        return (Date.parse(a.joinedAt) || 0) - (Date.parse(b.joinedAt) || 0);\n      default:\n        return text(a[sort.column], b[sort.column]);\n    }\n  };\n  return customers\n    .map((customer, index) => ({ customer, index }))\n    .sort((x, y) => compare(x.customer, y.customer) * direction || x.index - y.index)\n    .map((x) => x.customer);\n}\n\n/** How many pages there are (never fewer than one). */\nexport const pageCountOf = (total: number, pageSize: number) => Math.max(1, Math.ceil(total / Math.max(1, pageSize)));\n\n/** One page of the list. A page past the end gives the last page. */\nexport function paginate<T>(items: T[], page: number, pageSize: number): T[] {\n  const size = Math.max(1, pageSize);\n  const safe = Math.min(Math.max(1, page), pageCountOf(items.length, size));\n  return items.slice((safe - 1) * size, safe * size);\n}\n\n/** The whole pipeline in the order people expect: search and filter, then sort, then the page. */\nexport function applyQuery(customers: Customer[], query: CustomerQuery): { rows: Customer[]; total: number; filtered: Customer[] } {\n  const filtered = sortCustomers(filterCustomers(customers, query), query.sort);\n  return { rows: paginate(filtered, query.page, query.pageSize), total: filtered.length, filtered };\n}\n\n/** The distinct values of a field, in the order they first appear. */\nexport function distinct(customers: Customer[], field: \"plan\" | \"status\"): string[] {\n  const seen = new Map<string, string>();\n  for (const c of customers) if (!seen.has(c[field].toLowerCase())) seen.set(c[field].toLowerCase(), c[field]);\n  return [...seen.values()];\n}\n\nexport interface CustomerSummary {\n  total: number;\n  active: number;\n  churned: number;\n  mrr: number;\n  /** Monthly revenue of each plan, in the order the plans first appear. */\n  byPlan: Array<{ plan: string; mrr: number; customers: number }>;\n}\n\n/** Totals for the cards and the chart above the table. Revenue leaves out churned customers; \"active\" counts status \"active\" only (a trial is not yet active). */\nexport function summarize(customers: Customer[]): CustomerSummary {\n  const plans = new Map<string, { plan: string; mrr: number; customers: number }>();\n  let active = 0;\n  let churned = 0;\n  let mrr = 0;\n  for (const c of customers) {\n    const status = c.status.toLowerCase();\n    if (status === \"active\") active++;\n    if (status === \"churned\") churned++;\n    if (status !== \"churned\") mrr += Number.isFinite(c.mrr) ? c.mrr : 0;\n    const key = c.plan.toLowerCase();\n    const entry = plans.get(key) ?? { plan: c.plan, mrr: 0, customers: 0 };\n    entry.customers++;\n    if (status !== \"churned\") entry.mrr += Number.isFinite(c.mrr) ? c.mrr : 0;\n    plans.set(key, entry);\n  }\n  return { total: customers.length, active, churned, mrr, byPlan: [...plans.values()] };\n}\n\n// --- Export\n\nconst csvCell = (value: string | number): string => {\n  let text = String(value);\n  // A cell that starts with = + - or @ would run as a formula in a spreadsheet: make it plain text.\n  if (typeof value === \"string\" && /^[=+\\-@\\t\\r]/.test(text)) text = `'${text}`;\n  return /[\",\\n\\r]/.test(text) ? `\"${text.replace(/\"/g, '\"\"')}\"` : text;\n};\n\n/** The customers as CSV text: every row passed in, with a header. */\nexport function customersToCsv(customers: Customer[]): string {\n  const rows: Array<Array<string | number>> = [[\"Name\", \"Email\", \"Company\", \"Plan\", \"Status\", \"Monthly revenue\", \"Joined\"], ...customers.map((c) => [c.name, c.email, c.company ?? \"\", c.plan, c.status, c.mrr, c.joinedAt])];\n  return rows.map((row) => row.map(csvCell).join(\",\")).join(\"\\r\\n\");\n}\n\n// --- Display\n\nexport function formatMoney(value: number, currency = \"USD\", locale?: string): string {\n  try {\n    return new Intl.NumberFormat(locale, { style: \"currency\", currency, maximumFractionDigits: 0 }).format(value);\n  } catch {\n    return `${currency} ${Math.round(value).toLocaleString()}`;\n  }\n}\n\nexport function formatDate(value: string, locale?: string): string {\n  const time = Date.parse(value);\n  if (!Number.isFinite(time)) return value;\n  // A date with no time is a calendar day: read it in UTC so it can't slip a day in other time zones.\n  return new Intl.DateTimeFormat(locale, { dateStyle: \"medium\", timeZone: \"UTC\" }).format(time);\n}\n\n/** Two letters for an avatar. */\nexport const initialsOf = (name: string) =>\n  name\n    .split(/\\s+/)\n    .filter(Boolean)\n    .slice(0, 2)\n    .map((part) => part[0]!.toUpperCase())\n    .join(\"\");\n\n// --- What the cards and the chart above the table show\n\nexport interface CustomerStatInput {\n  label: string;\n  value: string | number;\n  trend?: { change: number; label?: string; goodWhen?: \"up\" | \"down\" };\n  /** A short history, drawn as a small line under the number. */\n  data?: number[];\n  description?: string;\n}\n\nexport interface CustomerChartInput {\n  title: string;\n  data: { labels: string[]; series: Array<{ name: string; values: number[] }>; unit?: string };\n  type?: \"bar\" | \"line\" | \"area\" | \"donut\";\n  summary?: string;\n}\n\nexport interface CustomerInsights {\n  stats: CustomerStatInput[];\n  chart?: CustomerChartInput;\n}\n"
+        },
+        {
+          "path": "generated/customer-table.types.ts",
+          "content": "// Generated by rdloom codegen from specs/customer-table.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nexport const customerTableDensityValues = [\"compact\", \"standard\", \"comfortable\"] as const;\n\n/** A ready-to-use customer list: search, filters, sorting, pages, CSV export, loading rows, an empty state, an error with retry, cards on a phone, and totals with a chart above that follow the filters. Give it customers and it works. */\nexport interface CustomerTableSpecProps {\n  /**\n   * The customers to show. With serverSide, only the current page.\n   */\n  customers: import(\"../customer-table/query\").Customer[];\n  /**\n   * Accessible name of the table and the section, e.g. \"Customers\".\n   * @default \"Customers\"\n   */\n  label?: string;\n  /**\n   * Customers per page.\n   * @default 10\n   */\n  pageSize?: number;\n  /**\n   * ISO currency code for revenue, e.g. \"USD\" or \"EUR\".\n   * @default \"USD\"\n   */\n  currency?: string;\n  /**\n   * Locale for numbers and dates, e.g. \"en-GB\". Defaults to the visitor's.\n   */\n  locale?: string;\n  /**\n   * Show loading rows and skeleton cards, disable the controls, and mark the section busy.\n   * @default false\n   */\n  isLoading?: boolean;\n  /**\n   * A message to show instead of the list when loading failed.\n   */\n  error?: string;\n  /**\n   * Adds a Try again button to the error message.\n   */\n  onRetry?: () => void;\n  /**\n   * The totals and chart above the table. \"auto\" works them out from the customers and follows the filters (not with serverSide); \"none\" hides them; or pass your own numbers.\n   * @default \"auto\"\n   */\n  insights?: \"auto\" | \"none\" | import(\"../customer-table/query\").CustomerInsights;\n  /**\n   * The list lives on a server. The table then shows exactly the customers you pass, and asks for new ones through onQueryChange when the search, a filter, the sort or the page changes.\n   * @default false\n   */\n  serverSide?: boolean;\n  /**\n   * With serverSide: how many customers match in all, so the pages and the count are right.\n   */\n  totalCount?: number;\n  /**\n   * With serverSide: called with the new query (search, status, plan, sort, page, pageSize). Typing in the search waits for a short pause first.\n   */\n  onQueryChange?: (query: import(\"../customer-table/query\").CustomerQuery) => void;\n  /**\n   * Start with a search, filters, a sort or a page already set.\n   */\n  defaultQuery?: Partial<import(\"../customer-table/query\").CustomerQuery>;\n  /**\n   * Replaces the built-in CSV download. It gets the customers that match (all pages when the list is in memory). With serverSide the Export button is shown only when you provide this.\n   */\n  onExport?: (customers: import(\"../customer-table/query\").Customer[], query: import(\"../customer-table/query\").CustomerQuery) => void;\n  /**\n   * Makes each name a button and calls this with the customer, e.g. to open a details panel.\n   */\n  onOpenCustomer?: (customer: import(\"../customer-table/query\").Customer) => void;\n  /**\n   * Which badge color a status gets. The defaults are active green, trial blue, overdue amber, churned red; anything else is neutral.\n   */\n  statusTones?: Record<string, \"neutral\" | \"info\" | \"success\" | \"warning\" | \"danger\">;\n  /**\n   * Row spacing of the table.\n   * @default \"standard\"\n   */\n  density?: \"compact\" | \"standard\" | \"comfortable\";\n}\n\nexport const customerTableDefaults = {\n  label: \"Customers\",\n  pageSize: 10,\n  currency: \"USD\",\n  isLoading: false,\n  insights: \"auto\",\n  serverSide: false,\n  density: \"standard\",\n} as const;\n\nexport const customerTableMeta = {\n  \"name\": \"CustomerTable\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"region\"\n} as const;\n"
         }
       ]
     },
@@ -7965,6 +8443,326 @@
       ]
     },
     {
+      "id": "sparkline",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "Sparkline",
+        "version": "0.1.0",
+        "category": "data",
+        "status": "experimental",
+        "description": "A tiny line or bar graphic that shows the shape of a trend, without axes. Decoration unless it has a label.",
+        "props": {
+          "data": {
+            "type": "custom",
+            "tsType": "number[]",
+            "required": true,
+            "description": "The values, oldest first. Non-numbers are ignored."
+          },
+          "type": {
+            "type": "enum",
+            "values": [
+              "line",
+              "bar"
+            ],
+            "default": "line",
+            "description": "A line, or thin bars from a zero baseline."
+          },
+          "label": {
+            "type": "string",
+            "description": "A text description, e.g. \"Revenue, last 12 months: from 21K to 48K\". Without it the graphic is hidden from assistive technology."
+          },
+          "width": {
+            "type": "number",
+            "default": 96,
+            "description": "Width in pixels."
+          },
+          "height": {
+            "type": "number",
+            "default": 32,
+            "description": "Height in pixels."
+          },
+          "color": {
+            "type": "enum",
+            "values": [
+              "primary",
+              "success",
+              "danger",
+              "muted"
+            ],
+            "default": "primary",
+            "description": "Color of the line or bars."
+          },
+          "showLast": {
+            "type": "boolean",
+            "default": true,
+            "description": "Marks the last point of a line with a dot."
+          }
+        },
+        "variants": [
+          "type",
+          "color"
+        ],
+        "states": [
+          "default"
+        ],
+        "slots": [
+          "root"
+        ],
+        "tokens": [
+          "color.chart.1",
+          "color.feedback.success",
+          "color.feedback.danger",
+          "color.text.muted"
+        ],
+        "a11y": {
+          "role": "img",
+          "keyboard": [],
+          "requirements": [
+            "With a label it is an image with that name; the label should state the range and direction, not just the topic",
+            "Without a label it is hidden from assistive technology: the surrounding text must already say what the number did",
+            "The shape is never the only way to get the information; put the figures in text nearby",
+            "Not interactive: no focus, no tooltip"
+          ],
+          "screenReader": [
+            "With a label: announced as an image, e.g. \"Revenue, last 12 months: from 21K to 48K, image\"",
+            "Without a label: not announced"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "Showing the recent shape of a number inside a Stat, table row or sentence",
+            "Where space is too tight for a full chart"
+          ],
+          "avoid_when": [
+            "People need to read exact values: use a Chart or a Table",
+            "The trend is the main content of the page"
+          ],
+          "anti_patterns": [
+            "Leaving out the label when no nearby text describes the trend",
+            "Using it as the only source of the figures",
+            "Comparing sparklines drawn on different scales as if they were equal"
+          ]
+        },
+        "examples": [
+          "line",
+          "bar",
+          "in-a-sentence"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {
+            "type": "Type",
+            "color": "Color"
+          }
+        }
+      },
+      "install": {
+        "command": "npx rdloom add sparkline",
+        "dependencies": [],
+        "registryDependencies": [
+          "tokens"
+        ]
+      },
+      "examples": [
+        {
+          "name": "line",
+          "code": "import { Sparkline } from \"@rdloom/react\";\n\nexport default function SparklineLineExample() {\n  return <Sparkline data={[21, 24, 22, 30, 28, 35, 41, 38, 44, 48]} label=\"Revenue, last 10 weeks: from 21K to 48K\" />;\n}\n"
+        },
+        {
+          "name": "bar",
+          "code": "import { Sparkline } from \"@rdloom/react\";\n\nexport default function SparklineBarExample() {\n  return <Sparkline type=\"bar\" color=\"success\" data={[3, 5, 2, 8, 6, 9, 7, 11]} label=\"Orders per day: from 3 to 11\" />;\n}\n"
+        },
+        {
+          "name": "in-a-sentence",
+          "code": "import { Sparkline } from \"@rdloom/react\";\n\nexport default function SparklineInASentenceExample() {\n  return (\n    <p className=\"flex items-center gap-2 text-sm\">\n      Traffic is up 18% this week\n      <Sparkline data={[40, 42, 39, 45, 50, 52, 58]} width={64} height={20} />\n    </p>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "sparkline/sparkline.tsx",
+          "content": "import { forwardRef, type SVGAttributes } from \"react\";\nimport { sparklineDefaults, type SparklineSpecProps } from \"../generated/sparkline.types\";\n\n// Plain markup with no hooks, so it also works in a React Server Component.\n\nexport interface SparklineProps\n  extends SparklineSpecProps,\n    Omit<SVGAttributes<SVGSVGElement>, keyof SparklineSpecProps | \"children\"> {}\n\nconst colors: Record<NonNullable<SparklineSpecProps[\"color\"]>, string> = {\n  primary: \"var(--rd-color-chart-1)\",\n  success: \"var(--rd-color-feedback-success)\",\n  danger: \"var(--rd-color-feedback-danger)\",\n  muted: \"var(--rd-color-text-muted)\",\n};\n\nconst PAD = 2;\nconst round = (n: number) => Math.round(n * 100) / 100;\n\nexport const Sparkline = forwardRef<SVGSVGElement, SparklineProps>(function Sparkline(\n  {\n    data,\n    type = sparklineDefaults.type,\n    label,\n    width = sparklineDefaults.width,\n    height = sparklineDefaults.height,\n    color = sparklineDefaults.color,\n    showLast = sparklineDefaults.showLast,\n    ...rest\n  },\n  ref,\n) {\n  const values = (data ?? []).filter((v) => typeof v === \"number\" && Number.isFinite(v));\n  const stroke = colors[color];\n  const a11y = label ? { role: \"img\" as const, \"aria-label\": label } : { \"aria-hidden\": true as const };\n\n  let shapes: React.ReactNode = null;\n  if (values.length > 0 && type === \"bar\") {\n    const lo = Math.min(0, ...values);\n    const hi = Math.max(0, ...values);\n    const range = hi - lo || 1;\n    const inner = height - PAD * 2;\n    const y = (v: number) => PAD + ((hi - v) / range) * inner;\n    const slot = (width - PAD * 2) / values.length;\n    const barWidth = Math.max(1, slot * 0.7);\n    shapes = values.map((v, i) => {\n      const top = Math.min(y(v), y(0));\n      const barHeight = Math.max(1, Math.abs(y(v) - y(0)));\n      return (\n        <rect\n          key={i}\n          x={round(PAD + i * slot + (slot - barWidth) / 2)}\n          y={round(top)}\n          width={round(barWidth)}\n          height={round(barHeight)}\n          rx={Math.min(1.5, barWidth / 2)}\n          fill={stroke}\n        />\n      );\n    });\n  } else if (values.length > 0) {\n    const lo = Math.min(...values);\n    const hi = Math.max(...values);\n    const inner = height - PAD * 2;\n    const x = (i: number) => (values.length === 1 ? width / 2 : PAD + (i * (width - PAD * 2)) / (values.length - 1));\n    // Flat data draws a centered line.\n    const y = (v: number) => (hi === lo ? height / 2 : PAD + ((hi - v) / (hi - lo)) * inner);\n    const points = values.map((v, i) => `${round(x(i))},${round(y(v))}`);\n    const last = values.length - 1;\n    shapes = (\n      <>\n        {values.length > 1 && (\n          <polyline\n            points={points.join(\" \")}\n            fill=\"none\"\n            stroke={stroke}\n            strokeWidth={1.5}\n            strokeLinejoin=\"round\"\n            strokeLinecap=\"round\"\n            vectorEffect=\"non-scaling-stroke\"\n          />\n        )}\n        {(showLast || values.length === 1) && <circle cx={round(x(last))} cy={round(y(values[last]))} r={2} fill={stroke} />}\n      </>\n    );\n  }\n\n  return (\n    <svg\n      focusable=\"false\"\n      {...rest}\n      {...a11y}\n      ref={ref}\n      width={width}\n      height={height}\n      viewBox={`0 0 ${width} ${height}`}\n      data-type={type}\n    >\n      {shapes}\n    </svg>\n  );\n});\n"
+        },
+        {
+          "path": "generated/sparkline.types.ts",
+          "content": "// Generated by rdloom codegen from specs/sparkline.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nexport const sparklineTypeValues = [\"line\", \"bar\"] as const;\nexport const sparklineColorValues = [\"primary\", \"success\", \"danger\", \"muted\"] as const;\n\n/** A tiny line or bar graphic that shows the shape of a trend, without axes. Decoration unless it has a label. */\nexport interface SparklineSpecProps {\n  /**\n   * The values, oldest first. Non-numbers are ignored.\n   */\n  data: number[];\n  /**\n   * A line, or thin bars from a zero baseline.\n   * @default \"line\"\n   */\n  type?: \"line\" | \"bar\";\n  /**\n   * A text description, e.g. \"Revenue, last 12 months: from 21K to 48K\". Without it the graphic is hidden from assistive technology.\n   */\n  label?: string;\n  /**\n   * Width in pixels.\n   * @default 96\n   */\n  width?: number;\n  /**\n   * Height in pixels.\n   * @default 32\n   */\n  height?: number;\n  /**\n   * Color of the line or bars.\n   * @default \"primary\"\n   */\n  color?: \"primary\" | \"success\" | \"danger\" | \"muted\";\n  /**\n   * Marks the last point of a line with a dot.\n   * @default true\n   */\n  showLast?: boolean;\n}\n\nexport const sparklineDefaults = {\n  type: \"line\",\n  width: 96,\n  height: 32,\n  color: \"primary\",\n  showLast: true,\n} as const;\n\nexport const sparklineMeta = {\n  \"name\": \"Sparkline\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"img\"\n} as const;\n"
+        }
+      ]
+    },
+    {
+      "id": "stat",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "Stat",
+        "version": "0.1.0",
+        "category": "data",
+        "status": "experimental",
+        "description": "A key number with its label and context: a value, an optional change over time and an optional small trend graphic. Unframed: place it in a Card or a grid.",
+        "props": {
+          "label": {
+            "type": "string",
+            "required": true,
+            "description": "What the number measures, e.g. \"Monthly revenue\"."
+          },
+          "value": {
+            "type": "custom",
+            "tsType": "string | number",
+            "required": true,
+            "description": "The number. A number is formatted with toLocaleString unless format is given; a string is shown as is."
+          },
+          "format": {
+            "type": "callback",
+            "tsType": "(value: number) => string",
+            "description": "Formats a numeric value, e.g. as currency."
+          },
+          "unit": {
+            "type": "string",
+            "description": "A small unit after the value, such as % or /mo."
+          },
+          "trend": {
+            "type": "custom",
+            "tsType": "{ change: number; label?: string; goodWhen?: \"up\" | \"down\" }",
+            "description": "The change over time. change is signed; label says what it is compared with (\"vs last month\"); goodWhen says which direction is an improvement (default up)."
+          },
+          "data": {
+            "type": "custom",
+            "tsType": "number[]",
+            "description": "Recent values, drawn as a small Sparkline beside the value."
+          },
+          "description": {
+            "type": "string",
+            "description": "A short line of extra context under the value."
+          },
+          "size": {
+            "type": "enum",
+            "values": [
+              "sm",
+              "md",
+              "lg"
+            ],
+            "default": "md",
+            "description": "Size of the value text."
+          },
+          "isLoading": {
+            "type": "boolean",
+            "default": false,
+            "description": "Shows placeholder blocks and announces loading."
+          }
+        },
+        "variants": [
+          "size"
+        ],
+        "states": [
+          "default",
+          "loading"
+        ],
+        "slots": [
+          "root",
+          "label",
+          "value",
+          "unit",
+          "trend",
+          "sparkline",
+          "description"
+        ],
+        "tokens": [
+          "color.text.default",
+          "color.text.muted",
+          "color.feedback.success-subtle",
+          "color.feedback.danger-subtle",
+          "color.surface.subtle",
+          "color.border.default"
+        ],
+        "a11y": {
+          "role": "text",
+          "keyboard": [],
+          "requirements": [
+            "The whole stat reads as one sentence, e.g. \"Monthly revenue: $48,200. Up 12% compared with last month.\"",
+            "Direction is always said in words (Up, Down, No change) and shown with an arrow shape, never by color alone",
+            "Good or bad is only spoken when goodWhen is set explicitly; the tint is an extra cue",
+            "Pill text uses the default text color on a subtle tint, meeting 4.5:1 in light and dark mode",
+            "While loading the region is marked busy and says Loading",
+            "Not interactive: it is not focusable"
+          ],
+          "screenReader": [
+            "Read in place as one sentence: label, value, change and description",
+            "Loading reads \"Loading\" followed by the label"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "Dashboards and summaries that lead with a few key numbers",
+            "Showing a number with how it changed"
+          ],
+          "avoid_when": [
+            "Many numbers that need comparing: use a Table",
+            "A value that changes live and must be announced: use a live region"
+          ],
+          "anti_patterns": [
+            "Showing a change as only a green or red color",
+            "Long sentences as the label",
+            "Putting more than a handful of stats in one row"
+          ]
+        },
+        "examples": [
+          "basic",
+          "with-trend",
+          "with-sparkline",
+          "loading",
+          "row"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {
+            "size": "Size"
+          }
+        }
+      },
+      "install": {
+        "command": "npx rdloom add stat",
+        "dependencies": [],
+        "registryDependencies": [
+          "tokens",
+          "skeleton",
+          "sparkline",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import { Stat } from \"@rdloom/react\";\n\nexport default function StatBasicExample() {\n  return <Stat label=\"Monthly revenue\" value={48200} format={(n) => `$${n.toLocaleString()}`} />;\n}\n"
+        },
+        {
+          "name": "with-trend",
+          "code": "import { Stat } from \"@rdloom/react\";\n\nexport default function StatWithTrendExample() {\n  return (\n    <div className=\"flex flex-wrap gap-10\">\n      <Stat label=\"Active users\" value={12840} trend={{ change: 12, label: \"vs last month\" }} />\n      <Stat label=\"Churn\" value={2.4} unit=\"%\" trend={{ change: 0.6, label: \"vs last month\", goodWhen: \"down\" }} />\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "with-sparkline",
+          "code": "import { Stat } from \"@rdloom/react\";\n\nexport default function StatWithSparklineExample() {\n  return (\n    <div className=\"w-72\">\n      <Stat\n        label=\"Signups\"\n        value={1284}\n        trend={{ change: 8, label: \"vs last week\" }}\n        data={[12, 18, 14, 22, 19, 27, 31, 28, 36]}\n        description=\"Across all plans\"\n      />\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "loading",
+          "code": "import { Stat } from \"@rdloom/react\";\n\nexport default function StatLoadingExample() {\n  return <Stat label=\"Monthly revenue\" value={0} isLoading />;\n}\n"
+        },
+        {
+          "name": "row",
+          "code": "import { Stat } from \"@rdloom/react\";\n\nexport default function StatRowExample() {\n  return (\n    <div className=\"grid grid-cols-1 gap-6 sm:grid-cols-3\">\n      <Stat label=\"Revenue\" value={48200} format={(n) => `$${n.toLocaleString()}`} trend={{ change: 12, label: \"vs last month\" }} />\n      <Stat label=\"Orders\" value={1320} trend={{ change: -3, label: \"vs last month\" }} />\n      <Stat label=\"Refund rate\" value={1.8} unit=\"%\" trend={{ change: 0 }} />\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "stat/stat.tsx",
+          "content": "import { forwardRef, type HTMLAttributes } from \"react\";\nimport { statDefaults, type StatSpecProps } from \"../generated/stat.types\";\nimport { Skeleton } from \"../skeleton/skeleton\";\nimport { Sparkline } from \"../sparkline/sparkline\";\nimport { cx } from \"../utils/cx\";\nimport { ArrowDownIcon, ArrowUpIcon, MinusIcon } from \"../utils/icons\";\n\n// Plain markup with no hooks, so it also works in a React Server Component.\n\nexport interface StatProps\n  extends StatSpecProps,\n    Omit<HTMLAttributes<HTMLDivElement>, keyof StatSpecProps | \"className\" | \"children\"> {\n  className?: string;\n}\n\nconst valueSizes: Record<NonNullable<StatSpecProps[\"size\"]>, string> = {\n  sm: \"text-xl\",\n  md: \"text-3xl\",\n  lg: \"text-4xl\",\n};\nconst unitSizes: Record<NonNullable<StatSpecProps[\"size\"]>, string> = {\n  sm: \"text-sm\",\n  md: \"text-base\",\n  lg: \"text-lg\",\n};\nconst skeletonHeights: Record<NonNullable<StatSpecProps[\"size\"]>, number> = { sm: 24, md: 32, lg: 40 };\n\nconst tints = {\n  good: \"bg-[var(--rd-color-feedback-success-subtle)] border-transparent\",\n  bad: \"bg-[var(--rd-color-feedback-danger-subtle)] border-transparent\",\n  neutral: \"bg-[var(--rd-color-surface-subtle)] border-[var(--rd-color-border-default)]\",\n};\n\nconst sparkColors = { good: \"success\", bad: \"danger\", neutral: \"muted\" } as const;\n\nexport const Stat = forwardRef<HTMLDivElement, StatProps>(function Stat(\n  {\n    label,\n    value,\n    format,\n    unit,\n    trend,\n    data,\n    description,\n    size = statDefaults.size,\n    isLoading = statDefaults.isLoading,\n    className,\n    ...rest\n  },\n  ref,\n) {\n  const root = cx(\"flex min-w-0 flex-col gap-1\", className);\n\n  if (isLoading) {\n    return (\n      <div {...rest} ref={ref} aria-busy=\"true\" className={root}>\n        <span className=\"sr-only\">Loading {label}</span>\n        <Skeleton variant=\"text\" width={96} height={14} />\n        <Skeleton variant=\"rect\" width={128} height={skeletonHeights[size]} />\n      </div>\n    );\n  }\n\n  const valueText = typeof value === \"number\" ? (format ? format(value) : value.toLocaleString()) : value;\n\n  // The change is a signed percentage: its sign picks the arrow and the word.\n  const change = trend?.change ?? 0;\n  const dir = change > 0 ? \"up\" : change < 0 ? \"down\" : \"flat\";\n  const goodWhen = trend?.goodWhen ?? \"up\";\n  const tone = dir === \"flat\" ? \"neutral\" : dir === goodWhen ? \"good\" : \"bad\";\n  const amount = Math.abs(change).toLocaleString();\n  const words = dir === \"up\" ? \"Up\" : dir === \"down\" ? \"Down\" : \"No change\";\n  const shown = dir === \"flat\" ? \"0%\" : `${dir === \"up\" ? \"+\" : \"-\"}${amount}%`;\n\n  const sparkColor = trend ? sparkColors[tone] : \"primary\";\n\n  // One sentence for screen readers. Good or bad is only spoken when goodWhen was set on purpose.\n  let reading = `${label}: ${valueText}${unit ?? \"\"}.`;\n  if (trend) {\n    reading += ` ${words}${dir === \"flat\" ? \"\" : ` ${amount}%`}`;\n    if (trend.label) reading += ` ${trend.label.replace(/^vs\\.?\\s+/i, \"compared with \")}`;\n    if (trend.goodWhen && dir !== \"flat\") reading += `, ${dir === goodWhen ? \"an improvement\" : \"worse\"}`;\n    reading += \".\";\n  }\n  if (description) reading += ` ${description}`;\n\n  return (\n    <div {...rest} ref={ref} className={root}>\n      <span className=\"sr-only\">{reading}</span>\n      <p aria-hidden=\"true\" className=\"text-sm text-[var(--rd-color-text-muted)]\">\n        {label}\n      </p>\n      <div aria-hidden=\"true\" className=\"flex items-end justify-between gap-4\">\n        <p className={cx(\"flex items-baseline gap-1 font-semibold tracking-[-0.02em] tabular-nums text-[var(--rd-color-text-default)]\", valueSizes[size])}>\n          {valueText}\n          {unit && <span className={cx(\"font-medium text-[var(--rd-color-text-muted)]\", unitSizes[size])}>{unit}</span>}\n        </p>\n        {data && data.length > 0 && <Sparkline data={data} color={sparkColor} />}\n      </div>\n      {trend && (\n        <p aria-hidden=\"true\" className=\"flex flex-wrap items-center gap-x-2 gap-y-1 text-sm\">\n          <span\n            className={cx(\n              \"inline-flex items-center gap-1 rounded-full border px-2 py-0.5 font-medium tabular-nums text-[var(--rd-color-text-default)]\",\n              tints[tone],\n            )}\n          >\n            {dir === \"up\" ? <ArrowUpIcon className=\"size-3.5 shrink-0\" /> : dir === \"down\" ? <ArrowDownIcon className=\"size-3.5 shrink-0\" /> : <MinusIcon className=\"size-3.5 shrink-0\" />}\n            {shown}\n          </span>\n          {trend.label && <span className=\"text-[var(--rd-color-text-muted)]\">{trend.label}</span>}\n        </p>\n      )}\n      {description && (\n        <p aria-hidden=\"true\" className=\"text-sm text-[var(--rd-color-text-muted)]\">\n          {description}\n        </p>\n      )}\n    </div>\n  );\n});\n"
+        },
+        {
+          "path": "generated/stat.types.ts",
+          "content": "// Generated by rdloom codegen from specs/stat.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nexport const statSizeValues = [\"sm\", \"md\", \"lg\"] as const;\n\n/** A key number with its label and context: a value, an optional change over time and an optional small trend graphic. Unframed: place it in a Card or a grid. */\nexport interface StatSpecProps {\n  /**\n   * What the number measures, e.g. \"Monthly revenue\".\n   */\n  label: string;\n  /**\n   * The number. A number is formatted with toLocaleString unless format is given; a string is shown as is.\n   */\n  value: string | number;\n  /**\n   * Formats a numeric value, e.g. as currency.\n   */\n  format?: (value: number) => string;\n  /**\n   * A small unit after the value, such as % or /mo.\n   */\n  unit?: string;\n  /**\n   * The change over time. change is signed; label says what it is compared with (\"vs last month\"); goodWhen says which direction is an improvement (default up).\n   */\n  trend?: { change: number; label?: string; goodWhen?: \"up\" | \"down\" };\n  /**\n   * Recent values, drawn as a small Sparkline beside the value.\n   */\n  data?: number[];\n  /**\n   * A short line of extra context under the value.\n   */\n  description?: string;\n  /**\n   * Size of the value text.\n   * @default \"md\"\n   */\n  size?: \"sm\" | \"md\" | \"lg\";\n  /**\n   * Shows placeholder blocks and announces loading.\n   * @default false\n   */\n  isLoading?: boolean;\n}\n\nexport const statDefaults = {\n  size: \"md\",\n  isLoading: false,\n} as const;\n\nexport const statMeta = {\n  \"name\": \"Stat\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"text\"\n} as const;\n"
+        }
+      ]
+    },
+    {
       "id": "steps",
       "spec": {
         "$schema": "./schema/component.schema.json",
@@ -10027,6 +10825,48 @@
       "dark": "#fdba74"
     },
     {
+      "path": "color.chart.1",
+      "cssVar": "--rd-color-chart-1",
+      "type": "color",
+      "light": "#c2410c",
+      "dark": "#fb923c"
+    },
+    {
+      "path": "color.chart.2",
+      "cssVar": "--rd-color-chart-2",
+      "type": "color",
+      "light": "#2563eb",
+      "dark": "#60a5fa"
+    },
+    {
+      "path": "color.chart.3",
+      "cssVar": "--rd-color-chart-3",
+      "type": "color",
+      "light": "#15803d",
+      "dark": "#4ade80"
+    },
+    {
+      "path": "color.chart.4",
+      "cssVar": "--rd-color-chart-4",
+      "type": "color",
+      "light": "#7c3aed",
+      "dark": "#a78bfa"
+    },
+    {
+      "path": "color.chart.5",
+      "cssVar": "--rd-color-chart-5",
+      "type": "color",
+      "light": "#0e7490",
+      "dark": "#22d3ee"
+    },
+    {
+      "path": "color.chart.6",
+      "cssVar": "--rd-color-chart-6",
+      "type": "color",
+      "light": "#be185d",
+      "dark": "#f472b6"
+    },
+    {
       "path": "radius.control",
       "cssVar": "--rd-radius-control",
       "type": "dimension",
@@ -10117,7 +10957,7 @@
       "files": [
         {
           "path": "@tokens",
-          "content": "/* Generated by rdloom codegen. Do not edit; change /tokens instead. */\n\n:root {\n  --rd-color-neutral-0: #ffffff;\n  --rd-color-neutral-50: #faf8f5;\n  --rd-color-neutral-100: #f2efe9;\n  --rd-color-neutral-200: #e4e0d8;\n  --rd-color-neutral-400: #a39e94;\n  --rd-color-neutral-500: #857f75;\n  --rd-color-neutral-600: #5c574f;\n  --rd-color-neutral-800: #2c2925;\n  --rd-color-neutral-900: #1c1a17;\n  --rd-color-neutral-950: #12100e;\n  --rd-color-ember-50: #fff4ec;\n  --rd-color-ember-300: #fdba74;\n  --rd-color-ember-400: #fb923c;\n  --rd-color-ember-500: #f97316;\n  --rd-color-ember-600: #ea580c;\n  --rd-color-ember-700: #c2410c;\n  --rd-color-ember-800: #9a3412;\n  --rd-color-ember-950: #431407;\n  --rd-color-green-50: #f0fdf4;\n  --rd-color-green-400: #4ade80;\n  --rd-color-green-600: #16a34a;\n  --rd-color-green-700: #15803d;\n  --rd-color-green-950: #15271f;\n  --rd-color-red-50: #fef2f2;\n  --rd-color-red-300: #fca5a5;\n  --rd-color-red-400: #f87171;\n  --rd-color-red-600: #dc2626;\n  --rd-color-red-700: #b91c1c;\n  --rd-color-red-950: #2a1a1d;\n  --rd-color-amber-50: #fffbeb;\n  --rd-color-amber-400: #fbbf24;\n  --rd-color-amber-700: #b45309;\n  --rd-color-amber-950: #2a2314;\n  --rd-color-blue-50: #eff6ff;\n  --rd-color-blue-400: #60a5fa;\n  --rd-color-blue-600: #2563eb;\n  --rd-color-blue-950: #18202e;\n  --rd-radius-sm: 6px;\n  --rd-radius-md: 10px;\n  --rd-radius-lg: 14px;\n  --rd-space-1: 4px;\n  --rd-space-2: 8px;\n  --rd-space-3: 12px;\n  --rd-space-4: 16px;\n  --rd-space-5: 20px;\n  --rd-color-action-primary: #c2410c;\n  --rd-color-action-primary-hover: #9a3412;\n  --rd-color-action-on-primary: #ffffff;\n  --rd-color-action-danger: #dc2626;\n  --rd-color-action-danger-hover: #b91c1c;\n  --rd-color-surface-default: #ffffff;\n  --rd-color-surface-subtle: #f2efe9;\n  --rd-color-surface-raised: #ffffff;\n  --rd-color-surface-selected: #fff4ec;\n  --rd-color-border-default: #e4e0d8;\n  --rd-color-border-strong: #857f75;\n  --rd-color-feedback-danger: #dc2626;\n  --rd-color-feedback-success: #16a34a;\n  --rd-color-feedback-warning: #b45309;\n  --rd-color-feedback-info: #2563eb;\n  --rd-color-feedback-danger-subtle: #fef2f2;\n  --rd-color-feedback-success-subtle: #f0fdf4;\n  --rd-color-feedback-warning-subtle: #fffbeb;\n  --rd-color-feedback-info-subtle: #eff6ff;\n  --rd-color-overlay-backdrop: rgb(14 14 18 / 0.5);\n  --rd-color-text-default: #1c1a17;\n  --rd-color-text-muted: #5c574f;\n  --rd-color-focus-ring: #ea580c;\n  --rd-radius-control: 10px;\n  --rd-radius-overlay: 14px;\n  --rd-space-control-x: 16px;\n  --rd-space-control-x-sm: 12px;\n  --rd-space-control-x-lg: 20px;\n  --rd-elevation-control: inset 0 1px 0 rgb(255 255 255 / 0.16), 0 1px 2px rgb(28 26 23 / 0.22);\n  --rd-elevation-raised: 0 1px 2px rgb(28 26 23 / 0.06), 0 1px 1px rgb(28 26 23 / 0.04);\n  --rd-elevation-floating: 0 8px 24px -6px rgb(28 26 23 / 0.18), 0 0 0 1px rgb(28 26 23 / 0.04);\n  --rd-elevation-overlay: 0 24px 64px -16px rgb(28 26 23 / 0.35), 0 0 0 1px rgb(28 26 23 / 0.05);\n  --rd-size-control-sm: 32px;\n  --rd-size-control-md: 40px;\n  --rd-size-control-lg: 48px;\n}\n\n@media (prefers-color-scheme: dark) {\n  :root:not([data-theme=\"light\"]) {\n    --rd-color-action-primary: #fb923c;\n    --rd-color-action-primary-hover: #fdba74;\n    --rd-color-action-on-primary: #12100e;\n    --rd-color-action-danger: #f87171;\n    --rd-color-action-danger-hover: #fca5a5;\n    --rd-color-surface-default: #12100e;\n    --rd-color-surface-subtle: #2c2925;\n    --rd-color-surface-raised: #1c1a17;\n    --rd-color-surface-selected: #431407;\n    --rd-color-border-default: #2c2925;\n    --rd-color-border-strong: #857f75;\n    --rd-color-feedback-danger: #f87171;\n    --rd-color-feedback-success: #4ade80;\n    --rd-color-feedback-warning: #fbbf24;\n    --rd-color-feedback-info: #60a5fa;\n    --rd-color-feedback-danger-subtle: #2a1a1d;\n    --rd-color-feedback-success-subtle: #15271f;\n    --rd-color-feedback-warning-subtle: #2a2314;\n    --rd-color-feedback-info-subtle: #18202e;\n    --rd-color-overlay-backdrop: rgb(0 0 0 / 0.6);\n    --rd-color-text-default: #faf8f5;\n    --rd-color-text-muted: #a39e94;\n    --rd-color-focus-ring: #fdba74;\n    --rd-elevation-control: inset 0 1px 0 rgb(255 255 255 / 0.2), 0 1px 2px rgb(0 0 0 / 0.5);\n    --rd-elevation-raised: 0 1px 2px rgb(0 0 0 / 0.4), 0 0 0 1px rgb(255 255 255 / 0.03);\n    --rd-elevation-floating: 0 8px 24px -6px rgb(0 0 0 / 0.6), 0 0 0 1px rgb(255 255 255 / 0.07);\n    --rd-elevation-overlay: 0 24px 64px -16px rgb(0 0 0 / 0.75), 0 0 0 1px rgb(255 255 255 / 0.08);\n  }\n}\n\n:root[data-theme=\"dark\"] {\n  --rd-color-action-primary: #fb923c;\n  --rd-color-action-primary-hover: #fdba74;\n  --rd-color-action-on-primary: #12100e;\n  --rd-color-action-danger: #f87171;\n  --rd-color-action-danger-hover: #fca5a5;\n  --rd-color-surface-default: #12100e;\n  --rd-color-surface-subtle: #2c2925;\n  --rd-color-surface-raised: #1c1a17;\n  --rd-color-surface-selected: #431407;\n  --rd-color-border-default: #2c2925;\n  --rd-color-border-strong: #857f75;\n  --rd-color-feedback-danger: #f87171;\n  --rd-color-feedback-success: #4ade80;\n  --rd-color-feedback-warning: #fbbf24;\n  --rd-color-feedback-info: #60a5fa;\n  --rd-color-feedback-danger-subtle: #2a1a1d;\n  --rd-color-feedback-success-subtle: #15271f;\n  --rd-color-feedback-warning-subtle: #2a2314;\n  --rd-color-feedback-info-subtle: #18202e;\n  --rd-color-overlay-backdrop: rgb(0 0 0 / 0.6);\n  --rd-color-text-default: #faf8f5;\n  --rd-color-text-muted: #a39e94;\n  --rd-color-focus-ring: #fdba74;\n  --rd-elevation-control: inset 0 1px 0 rgb(255 255 255 / 0.2), 0 1px 2px rgb(0 0 0 / 0.5);\n  --rd-elevation-raised: 0 1px 2px rgb(0 0 0 / 0.4), 0 0 0 1px rgb(255 255 255 / 0.03);\n  --rd-elevation-floating: 0 8px 24px -6px rgb(0 0 0 / 0.6), 0 0 0 1px rgb(255 255 255 / 0.07);\n  --rd-elevation-overlay: 0 24px 64px -16px rgb(0 0 0 / 0.75), 0 0 0 1px rgb(255 255 255 / 0.08);\n}\n\n[data-density=\"compact\"] {\n  --rd-size-control-sm: 28px;\n  --rd-size-control-md: 32px;\n  --rd-size-control-lg: 40px;\n  --rd-space-control-x: 12px;\n  --rd-space-control-x-sm: 10px;\n  --rd-space-control-x-lg: 16px;\n}\n\n"
+          "content": "/* Generated by rdloom codegen. Do not edit; change /tokens instead. */\n\n:root {\n  --rd-color-neutral-0: #ffffff;\n  --rd-color-neutral-50: #faf8f5;\n  --rd-color-neutral-100: #f2efe9;\n  --rd-color-neutral-200: #e4e0d8;\n  --rd-color-neutral-400: #a39e94;\n  --rd-color-neutral-500: #857f75;\n  --rd-color-neutral-600: #5c574f;\n  --rd-color-neutral-800: #2c2925;\n  --rd-color-neutral-900: #1c1a17;\n  --rd-color-neutral-950: #12100e;\n  --rd-color-ember-50: #fff4ec;\n  --rd-color-ember-300: #fdba74;\n  --rd-color-ember-400: #fb923c;\n  --rd-color-ember-500: #f97316;\n  --rd-color-ember-600: #ea580c;\n  --rd-color-ember-700: #c2410c;\n  --rd-color-ember-800: #9a3412;\n  --rd-color-ember-950: #431407;\n  --rd-color-green-50: #f0fdf4;\n  --rd-color-green-400: #4ade80;\n  --rd-color-green-600: #16a34a;\n  --rd-color-green-700: #15803d;\n  --rd-color-green-950: #15271f;\n  --rd-color-red-50: #fef2f2;\n  --rd-color-red-300: #fca5a5;\n  --rd-color-red-400: #f87171;\n  --rd-color-red-600: #dc2626;\n  --rd-color-red-700: #b91c1c;\n  --rd-color-red-950: #2a1a1d;\n  --rd-color-amber-50: #fffbeb;\n  --rd-color-amber-400: #fbbf24;\n  --rd-color-amber-700: #b45309;\n  --rd-color-amber-950: #2a2314;\n  --rd-color-blue-50: #eff6ff;\n  --rd-color-blue-400: #60a5fa;\n  --rd-color-blue-600: #2563eb;\n  --rd-color-blue-950: #18202e;\n  --rd-radius-sm: 6px;\n  --rd-radius-md: 10px;\n  --rd-radius-lg: 14px;\n  --rd-space-1: 4px;\n  --rd-space-2: 8px;\n  --rd-space-3: 12px;\n  --rd-space-4: 16px;\n  --rd-space-5: 20px;\n  --rd-color-action-primary: #c2410c;\n  --rd-color-action-primary-hover: #9a3412;\n  --rd-color-action-on-primary: #ffffff;\n  --rd-color-action-danger: #dc2626;\n  --rd-color-action-danger-hover: #b91c1c;\n  --rd-color-surface-default: #ffffff;\n  --rd-color-surface-subtle: #f2efe9;\n  --rd-color-surface-raised: #ffffff;\n  --rd-color-surface-selected: #fff4ec;\n  --rd-color-border-default: #e4e0d8;\n  --rd-color-border-strong: #857f75;\n  --rd-color-feedback-danger: #dc2626;\n  --rd-color-feedback-success: #16a34a;\n  --rd-color-feedback-warning: #b45309;\n  --rd-color-feedback-info: #2563eb;\n  --rd-color-feedback-danger-subtle: #fef2f2;\n  --rd-color-feedback-success-subtle: #f0fdf4;\n  --rd-color-feedback-warning-subtle: #fffbeb;\n  --rd-color-feedback-info-subtle: #eff6ff;\n  --rd-color-overlay-backdrop: rgb(14 14 18 / 0.5);\n  --rd-color-text-default: #1c1a17;\n  --rd-color-text-muted: #5c574f;\n  --rd-color-focus-ring: #ea580c;\n  --rd-color-chart-1: #c2410c;\n  --rd-color-chart-2: #2563eb;\n  --rd-color-chart-3: #15803d;\n  --rd-color-chart-4: #7c3aed;\n  --rd-color-chart-5: #0e7490;\n  --rd-color-chart-6: #be185d;\n  --rd-radius-control: 10px;\n  --rd-radius-overlay: 14px;\n  --rd-space-control-x: 16px;\n  --rd-space-control-x-sm: 12px;\n  --rd-space-control-x-lg: 20px;\n  --rd-elevation-control: inset 0 1px 0 rgb(255 255 255 / 0.16), 0 1px 2px rgb(28 26 23 / 0.22);\n  --rd-elevation-raised: 0 1px 2px rgb(28 26 23 / 0.06), 0 1px 1px rgb(28 26 23 / 0.04);\n  --rd-elevation-floating: 0 8px 24px -6px rgb(28 26 23 / 0.18), 0 0 0 1px rgb(28 26 23 / 0.04);\n  --rd-elevation-overlay: 0 24px 64px -16px rgb(28 26 23 / 0.35), 0 0 0 1px rgb(28 26 23 / 0.05);\n  --rd-size-control-sm: 32px;\n  --rd-size-control-md: 40px;\n  --rd-size-control-lg: 48px;\n}\n\n@media (prefers-color-scheme: dark) {\n  :root:not([data-theme=\"light\"]) {\n    --rd-color-action-primary: #fb923c;\n    --rd-color-action-primary-hover: #fdba74;\n    --rd-color-action-on-primary: #12100e;\n    --rd-color-action-danger: #f87171;\n    --rd-color-action-danger-hover: #fca5a5;\n    --rd-color-surface-default: #12100e;\n    --rd-color-surface-subtle: #2c2925;\n    --rd-color-surface-raised: #1c1a17;\n    --rd-color-surface-selected: #431407;\n    --rd-color-border-default: #2c2925;\n    --rd-color-border-strong: #857f75;\n    --rd-color-feedback-danger: #f87171;\n    --rd-color-feedback-success: #4ade80;\n    --rd-color-feedback-warning: #fbbf24;\n    --rd-color-feedback-info: #60a5fa;\n    --rd-color-feedback-danger-subtle: #2a1a1d;\n    --rd-color-feedback-success-subtle: #15271f;\n    --rd-color-feedback-warning-subtle: #2a2314;\n    --rd-color-feedback-info-subtle: #18202e;\n    --rd-color-overlay-backdrop: rgb(0 0 0 / 0.6);\n    --rd-color-text-default: #faf8f5;\n    --rd-color-text-muted: #a39e94;\n    --rd-color-focus-ring: #fdba74;\n    --rd-color-chart-1: #fb923c;\n    --rd-color-chart-2: #60a5fa;\n    --rd-color-chart-3: #4ade80;\n    --rd-color-chart-4: #a78bfa;\n    --rd-color-chart-5: #22d3ee;\n    --rd-color-chart-6: #f472b6;\n    --rd-elevation-control: inset 0 1px 0 rgb(255 255 255 / 0.2), 0 1px 2px rgb(0 0 0 / 0.5);\n    --rd-elevation-raised: 0 1px 2px rgb(0 0 0 / 0.4), 0 0 0 1px rgb(255 255 255 / 0.03);\n    --rd-elevation-floating: 0 8px 24px -6px rgb(0 0 0 / 0.6), 0 0 0 1px rgb(255 255 255 / 0.07);\n    --rd-elevation-overlay: 0 24px 64px -16px rgb(0 0 0 / 0.75), 0 0 0 1px rgb(255 255 255 / 0.08);\n  }\n}\n\n:root[data-theme=\"dark\"] {\n  --rd-color-action-primary: #fb923c;\n  --rd-color-action-primary-hover: #fdba74;\n  --rd-color-action-on-primary: #12100e;\n  --rd-color-action-danger: #f87171;\n  --rd-color-action-danger-hover: #fca5a5;\n  --rd-color-surface-default: #12100e;\n  --rd-color-surface-subtle: #2c2925;\n  --rd-color-surface-raised: #1c1a17;\n  --rd-color-surface-selected: #431407;\n  --rd-color-border-default: #2c2925;\n  --rd-color-border-strong: #857f75;\n  --rd-color-feedback-danger: #f87171;\n  --rd-color-feedback-success: #4ade80;\n  --rd-color-feedback-warning: #fbbf24;\n  --rd-color-feedback-info: #60a5fa;\n  --rd-color-feedback-danger-subtle: #2a1a1d;\n  --rd-color-feedback-success-subtle: #15271f;\n  --rd-color-feedback-warning-subtle: #2a2314;\n  --rd-color-feedback-info-subtle: #18202e;\n  --rd-color-overlay-backdrop: rgb(0 0 0 / 0.6);\n  --rd-color-text-default: #faf8f5;\n  --rd-color-text-muted: #a39e94;\n  --rd-color-focus-ring: #fdba74;\n  --rd-color-chart-1: #fb923c;\n  --rd-color-chart-2: #60a5fa;\n  --rd-color-chart-3: #4ade80;\n  --rd-color-chart-4: #a78bfa;\n  --rd-color-chart-5: #22d3ee;\n  --rd-color-chart-6: #f472b6;\n  --rd-elevation-control: inset 0 1px 0 rgb(255 255 255 / 0.2), 0 1px 2px rgb(0 0 0 / 0.5);\n  --rd-elevation-raised: 0 1px 2px rgb(0 0 0 / 0.4), 0 0 0 1px rgb(255 255 255 / 0.03);\n  --rd-elevation-floating: 0 8px 24px -6px rgb(0 0 0 / 0.6), 0 0 0 1px rgb(255 255 255 / 0.07);\n  --rd-elevation-overlay: 0 24px 64px -16px rgb(0 0 0 / 0.75), 0 0 0 1px rgb(255 255 255 / 0.08);\n}\n\n[data-density=\"compact\"] {\n  --rd-size-control-sm: 28px;\n  --rd-size-control-md: 32px;\n  --rd-size-control-lg: 40px;\n  --rd-space-control-x: 12px;\n  --rd-space-control-x-sm: 10px;\n  --rd-space-control-x-lg: 16px;\n}\n\n"
         }
       ]
     },

@@ -142,6 +142,40 @@ test.describe("component page", () => {
     await expect(toast).toBeHidden({ timeout: 14_000 });
   });
 
+  test("the customer table filters, sorts, pages and exports in a real browser", async ({ page }) => {
+    await page.goto("/components/customer-table");
+    await page.waitForLoadState("networkidle");
+    const block = page.getByRole("region", { name: "Customers" }).first();
+    await expect(block.getByText("24 customers")).toBeVisible();
+    await block.getByRole("searchbox", { name: "Search customers" }).fill("hopper");
+    await expect(block.getByText("1 customer", { exact: true })).toBeVisible();
+    await expect(block.getByRole("grid").getByText("Grace Hopper")).toBeVisible();
+    await block.getByRole("searchbox").fill("");
+    await block.getByRole("button", { name: /Status/ }).click();
+    await page.getByRole("option", { name: "overdue" }).click();
+    await expect(block.getByText("3 customers")).toBeVisible();
+    await block.getByRole("button", { name: "Clear filters" }).first().click();
+    await block.getByRole("button", { name: "Page 2" }).click();
+    await expect(block.getByText("Showing 9 to 16 of 24")).toBeVisible();
+    const download = page.waitForEvent("download");
+    await block.getByRole("button", { name: "Export CSV" }).click();
+    expect((await download).suggestedFilename()).toBe("customers.csv");
+  });
+
+  test("a chart is explored with the arrow keys and read out", async ({ page }) => {
+    await page.goto("/components/chart");
+    await page.waitForLoadState("networkidle");
+    const chart = page.getByRole("figure", { name: "Revenue by month" }).first();
+    const plot = chart.getByRole("group").first();
+    await plot.focus();
+    await page.keyboard.press("ArrowRight");
+    await page.keyboard.press("ArrowRight");
+    await expect(chart.getByRole("status")).toContainText("Feb");
+    await expect(chart.getByText("$26,500").first()).toBeVisible();
+    await chart.getByRole("button", { name: "View as table" }).click();
+    await expect(chart.getByRole("table")).toBeVisible();
+  });
+
   test("steps to the neighbouring components", async ({ page }) => {
     await page.goto("/components/alert");
     await page.getByRole("link", { name: "Next: Approval Box" }).click();
@@ -220,7 +254,7 @@ test.describe("small screens", () => {
     expect(overflow).toBeLessThanOrEqual(0);
   });
 
-  for (const path of ["/", "/components", "/docs/getting-started", "/components/data-grid", "/components/chat", "/components/generated-chart", "/docs/ai"]) {
+  for (const path of ["/", "/components", "/docs/getting-started", "/components/data-grid", "/components/chat", "/components/generated-chart", "/docs/ai", "/components/customer-table", "/components/chart", "/components/stat"]) {
     test(`${path} doesn't scroll sideways`, async ({ page }) => {
       await page.goto(path);
       await page.waitForLoadState("networkidle");

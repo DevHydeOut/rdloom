@@ -35,6 +35,12 @@ const pairs: Array<[fg: string, bg: string, min: number, where: string]> = [
   ["color.border.strong", "color.surface.default", 3, "checkbox/radio border"],
   ["color.action.primary", "color.surface.default", 3, "selected checkbox/radio/switch"],
   ["color.focus.ring", "color.surface.default", 3, "focus ring"],
+  ["color.chart.1", "color.surface.default", 3, "chart series 1"],
+  ["color.chart.2", "color.surface.default", 3, "chart series 2"],
+  ["color.chart.3", "color.surface.default", 3, "chart series 3"],
+  ["color.chart.4", "color.surface.default", 3, "chart series 4"],
+  ["color.chart.5", "color.surface.default", 3, "chart series 5"],
+  ["color.chart.6", "color.surface.default", 3, "chart series 6"],
 ];
 
 function luminance(hex: string): number {

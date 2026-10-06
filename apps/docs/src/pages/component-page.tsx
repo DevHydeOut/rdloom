@@ -387,6 +387,19 @@ function AiNote() {
   );
 }
 
+/** What every block promises, said once at the top of its page. */
+function BlockNote() {
+  return (
+    <div className="mb-2 rounded-xl border border-[var(--site-border)] bg-[var(--site-subtle)] p-4 text-sm leading-6">
+      <p className="font-medium">A ready-made piece, built from the library&apos;s own parts.</p>
+      <p className="text-[var(--site-muted)]">
+        A block puts several components together into something you would otherwise assemble by hand. It never fetches data: you give it the data, or answer its callbacks. It is copied into your project like any
+        component, with the parts it uses, so you can change anything.
+      </p>
+    </div>
+  );
+}
+
 export function ComponentPage({ component }: { component: DocComponent }) {
   const { spec, id } = component;
   const a = spec.a11y;
@@ -414,6 +427,7 @@ export function ComponentPage({ component }: { component: DocComponent }) {
 
       {spec.category === "motion" && <MotionNote />}
       {spec.category === "ai" && <AiNote />}
+      {spec.category === "block" && <BlockNote />}
 
       {hero && (
         <Preview code={hero.code} label={`${title(hero.name)} code`} tall={id === "data-grid" || id === "calendar"} motion={spec.category === "motion"}>

@@ -50,6 +50,14 @@ done
 test -e src/components/rdloom/utils/ai.ts || { echo "✗ the message types (utils/ai.ts) were not installed"; exit 1; }
 echo "✓ chat and its parts installed"
 
+step "Blocks: the customer table and every part it is made of"
+npx rdloom add customer-table --install
+for part in customer-table chart stat sparkline table pagination select badge avatar card alert empty-state skeleton button; do
+  test -e "src/components/rdloom/$part/$part.tsx" || { echo "✗ rdloom add customer-table did not bring $part"; exit 1; }
+done
+test -e src/components/rdloom/customer-table/query.ts || { echo "✗ the customer table logic (query.ts) was not installed"; exit 1; }
+echo "✓ customer table and its parts installed"
+
 step "Typecheck and production build"
 npm run build --silent
 # The keyframes must be in the CSS the browser actually loads, with no <style> tag in the markup.

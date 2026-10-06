@@ -6,7 +6,7 @@
 
 Every component is defined once, as a JSON spec. That spec generates the TypeScript types, the design tokens, the Figma library, the documentation and the AI-agent context, so design, code and AI tools never drift apart.
 
-> Status: 61 components built and tested, including a 100,000-row DataGrid, a command palette, file upload, DateRangePicker, Combobox and Table. The CLI (`rdloom`) and the MCP server (`@rdloom/mcp`) are on npm; the docs site is not hosted yet.
+> Status: 65 components built and tested, including a 100,000-row DataGrid, a command palette, file upload, DateRangePicker, Combobox and Table. The CLI (`rdloom`) and the MCP server (`@rdloom/mcp`) are on npm; the docs site is not hosted yet.
 
 ## How it works
 
@@ -363,6 +363,12 @@ Eleven components for building an assistant, copilot or agent screen: `Chat`, `M
 - **Safe with text you don't control.** `Response` reads markdown into React elements and never injects HTML; links with unsafe schemes show as plain text; half-finished markdown while streaming never throws. CSV export prefixes cells that start with `=`, `+`, `-` or `@` so a spreadsheet can't run them as formulas.
 - **A real message box.** `PromptInput` is one rounded bar: a `+` menu on the left (add files, plus any tools you list), the text, then your own controls, a microphone and Send. Files added show above the text, pictures as small previews drawn only from this device. You get only the buttons you ask for; with just `onSubmit` it is a plain box. `Chat` passes all of it through.
 - **No chart library.** `GeneratedChart` draws bars and lines in plain SVG.
+
+## Charts, stats and blocks
+
+- **Chart** draws bars, stacked bars, lines, areas and donuts in plain SVG, with no chart library. It is one tab stop: the arrow keys move between values, a tooltip and a polite announcement say what is selected, and "View as table" swaps the drawing for the same numbers as a real table. Series colors come from six chart tokens (`--rd-color-chart-1` to `-6`), tested for contrast in light and dark, and series are told apart by shape and label as well as color.
+- **Stat** is a key number with a trend (an arrow and a signed value, said in words for screen readers) and an optional **Sparkline**.
+- **CustomerTable** is a block: a ready-made piece built from the library's own parts. Give it customers and it has search, status and plan filters, sorting, pages, CSV export, loading rows, an empty state, an error with retry, and cards instead of a table on a phone. Above it, totals and a chart follow the filters. For a large list set `serverSide`: the table shows exactly what you pass and asks for more through `onQueryChange` (search waits for typing to pause). It never fetches anything itself.
 
 ## Renaming the library
 The name is kept in few places on purpose: `packages/codegen/src/brand.ts` (name, CSS prefix, npm scope), the `name` fields in each `package.json`, and this README.

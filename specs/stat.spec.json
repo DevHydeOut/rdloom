@@ -1,0 +1,61 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Stat",
+  "version": "0.1.0",
+  "category": "data",
+  "status": "experimental",
+  "description": "A key number with its label and context: a value, an optional change over time and an optional small trend graphic. Unframed: place it in a Card or a grid.",
+  "props": {
+    "label": { "type": "string", "required": true, "description": "What the number measures, e.g. \"Monthly revenue\"." },
+    "value": { "type": "custom", "tsType": "string | number", "required": true, "description": "The number. A number is formatted with toLocaleString unless format is given; a string is shown as is." },
+    "format": { "type": "callback", "tsType": "(value: number) => string", "description": "Formats a numeric value, e.g. as currency." },
+    "unit": { "type": "string", "description": "A small unit after the value, such as % or /mo." },
+    "trend": {
+      "type": "custom",
+      "tsType": "{ change: number; label?: string; goodWhen?: \"up\" | \"down\" }",
+      "description": "The change over time. change is signed; label says what it is compared with (\"vs last month\"); goodWhen says which direction is an improvement (default up)."
+    },
+    "data": { "type": "custom", "tsType": "number[]", "description": "Recent values, drawn as a small Sparkline beside the value." },
+    "description": { "type": "string", "description": "A short line of extra context under the value." },
+    "size": { "type": "enum", "values": ["sm", "md", "lg"], "default": "md", "description": "Size of the value text." },
+    "isLoading": { "type": "boolean", "default": false, "description": "Shows placeholder blocks and announces loading." }
+  },
+  "variants": ["size"],
+  "states": ["default", "loading"],
+  "slots": ["root", "label", "value", "unit", "trend", "sparkline", "description"],
+  "tokens": [
+    "color.text.default",
+    "color.text.muted",
+    "color.feedback.success-subtle",
+    "color.feedback.danger-subtle",
+    "color.surface.subtle",
+    "color.border.default"
+  ],
+  "a11y": {
+    "role": "text",
+    "keyboard": [],
+    "requirements": [
+      "The whole stat reads as one sentence, e.g. \"Monthly revenue: $48,200. Up 12% compared with last month.\"",
+      "Direction is always said in words (Up, Down, No change) and shown with an arrow shape, never by color alone",
+      "Good or bad is only spoken when goodWhen is set explicitly; the tint is an extra cue",
+      "Pill text uses the default text color on a subtle tint, meeting 4.5:1 in light and dark mode",
+      "While loading the region is marked busy and says Loading",
+      "Not interactive: it is not focusable"
+    ],
+    "screenReader": [
+      "Read in place as one sentence: label, value, change and description",
+      "Loading reads \"Loading\" followed by the label"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["Dashboards and summaries that lead with a few key numbers", "Showing a number with how it changed"],
+    "avoid_when": ["Many numbers that need comparing: use a Table", "A value that changes live and must be announced: use a live region"],
+    "anti_patterns": ["Showing a change as only a green or red color", "Long sentences as the label", "Putting more than a handful of stats in one row"]
+  },
+  "examples": ["basic", "with-trend", "with-sparkline", "loading", "row"],
+  "figma": {
+    "componentKey": null,
+    "variantMap": { "size": "Size" }
+  }
+}

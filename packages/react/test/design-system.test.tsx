@@ -70,7 +70,8 @@ describe("icons", () => {
   });
 
   it("is the only place icons are drawn: components import them, they don't draw their own", () => {
-    const allowed = new Set(["generated-chart.tsx", "arrow.tsx"]);
+    // charts draw their own marks: these are data graphics, not icons
+    const allowed = new Set(["generated-chart.tsx", "arrow.tsx", "chart.tsx", "sparkline.tsx", "stat.tsx"]);
     for (const file of componentFiles()) {
       if (allowed.has(path.basename(file))) continue;
       expect(fs.readFileSync(file, "utf8"), `${path.relative(root, file)} draws an inline <svg>`).not.toMatch(/<svg\b/);

@@ -142,5 +142,24 @@ export {
   type ToolPart,
   type ToolState,
 } from "./utils/ai";
+export { Chart, chartColor, type ChartPoint, type ChartProps } from "./chart/chart";
+export { niceRange, percentages } from "./chart/scales";
+export { Sparkline, type SparklineProps } from "./sparkline/sparkline";
+export { Stat, type StatProps } from "./stat/stat";
+export { CustomerTable, type CustomerTableProps } from "./customer-table/customer-table";
+export {
+  applyQuery as applyCustomerQuery,
+  customersToCsv,
+  emptyQuery as emptyCustomerQuery,
+  filterCustomers,
+  sortCustomers,
+  summarize as summarizeCustomers,
+  type Customer,
+  type CustomerInsights,
+  type CustomerQuery,
+  type CustomerSortColumn,
+  type CustomerStatInput,
+  type CustomerSummary,
+} from "./customer-table/query";
 // The icon family the components use, for your own buttons and menu entries.
 export * from "./utils/icons";
