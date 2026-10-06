@@ -2,13 +2,15 @@
 @import "@rdloom/tokens/tokens.css";
 @import "../../../packages/react/src/motion/rdloom-motion.css";
 @import "@fontsource-variable/plus-jakarta-sans/wght.css";
-@import "@fontsource-variable/instrument-sans";
-@import "@fontsource/ibm-plex-mono/latin-400.css";
-@import "@fontsource/ibm-plex-mono/latin-500.css";
 
 /* Tailwind only generates classes it finds: include the components and examples. */
 @source "../../../packages/react/src";
 @source "../../../examples/components";
+
+/* Tailwind's font-mono utility, used for labels and file names, follows the site font too. */
+@theme {
+  --font-mono: "Plus Jakarta Sans Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
 
 /*
  * The site's own chrome. rdloom's look is "loom": paper and ink, with one ember
@@ -74,7 +76,7 @@ body {
 
 code,
 pre {
-  font-family: ui-monospace, "Cascadia Code", Menlo, monospace;
+  font-family: "Plus Jakarta Sans Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
 ::selection {
@@ -84,12 +86,12 @@ pre {
 /*
  * The docs' reading typography. It is scoped to .docs (the site shell) so the
  * /visual pages that the screenshot tests use keep the components' own font.
- * Titles are set in Plus Jakarta Sans; the text you read is in Instrument Sans.
+ * Everything on the site, code included, is set in Plus Jakarta Sans.
  */
 .docs {
   /* Decoration that reaches past the viewport (the hero grid) must never add a sideways scrollbar. clip, unlike hidden, leaves sticky positioning alone. */
   overflow-x: clip;
-  font-family: "Instrument Sans Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-family: "Plus Jakarta Sans Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   font-optical-sizing: auto;
   /* The font for big numbers (stat cards, chart values). A component only reads this variable; without it numbers use the page font. */
   --rd-font-numeric: "Plus Jakarta Sans Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -99,7 +101,7 @@ pre {
 .docs pre,
 .docs kbd,
 .docs samp {
-  font-family: "IBM Plex Mono", ui-monospace, "Cascadia Code", Menlo, monospace;
+  font-family: "Plus Jakarta Sans Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
 /* Headings. In a layer, so a utility such as font-semibold can still override the weight. */

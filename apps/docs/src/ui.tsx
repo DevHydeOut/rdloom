@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useId, useState, type ReactNode }
 import { Tab, TabList, TabPanel, Tabs } from "@rdloom/react";
 import { highlight } from "sugar-high";
 import { CheckIcon, CopyIcon, DoIcon, DontIcon, FileIcon, LinkIcon } from "./icons";
+import { repoUrl } from "./data";
 
 // The docs' own building blocks: calm, neutral, and the same on every page.
 
@@ -342,5 +343,20 @@ export function List({ items, tone }: { items: string[]; tone?: "do" | "dont" })
         </li>
       ))}
     </ul>
+  );
+}
+
+/** The one footer of the site. Every page gets it from the shell, so its size and spacing never differ. */
+export function SiteFooter() {
+  return (
+    <footer className="mt-auto border-t border-[var(--site-border)] py-6">
+      <p className="mx-auto max-w-[88rem] px-4 text-sm text-[var(--site-muted)] sm:px-6">
+        Built by the rdloom team. Every page is generated from the component specs. The source is on{" "}
+        <a href={repoUrl} className="underline underline-offset-4">
+          GitHub
+        </a>
+        .
+      </p>
+    </footer>
   );
 }

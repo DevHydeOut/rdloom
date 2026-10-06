@@ -9,9 +9,7 @@
     "build": "node prerender.mjs"
   },
   "dependencies": {
-    "@fontsource-variable/instrument-sans": "^5.3.0",
     "@fontsource-variable/plus-jakarta-sans": "^5.3.0",
-    "@fontsource/ibm-plex-mono": "^5.3.0",
     "@internationalized/date": "^3.12.4",
     "@rdloom/react": "*",
     "@rdloom/tokens": "*",

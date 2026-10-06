@@ -6,7 +6,7 @@ import { VisualPage } from "./pages/visual";
 import { guides, routeFor, searchEntries } from "./routes";
 import { Link, navigate, RouterProvider, usePath } from "./router";
 import { ArrowRightIcon, ChevronRightIcon, MenuIcon, MoonIcon, SearchIcon, SunIcon } from "./icons";
-import { ManagerProvider } from "./ui";
+import { ManagerProvider, SiteFooter } from "./ui";
 
 const sideLink =
   "-ms-px block border-s border-transparent py-1.5 ps-3.5 pe-2 text-[13.5px] leading-5 text-[var(--site-muted)] outline-none transition-colors " +
@@ -276,7 +276,7 @@ function Shell() {
   ];
 
   return (
-    <div className="docs min-h-screen">
+    <div className="docs flex min-h-screen flex-col">
       <a
         href="#main"
         className="sr-only focus:not-sr-only focus:fixed focus:start-2 focus:top-2 focus:z-50 focus:rounded-md focus:bg-[var(--site-bg)] focus:px-3 focus:py-2"
@@ -341,11 +341,11 @@ function Shell() {
       </header>
 
       {route.wide ? (
-        <main id="main" className={`mx-auto px-4 py-12 sm:px-6 ${route.full ? "max-w-[88rem]" : "max-w-screen-xl"}`}>
+        <main id="main" className={`mx-auto w-full flex-1 px-4 pt-12 pb-24 sm:px-6 ${route.full ? "max-w-[88rem]" : "max-w-screen-xl"}`}>
           {route.page}
         </main>
       ) : (
-        <div className="mx-auto flex max-w-[88rem] gap-8 px-4 sm:px-6 lg:gap-12">
+        <div className="mx-auto flex w-full max-w-[88rem] flex-1 gap-8 px-4 sm:px-6 lg:gap-12">
           <div className="sticky top-14 hidden h-[calc(100vh-3.5rem)] w-60 shrink-0 overflow-y-auto py-8 pe-2 md:block thin-scroll">
             <Nav />
           </div>
@@ -357,15 +357,7 @@ function Shell() {
           </div>
         </div>
       )}
-      <footer className="border-t border-[var(--site-border)] py-6">
-        <p className="mx-auto max-w-[88rem] px-4 text-sm text-[var(--site-muted)] sm:px-6">
-          Built by the rdloom team. Every page is generated from the component specs. The source is on{" "}
-          <a href={repoUrl} className="underline underline-offset-4">
-            GitHub
-          </a>
-          .
-        </p>
-      </footer>
+      <SiteFooter />
       <Search open={searchOpen} onOpenChange={setSearchOpen} />
       <ToastRegion />
     </div>
