@@ -37,6 +37,8 @@ export interface Route {
   page: ReactNode;
   /** Pages with their own layout width (the home page). */
   wide?: boolean;
+  /** As wide as the navigation bar (blocks show whole screens), not the narrower width of the home page. */
+  full?: boolean;
   /** A page with no site chrome, for showing one example at the size of the window. */
   bare?: boolean;
   notFound?: boolean;
@@ -71,6 +73,7 @@ export function routeFor(rawPath: string): Route {
       title: `${blocks.length} ready-made blocks for React · rdloom`,
       description: "Whole screens built from rdloom components: a dashboard shell, a customer table with charts. See each at full width and on a phone, then copy it into your project.",
       wide: true,
+      full: true,
       page: <BlocksIndex />,
     };
   }
@@ -82,6 +85,7 @@ export function routeFor(rawPath: string): Route {
       title: `${displayName(block.spec.name)}: a React block · rdloom`,
       description: `${block.spec.description} See it at full width and on a phone, then copy it into your project.`,
       wide: true,
+      full: true,
       page: <ComponentPage key={block.id} component={block} layout="block" />,
     };
   }

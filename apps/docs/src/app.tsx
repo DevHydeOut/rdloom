@@ -341,7 +341,7 @@ function Shell() {
       </header>
 
       {route.wide ? (
-        <main id="main" className="mx-auto max-w-screen-xl px-4 py-12 sm:px-6">
+        <main id="main" className={`mx-auto px-4 py-12 sm:px-6 ${route.full ? "max-w-[88rem]" : "max-w-screen-xl"}`}>
           {route.page}
         </main>
       ) : (
