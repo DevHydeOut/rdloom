@@ -16,6 +16,7 @@ import {
 } from "react-aria-components";
 import { calendarDefaults, type CalendarSpecProps } from "../generated/calendar.types";
 import { cx } from "../utils/cx";
+import { ChevronLeftIcon, ChevronRightIcon } from "../utils/icons";
 
 type Omitted = keyof CalendarSpecProps | "className" | "children" | "visibleDuration";
 
@@ -31,39 +32,32 @@ function NavButton({ slot }: { slot: "previous" | "next" }) {
     <Button
       slot={slot}
       className={
-        "flex size-8 items-center justify-center rounded-[var(--rd-radius-control)] outline-none " +
+        "flex size-[var(--rd-size-control-sm)] items-center justify-center rounded-[var(--rd-radius-control)] outline-none " +
         "text-[var(--rd-color-text-muted)] data-[hovered]:bg-[var(--rd-color-surface-subtle)] data-[hovered]:text-[var(--rd-color-text-default)] " +
         "data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)] data-[disabled]:opacity-40"
       }
     >
-      <svg aria-hidden="true" viewBox="0 0 16 16" className="size-4 rtl:rotate-180" fill="none">
-        <path
-          d={slot === "previous" ? "M10 4l-4 4 4 4" : "M6 4l4 4-4 4"}
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
+      {slot === "previous" ? <ChevronLeftIcon className="size-4 rtl:rotate-180" /> : <ChevronRightIcon className="size-4 rtl:rotate-180" />}
     </Button>
   );
 }
 
 const cellBase =
   "relative flex size-9 cursor-default items-center justify-center text-sm tabular-nums outline-none " +
-  "text-[var(--rd-color-text-default)] data-[outside-month]:hidden " +
-  "data-[today]:font-semibold data-[today]:underline data-[today]:underline-offset-4 " +
-  "data-[disabled]:opacity-40 data-[unavailable]:line-through data-[unavailable]:opacity-40 " +
+  "text-[var(--rd-color-text-default)] data-[outside-month]:text-[var(--rd-color-text-muted)] data-[outside-month]:opacity-50 " +
+  "data-[today]:font-semibold data-[today]:ring-1 data-[today]:ring-inset data-[today]:ring-[var(--rd-color-action-primary)] " +
+  "data-[disabled]:opacity-40 data-[unavailable]:text-[var(--rd-color-text-muted)] data-[unavailable]:line-through data-[unavailable]:opacity-40 " +
   "data-[focus-visible]:z-10 data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)]";
 
 const singleCell =
   "rounded-[var(--rd-radius-control)] data-[hovered]:bg-[var(--rd-color-surface-subtle)] " +
-  "data-[selected]:bg-[var(--rd-color-action-primary)] data-[selected]:text-[var(--rd-color-action-on-primary)]";
+  "data-[selected]:bg-[var(--rd-color-action-primary)] data-[selected]:text-[var(--rd-color-action-on-primary)] data-[selected]:ring-0 data-[selected]:[box-shadow:var(--rd-elevation-control)]";
 
 // In a range, days between the ends get a soft band; the ends are solid.
 const rangeCell =
-  "data-[hovered]:bg-[var(--rd-color-surface-subtle)] data-[selected]:bg-[var(--rd-color-surface-subtle)] " +
+  "data-[hovered]:bg-[var(--rd-color-surface-subtle)] data-[selected]:bg-[var(--rd-color-surface-selected)] " +
   "data-[selection-start]:rounded-s-[var(--rd-radius-control)] data-[selection-end]:rounded-e-[var(--rd-radius-control)] " +
+  "data-[selection-start]:[box-shadow:var(--rd-elevation-control)] data-[selection-end]:[box-shadow:var(--rd-elevation-control)] " +
   "data-[selection-start]:bg-[var(--rd-color-action-primary)] data-[selection-start]:text-[var(--rd-color-action-on-primary)] " +
   "data-[selection-end]:bg-[var(--rd-color-action-primary)] data-[selection-end]:text-[var(--rd-color-action-on-primary)]";
 

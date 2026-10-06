@@ -21,19 +21,23 @@ export interface TextFieldProps
 
 const control =
   "w-full bg-[var(--rd-color-surface-default)] text-[var(--rd-color-text-default)] " +
-  "border border-[var(--rd-color-border-default)] rounded-[var(--rd-radius-control)] outline-none transition-colors " +
+  "border border-[var(--rd-color-border-default)] rounded-[var(--rd-radius-control)] outline-none transition-colors [box-shadow:var(--rd-elevation-raised)] " +
   "placeholder:text-[var(--rd-color-text-muted)] " +
   "data-[hovered]:border-[var(--rd-color-border-strong)] " +
-  "data-[focused]:ring-2 data-[focused]:ring-[var(--rd-color-focus-ring)] data-[focused]:border-transparent " +
+  "data-[focused]:ring-2 data-[focused]:ring-[var(--rd-color-focus-ring)] data-[focused]:border-[var(--rd-color-focus-ring)] " +
   "data-[invalid]:border-[var(--rd-color-feedback-danger)] " +
   "data-[disabled]:opacity-50 data-[disabled]:cursor-not-allowed";
 
 const sizes: Record<NonNullable<TextFieldSpecProps["size"]>, string> = {
-  sm: "px-2.5 text-sm",
-  md: "px-3 text-sm",
-  lg: "px-3.5 text-base",
+  sm: "px-[var(--rd-space-control-x-sm)] text-sm",
+  md: "px-[var(--rd-space-control-x)] text-sm",
+  lg: "px-[var(--rd-space-control-x-lg)] text-base",
 };
-const heights: Record<NonNullable<TextFieldSpecProps["size"]>, string> = { sm: "h-8", md: "h-10", lg: "h-12" };
+const heights: Record<NonNullable<TextFieldSpecProps["size"]>, string> = {
+  sm: "h-[var(--rd-size-control-sm)]",
+  md: "h-[var(--rd-size-control-md)]",
+  lg: "h-[var(--rd-size-control-lg)]",
+};
 
 export const TextField = forwardRef<HTMLDivElement, TextFieldProps>(function TextField(
   {
@@ -60,7 +64,7 @@ export const TextField = forwardRef<HTMLDivElement, TextFieldProps>(function Tex
       isDisabled={isDisabled}
       isInvalid={isInvalid}
       isRequired={isRequired}
-      className={cx("flex flex-col gap-1.5", className)}
+      className={cx("flex flex-col gap-2", className)}
     >
       <Label className="text-sm font-medium text-[var(--rd-color-text-default)]">
         {label}

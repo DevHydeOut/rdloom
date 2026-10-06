@@ -40,9 +40,9 @@ export interface ComboboxProps<T extends object, M extends Mode = "single">
 }
 
 const fieldSizes: Record<FieldSize, string> = {
-  sm: "min-h-8 ps-1.5 pe-1 text-sm",
-  md: "min-h-10 ps-2 pe-1 text-sm",
-  lg: "min-h-12 ps-2.5 pe-1.5 text-base",
+  sm: "min-h-[var(--rd-size-control-sm)] ps-1.5 pe-1 text-sm",
+  md: "min-h-[var(--rd-size-control-md)] ps-2 pe-1 text-sm",
+  lg: "min-h-[var(--rd-size-control-lg)] ps-2.5 pe-1.5 text-base",
 };
 const rowHeights: Record<FieldSize, number> = { sm: 30, md: 32, lg: 36 };
 
@@ -87,9 +87,9 @@ function Field({ fieldRef, size, isMultiple, isLoading, placeholder }: FieldProp
       ref={fieldRef}
       className={cx(
         "flex w-full flex-wrap items-center gap-1 bg-[var(--rd-color-surface-default)] text-[var(--rd-color-text-default)] " +
-          "border border-[var(--rd-color-border-default)] rounded-[var(--rd-radius-control)] transition-colors " +
+          "border border-[var(--rd-color-border-default)] rounded-[var(--rd-radius-control)] transition-colors [box-shadow:var(--rd-elevation-raised)] " +
           "hover:border-[var(--rd-color-border-strong)] " +
-          "focus-within:ring-2 focus-within:ring-[var(--rd-color-focus-ring)] focus-within:border-transparent " +
+          "focus-within:ring-2 focus-within:ring-[var(--rd-color-focus-ring)] focus-within:border-[var(--rd-color-focus-ring)] " +
           "group-data-[invalid]:border-[var(--rd-color-feedback-danger)] group-data-[disabled]:opacity-50",
         fieldSizes[size],
       )}
@@ -198,7 +198,7 @@ export function Combobox<T extends object, M extends Mode = "single">({
       isDisabled={isDisabled}
       isInvalid={isInvalid}
       isRequired={isRequired}
-      className={cx("group flex flex-col gap-1.5", className)}
+      className={cx("group flex flex-col gap-2", className)}
     >
       <Label className={fieldLabel}>
         {label}

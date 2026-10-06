@@ -46,7 +46,7 @@ export const TimeField = forwardRef<HTMLDivElement, TimeFieldProps>(function Tim
       isDisabled={isDisabled}
       isInvalid={isInvalid}
       isRequired={isRequired}
-      className={cx("flex flex-col gap-1.5", className)}
+      className={cx("flex flex-col gap-2", className)}
     >
       <Label className="text-sm font-medium text-[var(--rd-color-text-default)]">
         {label}

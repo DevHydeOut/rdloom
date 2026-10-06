@@ -76,9 +76,9 @@ export function SegmentedControlItem({ id, children, className }: SegmentedContr
       onFocus={() => choose(id)}
       className={cx(
         "inline-flex items-center justify-center rounded-[calc(var(--rd-radius-control)-2px)] font-medium whitespace-nowrap select-none outline-none transition-colors",
-        "h-9 px-3.5 text-sm group-data-[size=sm]:h-7 group-data-[size=sm]:px-2.5",
+        "h-[calc(var(--rd-size-control-md)-0.25rem)] px-[var(--rd-space-control-x)] text-sm group-data-[size=sm]:h-[calc(var(--rd-size-control-sm)-0.25rem)] group-data-[size=sm]:px-[var(--rd-space-control-x-sm)]",
         "text-[var(--rd-color-text-default)] data-[hovered]:bg-[var(--rd-color-surface-default)] " +
-          "data-[selected]:bg-[var(--rd-color-action-primary)] data-[selected]:text-[var(--rd-color-action-on-primary)] data-[selected]:font-semibold " +
+          "data-[selected]:bg-[var(--rd-color-action-primary)] data-[selected]:text-[var(--rd-color-action-on-primary)] data-[selected]:font-semibold data-[selected]:[box-shadow:var(--rd-elevation-raised)] " +
           "data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)] data-[focus-visible]:ring-offset-1 " +
           "data-[disabled]:cursor-not-allowed",
         className,

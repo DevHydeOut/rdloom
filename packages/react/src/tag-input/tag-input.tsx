@@ -93,7 +93,7 @@ export const TagInput = forwardRef<HTMLDivElement, TagInputProps>(function TagIn
   const describedBy = [description && `${id}-d`, isInvalid && errorMessage && `${id}-e`].filter(Boolean).join(" ") || undefined;
 
   return (
-    <div ref={ref} role="group" aria-labelledby={`${id}-l`} className={cx("flex flex-col gap-1.5", className)}>
+    <div ref={ref} role="group" aria-labelledby={`${id}-l`} className={cx("flex flex-col gap-2", className)}>
       <label id={`${id}-l`} htmlFor={`${id}-i`} className="text-sm font-medium text-[var(--rd-color-text-default)]">
         {label}
       </label>
@@ -101,9 +101,9 @@ export const TagInput = forwardRef<HTMLDivElement, TagInputProps>(function TagIn
         data-invalid={isInvalid || undefined}
         data-disabled={isDisabled || undefined}
         className={cx(
-          "flex min-h-10 flex-wrap items-center gap-1.5 rounded-[var(--rd-radius-control)] border bg-[var(--rd-color-surface-default)] px-2 py-1.5 transition-colors",
+          "flex min-h-[var(--rd-size-control-md)] flex-wrap items-center gap-1.5 rounded-[var(--rd-radius-control)] border bg-[var(--rd-color-surface-default)] px-2 py-1.5 transition-colors [box-shadow:var(--rd-elevation-raised)]",
           "border-[var(--rd-color-border-default)] hover:border-[var(--rd-color-border-strong)]",
-          "focus-within:border-transparent focus-within:ring-2 focus-within:ring-[var(--rd-color-focus-ring)]",
+          "focus-within:border-[var(--rd-color-focus-ring)] focus-within:ring-2 focus-within:ring-[var(--rd-color-focus-ring)]",
           "data-[invalid]:border-[var(--rd-color-feedback-danger)] data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50",
         )}
       >

@@ -42,7 +42,7 @@ describe("Button", () => {
     render(<Button>Save</Button>);
     const cls = screen.getByRole("button").className;
     expect(cls).toContain("--rd-color-action-primary"); // variant="primary"
-    expect(cls).toContain("h-10"); // size="md"
+    expect(cls).toContain("h-[var(--rd-size-control-md)]"); // size="md"
   });
 
   it("has no axe violations", async () => {

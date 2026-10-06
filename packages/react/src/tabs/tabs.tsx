@@ -53,8 +53,8 @@ export const Tabs = forwardRef<HTMLDivElement, TabsProps>(function Tabs(
 
 const listStyles: Record<Variant, string> = {
   underline:
-    "border-[var(--rd-color-border-default)] data-[orientation=horizontal]:border-b data-[orientation=vertical]:border-r",
-  pill: "rounded-[var(--rd-radius-control)] bg-[var(--rd-color-surface-subtle)] p-1",
+    "border-[var(--rd-color-border-default)] data-[orientation=horizontal]:border-b-2 data-[orientation=vertical]:border-r-2",
+  pill: "rounded-[var(--rd-radius-control)] border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-subtle)] p-1",
 };
 
 export interface TabListProps<T extends object> extends Omit<AriaTabListProps<T>, "className"> {
@@ -73,11 +73,11 @@ export function TabList<T extends object>({ className, ...rest }: TabListProps<T
 
 const tabStyles: Record<Variant, string> = {
   underline:
-    "-mb-px border-b-2 border-transparent px-3 py-2 " +
+    "-mb-0.5 h-[var(--rd-size-control-sm)] border-b-2 border-transparent px-3 " +
     "data-[selected]:border-[var(--rd-color-action-primary)] data-[selected]:text-[var(--rd-color-text-default)]",
   pill:
-    "rounded-[calc(var(--rd-radius-control)-2px)] px-3 py-1.5 " +
-    "data-[selected]:bg-[var(--rd-color-surface-raised)] data-[selected]:text-[var(--rd-color-text-default)] data-[selected]:shadow-sm",
+    "h-[var(--rd-size-control-sm)] rounded-[calc(var(--rd-radius-control)-2px)] px-3 " +
+    "data-[selected]:bg-[var(--rd-color-surface-raised)] data-[selected]:text-[var(--rd-color-text-default)] data-[selected]:[box-shadow:var(--rd-elevation-raised)]",
 };
 
 export interface TabProps extends Omit<AriaTabProps, "className"> {
@@ -90,7 +90,7 @@ export function Tab({ className, ...rest }: TabProps) {
     <AriaTab
       {...rest}
       className={cx(
-        "cursor-default text-sm font-medium outline-none transition-colors text-[var(--rd-color-text-muted)] " +
+        "flex cursor-default items-center text-sm font-medium outline-none transition-colors text-[var(--rd-color-text-muted)] " +
           "data-[hovered]:text-[var(--rd-color-text-default)] " +
           "data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)] " +
           "data-[disabled]:opacity-50",

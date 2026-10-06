@@ -15,7 +15,9 @@ import {
 } from "react-aria-components";
 import { menuDefaults, type MenuSpecProps } from "../generated/menu.types";
 import { cx } from "../utils/cx";
-import { overlayPanel } from "../utils/field";
+const panel =
+  "[box-shadow:var(--rd-elevation-floating)] bg-[var(--rd-color-surface-raised)] text-[var(--rd-color-text-default)] " +
+  "border border-[var(--rd-color-border-default)] rounded-[var(--rd-radius-overlay)]";
 import { CheckIcon } from "../utils/icons";
 
 export { MenuTrigger };
@@ -34,7 +36,7 @@ export function Menu<T extends object = object>({
   ...rest
 }: MenuProps<T>) {
   return (
-    <Popover placement={placement} offset={6} className={cx(overlayPanel, "min-w-48 overflow-auto p-1")}>
+    <Popover placement={placement} offset={6} className={cx(panel, "min-w-48 overflow-auto p-1.5")}>
       <AriaMenu<T>
         {...rest}
         selectionMode={selectionMode === "none" ? undefined : selectionMode}
@@ -62,8 +64,8 @@ export function MenuItem({ className, children, shortcut, variant = "default", .
       {...rest}
       textValue={textValue}
       className={cx(
-        "group flex cursor-default items-center gap-2 rounded-[var(--rd-radius-control)] px-2.5 py-1.5 text-sm outline-none",
-        "data-[focused]:bg-[var(--rd-color-surface-subtle)] data-[disabled]:opacity-50",
+        "group flex cursor-default items-center gap-2 rounded-[var(--rd-radius-control)] px-2.5 py-2 text-sm outline-none",
+        "data-[focused]:bg-[var(--rd-color-surface-subtle)] data-[hovered]:bg-[var(--rd-color-surface-subtle)] data-[disabled]:opacity-50",
         variant === "danger" ? "text-[var(--rd-color-feedback-danger)]" : "text-[var(--rd-color-text-default)]",
         className,
       )}
@@ -77,7 +79,7 @@ export function MenuItem({ className, children, shortcut, variant = "default", .
           )}
           <span className="flex-1 truncate">{children}</span>
           {shortcut && (
-            <Keyboard className="ms-4 font-sans text-xs text-[var(--rd-color-text-muted)]">{shortcut}</Keyboard>
+            <Keyboard className="ms-4 [font-family:inherit] text-xs text-[var(--rd-color-text-muted)]">{shortcut}</Keyboard>
           )}
         </>
       )}
@@ -102,5 +104,5 @@ export function MenuSection({ title, children, className }: MenuSectionProps) {
 }
 
 export function MenuSeparator() {
-  return <Separator className="my-1 border-t border-[var(--rd-color-border-default)]" />;
+  return <Separator className="my-1.5 border-t border-[var(--rd-color-border-default)]" />;
 }

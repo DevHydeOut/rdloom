@@ -9,16 +9,16 @@ export const fieldError = "text-xs text-[var(--rd-color-feedback-danger)]";
 
 export const fieldGroup =
   "flex w-full items-center gap-1 bg-[var(--rd-color-surface-default)] text-[var(--rd-color-text-default)] " +
-  "border border-[var(--rd-color-border-default)] rounded-[var(--rd-radius-control)] transition-colors " +
+  "border border-[var(--rd-color-border-default)] rounded-[var(--rd-radius-control)] transition-colors [box-shadow:var(--rd-elevation-raised)] " +
   "data-[hovered]:border-[var(--rd-color-border-strong)] " +
-  "data-[focus-within]:ring-2 data-[focus-within]:ring-[var(--rd-color-focus-ring)] data-[focus-within]:border-transparent " +
+  "data-[focus-within]:ring-2 data-[focus-within]:ring-[var(--rd-color-focus-ring)] data-[focus-within]:border-[var(--rd-color-focus-ring)] " +
   "data-[invalid]:border-[var(--rd-color-feedback-danger)] " +
   "data-[disabled]:opacity-50 data-[disabled]:cursor-not-allowed";
 
 export const fieldGroupSizes: Record<FieldSize, string> = {
-  sm: "h-8 pl-2.5 pr-1 text-sm",
-  md: "h-10 pl-3 pr-1 text-sm",
-  lg: "h-12 pl-3.5 pr-1.5 text-base",
+  sm: "h-[var(--rd-size-control-sm)] pl-[var(--rd-space-control-x-sm)] pr-1 text-sm",
+  md: "h-[var(--rd-size-control-md)] pl-[var(--rd-space-control-x)] pr-1 text-sm",
+  lg: "h-[var(--rd-size-control-lg)] pl-[var(--rd-space-control-x-lg)] pr-1.5 text-base",
 };
 
 export const segment =
@@ -33,10 +33,10 @@ export const iconButton =
 
 /** An option row in a Select or Combobox list. */
 export const listItem =
-  "flex cursor-default items-center justify-between gap-2 rounded-[var(--rd-radius-control)] px-2.5 py-1.5 text-sm outline-none " +
+  "flex cursor-default items-center justify-between gap-2 rounded-[var(--rd-radius-control)] px-2.5 py-2 text-sm outline-none " +
   "text-[var(--rd-color-text-default)] data-[focused]:bg-[var(--rd-color-surface-subtle)] " +
   "data-[selected]:font-medium data-[disabled]:opacity-50";
 
 export const overlayPanel =
-  "shadow-lg bg-[var(--rd-color-surface-raised)] text-[var(--rd-color-text-default)] " +
+  "[box-shadow:var(--rd-elevation-floating)] p-1.5 bg-[var(--rd-color-surface-raised)] text-[var(--rd-color-text-default)] " +
   "border border-[var(--rd-color-border-default)] rounded-[var(--rd-radius-overlay)]";

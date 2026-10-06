@@ -18,7 +18,8 @@ export function buildFigmaData(): string[] {
 
   const data = {
     collection: brand.displayName,
-    variables: Object.entries(light).map(([p, t]) => ({
+    // Figma variables are colors and numbers; shadows (elevation) are composite and stay in CSS.
+    variables: Object.entries(light).filter(([, t]) => t.type === "color" || t.type === "dimension").map(([p, t]) => ({
       name: p.replace(/\./g, "/"),
       token: p,
       cssVar: cssVar(p),

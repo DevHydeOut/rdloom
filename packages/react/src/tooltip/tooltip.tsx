@@ -30,7 +30,7 @@ export const Tooltip = forwardRef<HTMLDivElement, TooltipProps>(function Tooltip
       placement={placement}
       offset={showArrow ? 10 : 6}
       className={cx(
-        "max-w-64 px-2.5 py-1.5 text-xs font-medium shadow-md " +
+        "max-w-64 px-2.5 py-1.5 text-xs font-medium [box-shadow:var(--rd-elevation-floating)] " +
           "bg-[var(--rd-color-text-default)] text-[var(--rd-color-surface-default)] rounded-[var(--rd-radius-control)]",
         className,
       )}

@@ -11,7 +11,7 @@ import {
 } from "react-aria-components";
 import { Menu, MenuItem, MenuSection, MenuSeparator, MenuTrigger } from "../menu/menu";
 import { cx } from "../utils/cx";
-import { CheckIcon, ChevronDownIcon } from "../utils/icons";
+import { CheckIcon, ChevronDownIcon, DotsIcon, GripIcon } from "../utils/icons";
 
 // The pieces of the grid that open or drag: the header's column menu, the
 // set filter's value picker, and the row drag handle. They sit in grid cells
@@ -23,24 +23,6 @@ const smallButton =
   "inline-flex size-6 shrink-0 items-center justify-center rounded-[var(--rd-radius-control)] outline-none " +
   "text-[var(--rd-color-text-muted)] data-[hovered]:bg-[var(--rd-color-surface-default)] data-[hovered]:text-[var(--rd-color-text-default)] " +
   "data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)]";
-
-function KebabIcon() {
-  return (
-    <svg viewBox="0 0 16 16" className="size-4" fill="currentColor" aria-hidden="true">
-      <circle cx="8" cy="3" r="1.25" />
-      <circle cx="8" cy="8" r="1.25" />
-      <circle cx="8" cy="13" r="1.25" />
-    </svg>
-  );
-}
-
-function GripIcon() {
-  return (
-    <svg viewBox="0 0 16 16" className="size-4" fill="currentColor" aria-hidden="true">
-      {[4, 8, 12].flatMap((y) => [6, 10].map((x) => <circle key={`${x}${y}`} cx={x} cy={y} r="1.1" />))}
-    </svg>
-  );
-}
 
 export type ColumnMenuAction = "asc" | "desc" | "clear-sort" | "pin" | "unpin" | "hide" | "reset-width" | `show:${string}`;
 
@@ -66,7 +48,7 @@ export function ColumnMenu(p: ColumnMenuProps) {
   return (
     <MenuTrigger isOpen={p.isOpen} onOpenChange={p.onOpenChange}>
       <AriaButton data-widget="" excludeFromTabOrder aria-label={`${p.name} column menu`} className={smallButton}>
-        <KebabIcon />
+        <DotsIcon />
       </AriaButton>
       <Menu placement="bottom end" onAction={(key) => p.onAction(String(key) as ColumnMenuAction)}>
         {sortItems && (
@@ -158,7 +140,7 @@ export function SetFilter({ label, options, value, onChange, className }: SetFil
         placement="bottom start"
         className={
           "w-56 rounded-[var(--rd-radius-overlay)] border border-[var(--rd-color-border-default)] " +
-          "bg-[var(--rd-color-surface-raised)] text-[var(--rd-color-text-default)] shadow-lg"
+          "bg-[var(--rd-color-surface-raised)] text-[var(--rd-color-text-default)] [box-shadow:var(--rd-elevation-floating)]"
         }
       >
         <Dialog aria-label={label} className="flex flex-col gap-1 p-2 outline-none">

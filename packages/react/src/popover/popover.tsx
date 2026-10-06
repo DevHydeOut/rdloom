@@ -37,7 +37,7 @@ export const Popover = forwardRef<HTMLElement, PopoverProps>(function Popover(
       placement={placement}
       offset={showArrow ? 12 : 8}
       className={cx(
-        "shadow-lg bg-[var(--rd-color-surface-raised)] text-[var(--rd-color-text-default)] " +
+        "[box-shadow:var(--rd-elevation-floating)] bg-[var(--rd-color-surface-raised)] text-[var(--rd-color-text-default)] " +
           "border border-[var(--rd-color-border-default)] rounded-[var(--rd-radius-overlay)]",
         className,
       )}
@@ -45,7 +45,7 @@ export const Popover = forwardRef<HTMLElement, PopoverProps>(function Popover(
       {showArrow && (
         <Arrow className="fill-[var(--rd-color-surface-raised)] stroke-[var(--rd-color-border-default)]" />
       )}
-      <AriaDialog aria-label={label} className="p-4 outline-none">
+      <AriaDialog aria-label={label} className="p-1.5 outline-none">
         {children}
       </AriaDialog>
     </AriaPopover>

@@ -4,6 +4,7 @@ import { forwardRef } from "react";
 import { Button as AriaButton, type ButtonProps as AriaButtonProps } from "react-aria-components";
 import { buttonDefaults, type ButtonSpecProps } from "../generated/button.types";
 import { cx } from "../utils/cx";
+import { Spinner } from "../utils/icons";
 
 // This file is the styled layer: the CLI copies it into user projects and
 // they own it. Behavior and accessibility come from react-aria-components.
@@ -15,39 +16,30 @@ export interface ButtonProps
 }
 
 const base =
-  "inline-flex items-center justify-center gap-2 font-medium select-none whitespace-nowrap " +
-  "rounded-[var(--rd-radius-control)] transition-colors outline-none " +
+  "inline-flex items-center justify-center gap-2 font-semibold tracking-[-0.005em] select-none whitespace-nowrap " +
+  "rounded-[var(--rd-radius-control)] transition-[background-color,border-color,box-shadow,transform] outline-none " +
   "data-[focus-visible]:ring-2 data-[focus-visible]:ring-offset-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)] " +
   "data-[disabled]:opacity-50 data-[disabled]:cursor-not-allowed data-[pending]:cursor-wait";
 
 const variants: Record<NonNullable<ButtonSpecProps["variant"]>, string> = {
   primary:
-    "bg-[var(--rd-color-action-primary)] text-[var(--rd-color-action-on-primary)] " +
-    "data-[hovered]:bg-[var(--rd-color-action-primary-hover)]",
+    "bg-[var(--rd-color-action-primary)] text-[var(--rd-color-action-on-primary)] [box-shadow:var(--rd-elevation-control)] " +
+    "data-[hovered]:bg-[var(--rd-color-action-primary-hover)] data-[pressed]:translate-y-px data-[pressed]:[box-shadow:none]",
   secondary:
     "bg-[var(--rd-color-surface-default)] text-[var(--rd-color-text-default)] border border-[var(--rd-color-border-default)] " +
-    "data-[hovered]:bg-[var(--rd-color-surface-subtle)]",
+    "[box-shadow:var(--rd-elevation-raised)] data-[hovered]:bg-[var(--rd-color-surface-subtle)] data-[hovered]:border-[var(--rd-color-border-strong)] data-[pressed]:translate-y-px",
   ghost:
     "bg-transparent text-[var(--rd-color-text-default)] data-[hovered]:bg-[var(--rd-color-surface-subtle)]",
   danger:
-    "bg-[var(--rd-color-action-danger)] text-[var(--rd-color-action-on-primary)] " +
-    "data-[hovered]:bg-[var(--rd-color-action-danger-hover)]",
+    "bg-[var(--rd-color-action-danger)] text-[var(--rd-color-action-on-primary)] [box-shadow:var(--rd-elevation-control)] " +
+    "data-[hovered]:bg-[var(--rd-color-action-danger-hover)] data-[pressed]:translate-y-px data-[pressed]:[box-shadow:none]",
 };
 
 const sizes: Record<NonNullable<ButtonSpecProps["size"]>, string> = {
-  sm: "h-8 px-3 text-sm",
-  md: "h-10 px-[var(--rd-space-control-x)] text-sm",
-  lg: "h-12 px-5 text-base",
+  sm: "h-[var(--rd-size-control-sm)] px-[var(--rd-space-control-x-sm)] text-sm",
+  md: "h-[var(--rd-size-control-md)] px-[var(--rd-space-control-x)] text-sm",
+  lg: "h-[var(--rd-size-control-lg)] px-[var(--rd-space-control-x-lg)] text-base",
 };
-
-function Spinner() {
-  return (
-    <svg className="size-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" opacity="0.25" />
-      <path d="M22 12a10 10 0 0 0-10-10" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
-    </svg>
-  );
-}
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
   {
@@ -71,7 +63,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       isPending={isLoading}
       className={cx(base, variants[variant], sizes[size], className)}
     >
-      {isLoading && <Spinner />}
+      {isLoading && <Spinner className="size-4" />}
       {children}
     </AriaButton>
   );

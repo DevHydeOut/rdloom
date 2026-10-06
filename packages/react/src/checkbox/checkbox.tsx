@@ -4,6 +4,7 @@ import { forwardRef } from "react";
 import { Checkbox as AriaCheckbox, type CheckboxProps as AriaCheckboxProps } from "react-aria-components";
 import { checkboxDefaults, type CheckboxSpecProps } from "../generated/checkbox.types";
 import { cx } from "../utils/cx";
+import { CheckIcon, MinusIcon } from "../utils/icons";
 
 export interface CheckboxProps
   extends CheckboxSpecProps,
@@ -13,8 +14,9 @@ export interface CheckboxProps
 
 // The box reacts to state on the parent label via `group-data-[...]`.
 const box =
-  "flex size-4 shrink-0 items-center justify-center rounded-[4px] border transition-colors " +
+  "flex size-[18px] shrink-0 items-center justify-center rounded-[5px] border transition-colors " +
   "border-[var(--rd-color-border-strong)] bg-[var(--rd-color-surface-default)] text-[var(--rd-color-action-on-primary)] " +
+  "group-data-[hovered]:border-[var(--rd-color-action-primary)] group-data-[selected]:[box-shadow:var(--rd-elevation-control)] group-data-[indeterminate]:[box-shadow:var(--rd-elevation-control)] " +
   "group-data-[selected]:bg-[var(--rd-color-action-primary)] group-data-[selected]:border-[var(--rd-color-action-primary)] " +
   "group-data-[indeterminate]:bg-[var(--rd-color-action-primary)] group-data-[indeterminate]:border-[var(--rd-color-action-primary)] " +
   "group-data-[invalid]:border-[var(--rd-color-feedback-danger)] " +
@@ -52,13 +54,9 @@ export const Checkbox = forwardRef<HTMLLabelElement, CheckboxProps>(function Che
         <>
           <span className={box} aria-hidden="true">
             {mixed ? (
-              <svg viewBox="0 0 16 16" className="size-3" fill="none">
-                <path d="M4 8h8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-              </svg>
+              <MinusIcon className="size-3" strokeWidth={2} />
             ) : isSelected ? (
-              <svg viewBox="0 0 16 16" className="size-3" fill="none">
-                <path d="M3.5 8.5l3 3 6-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
+              <CheckIcon className="size-3" strokeWidth={2} />
             ) : null}
           </span>
           {children}

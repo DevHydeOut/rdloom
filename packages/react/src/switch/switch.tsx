@@ -11,10 +11,10 @@ export interface SwitchProps
   className?: string;
 }
 
-const track: Record<NonNullable<SwitchSpecProps["size"]>, string> = { sm: "h-4 w-7", md: "h-5 w-9" };
+const track: Record<NonNullable<SwitchSpecProps["size"]>, string> = { sm: "h-5 w-8", md: "h-6 w-10" };
 const thumb: Record<NonNullable<SwitchSpecProps["size"]>, string> = {
-  sm: "size-3 group-data-[selected]:translate-x-3",
-  md: "size-4 group-data-[selected]:translate-x-4",
+  sm: "size-4 group-data-[selected]:translate-x-3",
+  md: "size-5 group-data-[selected]:translate-x-4",
 };
 
 export const Switch = forwardRef<HTMLLabelElement, SwitchProps>(function Switch(
@@ -43,15 +43,15 @@ export const Switch = forwardRef<HTMLLabelElement, SwitchProps>(function Switch(
       <span
         aria-hidden="true"
         className={cx(
-          "flex shrink-0 items-center rounded-full p-0.5 transition-colors bg-[var(--rd-color-border-strong)] " +
-            "group-data-[selected]:bg-[var(--rd-color-action-primary)] " +
+          "flex shrink-0 items-center rounded-full p-0.5 transition-colors bg-[var(--rd-color-surface-subtle)] border border-[var(--rd-color-border-strong)] " +
+            "group-data-[selected]:bg-[var(--rd-color-action-primary)] group-data-[selected]:border-[var(--rd-color-action-primary)] " +
             "group-data-[focus-visible]:ring-2 group-data-[focus-visible]:ring-offset-2 group-data-[focus-visible]:ring-[var(--rd-color-focus-ring)]",
           track[size],
         )}
       >
         <span
           className={cx(
-            "rounded-full bg-[var(--rd-color-surface-default)] shadow-sm transition-transform motion-reduce:transition-none",
+            "rounded-full bg-[var(--rd-color-surface-default)] [box-shadow:var(--rd-elevation-raised)] transition-transform motion-reduce:transition-none",
             thumb[size],
           )}
         />

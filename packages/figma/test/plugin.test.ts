@@ -65,7 +65,7 @@ describe("sync variables", () => {
     const primary = f.variables.find((v) => v.name === "color/action/primary");
     expect(primary.codeSyntax.WEB).toBe("var(--rd-color-action-primary)");
     expect(primary.valuesByMode.m0).not.toEqual(primary.valuesByMode.m1);
-    expect(f.variables.find((v) => v.name === "radius/control").valuesByMode.m0).toBe(8);
+    expect(f.variables.find((v) => v.name === "radius/control").valuesByMode.m0).toBe(10);
   });
 
   it("updates in place on a second run and reports stale variables", async () => {

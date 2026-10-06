@@ -70,7 +70,7 @@ export const CommandPalette = forwardRef<HTMLDivElement, CommandPaletteProps>(fu
       isDismissable
       className={
         "fixed inset-0 z-50 flex items-start justify-center px-4 pt-[12vh] " +
-        "bg-[var(--rd-color-overlay-backdrop)] backdrop-blur-sm transition-opacity duration-150 " +
+        "bg-[var(--rd-color-overlay-backdrop)] backdrop-blur-[2px] transition-opacity duration-150 " +
         "data-[entering]:opacity-0 data-[exiting]:opacity-0 motion-reduce:transition-none"
       }
     >
@@ -78,7 +78,7 @@ export const CommandPalette = forwardRef<HTMLDivElement, CommandPaletteProps>(fu
         className={cx(
           "w-full max-w-xl overflow-hidden rounded-[calc(var(--rd-radius-overlay)+4px)] border border-[var(--rd-color-border-default)] " +
             "bg-[var(--rd-color-surface-raised)] text-[var(--rd-color-text-default)] " +
-            "shadow-[0_24px_64px_-12px_rgb(0_0_0/0.35),0_0_0_1px_rgb(0_0_0/0.04)] " +
+            "[box-shadow:var(--rd-elevation-overlay)] " +
             "transition duration-150 ease-out data-[entering]:translate-y-1 data-[entering]:scale-[0.98] data-[entering]:opacity-0 " +
             "data-[exiting]:scale-[0.98] data-[exiting]:opacity-0 motion-reduce:transition-none",
           className,
@@ -123,7 +123,7 @@ export interface CommandGroupProps {
 export function CommandGroup({ title, children }: CommandGroupProps) {
   return (
     <MenuSection className="flex flex-col pb-1 last:pb-0">
-      <Header className="px-3 pt-2 pb-1 text-[11px] font-semibold tracking-wider text-[var(--rd-color-text-muted)] uppercase">{title}</Header>
+      <Header className="px-3 pt-2 pb-1 text-xs font-semibold tracking-wide text-[var(--rd-color-text-muted)] uppercase">{title}</Header>
       {children}
     </MenuSection>
   );

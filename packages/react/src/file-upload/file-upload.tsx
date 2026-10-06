@@ -117,7 +117,7 @@ export const FileUpload = forwardRef<HTMLDivElement, FileUploadProps>(function F
           addFiles(dropped);
         }}
         className={
-          "group flex flex-col items-center gap-3 rounded-[var(--rd-radius-overlay)] border border-dashed border-[var(--rd-color-border-strong)] " +
+          "group flex flex-col items-center gap-3 rounded-[var(--rd-radius-overlay)] border border-dashed border-[var(--rd-color-border-strong)] [box-shadow:var(--rd-elevation-raised)] " +
           "bg-[var(--rd-color-surface-subtle)]/50 px-6 py-8 text-center outline-none transition-[background-color,border-color,box-shadow] duration-150 " +
           "data-[hovered]:bg-[var(--rd-color-surface-subtle)] " +
           "data-[drop-target]:border-[var(--rd-color-action-primary)] data-[drop-target]:bg-[var(--rd-color-surface-selected)] data-[drop-target]:ring-4 " +
@@ -127,7 +127,7 @@ export const FileUpload = forwardRef<HTMLDivElement, FileUploadProps>(function F
       >
         <span
           aria-hidden="true"
-          className="flex size-11 items-center justify-center rounded-full bg-[var(--rd-color-surface-default)] text-[var(--rd-color-text-muted)] ring-1 ring-[var(--rd-color-border-default)] shadow-sm transition-transform duration-150 group-data-[drop-target]:-translate-y-0.5 group-data-[drop-target]:text-[var(--rd-color-action-primary)] motion-reduce:transition-none"
+          className="flex size-11 items-center justify-center rounded-full bg-[var(--rd-color-surface-default)] text-[var(--rd-color-text-muted)] ring-1 ring-[var(--rd-color-border-default)] [box-shadow:var(--rd-elevation-raised)] transition-transform duration-150 group-data-[drop-target]:-translate-y-0.5 group-data-[drop-target]:text-[var(--rd-color-action-primary)] motion-reduce:transition-none"
         >
           <UploadIcon className="size-5" />
         </span>
@@ -166,7 +166,7 @@ export const FileUpload = forwardRef<HTMLDivElement, FileUploadProps>(function F
           {files.map((file) => (
             <li
               key={`${file.name}-${file.size}-${file.lastModified}`}
-              className="flex items-center gap-3 rounded-[var(--rd-radius-control)] border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-default)] py-2 ps-3 pe-2 text-sm shadow-[0_1px_2px_rgb(0_0_0/0.04)]"
+              className="flex items-center gap-3 rounded-[var(--rd-radius-control)] border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-default)] py-2 ps-3 pe-2 text-sm [box-shadow:var(--rd-elevation-raised)]"
             >
               <FileIcon className="size-5 shrink-0 text-[var(--rd-color-text-muted)]" />
               <span className="min-w-0 flex-1 truncate text-[var(--rd-color-text-default)]">{file.name}</span>

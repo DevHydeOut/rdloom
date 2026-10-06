@@ -1,0 +1,14 @@
+{
+  "size": {
+    "$type": "dimension",
+    "control-sm": { "$value": "28px" },
+    "control-md": { "$value": "32px" },
+    "control-lg": { "$value": "40px" }
+  },
+  "space": {
+    "$type": "dimension",
+    "control-x": { "$value": "{space.3}" },
+    "control-x-sm": { "$value": "10px" },
+    "control-x-lg": { "$value": "{space.4}" }
+  }
+}

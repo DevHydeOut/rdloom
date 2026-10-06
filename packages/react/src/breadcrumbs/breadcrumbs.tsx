@@ -4,6 +4,7 @@ import { forwardRef, type ReactNode } from "react";
 import { Breadcrumb, Breadcrumbs as AriaBreadcrumbs, Link } from "react-aria-components";
 import { breadcrumbsDefaults, type BreadcrumbsSpecProps } from "../generated/breadcrumbs.types";
 import { cx } from "../utils/cx";
+import { ChevronRightIcon } from "../utils/icons";
 
 export interface BreadcrumbsProps extends BreadcrumbsSpecProps {
   className?: string;
@@ -45,14 +46,7 @@ export function BreadcrumbItem({ href, children, className }: BreadcrumbItemProp
         {children}
       </Link>
       {/* Decorative: the list already says there are several items. The last one has none. */}
-      <svg
-        aria-hidden="true"
-        viewBox="0 0 16 16"
-        className="size-3.5 shrink-0 text-[var(--rd-color-text-muted)] group-data-[current]:hidden rtl:-scale-x-100"
-        fill="none"
-      >
-        <path d="M6 3.5l4.5 4.5L6 12.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
+      <ChevronRightIcon className="size-3.5 shrink-0 text-[var(--rd-color-text-muted)] group-data-[current]:hidden rtl:-scale-x-100" />
     </Breadcrumb>
   );
 }

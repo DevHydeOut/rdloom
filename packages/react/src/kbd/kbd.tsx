@@ -21,7 +21,7 @@ export const Kbd = forwardRef<HTMLElement, KbdProps>(function Kbd({ children, si
       className={cx(
         // A keycap: a hairline border with a slightly heavier bottom edge, like a key with depth.
         "inline-flex items-center justify-center rounded-md border border-b-2 border-[var(--rd-color-border-default)] border-b-[var(--rd-color-border-strong)] " +
-          "bg-[var(--rd-color-surface-subtle)] font-sans font-medium leading-none text-[var(--rd-color-text-muted)]",
+          "bg-[var(--rd-color-surface-subtle)] [font-family:inherit] font-medium leading-none text-[var(--rd-color-text-muted)]",
         sizes[size],
         className,
       )}

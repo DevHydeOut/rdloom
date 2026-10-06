@@ -4,6 +4,7 @@ import { forwardRef, useState } from "react";
 import { Button } from "react-aria-components";
 import { paginationDefaults, type PaginationSpecProps } from "../generated/pagination.types";
 import { cx } from "../utils/cx";
+import { ChevronRightIcon } from "../utils/icons";
 
 export interface PaginationProps extends PaginationSpecProps {
   className?: string;
@@ -55,9 +56,7 @@ const current =
 
 function Chevron({ direction }: { direction: "left" | "right" }) {
   return (
-    <svg aria-hidden="true" viewBox="0 0 16 16" className={cx("size-4 rtl:-scale-x-100", direction === "left" && "-scale-x-100 rtl:scale-x-100")} fill="none">
-      <path d="M6 3.5l4.5 4.5L6 12.5" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
+    <ChevronRightIcon className={cx("size-4 rtl:-scale-x-100", direction === "left" && "-scale-x-100 rtl:scale-x-100")} />
   );
 }
 

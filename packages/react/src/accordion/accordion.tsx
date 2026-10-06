@@ -32,7 +32,7 @@ export function Accordion({
       {...rest}
       allowsMultipleExpanded={allowsMultipleExpanded}
       isDisabled={isDisabled}
-      className={cx("flex w-full flex-col divide-y divide-[var(--rd-color-border-default)] border-y border-[var(--rd-color-border-default)]", className)}
+      className={cx("flex w-full flex-col divide-y divide-[var(--rd-color-border-default)] overflow-hidden rounded-[var(--rd-radius-overlay)] border border-[var(--rd-color-border-default)] [box-shadow:var(--rd-elevation-raised)]", className)}
     >
       {children}
     </DisclosureGroup>
@@ -55,10 +55,10 @@ export function AccordionItem({ title, children, headingLevel = 3, className, ..
         <Button
           slot="trigger"
           className={cx(
-            "flex w-full items-center justify-between gap-4 rounded-[var(--rd-radius-control)] py-4 text-start text-sm font-medium outline-none",
-            "text-[var(--rd-color-text-default)] data-[hovered]:underline",
-            "data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)]",
-            "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50 data-[disabled]:no-underline",
+            "flex w-full items-center justify-between gap-4 px-4 py-3.5 text-start text-sm font-medium outline-none",
+            "text-[var(--rd-color-text-default)] data-[hovered]:bg-[var(--rd-color-surface-subtle)]",
+            "data-[focus-visible]:ring-2 data-[focus-visible]:ring-inset data-[focus-visible]:ring-[var(--rd-color-focus-ring)]",
+            "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50 data-[disabled]:bg-transparent",
           )}
         >
           {title}
@@ -70,7 +70,7 @@ export function AccordionItem({ title, children, headingLevel = 3, className, ..
           </span>
         </Button>
       </Heading>
-      <DisclosurePanel className="pb-4 text-sm text-[var(--rd-color-text-muted)]">{children}</DisclosurePanel>
+      <DisclosurePanel className="px-4 pb-4 text-sm text-[var(--rd-color-text-default)]">{children}</DisclosurePanel>
     </Disclosure>
   );
 }

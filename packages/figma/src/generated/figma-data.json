@@ -190,16 +190,16 @@
       "token": "radius.control",
       "cssVar": "--rd-radius-control",
       "type": "FLOAT",
-      "light": "8px",
-      "dark": "8px"
+      "light": "10px",
+      "dark": "10px"
     },
     {
       "name": "radius/overlay",
       "token": "radius.overlay",
       "cssVar": "--rd-radius-overlay",
       "type": "FLOAT",
-      "light": "12px",
-      "dark": "12px"
+      "light": "14px",
+      "dark": "14px"
     },
     {
       "name": "space/control-x",
@@ -208,6 +208,46 @@
       "type": "FLOAT",
       "light": "16px",
       "dark": "16px"
+    },
+    {
+      "name": "space/control-x-sm",
+      "token": "space.control-x-sm",
+      "cssVar": "--rd-space-control-x-sm",
+      "type": "FLOAT",
+      "light": "12px",
+      "dark": "12px"
+    },
+    {
+      "name": "space/control-x-lg",
+      "token": "space.control-x-lg",
+      "cssVar": "--rd-space-control-x-lg",
+      "type": "FLOAT",
+      "light": "20px",
+      "dark": "20px"
+    },
+    {
+      "name": "size/control-sm",
+      "token": "size.control-sm",
+      "cssVar": "--rd-size-control-sm",
+      "type": "FLOAT",
+      "light": "32px",
+      "dark": "32px"
+    },
+    {
+      "name": "size/control-md",
+      "token": "size.control-md",
+      "cssVar": "--rd-size-control-md",
+      "type": "FLOAT",
+      "light": "40px",
+      "dark": "40px"
+    },
+    {
+      "name": "size/control-lg",
+      "token": "size.control-lg",
+      "cssVar": "--rd-size-control-lg",
+      "type": "FLOAT",
+      "light": "48px",
+      "dark": "48px"
     }
   ],
   "components": [

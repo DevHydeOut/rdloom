@@ -62,7 +62,7 @@ export const Alert = forwardRef<HTMLDivElement, AlertProps>(function Alert(
       role={urgent ? "alert" : "status"}
       className={cx(
         "flex items-start gap-3 rounded-[var(--rd-radius-overlay)] border p-3.5 " +
-          "text-sm leading-relaxed text-[var(--rd-color-text-default)] shadow-[0_1px_2px_rgb(0_0_0/0.04)]",
+          "text-sm leading-relaxed text-[var(--rd-color-text-default)] [box-shadow:var(--rd-elevation-raised)]",
         tone.box,
         className,
       )}

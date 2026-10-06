@@ -49,11 +49,11 @@ export const Dialog = forwardRef<HTMLElement, DialogProps>(function Dialog(
       isDismissable={isDismissable}
       isOpen={isOpen}
       onOpenChange={onOpenChange}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[var(--rd-color-overlay-backdrop)]"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[var(--rd-color-overlay-backdrop)] backdrop-blur-[2px]"
     >
       <Modal
         className={cx(
-          "w-full overflow-hidden shadow-xl bg-[var(--rd-color-surface-raised)] text-[var(--rd-color-text-default)] " +
+          "w-full overflow-hidden [box-shadow:var(--rd-elevation-overlay)] bg-[var(--rd-color-surface-raised)] text-[var(--rd-color-text-default)] " +
             "border border-[var(--rd-color-border-default)] rounded-[var(--rd-radius-overlay)]",
           widths[size],
         )}

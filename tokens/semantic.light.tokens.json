@@ -46,6 +46,21 @@
   },
   "space": {
     "$type": "dimension",
-    "control-x": { "$value": "{space.4}" }
+    "control-x": { "$value": "{space.4}" },
+    "control-x-sm": { "$value": "{space.3}" },
+    "control-x-lg": { "$value": "{space.5}" }
+  },
+  "elevation": {
+    "$type": "shadow",
+    "control": { "$value": "inset 0 1px 0 rgb(255 255 255 / 0.16), 0 1px 2px rgb(28 26 23 / 0.22)" },
+    "raised": { "$value": "0 1px 2px rgb(28 26 23 / 0.06), 0 1px 1px rgb(28 26 23 / 0.04)" },
+    "floating": { "$value": "0 8px 24px -6px rgb(28 26 23 / 0.18), 0 0 0 1px rgb(28 26 23 / 0.04)" },
+    "overlay": { "$value": "0 24px 64px -16px rgb(28 26 23 / 0.35), 0 0 0 1px rgb(28 26 23 / 0.05)" }
+  },
+  "size": {
+    "$type": "dimension",
+    "control-sm": { "$value": "32px" },
+    "control-md": { "$value": "40px" },
+    "control-lg": { "$value": "48px" }
   }
 }

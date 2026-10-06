@@ -154,7 +154,7 @@ export const Chat = forwardRef<HTMLDivElement, ChatProps>(function Chat(
               setAway(false);
               scroller.current?.focus();
             }}
-            className="absolute start-1/2 bottom-3 inline-flex -translate-x-1/2 items-center gap-1.5 rounded-full border border-[var(--rd-color-border-strong)] bg-[var(--rd-color-surface-raised)] px-3 py-1.5 text-xs font-medium text-[var(--rd-color-text-default)] shadow-md outline-none data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)]"
+            className="absolute start-1/2 bottom-3 inline-flex -translate-x-1/2 items-center gap-1.5 rounded-full border border-[var(--rd-color-border-strong)] bg-[var(--rd-color-surface-raised)] px-3 py-1.5 text-xs font-medium text-[var(--rd-color-text-default)] [box-shadow:var(--rd-elevation-floating)] outline-none data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)]"
           >
             <ArrowDownIcon />
             Jump to latest

@@ -82,7 +82,7 @@ export const Radio = forwardRef<HTMLLabelElement, RadioProps>(function Radio({ c
       <span
         aria-hidden="true"
         className={
-          "size-4 shrink-0 rounded-full border transition-[border-width,border-color] " +
+          "size-[18px] shrink-0 rounded-full border transition-[border-width,border-color] group-data-[hovered]:border-[var(--rd-color-action-primary)] group-data-[selected]:[box-shadow:var(--rd-elevation-control)] " +
           "border-[var(--rd-color-border-strong)] bg-[var(--rd-color-surface-default)] " +
           "group-data-[selected]:border-[5px] group-data-[selected]:border-[var(--rd-color-action-primary)] " +
           "group-data-[invalid]:border-[var(--rd-color-feedback-danger)] " +

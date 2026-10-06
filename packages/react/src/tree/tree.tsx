@@ -29,7 +29,7 @@ export const Tree = forwardRef<HTMLDivElement, TreeProps>(function Tree(
       selectionMode={selectionMode === "none" ? undefined : selectionMode}
       className={cx(
         "flex flex-col gap-0.5 rounded-[var(--rd-radius-overlay)] border border-[var(--rd-color-border-default)] " +
-          "bg-[var(--rd-color-surface-default)] p-1.5 text-sm text-[var(--rd-color-text-default)] outline-none",
+          "bg-[var(--rd-color-surface-default)] p-1.5 text-sm text-[var(--rd-color-text-default)] outline-none [box-shadow:var(--rd-elevation-raised)]",
         className,
       )}
     >

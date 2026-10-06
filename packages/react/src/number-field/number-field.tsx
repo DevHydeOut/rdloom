@@ -14,6 +14,7 @@ import {
 import { numberFieldDefaults, type NumberFieldSpecProps } from "../generated/number-field.types";
 import { cx } from "../utils/cx";
 import { fieldGroup, fieldGroupSizes } from "../utils/field";
+import { MinusIcon, PlusIcon } from "../utils/icons";
 
 export interface NumberFieldProps
   extends NumberFieldSpecProps,
@@ -26,6 +27,12 @@ const stepper =
   "data-[hovered]:bg-[var(--rd-color-surface-subtle)] data-[hovered]:text-[var(--rd-color-text-default)] data-[pressed]:bg-[var(--rd-color-surface-subtle)] " +
   "data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed " +
   "data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)]";
+
+const heights = {
+  sm: "h-[var(--rd-size-control-sm)]",
+  md: "h-[var(--rd-size-control-md)]",
+  lg: "h-[var(--rd-size-control-lg)]",
+} as const;
 
 export const NumberField = forwardRef<HTMLDivElement, NumberFieldProps>(function NumberField(
   {
@@ -53,25 +60,21 @@ export const NumberField = forwardRef<HTMLDivElement, NumberFieldProps>(function
       isDisabled={isDisabled}
       isInvalid={isInvalid}
       isRequired={isRequired}
-      className={cx("flex flex-col gap-1.5", className)}
+      className={cx("flex flex-col gap-2", className)}
     >
       <Label className="text-sm font-medium text-[var(--rd-color-text-default)]">
         {label}
         {isRequired && <span aria-hidden="true" className="text-[var(--rd-color-feedback-danger)]"> *</span>}
       </Label>
-      <Group className={cx(fieldGroup, fieldGroupSizes[size], showStepper && "pe-1")}>
+      <Group className={cx(fieldGroup, fieldGroupSizes[size], heights[size], showStepper && "pe-1")}>
         <Input className="min-w-0 flex-1 bg-transparent tabular-nums outline-none" />
         {showStepper && (
           <>
             <Button slot="decrement" className={stepper}>
-              <svg aria-hidden="true" viewBox="0 0 16 16" className="size-4" fill="none">
-                <path d="M3.5 8h9" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
-              </svg>
+              <MinusIcon className="size-4" />
             </Button>
             <Button slot="increment" className={stepper}>
-              <svg aria-hidden="true" viewBox="0 0 16 16" className="size-4" fill="none">
-                <path d="M3.5 8h9M8 3.5v9" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
-              </svg>
+              <PlusIcon className="size-4" />
             </Button>
           </>
         )}

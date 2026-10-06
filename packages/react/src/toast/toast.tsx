@@ -10,6 +10,7 @@ import {
 } from "react-aria-components";
 import { toastDefaults, type ToastSpecProps } from "../generated/toast.types";
 import { cx } from "../utils/cx";
+import { CloseIcon } from "../utils/icons";
 
 // React Aria's toast API is still marked UNSTABLE_. Everything that touches
 // it lives in this file, so an upstream rename is a one-file fix.
@@ -43,7 +44,7 @@ export function ToastRegion({ className }: { className?: string }) {
         <AriaToast
           toast={item}
           className={cx(
-            "relative flex items-start gap-3 overflow-hidden p-4 pl-5 shadow-lg outline-none " +
+            "relative flex items-start gap-3 overflow-hidden p-5 pl-6 [box-shadow:var(--rd-elevation-floating)] outline-none " +
               "bg-[var(--rd-color-surface-raised)] text-[var(--rd-color-text-default)] " +
               "border border-[var(--rd-color-border-default)] rounded-[var(--rd-radius-overlay)] " +
               "before:absolute before:inset-y-0 before:left-0 before:w-1 " +
@@ -65,13 +66,11 @@ export function ToastRegion({ className }: { className?: string }) {
             slot="close"
             aria-label="Dismiss"
             className={
-              "rounded p-0.5 text-[var(--rd-color-text-muted)] outline-none data-[hovered]:text-[var(--rd-color-text-default)] " +
+              "flex size-6 shrink-0 items-center justify-center rounded-[var(--rd-radius-sm)] text-[var(--rd-color-text-muted)] outline-none data-[hovered]:bg-[var(--rd-color-surface-subtle)] data-[hovered]:text-[var(--rd-color-text-default)] " +
               "data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)]"
             }
           >
-            <svg aria-hidden="true" viewBox="0 0 16 16" className="size-4" fill="none">
-              <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-            </svg>
+            <CloseIcon className="size-4" />
           </Button>
         </AriaToast>
       )}

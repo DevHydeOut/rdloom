@@ -19,8 +19,8 @@ export interface SliderProps
 }
 
 const thumb =
-  "top-1/2 size-6 rounded-full border-2 border-[var(--rd-color-action-primary)] bg-[var(--rd-color-surface-raised)] shadow-sm outline-none " +
-  "transition-[box-shadow] data-[dragging]:shadow-md data-[focus-visible]:ring-4 data-[focus-visible]:ring-[var(--rd-color-focus-ring)] " +
+  "top-1/2 size-5 rounded-full border-2 border-[var(--rd-color-action-primary)] bg-[var(--rd-color-surface-raised)] [box-shadow:var(--rd-elevation-raised)] outline-none " +
+  "transition-[box-shadow,transform] data-[dragging]:scale-110 data-[dragging]:[box-shadow:var(--rd-elevation-floating)] data-[focus-visible]:ring-4 data-[focus-visible]:ring-[var(--rd-color-focus-ring)] " +
   "data-[disabled]:border-[var(--rd-color-border-strong)]";
 
 export function Slider({
@@ -60,7 +60,7 @@ export function Slider({
           const end = state.getThumbPercent(range ? 1 : 0);
           return (
             <>
-              <div className="absolute top-1/2 h-1.5 w-full -translate-y-1/2 rounded-full bg-[var(--rd-color-surface-subtle)]" />
+              <div className="absolute top-1/2 h-1.5 w-full -translate-y-1/2 rounded-full border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-subtle)]" />
               <div
                 className="absolute top-1/2 h-1.5 -translate-y-1/2 rounded-full bg-[var(--rd-color-action-primary)] group-data-[disabled]:bg-[var(--rd-color-border-strong)]"
                 style={{ insetInlineStart: `${start * 100}%`, width: `${(end - start) * 100}%` }}

@@ -26,9 +26,9 @@ export interface SelectProps
 }
 
 const sizes: Record<NonNullable<SelectSpecProps["size"]>, string> = {
-  sm: "h-8 px-2.5 text-sm",
-  md: "h-10 px-3 text-sm",
-  lg: "h-12 px-3.5 text-base",
+  sm: "h-[var(--rd-size-control-sm)] px-[var(--rd-space-control-x-sm)] text-sm",
+  md: "h-[var(--rd-size-control-md)] px-[var(--rd-space-control-x)] text-sm",
+  lg: "h-[var(--rd-size-control-lg)] px-[var(--rd-space-control-x-lg)] text-base",
 };
 
 export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
@@ -57,7 +57,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
       isDisabled={isDisabled}
       isInvalid={isInvalid}
       isRequired={isRequired}
-      className={cx("group flex flex-col gap-1.5", className)}
+      className={cx("group flex flex-col gap-2", className)}
     >
       <Label className="text-sm font-medium text-[var(--rd-color-text-default)]">
         {label}
@@ -67,9 +67,9 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
         className={cx(
           "flex w-full items-center justify-between gap-2 text-left outline-none transition-colors " +
             "bg-[var(--rd-color-surface-default)] text-[var(--rd-color-text-default)] " +
-            "border border-[var(--rd-color-border-default)] rounded-[var(--rd-radius-control)] " +
+            "border border-[var(--rd-color-border-default)] rounded-[var(--rd-radius-control)] [box-shadow:var(--rd-elevation-raised)] " +
             "data-[hovered]:border-[var(--rd-color-border-strong)] " +
-            "data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)] " +
+            "data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)] data-[focus-visible]:border-[var(--rd-color-focus-ring)] " +
             "group-data-[invalid]:border-[var(--rd-color-feedback-danger)] " +
             "data-[disabled]:opacity-50 data-[disabled]:cursor-not-allowed",
           sizes[size],
@@ -86,7 +86,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
       <FieldError className="text-xs text-[var(--rd-color-feedback-danger)]">{errorMessage}</FieldError>
       <Popover
         className={
-          "min-w-[var(--trigger-width)] overflow-auto p-1 shadow-lg " +
+          "min-w-[var(--trigger-width)] overflow-auto p-1.5 [box-shadow:var(--rd-elevation-floating)] " +
           "bg-[var(--rd-color-surface-raised)] border border-[var(--rd-color-border-default)] rounded-[var(--rd-radius-overlay)]"
         }
       >

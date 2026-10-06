@@ -126,7 +126,7 @@ export function DateRangePicker<T extends DateValue = DateValue>({
       isDisabled={isDisabled}
       isInvalid={isInvalid}
       isRequired={isRequired}
-      className={cx("group flex flex-col gap-1.5", className)}
+      className={cx("group flex flex-col gap-2", className)}
     >
       <Label className={fieldLabel}>
         {label}

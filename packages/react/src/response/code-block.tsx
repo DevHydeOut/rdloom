@@ -2,22 +2,13 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Button as AriaButton } from "react-aria-components";
-import { CheckIcon } from "../utils/icons";
+import { CheckIcon, CopyIcon } from "../utils/icons";
 
 export interface CodeBlockProps {
   code: string;
   language?: string;
   /** True while the closing fence hasn't arrived yet (the reply is still streaming). */
   open?: boolean;
-}
-
-function CopyIcon() {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 16 16" className="size-4" fill="none">
-      <rect x="5.5" y="5.5" width="8" height="8" rx="1.5" stroke="currentColor" strokeWidth="1.3" />
-      <path d="M10.5 3.5v-.5A1.5 1.5 0 0 0 9 1.5H4A1.5 1.5 0 0 0 2.5 3v5A1.5 1.5 0 0 0 4 9.5h.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
-    </svg>
-  );
 }
 
 /** A code block with a copy button. Once copied, the button says so and a polite status repeats it. */

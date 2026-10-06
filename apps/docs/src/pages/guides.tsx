@@ -1,4 +1,6 @@
-﻿import { repoUrl, semanticTokens } from "../data";
+﻿import { useState } from "react";
+import { Button, TextField } from "@rdloom/react";
+import { repoUrl, semanticTokens } from "../data";
 import { Link } from "../router";
 import { registryBase } from "../routes";
 import { CodeBlock, H2, PageTitle, Prose } from "../ui";
@@ -345,9 +347,66 @@ setMessages((m) => [...m.slice(0, -1), finishMessage(m[m.length - 1])]);
 }
 
 export function TokensGuide() {
+  const [density, setDensity] = useState<"comfortable" | "compact">("comfortable");
   return (
     <article>
-      <PageTitle lead="Semantic tokens as CSS variables. Use these instead of raw colors: they switch for dark mode by themselves.">Design tokens</PageTitle>
+      <PageTitle lead="Semantic tokens as CSS variables. Use these instead of raw values: colors and shadows switch for dark mode by themselves, and sizes follow the density you choose.">Design tokens</PageTitle>
+      <Prose>
+        <H2 id="elevation">Elevation</H2>
+        <p>
+          Four shadow levels, defined once. Components use them by name, so a popover, a dialog and a menu always feel related, and changing the look of depth is one edit. In dark mode each level uses a deeper shadow with a faint light
+          edge, because a dark shadow barely shows on a dark surface.
+        </p>
+        <ul className="grid gap-4 sm:grid-cols-2">
+          {[
+            ["control", "Filled buttons and checked boxes: a lit top edge and a small drop."],
+            ["raised", "Resting controls, cards and the selected tab."],
+            ["floating", "Menus, listboxes, tooltips and toasts."],
+            ["overlay", "Dialogs, sheets and the command palette."],
+          ].map(([name, use]) => (
+            <li key={name} className="flex items-center gap-4">
+              <span
+                aria-hidden="true"
+                className="size-14 shrink-0 rounded-xl border border-[var(--site-border)] bg-[var(--rd-color-surface-raised)]"
+                style={{ boxShadow: `var(--rd-elevation-${name})` }}
+              />
+              <span className="flex flex-col text-sm">
+                <code>--rd-elevation-{name}</code>
+                <span className="text-[var(--site-muted)]">{use}</span>
+              </span>
+            </li>
+          ))}
+        </ul>
+        <CodeBlock label="Use an elevation token" code={`.menu { box-shadow: var(--rd-elevation-floating); }`} />
+
+        <H2 id="density">Density</H2>
+        <p>
+          Control heights and padding come from tokens too. Put <code>data-density=&quot;compact&quot;</code> on <code>&lt;html&gt;</code>, or on any container, and everything inside tightens. Use it for data-heavy admin
+          screens; leave it off for marketing pages and forms people fill in once.
+        </p>
+        <div className="not-prose flex flex-col gap-3 rounded-[var(--site-radius)] border border-[var(--site-border)] p-4">
+          <div role="group" aria-label="Density" className="flex w-fit gap-1 rounded-lg border border-[var(--site-border)] bg-[var(--site-subtle)] p-1">
+            {(["comfortable", "compact"] as const).map((d) => (
+              <button
+                key={d}
+                type="button"
+                aria-pressed={density === d}
+                onClick={() => setDensity(d)}
+                className="rounded-md px-3 py-1 text-sm capitalize outline-none transition-colors focus-visible:ring-2 focus-visible:ring-[var(--rd-color-focus-ring)] aria-pressed:bg-[var(--site-bg)] aria-pressed:font-medium aria-pressed:shadow-sm"
+              >
+                {d}
+              </button>
+            ))}
+          </div>
+          <div data-density={density} className="flex flex-wrap items-end gap-3">
+            <TextField label="Search" placeholder="Find an invoice" className="w-56" />
+            <Button>Search</Button>
+            <Button variant="secondary">Filters</Button>
+          </div>
+        </div>
+        <CodeBlock label="Set the density" code={`<html data-density="compact">\n\n<section data-density="compact">…</section>`} />
+        <H2 id="all">All tokens</H2>
+      </Prose>
       <div role="region" aria-label="Tokens" tabIndex={0} className="overflow-x-auto rounded-[var(--site-radius)] border border-[var(--site-border)]">
         <table className="w-full min-w-[36rem] text-left text-sm">
           <thead className="bg-[var(--site-subtle)]">

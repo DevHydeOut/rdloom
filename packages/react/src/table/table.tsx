@@ -19,7 +19,7 @@ import {
 } from "react-aria-components";
 import { tableDefaults, type TableSpecProps } from "../generated/table.types";
 import { cx } from "../utils/cx";
-import { CheckIcon } from "../utils/icons";
+import { CheckIcon, SortIcon } from "../utils/icons";
 
 export type { SortDescriptor } from "react-aria-components";
 
@@ -39,7 +39,7 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(function Table(
       data-density={density}
       className={cx(
         "group/table overflow-x-auto rounded-[var(--rd-radius-overlay)] border border-[var(--rd-color-border-default)]",
-        "bg-[var(--rd-color-surface-default)]",
+        "bg-[var(--rd-color-surface-default)] [box-shadow:var(--rd-elevation-raised)]",
         className,
       )}
     >
@@ -100,7 +100,7 @@ export function TableColumn({ children, className, ...rest }: TableColumnProps) 
     <Column
       {...rest}
       className={cx(
-        "px-3 py-2 text-start font-medium text-[var(--rd-color-text-muted)] outline-none " +
+        "px-3 py-2 text-start text-xs font-semibold uppercase tracking-wide text-[var(--rd-color-text-muted)] outline-none " +
           "data-[focus-visible]:ring-2 data-[focus-visible]:ring-inset data-[focus-visible]:ring-[var(--rd-color-focus-ring)] " +
           "data-[allows-sorting]:cursor-pointer data-[allows-sorting]:hover:text-[var(--rd-color-text-default)]",
         className,
@@ -109,26 +109,7 @@ export function TableColumn({ children, className, ...rest }: TableColumnProps) 
       {({ allowsSorting, sortDirection }) => (
         <span className="inline-flex items-center gap-1">
           {children}
-          {allowsSorting && (
-            <svg aria-hidden="true" viewBox="0 0 16 16" className="size-3.5 shrink-0" fill="none">
-              <path
-                d="M8 3v10M4.5 6.5L8 3l3.5 3.5"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                opacity={sortDirection === "ascending" ? 1 : 0.3}
-              />
-              <path
-                d="M4.5 9.5L8 13l3.5-3.5"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                opacity={sortDirection === "descending" ? 1 : 0.3}
-              />
-            </svg>
-          )}
+          {allowsSorting && <SortIcon direction={sortDirection === "ascending" ? "asc" : sortDirection === "descending" ? "desc" : false} className="size-3.5 shrink-0" />}
         </span>
       )}
     </Column>

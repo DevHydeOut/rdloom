@@ -53,9 +53,9 @@
   },
   "radius": {
     "$type": "dimension",
-    "sm": { "$value": "4px" },
-    "md": { "$value": "8px" },
-    "lg": { "$value": "12px" }
+    "sm": { "$value": "6px" },
+    "md": { "$value": "10px" },
+    "lg": { "$value": "14px" }
   },
   "space": {
     "$type": "dimension",

@@ -12,7 +12,7 @@ export interface CardProps
 
 const variants: Record<NonNullable<CardSpecProps["variant"]>, string> = {
   outlined: "bg-[var(--rd-color-surface-default)] border border-[var(--rd-color-border-default)]",
-  raised: "bg-[var(--rd-color-surface-raised)] border border-[var(--rd-color-border-default)] shadow-md",
+  raised: "bg-[var(--rd-color-surface-raised)] border border-[var(--rd-color-border-default)] [box-shadow:var(--rd-elevation-raised)]",
   subtle: "bg-[var(--rd-color-surface-subtle)] border border-transparent",
 };
 

@@ -71,12 +71,12 @@ export const Sheet = forwardRef<HTMLElement, SheetProps>(function Sheet(
       isDismissable={isDismissable}
       isOpen={isOpen}
       onOpenChange={onOpenChange}
-      className="fixed inset-0 z-50 bg-[var(--rd-color-overlay-backdrop)] data-[entering]:animate-[rd-sheet-fade_200ms] motion-reduce:animate-none"
+      className="fixed inset-0 z-50 bg-[var(--rd-color-overlay-backdrop)] backdrop-blur-[2px] data-[entering]:animate-[rd-sheet-fade_200ms] motion-reduce:animate-none"
     >
       <style>{keyframes}</style>
       <Modal
         className={cx(
-          "fixed flex flex-col overflow-hidden shadow-xl bg-[var(--rd-color-surface-raised)] text-[var(--rd-color-text-default)] border-[var(--rd-color-border-default)]",
+          "fixed flex flex-col overflow-hidden [box-shadow:var(--rd-elevation-overlay)] bg-[var(--rd-color-surface-raised)] text-[var(--rd-color-text-default)] border-[var(--rd-color-border-default)]",
           "motion-reduce:!animate-none",
           placement[side],
           sizes[side][size],
@@ -86,7 +86,7 @@ export const Sheet = forwardRef<HTMLElement, SheetProps>(function Sheet(
         <AriaDialog {...rest} ref={ref} className={cx("flex h-full min-h-0 flex-col outline-none", className)}>
           {(renderProps) => (
             <>
-              <div className="flex items-start justify-between gap-4 border-b border-[var(--rd-color-border-default)] p-5">
+              <div className="flex items-start justify-between gap-4 border-b border-[var(--rd-color-border-default)] p-6">
                 <div className="flex flex-col gap-1">
                   <Heading slot="title" className="text-lg font-semibold">
                     {title}
@@ -101,7 +101,7 @@ export const Sheet = forwardRef<HTMLElement, SheetProps>(function Sheet(
                   <CloseIcon className="size-4" />
                 </Button>
               </div>
-              <div className="min-h-0 flex-1 overflow-y-auto p-5">
+              <div className="min-h-0 flex-1 overflow-y-auto p-6">
                 {typeof children === "function" ? children(renderProps) : children}
               </div>
             </>

@@ -22,7 +22,7 @@ import { useEffect, useMemo, useRef, useState, type ClipboardEvent, type CSSProp
 import { Button } from "../button/button";
 import { dataGridDefaults, type DataGridSpecProps } from "../generated/data-grid.types";
 import { cx } from "../utils/cx";
-import { Spinner } from "../utils/icons";
+import { ArrowDownIcon, ArrowUpIcon, ChevronRightIcon, Spinner } from "../utils/icons";
 import { columnFilter, filteredRowModel, searchFilter, sortedRowModel } from "./hierarchy";
 import { ColumnMenu, RowHandle, SetFilter, type ColumnMenuAction } from "./column-ui";
 import { extendValues } from "./fill";
@@ -116,15 +116,7 @@ function SortIcon({ direction, index }: { direction: false | "asc" | "desc"; ind
   if (!direction) return null;
   return (
     <span aria-hidden="true" className="inline-flex items-center text-[var(--rd-color-action-primary)]">
-      <svg viewBox="0 0 16 16" className="size-3.5" fill="none">
-        <path
-          d={direction === "asc" ? "M8 12V4M4.5 7.5L8 4l3.5 3.5" : "M8 4v8M4.5 8.5L8 12l3.5-3.5"}
-          stroke="currentColor"
-          strokeWidth="1.6"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
+      {direction === "asc" ? <ArrowUpIcon className="size-3.5" /> : <ArrowDownIcon className="size-3.5" />}
       {index !== undefined && <span className="text-[10px] font-semibold">{index + 1}</span>}
     </span>
   );
@@ -143,9 +135,7 @@ function ExpandToggle({ expanded, onToggle }: { expanded: boolean; onToggle: () 
       onMouseDown={(e) => e.preventDefault()}
       className="me-1 inline-flex size-5 flex-none items-center justify-center rounded text-[var(--rd-color-text-muted)] hover:bg-[var(--rd-color-surface-subtle)]"
     >
-      <svg viewBox="0 0 16 16" className={cx("size-3.5 transition-transform", expanded && "rotate-90")} fill="none" aria-hidden="true">
-        <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
+      <ChevronRightIcon className={cx("size-3.5 transition-transform motion-reduce:transition-none", expanded && "rotate-90")} />
     </button>
   );
 }
@@ -1151,7 +1141,7 @@ export function DataGrid<T>({
     <div
       className={cx(
         "relative overflow-hidden border border-[var(--rd-color-border-default)] rounded-[var(--rd-radius-overlay)] " +
-          "bg-[var(--rd-color-surface-default)] text-sm text-[var(--rd-color-text-default)]",
+          "bg-[var(--rd-color-surface-default)] text-sm text-[var(--rd-color-text-default)] [box-shadow:var(--rd-elevation-raised)]",
         className,
       )}
     >
@@ -1194,7 +1184,7 @@ export function DataGrid<T>({
                     onFocus={() => setActiveCell({ row: 0, col })}
                     onClick={canSort ? column.getToggleSortingHandler() : undefined}
                     className={cx(
-                      "relative flex flex-none items-center gap-1 px-3 font-medium text-[var(--rd-color-text-muted)] select-none",
+                      "relative flex flex-none items-center gap-1 px-3 text-xs font-semibold text-[var(--rd-color-text-muted)] select-none",
                       "bg-[var(--rd-color-surface-subtle)]",
                       canSort && "cursor-pointer hover:text-[var(--rd-color-text-default)]",
                       align(column),
@@ -1493,7 +1483,7 @@ export function DataGrid<T>({
                           editable && "cursor-text",
                           rangeSelection && !isEditing && "select-none",
                           inRange && "bg-[var(--rd-color-surface-selected)]",
-                          inFill && "bg-[var(--rd-color-surface-selected)] shadow-[inset_0_0_0_1px_var(--rd-color-action-primary)]",
+                          inFill && "bg-[var(--rd-color-surface-selected)] [box-shadow:inset_0_0_0_1px_var(--rd-color-action-primary)]",
                           showHandle && "relative",
                           pinned &&
                             "bg-[var(--rd-color-surface-default)] group-hover:bg-[var(--rd-color-surface-subtle)] " +
