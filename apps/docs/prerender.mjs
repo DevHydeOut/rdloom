@@ -15,7 +15,7 @@ const serverOut = path.join(root, "dist-server");
 await build({ root, logLevel: "warn" });
 await build({ root, logLevel: "warn", build: { ssr: "src/entry-server.tsx", outDir: serverOut } });
 
-const { render, allPaths, siteUrl } = await import(pathToFileURL(path.join(serverOut, "entry-server.js")).href);
+const { render, allPaths, previewPaths, siteUrl } = await import(pathToFileURL(path.join(serverOut, "entry-server.js")).href);
 const template = fs.readFileSync(path.join(dist, "index.html"), "utf8");
 
 const esc = (s) => s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
@@ -63,6 +63,14 @@ for (const p of allPaths) {
   pages.push({ path: p, url, ...result });
 }
 
+// The full-screen example pages: real files so a link to one works, kept out of search results and the sitemap.
+for (const p of previewPaths) {
+  const result = await render(p);
+  const file = path.join(dist, `${p.slice(1)}.html`);
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  fs.writeFileSync(file, page(result.html, result, siteUrl + p, '<meta name="robots" content="noindex" />', p));
+}
+
 // Unknown paths: static hosts serve 404.html (with a real 404 status).
 const missing = await render("/404");
 fs.writeFileSync(path.join(dist, "404.html"), page(missing.html, missing, `${siteUrl}/404`, '<meta name="robots" content="noindex" />', "*"));
@@ -80,7 +88,8 @@ if (siteUrl) {
 }
 fs.writeFileSync(
   path.join(dist, "robots.txt"),
-  `User-agent: *\nAllow: /\nDisallow: /visual/\n${siteUrl ? `\nSitemap: ${siteUrl}/sitemap.xml\n` : ""}`,
+  `User-agent: *\nAllow: /\nDisallow: /visual/
+Disallow: /preview/\n${siteUrl ? `\nSitemap: ${siteUrl}/sitemap.xml\n` : ""}`,
 );
 
 // llms.txt (llmstxt.org): a plain index of the docs for AI tools.

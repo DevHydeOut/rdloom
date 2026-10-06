@@ -5,6 +5,7 @@ import {
   defaultComponentsDir,
   defaultMotionCssPath,
   displayName,
+  hrefOf,
   loadMotionCss,
   EagerExamples,
   neighbours,
@@ -22,7 +23,7 @@ import { addCommand, Badge, CodeBlock, CommandBlock, CopyPill, DocTabs, H2, H3, 
 
 const title = (name: string) => name.replace(/-/g, " ").replace(/^./, (c) => c.toUpperCase());
 
-function Live({ component, example }: { component: DocComponent; example: Example }) {
+export function Live({ component, example }: { component: DocComponent; example: Example }) {
   const Example = useContext(EagerExamples)?.[`${component.id}/${example.name}`] ?? example.Component;
   return (
     <Suspense fallback={<span className="text-sm text-[var(--site-muted)]">Loading example…</span>}>
@@ -183,7 +184,7 @@ function Installation({ component }: { component: DocComponent }) {
                 <span key={p}>
                   {i > 0 && ", "}
                   {components.some((c) => c.id === p) ? (
-                    <Link href={`/components/${p}`} className="underline underline-offset-4">
+                    <Link href={hrefOf(components.find((c) => c.id === p)!)} className="underline underline-offset-4">
                       {displayName(components.find((c) => c.id === p)!.spec.name)}
                     </Link>
                   ) : (
@@ -311,18 +312,18 @@ function toMarkdown(component: DocComponent): string {
   ].join("\n\n");
 }
 
-function PageActions({ component }: { component: DocComponent }) {
+function PageActions({ component, showSteps = true }: { component: DocComponent; showSteps?: boolean }) {
   const { previous, next } = neighbours(component.id);
   const arrow = "flex size-8 items-center justify-center rounded-lg border border-[var(--site-border)] bg-[var(--site-subtle)] text-[var(--site-muted)] outline-none hover:text-[var(--site-fg)] focus-visible:ring-2 focus-visible:ring-[var(--rd-color-focus-ring)]";
   return (
     <>
       <CopyPill text={toMarkdown(component)} label="Copy page" className="hidden sm:inline-flex" />
-      {previous ? (
+      {showSteps && previous ? (
         <Link href={`/components/${previous.id}`} aria-label={`Previous: ${displayName(previous.spec.name)}`} className={arrow}>
           <ArrowLeftIcon size={15} />
         </Link>
       ) : null}
-      {next ? (
+      {showSteps && next ? (
         <Link href={`/components/${next.id}`} aria-label={`Next: ${displayName(next.spec.name)}`} className={arrow}>
           <ArrowRightIcon size={15} />
         </Link>
@@ -400,7 +401,64 @@ function BlockNote() {
   );
 }
 
-export function ComponentPage({ component }: { component: DocComponent }) {
+/** One example of a block, shown big: choose the width to see how it folds, switch to the code, or open it full screen. */
+function BlockExample({ component, example }: { component: DocComponent; example: Example }) {
+  const [size, setSize] = useState<"desktop" | "tablet" | "phone">("desktop");
+  const [view, setView] = useState<"preview" | "code">("preview");
+  const widths = { desktop: "max-w-full", tablet: "max-w-[768px]", phone: "max-w-[390px]" } as const;
+  const seg = (active: boolean) =>
+    `h-7 rounded-md px-2.5 text-xs font-medium outline-none transition-colors focus-visible:ring-2 focus-visible:ring-[var(--rd-color-focus-ring)] ${active ? "bg-[var(--site-bg)] text-[var(--site-fg)] shadow-sm" : "text-[var(--site-muted)] hover:text-[var(--site-fg)]"}`;
+  return (
+    <section className="min-w-0">
+      <H2 id={`example-${example.name}`} label={title(example.name)}>
+        {title(example.name)}
+      </H2>
+      <div className="overflow-hidden rounded-xl border border-[var(--site-border)]">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--site-border)] bg-[var(--site-bg)] px-3 py-2">
+          <div role="group" aria-label="Preview or code" className="flex gap-0.5 rounded-lg bg-[var(--site-subtle)] p-0.5">
+            <button type="button" aria-pressed={view === "preview"} onClick={() => setView("preview")} className={seg(view === "preview")}>
+              Preview
+            </button>
+            <button type="button" aria-pressed={view === "code"} onClick={() => setView("code")} className={seg(view === "code")}>
+              Code
+            </button>
+          </div>
+          {view === "preview" && (
+            <div role="group" aria-label="Preview width" className="hidden gap-0.5 rounded-lg bg-[var(--site-subtle)] p-0.5 sm:flex">
+              {([["desktop", "Desktop"], ["tablet", "Tablet"], ["phone", "Phone"]] as const).map(([id, label]) => (
+                <button key={id} type="button" aria-pressed={size === id} onClick={() => setSize(id)} className={seg(size === id)}>
+                  {label}
+                </button>
+              ))}
+            </div>
+          )}
+          <a
+            href={`/preview/${component.id}/${example.name}`}
+            target="_blank"
+            rel="noopener"
+            className="inline-flex h-7 items-center gap-1 rounded-md px-2 text-xs font-medium text-[var(--site-muted)] outline-none hover:text-[var(--site-fg)] focus-visible:ring-2 focus-visible:ring-[var(--rd-color-focus-ring)]"
+          >
+            Full screen
+            <span className="sr-only"> (opens in a new tab)</span>
+            <ArrowRightIcon size={12} className="-rotate-45" />
+          </a>
+        </div>
+        {view === "preview" ? (
+          <div data-block-preview className="bg-[var(--site-subtle)] p-3 sm:p-6">
+            <div className={`mx-auto w-full transition-[max-width] duration-300 motion-reduce:transition-none ${widths[size]}`}>
+              <Live component={component} example={example} />
+            </div>
+          </div>
+        ) : (
+          <CodeBlock bare code={example.code} label={`${title(example.name)} code`} />
+        )}
+      </div>
+    </section>
+  );
+}
+
+export function ComponentPage({ component, layout = "page" }: { component: DocComponent; /** "block": examples shown at full width, the rest in a reading column. */ layout?: "page" | "block" }) {
+  const asBlock = layout === "block";
   const { spec, id } = component;
   const a = spec.a11y;
   const [hero, ...more] = component.examples;
@@ -411,7 +469,7 @@ export function ComponentPage({ component }: { component: DocComponent }) {
       <PageHeader
         title={displayName(spec.name)}
         lead={spec.description}
-        actions={<PageActions component={component} />}
+        actions={<PageActions component={component} showSteps={!asBlock} />}
         meta={
           <div className="flex flex-wrap items-center gap-1.5 pt-2">
             <Badge>{categoryLabel(spec.category)}</Badge>
@@ -429,7 +487,10 @@ export function ComponentPage({ component }: { component: DocComponent }) {
       {spec.category === "ai" && <AiNote />}
       {spec.category === "block" && <BlockNote />}
 
-      {hero && (
+      {asBlock && component.examples.map((e) => <BlockExample key={e.name} component={component} example={e} />)}
+
+      <div className={asBlock ? "mx-auto max-w-3xl" : undefined}>
+      {!asBlock && hero && (
         <Preview code={hero.code} label={`${title(hero.name)} code`} tall={id === "data-grid" || id === "calendar"} motion={spec.category === "motion"} flush={spec.category === "block"}>
           <Live component={component} example={hero} />
         </Preview>
@@ -441,7 +502,7 @@ export function ComponentPage({ component }: { component: DocComponent }) {
       <H2 id="usage">Usage</H2>
       {usage ? <CodeBlock code={usage} label="Usage" /> : <Muted>See the examples below.</Muted>}
 
-      {more.map((e) => (
+      {!asBlock && more.map((e) => (
         <section key={e.name} className="min-w-0">
           <H2 id={`example-${e.name}`} label={title(e.name)}>
             {title(e.name)}
@@ -519,7 +580,8 @@ export function ComponentPage({ component }: { component: DocComponent }) {
         </>
       ) : null}
 
-      <NeighbourLinks id={id} />
+      </div>
+      {!asBlock && <NeighbourLinks id={id} />}
     </article>
   );
 }

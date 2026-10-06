@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { CommandGroup, CommandItem, CommandPalette, ToastRegion } from "@rdloom/react";
-import { componentGroups, displayName, groupIdOf, repoUrl, type ComponentGroup } from "./data";
+import { componentGroups, displayName, groupIdOf, hrefOf, repoUrl, type ComponentGroup } from "./data";
+import { FullScreenPage } from "./pages/blocks";
 import { VisualPage } from "./pages/visual";
 import { guides, routeFor, searchEntries } from "./routes";
 import { Link, navigate, RouterProvider, usePath } from "./router";
@@ -23,7 +24,7 @@ function Group({ label, children }: { label: string; children: React.ReactNode }
 
 function GroupToggle({ group, open, onToggle, onNavigate, path }: { group: ComponentGroup; open: boolean; onToggle: () => void; onNavigate?: () => void; path: string }) {
   const listId = `side-${group.id}`;
-  const here = group.items.some((c) => path === `/components/${c.id}`);
+  const here = group.items.some((c) => path === hrefOf(c));
   return (
     <li>
       <button
@@ -43,7 +44,7 @@ function GroupToggle({ group, open, onToggle, onNavigate, path }: { group: Compo
       <ul id={listId} hidden={!open} className="mb-1 ms-[0.9rem] flex flex-col border-s border-[var(--site-border)]">
         {group.items.map((c) => (
           <li key={c.id}>
-            <Link href={`/components/${c.id}`} className={sideLink} onClick={onNavigate}>
+            <Link href={hrefOf(c)} className={sideLink} onClick={onNavigate}>
               {displayName(c.spec.name)}
             </Link>
           </li>
@@ -55,7 +56,7 @@ function GroupToggle({ group, open, onToggle, onNavigate, path }: { group: Compo
 
 function Nav({ onNavigate }: { onNavigate?: () => void }) {
   const path = usePath();
-  const current = path.startsWith("/components/") ? groupIdOf(path.slice("/components/".length).split("/")[0]) : undefined;
+  const current = path.startsWith("/components/") || path.startsWith("/blocks/") ? groupIdOf(path.split("/")[2]) : undefined;
   const [open, setOpen] = useState<Set<string>>(() => new Set(current ? [current] : []));
   // Going to a component opens its group; the others stay as you left them.
   useEffect(() => {
@@ -194,6 +195,15 @@ function Search({ open, onOpenChange }: { open: boolean; onOpenChange: (open: bo
             </CommandItem>
           ))}
       </CommandGroup>
+      <CommandGroup title="Blocks">
+        {searchEntries
+          .filter((e) => e.group === "Blocks")
+          .map((e) => (
+            <CommandItem key={e.id} id={e.id}>
+              {e.name}
+            </CommandItem>
+          ))}
+      </CommandGroup>
     </CommandPalette>
   );
 }
@@ -260,6 +270,7 @@ function Shell() {
   const topLinks = [
     { href: "/docs/getting-started", label: "Docs", current: path.startsWith("/docs/") && !path.startsWith("/docs/mcp") && !path.startsWith("/docs/figma") },
     { href: "/components", label: "Components", current: inComponents },
+    { href: "/blocks", label: "Blocks", current: path === "/blocks" || path.startsWith("/blocks/") },
     { href: "/docs/mcp", label: "AI agents", current: path.startsWith("/docs/mcp") },
     { href: "/docs/figma", label: "Figma", current: path.startsWith("/docs/figma") },
   ];
@@ -339,7 +350,7 @@ function Shell() {
             <Nav />
           </div>
           <main id="main" className="min-w-0 flex-1 py-10 pb-24">
-            <div className={`thread mx-auto ${route.roomy ? "max-w-[58rem]" : "max-w-[44rem]"}`}>{route.page}</div>
+            <div className="thread mx-auto max-w-[44rem]">{route.page}</div>
           </main>
           <div className="sticky top-14 hidden h-[calc(100vh-3.5rem)] w-52 shrink-0 overflow-y-auto py-10 xl:block thin-scroll">
             <Toc path={path} />
@@ -364,7 +375,9 @@ function Shell() {
 function Root() {
   const path = usePath();
   const visual = path.match(/^\/visual\/([^/]+)\/([^/]+)$/);
-  return visual ? <VisualPage id={visual[1]} name={visual[2]} /> : <Shell />;
+  if (visual) return <VisualPage id={visual[1]} name={visual[2]} />;
+  const preview = path.match(/^\/preview\/([^/]+)\/([^/]+)$/);
+  return preview ? <FullScreenPage id={preview[1]} name={preview[2]} /> : <Shell />;
 }
 
 export function App({ path }: { path?: string }) {

@@ -785,7 +785,7 @@ Role `navigation` · WCAG 2.2 AA · spec: [`specs/dashboard-shell.spec.json`](..
 
 9. A skip link is the first focusable thing and moves focus to the page (a main landmark that can take focus)
 10. The sidebar is a named navigation landmark; there is one main landmark and one header landmark
-11. The current page is marked with aria-current="page" and also shown by a bar on its edge, a tinted background and a heavier label, never by color alone
+11. The current page is marked with aria-current="page" and also shown by a tinted background, an accent-colored icon and a heavier label, never by color alone
 12. An item with sub-items is a button with aria-expanded and aria-controls; the sub-list is hidden when closed
 13. A badge is read after the label ("Inbox, 3") and drawn as a pill; in the folded sidebar it becomes a dot but is still read
 14. The folded sidebar keeps every item's name for assistive technology and shows it in a tooltip on hover and focus; the collapse button says what it will do (Collapse sidebar, Expand sidebar) and has aria-expanded

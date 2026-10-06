@@ -95,7 +95,7 @@ export const Stat = forwardRef<HTMLDivElement, StatProps>(function Stat(
           {valueText}
           {unit && <span className={cx("font-medium text-[var(--rd-color-text-muted)]", unitSizes[size])}>{unit}</span>}
         </p>
-        {data && data.length > 0 && <Sparkline data={data} color={sparkColor} />}
+        {data && data.length > 0 && <Sparkline type="area" data={data} color={sparkColor} />}
       </div>
       {trend && (
         <p aria-hidden="true" className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm">

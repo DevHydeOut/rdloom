@@ -143,7 +143,7 @@ test.describe("component page", () => {
   });
 
   test("the customer table filters, sorts, pages and exports in a real browser", async ({ page }) => {
-    await page.goto("/components/customer-table");
+    await page.goto("/blocks/customer-table");
     await page.waitForLoadState("networkidle");
     const block = page.getByRole("region", { name: "Customers" }).first();
     await expect(block.getByText("24 customers")).toBeVisible();
@@ -176,26 +176,65 @@ test.describe("component page", () => {
     await expect(chart.getByRole("table")).toBeVisible();
   });
 
-  test("the dashboard shell folds its sidebar, opens sub-items and marks the current page", async ({ page }) => {
+  test("blocks have their own pages: an index, and a block shown at full width", async ({ page }) => {
+    await page.goto("/blocks");
+    await expect(page.getByRole("heading", { level: 1, name: "Blocks" })).toBeVisible();
+    await page.getByRole("link", { name: /Dashboard Shell/ }).click();
+    await expect(page.getByRole("heading", { level: 1, name: "Dashboard Shell" })).toBeVisible();
+    // the block is not squeezed into the reading column: its preview is wider than the text
+    const preview = page.locator("[data-block-preview]").first();
+    const box = await preview.boundingBox();
+    expect(box!.width).toBeGreaterThan(900);
+    // and it shows the real desktop layout, with its sidebar
+    await expect(preview.getByRole("navigation", { name: "Main navigation" })).toBeVisible();
+    // a block is not also a component page
     await page.goto("/components/dashboard-shell");
+    await expect(page.getByRole("heading", { level: 1, name: "Page not found" })).toBeVisible();
+  });
+
+  test("a block can be previewed at tablet and phone width, and opened full screen", async ({ page, context }) => {
+    await page.goto("/blocks/dashboard-shell");
     await page.waitForLoadState("networkidle");
-    const demo = page.locator("main .rounded-xl.overflow-hidden:has(> div.relative.flex)").nth(1);
+    const preview = page.locator("[data-block-preview]").first();
+    await page.getByRole("button", { name: "Phone" }).first().click();
+    await expect(page.getByRole("button", { name: "Phone" }).first()).toHaveAttribute("aria-pressed", "true");
+    await expect.poll(async () => (await preview.locator("> div").boundingBox())!.width).toBeLessThanOrEqual(392);
+    // at phone width the shell folds its sidebar into a menu
+    await expect(preview.getByRole("button", { name: "Open navigation" })).toBeVisible();
+    const [full] = await Promise.all([context.waitForEvent("page"), page.getByRole("link", { name: /Full screen/ }).first().click()]);
+    await full.waitForLoadState("networkidle");
+    await expect(full).toHaveURL(/\/preview\/dashboard-shell\/basic$/);
+    await expect(full.getByRole("navigation", { name: "Main navigation" })).toBeVisible();
+    await expect(full.getByRole("link", { name: "Back to the docs" })).toBeVisible();
+    // no docs header, and the block fills the window
+    await expect(full.getByRole("link", { name: "Components", exact: true })).toHaveCount(0);
+  });
+
+  test("the dashboard shell folds its sidebar, opens sub-items and marks the current page", async ({ page }) => {
+    await page.goto("/blocks/dashboard-shell");
+    await page.waitForLoadState("networkidle");
+    const demo = page.locator("[data-block-preview]").nth(0);
     const nav = demo.getByRole("navigation", { name: "Main navigation" });
-    await expect(nav.getByRole("link", { name: /Customers/ }).or(nav.getByRole("button", { name: /Customers/ })).first()).toBeVisible();
     await expect(nav.locator("[aria-current=page]")).toHaveCount(1);
     await nav.getByRole("button", { name: /Customers/ }).click();
     await expect(nav.locator("[aria-current=page]")).toContainText("Customers");
+    // the current page is not marked by a thick bar on one edge
+    const marker = await nav.locator("[aria-current=page]").evaluate((el) => {
+      const before = getComputedStyle(el, "::before");
+      return { content: before.content, left: getComputedStyle(el).borderLeftWidth };
+    });
+    expect(["none", "normal", '""']).toContain(marker.content);
+    expect(marker.left).toBe("0px");
     await demo.getByRole("button", { name: "Collapse sidebar" }).click();
     await expect(demo.getByRole("button", { name: "Expand sidebar" })).toHaveAttribute("aria-expanded", "false");
-    // the folded sidebar still gives every item its name
     await expect(nav.getByRole("button", { name: /Customers/ })).toBeVisible();
   });
 
   test("on a phone the shell's sidebar becomes a menu that slides in and closes after a choice", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 800 });
-    await page.goto("/components/dashboard-shell");
+    await page.goto("/blocks/dashboard-shell");
     await page.waitForLoadState("networkidle");
-    const demo = page.locator("main .rounded-xl.overflow-hidden:has(> div.relative.flex)").nth(1);
+    const demo = page.locator("[data-block-preview]").nth(0);
     await demo.getByRole("button", { name: "Open navigation" }).click();
     const dialog = page.getByRole("dialog");
     await expect(dialog.getByRole("navigation", { name: "Main navigation" })).toBeVisible();
@@ -284,7 +323,7 @@ test.describe("small screens", () => {
     expect(overflow).toBeLessThanOrEqual(0);
   });
 
-  for (const path of ["/", "/components", "/docs/getting-started", "/components/data-grid", "/components/chat", "/components/generated-chart", "/docs/ai", "/components/customer-table", "/components/chart", "/components/stat", "/components/dashboard-shell"]) {
+  for (const path of ["/", "/components", "/docs/getting-started", "/components/data-grid", "/components/chat", "/components/generated-chart", "/docs/ai", "/blocks", "/blocks/customer-table", "/blocks/dashboard-shell", "/components/chart", "/components/stat"]) {
     test(`${path} doesn't scroll sideways`, async ({ page }) => {
       await page.goto(path);
       await page.waitForLoadState("networkidle");

@@ -164,10 +164,17 @@ export const defaultComponentsDir = "src/components/rdloom";
 /** Where the CLI writes the motion CSS: beside the tokens file. */
 export const defaultMotionCssPath = "src/styles/rdloom-motion.css";
 
-/** The component before and after this one in the sidebar's order. */
+/** Blocks are whole screens, so they have their own pages (/blocks) instead of sitting among the components. */
+export const isBlock = (c: DocComponent) => c.spec.category === "block";
+export const blocks = components.filter(isBlock);
+export const parts = components.filter((c) => !isBlock(c));
+/** Where a component's page lives. */
+export const hrefOf = (c: Pick<DocComponent, "id" | "spec">) => `${c.spec.category === "block" ? "/blocks" : "/components"}/${c.id}`;
+
+/** The component before and after this one in the sidebar's order (blocks are not in the sequence). */
 export function neighbours(id: string) {
-  const i = components.findIndex((c) => c.id === id);
-  return { previous: i > 0 ? components[i - 1] : undefined, next: i >= 0 && i < components.length - 1 ? components[i + 1] : undefined };
+  const i = parts.findIndex((c) => c.id === id);
+  return { previous: i > 0 ? parts[i - 1] : undefined, next: i >= 0 && i < parts.length - 1 ? parts[i + 1] : undefined };
 }
 
 /** "DataGrid" -> "Data Grid": the name people read, while code keeps the real one. */

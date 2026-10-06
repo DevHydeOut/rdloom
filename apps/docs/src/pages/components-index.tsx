@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { componentGroups, components, displayName } from "../data";
+import { componentGroups, components, displayName, hrefOf, parts } from "../data";
 import { Link } from "../router";
 import { H2, Muted, PageHeader } from "../ui";
 
@@ -13,7 +13,7 @@ export function ComponentsIndex() {
     <div>
       <PageHeader
         title="Components"
-        lead={`${components.length} accessible components, each with live examples, the props, keyboard and screen reader behaviour, and source you own.`}
+        lead={`${parts.length} accessible components and ${components.length - parts.length} ready-made blocks, each with live examples, the props, keyboard and screen reader behaviour, and source you own.`}
       />
       <div className="pb-2">
         <label htmlFor="filter" className="sr-only">
@@ -44,7 +44,7 @@ export function ComponentsIndex() {
               {list.map((c) => (
                 <li key={c.id}>
                   <Link
-                    href={`/components/${c.id}`}
+                    href={hrefOf(c)}
                     className="group flex h-full flex-col gap-1.5 rounded-xl border border-[var(--site-border)] p-4 outline-none transition-colors hover:bg-[var(--site-subtle)] focus-visible:ring-2 focus-visible:ring-[var(--rd-color-focus-ring)]"
                   >
                     <span className="flex items-center justify-between gap-2 font-medium">

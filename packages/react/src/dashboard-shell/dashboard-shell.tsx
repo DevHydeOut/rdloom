@@ -21,9 +21,9 @@ const linkBase =
   "relative flex w-full items-center gap-3 rounded-[var(--rd-radius-control)] px-3 py-1.5 text-start text-sm outline-none transition-colors " +
   "min-h-[var(--rd-size-control-sm)] text-[var(--rd-color-text-muted)] data-[hovered]:bg-[var(--rd-color-surface-subtle)] data-[hovered]:text-[var(--rd-color-text-default)] " +
   "data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)] motion-reduce:transition-none";
-// The current page is shown three ways: a tinted background, a bar on the edge, and a heavier label. It is also aria-current.
-const linkCurrent =
-  "bg-[var(--rd-color-surface-selected)] font-medium !text-[var(--rd-color-text-default)] before:absolute before:inset-y-1.5 before:start-0 before:w-[3px] before:rounded-full before:bg-[var(--rd-color-action-primary)]";
+// The current page: a soft tinted background, the accent color on its icon, and a heavier label. It is also aria-current.
+// No thick bar on one edge: the tint and the weight carry it.
+const linkCurrent = "bg-[var(--rd-color-surface-selected)] font-medium !text-[var(--rd-color-text-default)]";
 
 type RenderLink = NonNullable<DashboardShellSpecProps["renderLink"]>;
 

@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import { components, displayName } from "./data";
+import { blocks, components, displayName, hrefOf, parts } from "./data";
+import { BlocksIndex } from "./pages/blocks";
 import { ComponentPage } from "./pages/component-page";
 import { ComponentsIndex } from "./pages/components-index";
 import { AiGuide, CliGuide, FigmaGuide, GettingStarted, McpGuide, TokensGuide } from "./pages/guides";
@@ -36,8 +37,8 @@ export interface Route {
   page: ReactNode;
   /** Pages with their own layout width (the home page). */
   wide?: boolean;
-  /** A wider column for pages whose examples are whole screens (blocks). */
-  roomy?: boolean;
+  /** A page with no site chrome, for showing one example at the size of the window. */
+  bare?: boolean;
   notFound?: boolean;
 }
 
@@ -55,7 +56,7 @@ export function routeFor(rawPath: string): Route {
   if (path === "/components") {
     return {
       path,
-      title: `${components.length} accessible React components · rdloom`,
+      title: `${parts.length} accessible React components · rdloom`,
       description: "Every rdloom component with live examples, props, keyboard and screen reader behaviour, and source you own.",
       page: <ComponentsIndex />,
     };
@@ -64,7 +65,35 @@ export function routeFor(rawPath: string): Route {
   const guide = guides.find((g) => g.href === path);
   if (guide) return { path, title: `${guide.title} · rdloom`, description: guide.description, page: <guide.Page /> };
 
-  const component = components.find((c) => `/components/${c.id}` === path);
+  if (path === "/blocks") {
+    return {
+      path,
+      title: `${blocks.length} ready-made blocks for React · rdloom`,
+      description: "Whole screens built from rdloom components: a dashboard shell, a customer table with charts. See each at full width and on a phone, then copy it into your project.",
+      wide: true,
+      page: <BlocksIndex />,
+    };
+  }
+
+  const block = blocks.find((c) => `/blocks/${c.id}` === path);
+  if (block) {
+    return {
+      path,
+      title: `${displayName(block.spec.name)}: a React block · rdloom`,
+      description: `${block.spec.description} See it at full width and on a phone, then copy it into your project.`,
+      wide: true,
+      page: <ComponentPage key={block.id} component={block} layout="block" />,
+    };
+  }
+
+  // /preview/<block>/<example>: one example filling the window, opened from a block page.
+  const preview = path.match(/^\/preview\/([^/]+)\/([^/]+)$/);
+  if (preview) {
+    const owner = components.find((c) => c.id === preview[1]);
+    return { path, title: `${owner ? displayName(owner.spec.name) : preview[1]}, full screen · rdloom`, description: "One example at the size of the window.", bare: true, page: null };
+  }
+
+  const component = parts.find((c) => `/components/${c.id}` === path);
   if (component) {
     const { spec } = component;
     return {
@@ -72,7 +101,6 @@ export function routeFor(rawPath: string): Route {
       title: `${displayName(spec.name)}: accessible React ${spec.name === "DataGrid" ? "data grid" : "component"} · rdloom`,
       description: `${spec.description} Keyboard and screen reader support, ${component.examples.length} tested examples, and source you own.`,
       page: <ComponentPage key={component.id} component={component} />,
-      roomy: component.spec.category === "block",
     };
   }
 
@@ -100,11 +128,16 @@ export function routeFor(rawPath: string): Route {
 }
 
 /** Every real page, for prerendering and the sitemap. */
-export const allPaths = ["/", "/components", ...guides.map((g) => g.href), ...components.map((c) => `/components/${c.id}`)];
+export const allPaths = ["/", "/components", "/blocks", ...guides.map((g) => g.href), ...parts.map((c) => `/components/${c.id}`), ...blocks.map((c) => `/blocks/${c.id}`)];
+
+/** The full-screen example pages: written as files so a link to one works, but kept out of the sitemap and the index of the docs. */
+export const previewPaths = blocks.flatMap((c) => c.examples.map((e) => `/preview/${c.id}/${e.name}`));
 
 /** For search in the header: every page with a group label. */
 export const searchEntries = [
   ...guides.map((g) => ({ id: g.href, name: g.title, group: "Guides" })),
   { id: "/components", name: "All components", group: "Components" },
-  ...components.map((c) => ({ id: `/components/${c.id}`, name: displayName(c.spec.name), group: "Components", category: c.spec.category })),
+  ...parts.map((c) => ({ id: `/components/${c.id}`, name: displayName(c.spec.name), group: "Components", category: c.spec.category })),
+  { id: "/blocks", name: "All blocks", group: "Blocks" },
+  ...blocks.map((c) => ({ id: hrefOf(c), name: displayName(c.spec.name), group: "Blocks", category: c.spec.category })),
 ];

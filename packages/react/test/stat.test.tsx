@@ -46,7 +46,7 @@ describe("Stat", () => {
   it("shows a description and a sparkline when given data", () => {
     const { container } = render(<Stat label="Signups" value={3} description="All plans" data={[1, 2, 3]} />);
     expect(reading(container)).toContain("All plans");
-    expect(container.querySelector("svg[data-type='line']")).toBeInTheDocument();
+    expect(container.querySelector("svg[data-type='area']")).toBeInTheDocument();
   });
 
   it("has a loading state", () => {
@@ -162,5 +162,53 @@ describe("Sparkline", () => {
       </>,
     );
     expect(await axeViolations(container)).toEqual([]);
+  });
+});
+
+describe("Sparkline: area, extremes and average", () => {
+  const data = [3, 8, 2, 9, 5, 7];
+
+  it("fills softly under the line for the area type, and not for the line type", () => {
+    const area = render(<Sparkline type="area" data={data} />);
+    expect(area.container.querySelectorAll("polygon")).toHaveLength(1);
+    expect(area.container.querySelectorAll("polyline")).toHaveLength(1);
+    expect(area.container.querySelector("polygon")).toHaveAttribute("fill-opacity", "0.16");
+    area.unmount();
+    const line = render(<Sparkline data={data} />);
+    expect(line.container.querySelector("polygon")).toBeNull();
+  });
+
+  it("marks the lowest and highest points with rings, only when asked and only when there is a range", () => {
+    const plain = render(<Sparkline data={data} showLast={false} />);
+    expect(plain.container.querySelectorAll("circle")).toHaveLength(0);
+    plain.unmount();
+    const marked = render(<Sparkline data={data} showLast={false} showExtremes />);
+    expect(marked.container.querySelectorAll("circle")).toHaveLength(2);
+    marked.unmount();
+    const flat = render(<Sparkline data={[4, 4, 4, 4]} showLast={false} showExtremes />);
+    expect(flat.container.querySelectorAll("circle")).toHaveLength(0);
+    flat.unmount();
+    const two = render(<Sparkline data={[1, 5]} showLast={false} showExtremes />);
+    expect(two.container.querySelectorAll("circle")).toHaveLength(0);
+  });
+
+  it("never draws two marks on the same point: the last point's dot wins over its ring", () => {
+    const { container } = render(<Sparkline data={[3, 8, 2, 9]} showExtremes />);
+    // highest is the last point: one dot there, plus the ring for the lowest
+    expect(container.querySelectorAll("circle")).toHaveLength(2);
+  });
+
+  it("draws a dashed average line at the mean, only with at least two points", () => {
+    const { container, rerender } = render(<Sparkline data={[0, 10]} height={32} showAverage />);
+    const line = container.querySelector("line")!;
+    expect(line).toHaveAttribute("stroke-dasharray", "2 3");
+    expect(Number(line.getAttribute("y1"))).toBeCloseTo(16, 0);
+    rerender(<Sparkline data={[5]} showAverage />);
+    expect(container.querySelector("line")).toBeNull();
+  });
+
+  it("stays decoration without a label, whichever type", () => {
+    const { container } = render(<Sparkline type="area" data={data} showExtremes showAverage />);
+    expect(container.querySelector("svg")).toHaveAttribute("aria-hidden", "true");
   });
 });

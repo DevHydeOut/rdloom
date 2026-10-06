@@ -26,6 +26,8 @@ export const Sparkline = forwardRef<SVGSVGElement, SparklineProps>(function Spar
     height = sparklineDefaults.height,
     color = sparklineDefaults.color,
     showLast = sparklineDefaults.showLast,
+    showExtremes = sparklineDefaults.showExtremes,
+    showAverage = sparklineDefaults.showAverage,
     ...rest
   },
   ref,
@@ -67,20 +69,36 @@ export const Sparkline = forwardRef<SVGSVGElement, SparklineProps>(function Spar
     const y = (v: number) => (hi === lo ? height / 2 : PAD + ((hi - v) / (hi - lo)) * inner);
     const points = values.map((v, i) => `${round(x(i))},${round(y(v))}`);
     const last = values.length - 1;
+    const bottom = height - PAD;
+    const mean = values.reduce((n, v) => n + v, 0) / values.length;
+    const lowAt = values.indexOf(lo);
+    const highAt = values.indexOf(hi);
     shapes = (
       <>
+        {/* The soft area under the line: the same color, faint, so the line stays the thing you read. */}
+        {type === "area" && values.length > 1 && (
+          <polygon points={`${points.join(" ")} ${round(x(last))},${round(bottom)} ${round(x(0))},${round(bottom)}`} fill={stroke} fillOpacity={0.16} stroke="none" />
+        )}
+        {showAverage && values.length > 1 && (
+          <line x1={PAD} x2={width - PAD} y1={round(y(mean))} y2={round(y(mean))} stroke="var(--rd-color-text-muted)" strokeOpacity={0.7} strokeWidth={1} strokeDasharray="2 3" vectorEffect="non-scaling-stroke" />
+        )}
         {values.length > 1 && (
           <polyline
             points={points.join(" ")}
             fill="none"
             stroke={stroke}
-            strokeWidth={1.5}
+            strokeWidth={1.75}
             strokeLinejoin="round"
             strokeLinecap="round"
             vectorEffect="non-scaling-stroke"
           />
         )}
-        {(showLast || values.length === 1) && <circle cx={round(x(last))} cy={round(y(values[last]))} r={2} fill={stroke} />}
+        {/* The highest and lowest points as small rings, so the range is visible without reading numbers. */}
+        {showExtremes && values.length > 2 && hi !== lo &&
+          [lowAt, highAt]
+            .filter((i) => i !== last || !showLast)
+            .map((i) => <circle key={i} cx={round(x(i))} cy={round(y(values[i]))} r={2.5} fill="var(--rd-color-surface-default)" stroke={stroke} strokeWidth={1.5} vectorEffect="non-scaling-stroke" />)}
+        {(showLast || values.length === 1) && <circle cx={round(x(last))} cy={round(y(values[last]))} r={2.5} fill={stroke} stroke="var(--rd-color-surface-default)" strokeWidth={1.5} vectorEffect="non-scaling-stroke" />}
       </>
     );
   }

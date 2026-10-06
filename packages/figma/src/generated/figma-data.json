@@ -1414,6 +1414,7 @@
           "name": "Type",
           "values": [
             "line",
+            "area",
             "bar"
           ],
           "default": "line"
