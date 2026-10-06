@@ -262,6 +262,42 @@ export function BanIcon({ className = "size-4 shrink-0", strokeWidth }: IconProp
   );
 }
 
+export function MicIcon({ className = "size-4 shrink-0", strokeWidth }: IconProps) {
+  return (
+    <Icon className={className} strokeWidth={strokeWidth}>
+      <R x={5.75} y={1.75} width={4.5} height={7.5} rx={2.25} />
+      <P d="M3.5 7.75a4.5 4.5 0 0 0 9 0M8 12.25v2" />
+    </Icon>
+  );
+}
+
+export function PaperclipIcon({ className = "size-4 shrink-0", strokeWidth }: IconProps) {
+  return (
+    <Icon className={className} strokeWidth={strokeWidth}>
+      <P d="M12.9 7.4l-4.6 4.6a3 3 0 0 1-4.25-4.25l5-5a2 2 0 0 1 2.85 2.85l-5 5a1 1 0 0 1-1.4-1.4l4.4-4.4" />
+    </Icon>
+  );
+}
+
+export function ImageIcon({ className = "size-4 shrink-0", strokeWidth }: IconProps) {
+  return (
+    <Icon className={className} strokeWidth={strokeWidth}>
+      <R x={2} y={2.75} width={12} height={10.5} rx={2} />
+      <C cx={5.75} cy={6.25} r={1.1} />
+      <P d="M2.5 11.5l3.25-3 2.5 2.25 2-1.75 3.25 2.75" />
+    </Icon>
+  );
+}
+
+export function GlobeIcon({ className = "size-4 shrink-0", strokeWidth }: IconProps) {
+  return (
+    <Icon className={className} strokeWidth={strokeWidth}>
+      <C cx={8} cy={8} r={6} />
+      <P d="M2 8h12M8 2c1.75 1.75 2.5 3.75 2.5 6S9.75 12.25 8 14c-1.75-1.75-2.5-3.75-2.5-6S6.25 3.75 8 2z" />
+    </Icon>
+  );
+}
+
 // --- Chat
 
 export function SendIcon({ className = "size-4 shrink-0", strokeWidth }: IconProps) {

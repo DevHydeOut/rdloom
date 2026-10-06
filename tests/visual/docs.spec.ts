@@ -98,6 +98,50 @@ test.describe("component page", () => {
     await expect(chart.getByRole("rowheader", { name: "Jun" })).toBeVisible();
   });
 
+  test("the whole Copy page button copies, not only its icon", async ({ page, context }) => {
+    await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+    await page.goto("/components/alert");
+    await page.waitForLoadState("networkidle");
+    // click the words, away from the icon
+    await page.getByRole("button", { name: /Copy page/ }).click({ position: { x: 12, y: 14 } });
+    await expect(page.getByRole("button", { name: /Copied/ })).toBeVisible();
+    expect(await page.evaluate(() => navigator.clipboard.readText())).toContain("# Alert");
+  });
+
+  test("a heading has a button that copies the link to its section", async ({ page, context }) => {
+    await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+    await page.goto("/components/alert");
+    await page.waitForLoadState("networkidle");
+    const heading = page.getByRole("heading", { level: 2, name: "Installation" });
+    await heading.hover();
+    await heading.getByRole("button", { name: "Copy link to Installation" }).click();
+    await expect(heading.getByText("Link copied")).toBeAttached();
+    expect(await page.evaluate(() => navigator.clipboard.readText())).toMatch(/\/components\/alert#installation$/);
+    // the heading is plain text now, not a link with a # after it
+    await expect(heading.getByRole("link")).toHaveCount(0);
+  });
+
+  test("previews keep their content in the middle, also after something is dismissed", async ({ page }) => {
+    await page.goto("/components/alert");
+    await page.waitForLoadState("networkidle");
+    const card = page.locator("main .rounded-xl.overflow-hidden:has(> div.relative.flex)", { hasText: "keyboard shortcuts" });
+    await card.getByRole("button", { name: "Dismiss", exact: true }).click();
+    const area = await card.locator("> div.relative.flex").boundingBox();
+    const again = await card.getByRole("button", { name: "Show the message again" }).boundingBox();
+    expect(Math.abs(area!.x + area!.width / 2 - (again!.x + again!.width / 2))).toBeLessThan(4);
+  });
+
+  test("a toast closes by itself", async ({ page }) => {
+    await page.goto("/components/toast");
+    await page.waitForLoadState("networkidle");
+    await page.getByRole("button", { name: "Save" }).first().click();
+    const toast = page.getByRole("alertdialog").filter({ hasText: "Changes saved" });
+    await expect(toast).toBeVisible();
+    // 10 seconds by default; the pointer is not over it, so the timer runs
+    await page.mouse.move(5, 5);
+    await expect(toast).toBeHidden({ timeout: 14_000 });
+  });
+
   test("steps to the neighbouring components", async ({ page }) => {
     await page.goto("/components/alert");
     await page.getByRole("link", { name: "Next: Approval Box" }).click();

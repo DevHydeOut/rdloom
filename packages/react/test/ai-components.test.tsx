@@ -724,7 +724,7 @@ describe("PromptInput", () => {
     render(<PromptInput onSubmit={onSubmit} />);
     const box = screen.getByRole("textbox", { name: "Message" });
     await userEvent.type(box, "  hello there  {Enter}");
-    expect(onSubmit).toHaveBeenCalledWith("hello there");
+    expect(onSubmit).toHaveBeenCalledWith("hello there", []);
     expect(box).toHaveValue("");
     expect(box).toHaveFocus();
   });
@@ -746,7 +746,7 @@ describe("PromptInput", () => {
     fireEvent.keyDown(box, { key: "Enter", keyCode: 229 });
     expect(onSubmit).not.toHaveBeenCalled();
     fireEvent.keyDown(box, { key: "Enter" });
-    expect(onSubmit).toHaveBeenCalledWith("かん");
+    expect(onSubmit).toHaveBeenCalledWith("かん", []);
   });
 
   it("won't send nothing, or only spaces, and the Send button says so", async () => {
@@ -759,7 +759,7 @@ describe("PromptInput", () => {
     await userEvent.type(screen.getByRole("textbox"), "x");
     expect(send).toBeEnabled();
     await userEvent.click(send);
-    expect(onSubmit).toHaveBeenCalledWith("x");
+    expect(onSubmit).toHaveBeenCalledWith("x", []);
   });
 
   it("turns into Stop while streaming and blocks sending", async () => {
@@ -819,7 +819,7 @@ describe("Chat", () => {
     render(<Chat messages={[]} suggestions={["Show sales", "List customers"]} onSend={onSend} />);
     expect(screen.getByText("Ask anything to get started.")).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "List customers" }));
-    expect(onSend).toHaveBeenCalledWith("List customers");
+    expect(onSend).toHaveBeenCalledWith("List customers", undefined);
   });
 
   it("sends what is typed, and shows Stop while a reply streams", async () => {
@@ -827,7 +827,7 @@ describe("Chat", () => {
     const onStop = vi.fn();
     const { rerender } = render(<Chat messages={[]} onSend={onSend} />);
     await userEvent.type(screen.getByRole("textbox"), "Hello{Enter}");
-    expect(onSend).toHaveBeenCalledWith("Hello");
+    expect(onSend).toHaveBeenCalledWith("Hello", []);
     rerender(<Chat messages={[user("1", "Hello"), reply("2", "Hi", "streaming")]} status="streaming" onSend={onSend} onStop={onStop} />);
     await userEvent.click(screen.getByRole("button", { name: "Stop generating" }));
     expect(onStop).toHaveBeenCalled();

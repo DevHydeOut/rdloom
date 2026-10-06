@@ -8,7 +8,7 @@ import { GeneratedChart } from "../generated-chart/generated-chart";
 import { GeneratedTable } from "../generated-table/generated-table";
 import { Response } from "../response/response";
 import { Sources } from "../sources/sources";
-import { groupParts, messageText, type CitationPart, type ChatMessage, type ReasoningPart } from "../utils/ai";
+import { groupParts, isLocalImage, messageText, type CitationPart, type ChatMessage, type ReasoningPart } from "../utils/ai";
 import { cx } from "../utils/cx";
 import { ChevronRightIcon, ErrorIcon, FileIcon, SparkleIcon } from "../utils/icons";
 
@@ -115,7 +115,10 @@ export const Message = forwardRef<HTMLElement, MessageProps>(function Message(
           <GeneratedChart key={i} title={part.title} summary={part.summary} data={part.data} />
         );
       case "file":
-        return (
+        // A picture from this device is shown small, with its file name as the alt text; anything else is a chip.
+        return isLocalImage(part) ? (
+          <img key={i} src={part.url} alt={part.name} className="max-h-40 max-w-full rounded-2xl border border-[var(--rd-color-border-default)] object-cover" />
+        ) : (
           <span key={i} className="inline-flex w-fit items-center gap-2 rounded-[var(--rd-radius-control)] border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-subtle)] px-2.5 py-1.5 text-sm">
             <FileIcon className="size-4 shrink-0" />
             {part.url ? (

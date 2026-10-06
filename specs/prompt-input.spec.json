@@ -4,13 +4,13 @@
   "version": "0.1.0",
   "category": "ai",
   "status": "experimental",
-  "description": "The box people type a message in. Enter sends, Shift+Enter adds a line, the box grows with the text, and the Send button becomes Stop while a reply is on its way.",
+  "description": "The message box of a chat: one rounded bar with a + menu on the left, the text in the middle, and your own controls, a microphone and Send on the right. Added files show above the text. You get only the buttons you ask for.",
   "props": {
     "onSubmit": {
       "type": "callback",
-      "description": "Called with the trimmed text when the person sends.",
+      "description": "Called with the trimmed text and the attachments when the person sends. A message with files and no text can be sent.",
       "required": true,
-      "tsType": "(text: string) => void"
+      "tsType": "(text: string, attachments: import(\"../utils/ai\").PromptAttachment[]) => void"
     },
     "onStop": {
       "type": "callback",
@@ -49,6 +49,44 @@
     "maxLength": {
       "type": "number",
       "description": "Longest message allowed."
+    },
+    "attachments": {
+      "type": "custom",
+      "description": "Files added to the message but not sent yet. You own the list: add to it in onAttach, remove from it in onRemoveAttachment. Images show as small pictures, other files as chips.",
+      "tsType": "import(\"../utils/ai\").PromptAttachment[]"
+    },
+    "onAttach": {
+      "type": "callback",
+      "description": "Called with the chosen files. Providing it adds \"Add photos & files\" to the + menu and opens the file picker. Use fileToAttachment() to make attachments.",
+      "tsType": "(files: File[]) => void"
+    },
+    "onRemoveAttachment": {
+      "type": "callback",
+      "description": "Called with an attachment's id when the person removes it. Without it the attachments have no remove button.",
+      "tsType": "(id: string) => void"
+    },
+    "accept": {
+      "type": "string",
+      "description": "Which files the picker offers, e.g. \"image/*,.pdf\"."
+    },
+    "actions": {
+      "type": "custom",
+      "description": "Extra entries for the + menu, such as Create image or Web search. Each has a label, an optional description and icon, and what to do when chosen.",
+      "tsType": "import(\"../utils/ai\").PromptAction[]"
+    },
+    "onVoice": {
+      "type": "callback",
+      "description": "Shows a microphone button and calls this when it is pressed. Start or stop dictation yourself.",
+      "tsType": "() => void"
+    },
+    "isListening": {
+      "type": "boolean",
+      "description": "Dictation is on: the microphone button shows as pressed and its name becomes Stop dictation.",
+      "default": false
+    },
+    "endContent": {
+      "type": "node",
+      "description": "Your own controls on the right, before the microphone, for example a Think toggle."
     }
   },
   "states": [
@@ -58,20 +96,32 @@
   ],
   "slots": [
     "root",
+    "attachments",
+    "attachment",
+    "menu-button",
+    "menu",
     "input",
+    "tools",
+    "voice",
     "send",
-    "stop",
-    "hint"
+    "stop"
   ],
   "tokens": [
-    "color.surface.default",
+    "color.action.on-primary",
+    "color.action.primary",
+    "color.action.primary-hover",
+    "color.border.default",
     "color.border.strong",
+    "color.focus.ring",
+    "color.surface.default",
+    "color.surface.raised",
+    "color.surface.selected",
+    "color.surface.subtle",
     "color.text.default",
     "color.text.muted",
-    "color.action.primary",
-    "color.action.on-primary",
-    "color.action.primary-hover",
-    "color.focus.ring",
+    "elevation.control",
+    "elevation.floating",
+    "elevation.raised",
     "radius.overlay"
   ],
   "a11y": {
@@ -79,19 +129,26 @@
     "keyboard": [
       "Enter: sends",
       "Shift+Enter: new line",
-      "Tab: moves to the Send or Stop button"
+      "Tab: moves through the + button, the text, your controls, the microphone and Send",
+      "In the + menu: arrow keys move, Enter chooses, Escape closes"
     ],
     "requirements": [
-      "A real labelled multi-line text box; the shortcut hint is attached with aria-describedby",
+      "A real labelled multi-line text box; the shortcut hint is attached with aria-describedby (read by assistive technology, not drawn)",
       "Enter does nothing while an input method (IME) is composing, so a half-typed word can't be sent",
-      "Send is disabled for empty or whitespace-only text; Stop replaces it while streaming and has its own name",
-      "Focus stays in the box after sending",
+      "Send is disabled when there is no text and no file; Stop replaces it while streaming and has its own name",
+      "The + button is a menu button named \"Add attachments or tools\"; its menu has a name and every entry has a text label",
+      "Attachments are a labelled list; every remove button names its file (\"Remove photo.png\"); adding and removing is announced politely; an image's alt text is its file name",
+      "Only pictures from this device (blob: or data: addresses) are drawn: nothing is loaded from a remote address",
+      "The microphone button is a toggle (aria-pressed) whose name changes to Stop dictation",
+      "When the text grows past a line the bar becomes two rows without moving the text box in the page, so typing and focus are never interrupted",
+      "Focus stays in the text box after sending, attaching or removing a file",
       "Growth stops at a maximum height, then the box scrolls"
     ],
     "screenReader": [
       "\"Message, edit text, multi-line. Enter to send, Shift+Enter for a new line\"",
-      "\"Send message, button, dimmed\" while empty",
-      "\"Stop generating, button\" while streaming"
+      "\"Add attachments or tools, menu button\", then the entries such as \"Add photos & files\"",
+      "After choosing files: \"Added photo.png\"; the list reads \"Attachments, list, 1 item\" and \"Remove photo.png, button\"",
+      "\"Send message, button, dimmed\" while empty; \"Stop generating, button\" while streaming"
     ],
     "wcag": "2.2 AA"
   },
@@ -109,6 +166,8 @@
   },
   "examples": [
     "default",
+    "with-attachments",
+    "with-tools",
     "streaming"
   ],
   "figma": {

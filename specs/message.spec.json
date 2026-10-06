@@ -77,7 +77,8 @@
       "Your own text is plain text; the assistant's is formatted, with no HTML injected",
       "A reply that hasn't started shows \"Assistant is thinking\" for screen readers as well as animated dots, and the dots stand still for reduced motion",
       "Errors are announced (role alert) and offer Try again when you provide onRetry; a stopped reply says so",
-      "aria-busy is set while the message streams"
+      "aria-busy is set while the message streams",
+      "A picture the person attached is shown small, with its file name as alt text, only when it comes from this device (blob: or data: address); other files show as a chip"
     ],
     "screenReader": [
       "\"Assistant message, article\" then the reply",

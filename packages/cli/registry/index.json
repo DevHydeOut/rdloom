@@ -221,7 +221,7 @@
       "name": "prompt-input",
       "type": "registry:ui",
       "version": "0.1.0",
-      "description": "The box people type a message in. Enter sends, Shift+Enter adds a line, the box grows with the text, and the Send button becomes Stop while a reply is on its way."
+      "description": "The message box of a chat: one rounded bar with a + menu on the left, the text in the middle, and your own controls, a microphone and Send on the right. Added files show above the text. You get only the buttons you ask for."
     },
     {
       "name": "pulse-button",

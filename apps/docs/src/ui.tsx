@@ -1,11 +1,41 @@
 import { createContext, useContext, useEffect, useId, useState, type ReactNode } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "@rdloom/react";
 import { highlight } from "sugar-high";
-import { CheckIcon, CopyIcon, DoIcon, DontIcon, FileIcon } from "./icons";
+import { CheckIcon, CopyIcon, DoIcon, DontIcon, FileIcon, LinkIcon } from "./icons";
 
 // The docs' own building blocks: calm, neutral, and the same on every page.
 
 // --- Copy ------------------------------------------------------------------
+
+/** A labelled button that copies text: the whole button is the target, not only its icon. */
+export function CopyPill({ text, label, copiedLabel = "Copied", className = "" }: { text: string; label: string; copiedLabel?: string; className?: string }) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <>
+      <button
+        type="button"
+        onClick={async () => {
+          try {
+            await navigator.clipboard?.writeText(text);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 1600);
+          } catch {}
+        }}
+        className={
+          "inline-flex h-8 items-center gap-1.5 rounded-lg border border-[var(--site-border)] bg-[var(--site-subtle)] px-2.5 text-sm font-medium text-[var(--site-fg)] outline-none transition-colors " +
+          "hover:bg-[var(--site-border)]/60 focus-visible:ring-2 focus-visible:ring-[var(--rd-color-focus-ring)] " +
+          className
+        }
+      >
+        {copied ? copiedLabel : label}
+        {copied ? <CheckIcon size={15} /> : <CopyIcon size={15} />}
+      </button>
+      <span role="status" className="sr-only">
+        {copied ? "Copied to clipboard" : ""}
+      </span>
+    </>
+  );
+}
 
 export function CopyButton({ text, label = "Copy", className = "" }: { text: string; label?: string; className?: string }) {
   const [copied, setCopied] = useState(false);
@@ -245,18 +275,35 @@ export function PageTitle({ children, lead }: { children: ReactNode; lead?: Reac
 }
 
 export function H2({ id, label, children }: { id: string; /** Text for "On this page" when the heading isn't plain text. */ label?: string; children: ReactNode }) {
+  const [copied, setCopied] = useState(false);
+  const name = label ?? (typeof children === "string" ? children : "this section");
   return (
     <h2
       id={id}
       data-label={label ?? (typeof children === "string" ? children : undefined)}
       className="font-display group scroll-mt-20 pt-14 pb-4 text-[24px] leading-8 tracking-[-0.03em]"
     >
-      <a href={`#${id}`} data-anchor="" className="outline-none focus-visible:underline">
-        {children}
-        <span aria-hidden="true" className="ms-2 font-sans text-base text-[var(--site-accent)] opacity-0 transition-opacity group-hover:opacity-100">
-          #
-        </span>
-      </a>
+      {children}
+      {/* A permalink: copies the address of this section, so it can be shared or bookmarked. Shown on hover and on keyboard focus. */}
+      <button
+        type="button"
+        aria-label={`Copy link to ${name}`}
+        onClick={async () => {
+          const url = `${window.location.origin}${window.location.pathname}#${id}`;
+          window.history.replaceState(null, "", `#${id}`);
+          try {
+            await navigator.clipboard?.writeText(url);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 1600);
+          } catch {}
+        }}
+        className="ms-2 inline-flex size-7 translate-y-[-1px] items-center justify-center rounded-md align-middle text-[var(--site-muted)] opacity-0 outline-none transition-opacity hover:bg-[var(--site-border)]/60 hover:text-[var(--site-fg)] focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-[var(--rd-color-focus-ring)] group-hover:opacity-100 pointer-coarse:opacity-100"
+      >
+        {copied ? <CheckIcon size={15} /> : <LinkIcon size={15} />}
+      </button>
+      <span role="status" className="sr-only">
+        {copied ? "Link copied" : ""}
+      </span>
     </h2>
   );
 }
@@ -266,7 +313,7 @@ export function H3({ children }: { children: ReactNode }) {
 }
 
 export function Prose({ children }: { children: ReactNode }) {
-  return <div className="flex flex-col gap-4 text-[15px] leading-7 [&_a:not([data-anchor])]:font-medium [&_a:not([data-anchor])]:underline [&_a:not([data-anchor])]:underline-offset-4">{children}</div>;
+  return <div className="flex flex-col gap-4 text-[15px] leading-7 [&_a]:font-medium [&_a]:underline [&_a]:underline-offset-4">{children}</div>;
 }
 
 export function Muted({ children, className = "" }: { children: ReactNode; className?: string }) {

@@ -12,9 +12,9 @@ export interface ChatSpecProps {
    */
   messages: import("../utils/ai").ChatMessage[];
   /**
-   * Called with the text when the person sends a message or picks a suggestion.
+   * Called with the text and any attachments when the person sends a message or picks a suggestion.
    */
-  onSend: (text: string) => void;
+  onSend: (text: string, attachments?: import("../utils/ai").PromptAttachment[]) => void;
   /**
    * Called when the person presses Stop while a reply is on its way.
    */
@@ -57,11 +57,45 @@ export interface ChatSpecProps {
    * Level of headings inside replies, 2 to 6.
    */
   headingLevel?: number;
+  /**
+   * Files added to the message being written. You own the list: add in onAttach, remove in onRemoveAttachment, clear it in onSend.
+   */
+  attachments?: import("../utils/ai").PromptAttachment[];
+  /**
+   * Called with the chosen files. Providing it adds "Add photos & files" to the + menu and opens the file picker. Use fileToAttachment() to make attachments.
+   */
+  onAttach?: (files: File[]) => void;
+  /**
+   * Called with an attachment's id when the person removes it. Without it the attachments have no remove button.
+   */
+  onRemoveAttachment?: (id: string) => void;
+  /**
+   * Which files the picker offers, e.g. "image/*,.pdf".
+   */
+  accept?: string;
+  /**
+   * Extra entries for the + menu, such as Create image or Web search. Each has a label, an optional description and icon, and what to do when chosen.
+   */
+  actions?: import("../utils/ai").PromptAction[];
+  /**
+   * Shows a microphone button and calls this when it is pressed. Start or stop dictation yourself.
+   */
+  onVoice?: () => void;
+  /**
+   * Dictation is on: the microphone button shows as pressed and its name becomes Stop dictation.
+   * @default false
+   */
+  isListening?: boolean;
+  /**
+   * Your own controls on the right, before the microphone, for example a Think toggle.
+   */
+  endContent?: ReactNode;
 }
 
 export const chatDefaults = {
   status: "ready",
   label: "Chat",
+  isListening: false,
 } as const;
 
 export const chatMeta = {

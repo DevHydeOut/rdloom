@@ -524,12 +524,11 @@ const blueprints: Record<string, Blueprint> = {
     ]),
 
   PromptInput: () =>
-    frame({ name: "prompt input", dir: "col", gap: 6, pad: 8, w: 440, fill: "color.surface.default", stroke: "color.border.strong", radius: "radius.overlay" }, [
-      frame({ name: "row", dir: "row", gap: 8, w: "fill", cross: "end" }, [
-        text("Message the assistant", 14, "color.text.muted", "Regular", "fill"),
-        box(36, 36, { fill: "color.action.primary", radius: PILL, name: "send" }),
-      ]),
-      text("Enter to send, Shift+Enter for a new line", 12, "color.text.muted"),
+    frame({ name: "prompt input", dir: "row", gap: 8, pad: 8, w: 440, cross: "center", fill: "color.surface.subtle", stroke: "color.border.default", radius: 28 }, [
+      box(40, 40, { name: "plus", radius: PILL, stroke: "color.border.default" }),
+      text("Ask anything", 15, "color.text.muted", "Regular", "fill"),
+      box(40, 40, { name: "mic", radius: PILL, stroke: "color.border.default" }),
+      box(40, 40, { fill: "color.action.primary", radius: PILL, name: "send" }),
     ]),
 
   Chat: () =>
@@ -549,9 +548,10 @@ const blueprints: Record<string, Blueprint> = {
           ]),
         ]),
       ]),
-      frame({ name: "input", dir: "row", gap: 8, pad: 8, w: "fill", cross: "center", stroke: "color.border.strong", radius: "radius.overlay" }, [
-        text("Message the assistant", 14, "color.text.muted", "Regular", "fill"),
-        box(32, 32, { fill: "color.action.primary", radius: PILL, name: "send" }),
+      frame({ name: "input", dir: "row", gap: 8, pad: 8, w: "fill", cross: "center", fill: "color.surface.subtle", stroke: "color.border.default", radius: 28 }, [
+        box(40, 40, { name: "plus", radius: PILL, stroke: "color.border.default" }),
+        text("Ask anything", 15, "color.text.muted", "Regular", "fill"),
+        box(40, 40, { fill: "color.action.primary", radius: PILL, name: "send" }),
       ]),
     ]),
 

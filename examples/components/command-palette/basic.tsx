@@ -5,7 +5,7 @@ import { Button, CommandItem, CommandPalette, Kbd } from "@rdloom/react";
 export default function CommandPaletteBasicExample() {
   const [last, setLast] = useState("");
   return (
-    <div className="flex flex-col items-start gap-3 text-sm">
+    <div className="flex flex-col items-center gap-3 text-sm">
       <p className="flex items-center gap-1.5">
         Press <Kbd>Ctrl</Kbd> <Kbd>K</Kbd> to open the palette.
       </p>

@@ -101,3 +101,9 @@ export const DontIcon = (p: P) => (
     <path d="M5 5l10 10M15 5L5 15" />
   </Icon>
 );
+
+export const LinkIcon = (p: P) => (
+  <Icon {...p}>
+    <path d="M8.5 11.5l3-3M7.25 5.9l.9-.9a3 3 0 0 1 4.25 4.25l-.9.9M12.75 14.1l-.9.9A3 3 0 0 1 7.6 10.75l.9-.9" />
+  </Icon>
+);

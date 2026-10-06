@@ -19,15 +19,15 @@ export interface ToastSpecProps {
    */
   variant?: "neutral" | "success" | "danger";
   /**
-   * Auto-dismiss after this many ms. 0 keeps it open. Timers pause on hover and focus.
-   * @default 5000
+   * Auto-dismiss after this many ms (10 seconds by default). 0 keeps it open until the person closes it. Timers pause while the pointer is over the toast or it has keyboard focus, so nobody loses a message they are reading.
+   * @default 10000
    */
   timeout?: number;
 }
 
 export const toastDefaults = {
   variant: "neutral",
-  timeout: 5000,
+  timeout: 10000,
 } as const;
 
 export const toastMeta = {

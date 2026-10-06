@@ -110,12 +110,15 @@ export { ToolCall, type ToolCallProps } from "./tool-call/tool-call";
 export {
   appendText,
   canMoveTool,
+  fileToAttachment,
   finishMessage,
   groupParts,
+  isLocalImage,
   isToolActive,
   isToolFinal,
   messageText,
   pendingApproval,
+  releaseAttachment,
   toolDuration,
   toolStateLabel,
   updateTool,
@@ -129,6 +132,8 @@ export {
   type MessageRole,
   type MessageStatus,
   type PartGroup,
+  type PromptAction,
+  type PromptAttachment,
   type ReasoningPart,
   type TableArtifactPart,
   type TableData,
@@ -137,3 +142,5 @@ export {
   type ToolPart,
   type ToolState,
 } from "./utils/ai";
+// The icon family the components use, for your own buttons and menu entries.
+export * from "./utils/icons";

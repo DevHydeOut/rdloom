@@ -6,14 +6,45 @@
   "status": "experimental",
   "description": "Brief, non-blocking message about the result of an action. Render ToastRegion once and call toast().",
   "props": {
-    "title": { "type": "string", "required": true, "description": "Main message." },
-    "description": { "type": "string", "description": "Optional extra detail." },
-    "variant": { "type": "enum", "values": ["neutral", "success", "danger"], "default": "neutral", "description": "Tone of the message." },
-    "timeout": { "type": "number", "default": 5000, "description": "Auto-dismiss after this many ms. 0 keeps it open. Timers pause on hover and focus." }
+    "title": {
+      "type": "string",
+      "required": true,
+      "description": "Main message."
+    },
+    "description": {
+      "type": "string",
+      "description": "Optional extra detail."
+    },
+    "variant": {
+      "type": "enum",
+      "values": [
+        "neutral",
+        "success",
+        "danger"
+      ],
+      "default": "neutral",
+      "description": "Tone of the message."
+    },
+    "timeout": {
+      "type": "number",
+      "default": 10000,
+      "description": "Auto-dismiss after this many ms (10 seconds by default). 0 keeps it open until the person closes it. Timers pause while the pointer is over the toast or it has keyboard focus, so nobody loses a message they are reading."
+    }
   },
-  "variants": ["variant"],
-  "states": ["default", "focus"],
-  "slots": ["region", "toast", "title", "description", "close"],
+  "variants": [
+    "variant"
+  ],
+  "states": [
+    "default",
+    "focus"
+  ],
+  "slots": [
+    "region",
+    "toast",
+    "title",
+    "description",
+    "close"
+  ],
   "tokens": [
     "color.surface.raised",
     "color.border.default",
@@ -26,7 +57,11 @@
   ],
   "a11y": {
     "role": "alertdialog",
-    "keyboard": ["F6 moves focus to the toast region", "Tab reaches the close button", "Esc dismisses the focused toast"],
+    "keyboard": [
+      "F6 moves focus to the toast region",
+      "Tab reaches the close button",
+      "Esc dismisses the focused toast"
+    ],
     "requirements": [
       "New toasts are announced by screen readers",
       "Auto-dismiss pauses on hover and focus",
@@ -41,13 +76,28 @@
     "wcag": "2.2 AA"
   },
   "usage": {
-    "use_when": ["Confirming a completed action, like 'Saved'", "Reporting a background failure"],
-    "avoid_when": ["Errors the user must fix in a form: show them inline", "Critical decisions: use Dialog"],
-    "anti_patterns": ["Several toasts at once for one action", "Important info that disappears too fast"]
+    "use_when": [
+      "Confirming a completed action, like 'Saved'",
+      "Reporting a background failure"
+    ],
+    "avoid_when": [
+      "Errors the user must fix in a form: show them inline",
+      "Critical decisions: use Dialog"
+    ],
+    "anti_patterns": [
+      "Several toasts at once for one action",
+      "Important info that disappears too fast"
+    ]
   },
-  "examples": ["success", "danger", "persistent"],
+  "examples": [
+    "success",
+    "danger",
+    "persistent"
+  ],
   "figma": {
     "componentKey": null,
-    "variantMap": { "variant": "Variant" }
+    "variantMap": {
+      "variant": "Variant"
+    }
   }
 }

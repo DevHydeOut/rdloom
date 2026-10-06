@@ -2,6 +2,8 @@
 // Nothing here calls a model: you feed messages in, in this shape, from any backend.
 // specs/schema/ai-message.schema.json is the same shape as JSON Schema.
 
+import type { ReactNode } from "react";
+
 export type MessageRole = "user" | "assistant" | "system";
 export type MessageStatus = "streaming" | "complete" | "stopped" | "error";
 
@@ -211,3 +213,43 @@ export function toolDuration(tool: Pick<ToolPart, "startedAt" | "endedAt">): str
   if (s < 60) return `${s < 10 ? s.toFixed(1) : Math.round(s)} s`;
   return `${Math.floor(s / 60)} min ${Math.round(s % 60)} s`;
 }
+
+// --- The message box: attachments and the "+" menu
+
+/** A file the person has added to a message that hasn't been sent yet. */
+export interface PromptAttachment {
+  id: string;
+  name: string;
+  mediaType?: string;
+  size?: number;
+  /** A preview address for images (a blob: or data: URL). Other files show as a chip. */
+  url?: string;
+  file?: File;
+}
+
+/** One entry in the "+" menu of the message box, next to the built-in "Add photos & files". */
+export interface PromptAction {
+  id: string;
+  label: string;
+  description?: string;
+  icon?: ReactNode;
+  onSelect: () => void;
+  isDisabled?: boolean;
+}
+
+let attachmentCount = 0;
+
+/** Turns a chosen File into an attachment. Images get a preview address: call releaseAttachment when you drop it. */
+export function fileToAttachment(file: File): PromptAttachment {
+  const isImage = file.type.startsWith("image/");
+  return { id: `att-${Date.now().toString(36)}-${attachmentCount++}`, name: file.name, mediaType: file.type || undefined, size: file.size, url: isImage ? URL.createObjectURL(file) : undefined, file };
+}
+
+/** Frees the preview address made by fileToAttachment. */
+export function releaseAttachment(attachment: PromptAttachment): void {
+  if (attachment.url?.startsWith("blob:")) URL.revokeObjectURL(attachment.url);
+}
+
+/** True for an image we may draw: it came from this device (blob: or data:), never from a remote address. */
+export const isLocalImage = (item: { mediaType?: string; url?: string }): boolean =>
+  !!item.url && (item.mediaType?.startsWith("image/") ?? /^data:image\//.test(item.url)) && /^(blob:|data:image\/)/.test(item.url);

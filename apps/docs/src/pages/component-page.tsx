@@ -18,7 +18,7 @@ import {
 import { ArrowLeftIcon, ArrowRightIcon } from "../icons";
 import { Link } from "../router";
 import { registryBase } from "../routes";
-import { addCommand, Badge, CodeBlock, CommandBlock, CopyButton, DocTabs, H2, H3, List, Muted, PageHeader, Preview, runCommand } from "../ui";
+import { addCommand, Badge, CodeBlock, CommandBlock, CopyPill, DocTabs, H2, H3, List, Muted, PageHeader, Preview, runCommand } from "../ui";
 
 const title = (name: string) => name.replace(/-/g, " ").replace(/^./, (c) => c.toUpperCase());
 
@@ -316,10 +316,7 @@ function PageActions({ component }: { component: DocComponent }) {
   const arrow = "flex size-8 items-center justify-center rounded-lg border border-[var(--site-border)] bg-[var(--site-subtle)] text-[var(--site-muted)] outline-none hover:text-[var(--site-fg)] focus-visible:ring-2 focus-visible:ring-[var(--rd-color-focus-ring)]";
   return (
     <>
-      <span className="hidden items-center gap-1 rounded-lg border border-[var(--site-border)] bg-[var(--site-subtle)] ps-2.5 text-sm font-medium sm:flex">
-        Copy page
-        <CopyButton text={toMarkdown(component)} label="Copy this page as Markdown" className="rounded-md" />
-      </span>
+      <CopyPill text={toMarkdown(component)} label="Copy page" className="hidden sm:inline-flex" />
       {previous ? (
         <Link href={`/components/${previous.id}`} aria-label={`Previous: ${displayName(previous.spec.name)}`} className={arrow}>
           <ArrowLeftIcon size={15} />

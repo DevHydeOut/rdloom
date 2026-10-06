@@ -4,7 +4,7 @@ import { SegmentedControl, SegmentedControlItem } from "@rdloom/react";
 export default function SegmentedControlControlledExample() {
   const [billing, setBilling] = useState<string>("monthly");
   return (
-    <div className="flex flex-col items-start gap-3 text-sm">
+    <div className="flex flex-col items-center gap-3 text-sm">
       <SegmentedControl label="Billing period" selectedKey={billing} onChange={(key) => setBilling(String(key))}>
         <SegmentedControlItem id="monthly">Monthly</SegmentedControlItem>
         <SegmentedControlItem id="yearly">Yearly</SegmentedControlItem>

@@ -14,9 +14,9 @@
     },
     "onSend": {
       "type": "callback",
-      "description": "Called with the text when the person sends a message or picks a suggestion.",
+      "description": "Called with the text and any attachments when the person sends a message or picks a suggestion.",
       "required": true,
-      "tsType": "(text: string) => void"
+      "tsType": "(text: string, attachments?: import(\"../utils/ai\").PromptAttachment[]) => void"
     },
     "onStop": {
       "type": "callback",
@@ -70,6 +70,44 @@
     "headingLevel": {
       "type": "number",
       "description": "Level of headings inside replies, 2 to 6."
+    },
+    "attachments": {
+      "type": "custom",
+      "description": "Files added to the message being written. You own the list: add in onAttach, remove in onRemoveAttachment, clear it in onSend.",
+      "tsType": "import(\"../utils/ai\").PromptAttachment[]"
+    },
+    "onAttach": {
+      "type": "callback",
+      "description": "Called with the chosen files. Providing it adds \"Add photos & files\" to the + menu and opens the file picker. Use fileToAttachment() to make attachments.",
+      "tsType": "(files: File[]) => void"
+    },
+    "onRemoveAttachment": {
+      "type": "callback",
+      "description": "Called with an attachment's id when the person removes it. Without it the attachments have no remove button.",
+      "tsType": "(id: string) => void"
+    },
+    "accept": {
+      "type": "string",
+      "description": "Which files the picker offers, e.g. \"image/*,.pdf\"."
+    },
+    "actions": {
+      "type": "custom",
+      "description": "Extra entries for the + menu, such as Create image or Web search. Each has a label, an optional description and icon, and what to do when chosen.",
+      "tsType": "import(\"../utils/ai\").PromptAction[]"
+    },
+    "onVoice": {
+      "type": "callback",
+      "description": "Shows a microphone button and calls this when it is pressed. Start or stop dictation yourself.",
+      "tsType": "() => void"
+    },
+    "isListening": {
+      "type": "boolean",
+      "description": "Dictation is on: the microphone button shows as pressed and its name becomes Stop dictation.",
+      "default": false
+    },
+    "endContent": {
+      "type": "node",
+      "description": "Your own controls on the right, before the microphone, for example a Think toggle."
     }
   },
   "states": [
@@ -87,15 +125,17 @@
     "status"
   ],
   "tokens": [
-    "color.text.default",
-    "color.text.muted",
+    "color.action.primary",
+    "color.border.default",
+    "color.border.strong",
+    "color.focus.ring",
     "color.surface.default",
     "color.surface.raised",
     "color.surface.subtle",
-    "color.border.default",
-    "color.border.strong",
-    "color.action.primary",
-    "color.focus.ring"
+    "color.text.default",
+    "color.text.muted",
+    "elevation.floating",
+    "elevation.raised"
   ],
   "a11y": {
     "role": "log",
@@ -135,7 +175,8 @@
   "examples": [
     "basic",
     "with-tools",
-    "suggestions"
+    "suggestions",
+    "with-attachments"
   ],
   "figma": {
     "componentKey": null,

@@ -17,8 +17,8 @@ export default function ResponseStreamingExample() {
   }, [run]);
 
   return (
-    <div className="flex w-[34rem] max-w-full flex-col items-start gap-3">
-      <Response isStreaming={!done}>{reply.slice(0, shown)}</Response>
+    <div className="flex w-[34rem] max-w-full flex-col items-center gap-3">
+      <Response className="w-full" isStreaming={!done}>{reply.slice(0, shown)}</Response>
       <Button variant="secondary" size="sm" onPress={() => setRun((n) => n + 1)}>
         Replay
       </Button>

@@ -5,7 +5,7 @@ import { Button as AriaButton } from "react-aria-components";
 import { chatDefaults, type ChatSpecProps } from "../generated/chat.types";
 import { Message } from "../message/message";
 import { PromptInput } from "../prompt-input/prompt-input";
-import { pendingApproval } from "../utils/ai";
+import { pendingApproval, type PromptAttachment } from "../utils/ai";
 import { cx } from "../utils/cx";
 import { ArrowDownIcon, SparkleIcon } from "../utils/icons";
 
@@ -27,7 +27,29 @@ const useIsoLayoutEffect = typeof window === "undefined" ? useEffect : useLayout
  * tool announces its own changes.
  */
 export const Chat = forwardRef<HTMLDivElement, ChatProps>(function Chat(
-  { messages, onSend, onStop, onApprove, onDeny, onRetry, status = chatDefaults.status, label = chatDefaults.label, placeholder, suggestions, emptyState, headingLevel, className },
+  {
+    messages,
+    onSend,
+    onStop,
+    onApprove,
+    onDeny,
+    onRetry,
+    status = chatDefaults.status,
+    label = chatDefaults.label,
+    placeholder,
+    suggestions,
+    emptyState,
+    headingLevel,
+    attachments,
+    onAttach,
+    onRemoveAttachment,
+    accept,
+    actions,
+    onVoice,
+    isListening,
+    endContent,
+    className,
+  },
   ref,
 ) {
   const scroller = useRef<HTMLDivElement>(null);
@@ -82,9 +104,9 @@ export const Chat = forwardRef<HTMLDivElement, ChatProps>(function Chat(
   const empty = messages.length === 0;
   const lastIndex = messages.length - 1;
 
-  const send = (text: string) => {
+  const send = (text: string, files?: PromptAttachment[]) => {
     stuck.current = true; // sending means "I'm here": show what comes back
-    onSend(text);
+    onSend(text, files);
   };
 
   return (
@@ -163,7 +185,20 @@ export const Chat = forwardRef<HTMLDivElement, ChatProps>(function Chat(
       </div>
 
       <div className="mx-auto w-full max-w-3xl px-4 pt-2 pb-4">
-        <PromptInput onSubmit={send} onStop={onStop} isStreaming={busy} placeholder={placeholder} />
+        <PromptInput
+          onSubmit={send}
+          onStop={onStop}
+          isStreaming={busy}
+          placeholder={placeholder}
+          attachments={attachments}
+          onAttach={onAttach}
+          onRemoveAttachment={onRemoveAttachment}
+          accept={accept}
+          actions={actions}
+          onVoice={onVoice}
+          isListening={isListening}
+          endContent={endContent}
+        />
       </div>
 
       <div role="status" className="sr-only">
