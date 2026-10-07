@@ -16,7 +16,7 @@ function Total() {
 export default function FieldArrayInvoiceLinesExample() {
   return (
     <Form<Values>
-      className="w-full max-w-2xl"
+      className="w-full max-w-3xl"
       defaultValues={{ lines: [{ description: "Design work", qty: 10, price: 80 }] }}
       onSubmit={() => {}}
     >
@@ -32,8 +32,10 @@ export default function FieldArrayInvoiceLinesExample() {
         allowInsert
       >
         {(row) => (
-          <div className="grid gap-3 sm:grid-cols-[1fr_6rem_8rem]">
-            <FormTextField name={row.name("description")} label="Description" isRequired />
+          <div className="grid grid-cols-2 gap-3">
+            <div className="col-span-2">
+              <FormTextField name={row.name("description")} label="Description" isRequired />
+            </div>
             <FormNumberField name={row.name("qty")} label="Qty" minValue={1} isRequired />
             <FormNumberField
               name={row.name("price")}
