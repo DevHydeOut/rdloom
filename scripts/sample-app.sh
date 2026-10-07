@@ -52,17 +52,28 @@ echo "✓ chat and its parts installed"
 
 step "Blocks: the customer table and every part it is made of"
 npx rdloom add customer-table --install
-for part in customer-table chart stat sparkline table pagination select badge avatar card alert empty-state skeleton button; do
+for part in customer-table chart stat sparkline table pagination select badge avatar alert empty-state skeleton button; do
   test -e "src/components/rdloom/$part/$part.tsx" || { echo "✗ rdloom add customer-table did not bring $part"; exit 1; }
 done
 test -e src/components/rdloom/customer-table/query.ts || { echo "✗ the customer table logic (query.ts) was not installed"; exit 1; }
 echo "✓ customer table and its parts installed"
 npx rdloom add dashboard-shell dashboard-page --install
-for part in dashboard-shell dashboard-page sheet tooltip menu avatar; do
+for part in dashboard-shell dashboard-page sidebar sheet tooltip menu avatar; do
   test -e "src/components/rdloom/$part/$part.tsx" || { echo "✗ rdloom add dashboard-shell did not bring $part"; exit 1; }
 done
-test -e src/components/rdloom/dashboard-shell/nav.ts || { echo "✗ the dashboard navigation helpers (nav.ts) were not installed"; exit 1; }
+test -e src/components/rdloom/sidebar/nav.ts || { echo "✗ the navigation helpers (sidebar/nav.ts) were not installed"; exit 1; }
 echo "✓ dashboard shell and its parts installed"
+npx rdloom add sidebar --install
+echo "✓ sidebar installed on its own"
+
+step "Forms: the form, its fields, the error summary and repeating rows"
+npx rdloom add form field-array error-summary --install
+for part in form field-array error-summary text-field number-field select checkbox switch button; do
+  test -e "src/components/rdloom/$part/$part.tsx" || { echo "✗ rdloom add form did not bring $part"; exit 1; }
+done
+test -e src/components/rdloom/form/form-engine.ts || { echo "✗ the form engine adapter (form-engine.ts) was not installed"; exit 1; }
+grep -q '@tanstack/react-form' package.json || { echo "✗ the form engine dependency was not added to package.json"; exit 1; }
+echo "✓ forms and their parts installed"
 
 step "Typecheck and production build"
 npm run build --silent
