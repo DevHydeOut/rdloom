@@ -5,7 +5,7 @@ import { renderToString } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { DashboardPage } from "../src/dashboard-page/dashboard-page";
 import { DashboardShell } from "../src/dashboard-shell/dashboard-shell";
-import { badgeText, currentTopLevel, findNavItem, flattenNav, initialOf, trailOf, type NavGroup } from "../src/dashboard-shell/nav";
+import { badgeText, currentTopLevel, findNavItem, flattenNav, initialOf, trailOf, type NavGroup } from "../src/sidebar/nav";
 import { HomeIcon, UsersIcon } from "../src/utils/icons";
 import { axeViolations } from "./axe";
 

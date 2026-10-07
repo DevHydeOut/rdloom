@@ -14,6 +14,7 @@
   "dependencies": {
     "@internationalized/date": "^3.12.4",
     "@rdloom/tokens": "*",
+    "@tanstack/react-form": "^1.33.5",
     "@tanstack/react-table": "^8.21.3",
     "@tanstack/react-virtual": "^3.14.13",
     "react-aria-components": "^1.21.1"
@@ -29,7 +30,8 @@
     "jsdom": "^26.1.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "vitest": "^5.0.3"
+    "vitest": "^5.0.3",
+    "zod": "^4.6.5"
   },
   "homepage": "https://github.com/DevHydeOut/rdloom",
   "repository": {

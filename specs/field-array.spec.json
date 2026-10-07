@@ -1,0 +1,76 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "FieldArray",
+  "version": "0.1.0",
+  "category": "input",
+  "status": "experimental",
+  "description": "Repeating rows of fields inside a Form, such as invoice lines or team members. Add, remove, move up or down and insert are all buttons, so the keyboard does everything; focus lands somewhere sensible and a polite message says what changed. The rows contents and any totals are yours.",
+  "props": {
+    "name": { "type": "string", "required": true, "description": "Where the rows live in the Form values, for example \"lines\". Each row field is named with row.name(\"qty\"), which gives \"lines[0].qty\"." },
+    "label": { "type": "string", "required": true, "description": "Names the whole group, for example \"Invoice lines\"." },
+    "description": { "type": "string", "description": "Help text under the label." },
+    "itemLabel": { "type": "string", "default": "Row", "description": "What one row is called, for example \"Line\". Used in button names and announcements." },
+    "defaultRow": { "type": "custom", "required": true, "tsType": "unknown | (() => unknown)", "description": "The values of a new row, or a function that returns them. Each added row gets its own copy." },
+    "minRows": { "type": "number", "default": 0, "description": "Fewest rows. Remove is disabled at this count." },
+    "maxRows": { "type": "number", "description": "Most rows. Add and Insert are disabled at this count, and a message says so." },
+    "addLabel": { "type": "string", "default": "Add row", "description": "Text of the Add button." },
+    "emptyText": { "type": "string", "default": "No rows yet.", "description": "Shown when there are no rows." },
+    "allowReorder": { "type": "boolean", "default": true, "description": "Shows Move up and Move down on each row." },
+    "allowInsert": { "type": "boolean", "default": false, "description": "Shows Insert below on each row." },
+    "validate": { "type": "callback", "tsType": "(rows: any[]) => string | null | undefined | void", "description": "Checks the rows as a whole, for example at least one with a quantity. The message shows under the group." },
+    "messages": { "type": "custom", "tsType": "Partial<import(\"../field-array/field-array\").FieldArrayMessages>", "description": "Replaces any sentence the component says (button names, announcements). Use it to translate." },
+    "children": { "type": "custom", "required": true, "tsType": "(row: import(\"../field-array/field-array\").FieldArrayRow) => import(\"react\").ReactNode", "description": "Renders the fields of one row. Name them with row.name(\"field\")." }
+  },
+  "variants": ["allowReorder", "allowInsert"],
+  "states": ["default", "disabled", "invalid"],
+  "slots": ["legend", "description", "empty", "row", "actions", "add", "status"],
+  "tokens": [
+    "color.surface.default",
+    "color.border.default",
+    "color.text.default",
+    "color.text.muted",
+    "color.feedback.danger",
+    "color.focus.ring",
+    "radius.control",
+    "radius.overlay"
+  ],
+  "a11y": {
+    "role": "group",
+    "keyboard": [
+      "Tab moves through the fields and the buttons of each row",
+      "Enter or Space presses a row button or Add",
+      "Move up and Move down are real buttons, not drag handles: nothing needs a pointer",
+      "After Remove, focus moves to the Remove button of the row that took its place, else the row before, else Add",
+      "After Add or Insert, focus moves to the first field of the new row",
+      "After a move, focus stays on the button that was pressed"
+    ],
+    "requirements": [
+      "The group is a fieldset named by its legend; each row is a labelled group (\"Line 2\")",
+      "Every row button has a name that includes the row (\"Remove line 2\")",
+      "Add, remove and move are announced in a polite status region (\"Line 3 removed\")",
+      "Buttons that cannot act are disabled (the first row cannot move up, the minimum rows cannot be removed); a maximum is explained in text",
+      "The empty state is text, not only an image or color"
+    ],
+    "screenReader": [
+      "Entering the group: the legend, then the description",
+      "On a row button: its name, such as \"Move line 2 up\"",
+      "After an action: a polite message such as \"Line 3 removed\" or \"Line moved to position 1 of 4\"",
+      "At the maximum: the Add button is read as dimmed, and the message \"You can add up to 5.\" is linked to the group"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["Invoice or order lines, phone numbers, team members, anything the person can repeat", "A list that needs reordering without a mouse"],
+    "avoid_when": ["A fixed set of fields: lay them out directly", "Hundreds of rows: use DataGrid with editing"],
+    "anti_patterns": [
+      "Calculating totals here: read the rows with useFormValues in your own code",
+      "Drag-only reordering: always keep the buttons",
+      "Using the row index as a key in your own lists: use row.id, which stays with the row when it moves"
+    ]
+  },
+  "examples": ["invoice-lines"],
+  "figma": {
+    "componentKey": null,
+    "variantMap": { "allowReorder": "Reorder", "allowInsert": "Insert" }
+  }
+}

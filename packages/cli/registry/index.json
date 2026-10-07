@@ -170,10 +170,28 @@
       "description": "What to show when a list, table or page has nothing in it yet: a short explanation and the next step."
     },
     {
+      "name": "error-summary",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "The list of problems at the top of a Form after a failed submit. Focus moves to it and each item takes the person to its field. It shows nothing until a submit has failed and goes away when everything is fixed."
+    },
+    {
+      "name": "field-array",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "Repeating rows of fields inside a Form, such as invoice lines or team members. Add, remove, move up or down and insert are all buttons, so the keyboard does everything; focus lands somewhere sensible and a polite message says what changed. The rows contents and any totals are yours."
+    },
+    {
       "name": "file-upload",
       "type": "registry:ui",
       "version": "0.1.0",
       "description": "A drop zone and button for choosing files, with type, size and count limits and a list of the chosen files you can remove from. The component picks the files; you upload them."
+    },
+    {
+      "name": "form",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A form that holds the values, runs your validators or a schema, and exposes its progress as an action state (idle, pending, success, error). Fields connect by name and the inputs already link label, help text and error. It never fetches or saves anything: your onSubmit does."
     },
     {
       "name": "generated-chart",
@@ -318,6 +336,12 @@
       "type": "registry:ui",
       "version": "0.1.0",
       "description": "A point of light that runs around the edge of whatever is inside, like the shuttle of a loom crossing the threads. Wrap a card, an input or a button; give it your radius and background."
+    },
+    {
+      "name": "sidebar",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A sidebar of navigation: the team or product name at the top, grouped links with sub-items and badges, an optional footer, and the signed-in person at the bottom. It can fold down to icons, and comes in three looks. It is only the panel; DashboardShell adds the top bar and the phone menu."
     },
     {
       "name": "skeleton",

@@ -1,0 +1,49 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "ErrorSummary",
+  "version": "0.1.0",
+  "category": "feedback",
+  "status": "experimental",
+  "description": "The list of problems at the top of a Form after a failed submit. Focus moves to it and each item takes the person to its field. It shows nothing until a submit has failed and goes away when everything is fixed.",
+  "props": {
+    "title": { "type": "string", "default": "There is a problem", "description": "The heading read first when focus arrives." }
+  },
+  "variants": [],
+  "states": ["default"],
+  "slots": ["icon", "title", "message", "list"],
+  "tokens": [
+    "color.text.default",
+    "color.feedback.danger",
+    "color.feedback.danger-subtle",
+    "color.focus.ring",
+    "radius.overlay"
+  ],
+  "a11y": {
+    "role": "region",
+    "keyboard": [
+      "Focus lands on the summary after a failed submit",
+      "Tab moves through the links; Enter moves focus to that field"
+    ],
+    "requirements": [
+      "The summary is named by its heading (aria-labelledby)",
+      "Each item names its field and says what is wrong, so it makes sense out of context",
+      "Moving focus to the summary reads it once; it is not also an alert, so nothing is spoken twice",
+      "Goes with the field errors, never instead of them: each field still shows its own message"
+    ],
+    "screenReader": [
+      "On focus: the heading, then each problem as a link, for example \"Email: Enter a valid address\"",
+      "Activating a link moves focus to the field, which reads its label and error"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["Forms with more than a couple of fields, where finding the errors would otherwise mean scrolling"],
+    "avoid_when": ["A one-field form: the field's own error is enough"],
+    "anti_patterns": ["Placing it at the bottom: put it above the fields, where focus lands", "Listing messages without naming the field"]
+  },
+  "examples": ["basic"],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {}
+  }
+}

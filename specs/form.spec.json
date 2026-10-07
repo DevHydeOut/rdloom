@@ -1,0 +1,81 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Form",
+  "version": "0.1.0",
+  "category": "input",
+  "status": "experimental",
+  "description": "A form that holds the values, runs your validators or a schema, and exposes its progress as an action state (idle, pending, success, error). Fields connect by name and the inputs already link label, help text and error. It never fetches or saves anything: your onSubmit does.",
+  "props": {
+    "defaultValues": { "type": "custom", "required": true, "tsType": "Record<string, any>", "description": "The starting values, shaped like the data you submit. Nested objects and arrays work." },
+    "onSubmit": {
+      "type": "callback",
+      "required": true,
+      "tsType": "(values: any) => void | import(\"../form/form\").SubmitResult | Promise<void | import(\"../form/form\").SubmitResult>",
+      "description": "Called with the values when every check passes. Await your own request here. Throw, or return { fieldErrors, formError }, to report a failure; the form goes to the error state."
+    },
+    "schema": { "type": "custom", "tsType": "import(\"../form/form-engine\").FormSchema", "description": "A schema from any library that follows the Standard Schema spec (Zod, Valibot, ArkType). Its issues land on the fields by path." },
+    "validateOn": { "type": "enum", "values": ["submit", "blur", "change"], "default": "submit", "description": "When errors first appear. After a failed submit they always update as the person types." },
+    "successMessage": { "type": "string", "description": "Read out politely by screen readers after a successful submit. Show your own visible confirmation as well." },
+    "errorMessage": { "type": "string", "default": "We could not complete that. Try again.", "description": "The form-level message when onSubmit throws." },
+    "resetOnSuccess": { "type": "boolean", "default": false, "description": "Put the default values back after a successful submit." },
+    "children": {
+      "type": "custom",
+      "tsType": "import(\"react\").ReactNode | ((form: import(\"../form/form\").FormRenderState) => import(\"react\").ReactNode)",
+      "description": "The fields and buttons, or a function that receives { state, isPending, formError, error }. Inside, useFormState() and useFormValues() read the same."
+    }
+  },
+  "variants": [],
+  "states": ["default", "loading", "invalid"],
+  "slots": ["errorSummary", "fields", "actions", "status"],
+  "tokens": [
+    "color.text.default",
+    "color.text.muted",
+    "color.border.default",
+    "color.surface.default",
+    "color.feedback.danger",
+    "color.focus.ring"
+  ],
+  "a11y": {
+    "role": "form",
+    "keyboard": [
+      "Tab moves through the fields in order",
+      "Enter in a text field submits the form",
+      "A failed submit moves focus to the ErrorSummary; each item moves focus to its field"
+    ],
+    "requirements": [
+      "The browser checks are off (noValidate); the validators and schema you pass produce every message, so they read the same everywhere",
+      "Each field links its label, help text and error with aria-describedby and sets aria-invalid",
+      "Errors do not appear before the person has finished: on submit by default, then live while fixing",
+      "A repeat submit is ignored while one is pending, and the submit button announces the pending state",
+      "Success and failure are announced in a polite status region (a failure is left to the ErrorSummary when one is on the page)"
+    ],
+    "screenReader": [
+      "Submitting with problems: the summary heading is read, then the list of problems; each is a link to its field",
+      "Moving to a field with an error: label, then the error text, then that it is invalid",
+      "After a successful submit: the success message is read without moving focus",
+      "While the request runs, the submit button is read as busy"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "Any form with more than one field, validation, or an async submit",
+      "Forms with repeating rows (use FieldArray inside)"
+    ],
+    "avoid_when": [
+      "A single search box or filter that applies as you type: use a plain TextField",
+      "Fetching, saving or caching: do that in your onSubmit with your own data layer"
+    ],
+    "anti_patterns": [
+      "Putting totals or other derived numbers in the library: read values with useFormValues and calculate in your own code",
+      "Passing isInvalid to an input inside a Field: the Field sets it from the errors",
+      "Validating on every keystroke before the person has submitted or left the field: leave validateOn on submit or blur",
+      "Using color alone for an error: the message text is always shown and read"
+    ]
+  },
+  "examples": ["basic", "validation", "async-submit", "conditional-field"],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {}
+  }
+}

@@ -800,6 +800,39 @@
       ]
     },
     {
+      "name": "ErrorSummary",
+      "id": "error-summary",
+      "version": "0.1.0",
+      "description": "The list of problems at the top of a Form after a failed submit. Focus moves to it and each item takes the person to its field. It shows nothing until a submit has failed and goes away when everything is fixed.",
+      "properties": []
+    },
+    {
+      "name": "FieldArray",
+      "id": "field-array",
+      "version": "0.1.0",
+      "description": "Repeating rows of fields inside a Form, such as invoice lines or team members. Add, remove, move up or down and insert are all buttons, so the keyboard does everything; focus lands somewhere sensible and a polite message says what changed. The rows contents and any totals are yours.",
+      "properties": [
+        {
+          "prop": "allowReorder",
+          "name": "Reorder",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "true"
+        },
+        {
+          "prop": "allowInsert",
+          "name": "Insert",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
       "name": "FileUpload",
       "id": "file-upload",
       "version": "0.1.0",
@@ -815,6 +848,13 @@
           "default": "false"
         }
       ]
+    },
+    {
+      "name": "Form",
+      "id": "form",
+      "version": "0.1.0",
+      "description": "A form that holds the values, runs your validators or a schema, and exposes its progress as an action state (idle, pending, success, error). Fields connect by name and the inputs already link label, help text and error. It never fetches or saves anything: your onSubmit does.",
+      "properties": []
     },
     {
       "name": "GeneratedChart",
@@ -1358,6 +1398,24 @@
             "true"
           ],
           "default": "false"
+        }
+      ]
+    },
+    {
+      "name": "Sidebar",
+      "id": "sidebar",
+      "version": "0.1.0",
+      "description": "A sidebar of navigation: the team or product name at the top, grouped links with sub-items and badges, an optional footer, and the signed-in person at the bottom. It can fold down to icons, and comes in three looks. It is only the panel; DashboardShell adds the top bar and the phone menu.",
+      "properties": [
+        {
+          "prop": "appearance",
+          "name": "appearance",
+          "values": [
+            "bordered",
+            "subtle",
+            "floating"
+          ],
+          "default": "bordered"
         }
       ]
     },

@@ -162,8 +162,42 @@ export {
   type CustomerSummary,
 } from "./customer-table/query";
 export { DashboardShell, type DashboardShellProps } from "./dashboard-shell/dashboard-shell";
-export { currentTopLevel, findNavItem, flattenNav, trailOf, type NavGroup, type NavItem, type ShellUser } from "./dashboard-shell/nav";
+export { currentTopLevel, findNavItem, flattenNav, trailOf, type NavGroup, type NavItem, type ShellUser } from "./sidebar/nav";
+export { Sidebar, type SidebarProps } from "./sidebar/sidebar";
 export { DashboardPage, type DashboardPageProps } from "./dashboard-page/dashboard-page";
 export type { DashboardStat } from "./dashboard-page/stats";
 // The icon family the components use, for your own buttons and menu entries.
 export * from "./utils/icons";
+// Forms: the Form, its fields, the error summary and repeating rows. The engine behind them is one adapter file.
+export {
+  Form,
+  FormSubmitButton,
+  useFormContext,
+  useFormState,
+  useFormValues,
+  type FormProps,
+  type FormRenderState,
+  type SubmitResult,
+} from "./form/form";
+export {
+  Field,
+  FormCheckbox,
+  FormNumberField,
+  FormSelect,
+  FormSwitch,
+  FormTextField,
+  type FieldOptions,
+  type FieldProps,
+  type FieldState,
+  type FormCheckboxProps,
+  type FormNumberFieldProps,
+  type FormSelectProps,
+  type FormSwitchProps,
+  type FormTextFieldProps,
+} from "./form/field";
+export type { AsyncFieldValidator, FieldValidator, FormSchema, ValidateOn } from "./form/form-engine";
+export { ErrorSummary, type ErrorSummaryProps } from "./error-summary/error-summary";
+export { FieldArray, type FieldArrayMessages, type FieldArrayProps, type FieldArrayRow } from "./field-array/field-array";
+// The two kinds of state (what a screen shows, what an action did) and the boundary that renders by DataState.
+export { toActionState, toDataState, type ActionState, type DataState } from "./utils/state";
+export { StateBoundary, type StateBoundaryProps } from "./utils/state-boundary";

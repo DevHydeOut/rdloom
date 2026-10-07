@@ -640,8 +640,44 @@ const blueprints: Record<string, Blueprint> = {
     ]);
   },
 
-  DashboardShell: () => {
+  Sidebar: (c) => {
+    const appearance = String(c.appearance ?? "bordered");
     const item = (label: string, current = false, badge?: string) =>
+      frame({ name: current ? "item current" : "item", dir: "row", gap: 12, pad: [0, 12], w: "fill", h: 36, cross: "center", fill: current ? "color.surface.selected" : undefined, radius: "radius.control" }, [
+        box(16, 16, { stroke: current ? "color.action.primary" : "color.text.muted", radius: 4, name: "icon" }),
+        text(label, 14, current ? "color.text.default" : "color.text.muted", current ? "Medium" : "Regular", "fill"),
+        ...(badge ? [frame({ name: "badge", dir: "row", pad: [0, 6], cross: "center", fill: "color.surface.subtle", radius: 999 }, [text(badge, 11, "color.text.default", "Medium")])] : []),
+      ]);
+    return frame(
+      {
+        name: `sidebar ${appearance}`,
+        dir: "col",
+        gap: 4,
+        pad: 12,
+        w: 256,
+        h: 520,
+        fill: appearance === "subtle" ? "color.surface.subtle" : appearance === "floating" ? "color.surface.raised" : "color.surface.default",
+        stroke: appearance === "subtle" ? undefined : "color.border.default",
+        radius: appearance === "floating" ? "radius.overlay" : undefined,
+      },
+      [
+        frame({ name: "brand", dir: "row", w: "fill", h: 44, pad: [0, 4], cross: "center" }, [text("Acme Cloud", 15, "color.text.default", "Semi Bold")]),
+        item("Dashboard", true),
+        item("Customers", false, "24"),
+        item("Revenue"),
+        item("Inbox", false, "3"),
+        frame({ name: "spacer", dir: "col", w: "fill", h: 190 }, []),
+        item("Collapse"),
+        frame({ name: "account", dir: "row", gap: 10, pad: 8, w: "fill", cross: "center", stroke: "color.border.default", radius: "radius.control" }, [
+          box(28, 28, { fill: "color.surface.subtle", radius: 999, name: "avatar" }),
+          frame({ name: "who", dir: "col" }, [text("Ada Lovelace", 14, "color.text.default", "Medium"), text("ada@example.com", 12, "color.text.muted")]),
+        ]),
+      ],
+    );
+  },
+
+  DashboardShell: () => {
+    const item =(label: string, current = false, badge?: string) =>
       frame({ name: current ? "item current" : "item", dir: "row", gap: 12, pad: [0, 12], w: "fill", h: 36, cross: "center", fill: current ? "color.surface.selected" : undefined, radius: "radius.control" }, [
         box(16, 16, { stroke: current ? "color.action.primary" : "color.text.muted", radius: 4, name: "icon" }),
         text(label, 14, current ? "color.text.default" : "color.text.muted", current ? "Medium" : "Regular", "fill"),
@@ -672,6 +708,46 @@ const blueprints: Record<string, Blueprint> = {
         ]),
       ]),
     ]);
+  },
+
+  Form: () =>
+    frame({ name: "form", dir: "col", gap: 16, w: 320 }, [
+      field("Email", { size: "md" }, [placeholder("name@example.com", { size: "md" })]),
+      field("Password", { size: "md" }, [placeholder("Password", { size: "md" })]),
+      button("Sign in", "primary"),
+    ]),
+
+  ErrorSummary: () =>
+    frame({ name: "error summary", dir: "row", gap: 12, pad: 14, w: 360, fill: "color.feedback.danger-subtle", stroke: "color.feedback.danger", radius: "radius.overlay" }, [
+      box(20, 20, { stroke: "color.feedback.danger", radius: 999, name: "icon" }),
+      frame({ name: "message", dir: "col", gap: 6, w: "fill" }, [
+        text("There is a problem", 14, "color.text.default", "Medium"),
+        text("Email: Enter a valid address", 14, "color.text.default"),
+        text("Password: Password is required", 14, "color.text.default"),
+      ]),
+    ]),
+
+  FieldArray: (c) => {
+    const iconButton = (name: string) => box(32, 32, { stroke: "color.border.default", radius: "radius.control", name });
+    const row = (n: number) =>
+      frame({ name: `row ${n}`, dir: "row", gap: 12, pad: 12, w: "fill", cross: "start", fill: "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, [
+        frame({ name: "fields", dir: "row", gap: 12, w: "fill" }, [
+          frame({ name: "description", dir: "col", gap: 6, w: "fill" }, [
+            text("Description", 14, "color.text.default", "Medium"),
+            frame({ name: "control", dir: "row", pad: [0, 12], w: "fill", h: 40, cross: "center", fill: "color.surface.default", stroke: "color.border.default", radius: "radius.control" }, [text("Design work", 14, "color.text.default")]),
+          ]),
+          frame({ name: "qty", dir: "col", gap: 6, w: 96 }, [
+            text("Qty", 14, "color.text.default", "Medium"),
+            frame({ name: "control", dir: "row", pad: [0, 12], w: "fill", h: 40, cross: "center", fill: "color.surface.default", stroke: "color.border.default", radius: "radius.control" }, [text("1", 14, "color.text.default")]),
+          ]),
+        ]),
+        frame({ name: "actions", dir: "row", gap: 2 }, [
+          ...(on(c, "allowReorder") ? [iconButton("move up"), iconButton("move down")] : []),
+          ...(on(c, "allowInsert") ? [iconButton("insert below")] : []),
+          iconButton("remove"),
+        ]),
+      ]);
+    return frame({ name: "field array", dir: "col", gap: 12, w: 560 }, [text("Invoice lines", 14, "color.text.default", "Medium"), row(1), row(2), button("Add line", "secondary", "sm")]);
   },
 
   DashboardPage: () =>
