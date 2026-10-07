@@ -1,0 +1,196 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "UserForm",
+  "version": "0.1.0",
+  "category": "block",
+  "status": "experimental",
+  "description": "A form to create or edit a user: name, email, role, status and team, with a danger zone for suspending and deleting. Save stays disabled until something changes, and Cancel asks before throwing changes away. Your onSubmit does the work. UI permission is not security: the server must check again.",
+  "props": {
+    "mode": {
+      "type": "enum",
+      "values": [
+        "create",
+        "edit"
+      ],
+      "default": "create",
+      "description": "create starts empty and shows no danger zone. edit makes the email read-only, with a hint, and shows the danger zone."
+    },
+    "defaultValues": {
+      "type": "custom",
+      "tsType": "Partial<{ name: string; email: string; role: string; status: \"active\" | \"suspended\"; team: string | null }>",
+      "description": "The starting values. Only read when the form mounts; give it a key to start over."
+    },
+    "roles": {
+      "type": "custom",
+      "required": true,
+      "tsType": "Array<{ id: string; label: string; description?: string }>",
+      "description": "The roles a user can have. The description of the chosen role is shown under its Select."
+    },
+    "teams": {
+      "type": "custom",
+      "tsType": "Array<{ id: string; label: string }>",
+      "description": "The teams a user can belong to. Without teams the team field is left out."
+    },
+    "title": {
+      "type": "node",
+      "description": "A heading for the form. Leave it out when the form sits in a Sheet that already has a title."
+    },
+    "headingLevel": {
+      "type": "number",
+      "default": 2,
+      "description": "Heading level of the title, 1 to 6."
+    },
+    "layout": {
+      "type": "enum",
+      "values": [
+        "card",
+        "plain"
+      ],
+      "default": "card",
+      "description": "card draws a bordered card with padding; plain has no chrome, for a Sheet or a page that already has one."
+    },
+    "submitLabel": {
+      "type": "string",
+      "description": "The text of the Save button. Default: \"Create user\" or \"Save changes\"."
+    },
+    "successMessage": {
+      "type": "string",
+      "default": "User saved.",
+      "description": "Announced and shown when onSubmit worked."
+    },
+    "dangerZone": {
+      "type": "node",
+      "description": "More actions for the danger zone, shown next to Suspend and Delete user. Edit mode only."
+    },
+    "onSubmit": {
+      "type": "callback",
+      "required": true,
+      "tsType": "(values: { name: string; email: string; role: string; status: \"active\" | \"suspended\"; team: string | null }) => void | import(\"../form/form\").SubmitResult | Promise<void | import(\"../form/form\").SubmitResult>",
+      "description": "Saves the user; yours, async. Return { fieldErrors } to show a server problem on a field (for example email) or { formError } for the whole form."
+    },
+    "onCancel": {
+      "type": "callback",
+      "tsType": "() => void",
+      "description": "Called when the person cancels. With unsaved changes it is called after they confirm Discard."
+    },
+    "onDelete": {
+      "type": "callback",
+      "tsType": "() => void | Promise<unknown>",
+      "description": "Deletes the user; yours. The Delete user button asks first. Without it the button is left out."
+    },
+    "onSuspend": {
+      "type": "callback",
+      "tsType": "() => void | Promise<unknown>",
+      "description": "Suspends the user right away; yours. The Suspend button asks first. Without it the button is left out."
+    },
+    "permissions": {
+      "type": "custom",
+      "tsType": "import(\"../utils/permissions\").Permissions<\"edit\" | \"delete\" | \"changeRole\">",
+      "description": "What the app allows: edit (the whole form, and Suspend), delete (Delete user) and changeRole (the role field). Hidden removes it; disabled makes a field read-only but focusable with the reason as its description, and a button stays focusable with the reason. This only changes what people see: the server must check again."
+    },
+    "classNames": {
+      "type": "custom",
+      "description": "Extra class names for single parts, so you can restyle one part without editing the file. Keys: root, header, title, form, fields, actions, saveButton, cancelButton, dangerZone, status.",
+      "tsType": "Partial<Record<\"root\" | \"header\" | \"title\" | \"form\" | \"fields\" | \"actions\" | \"saveButton\" | \"cancelButton\" | \"dangerZone\" | \"status\", string>>"
+    }
+  },
+  "states": [
+    "default",
+    "disabled",
+    "invalid",
+    "loading",
+    "readonly"
+  ],
+  "slots": [
+    "root",
+    "header",
+    "title",
+    "form",
+    "fields",
+    "actions",
+    "saveButton",
+    "cancelButton",
+    "dangerZone",
+    "status"
+  ],
+  "tokens": [
+    "color.surface.default",
+    "color.border.default",
+    "color.text.default",
+    "color.text.muted",
+    "color.feedback.danger",
+    "radius.overlay",
+    "elevation.raised"
+  ],
+  "a11y": {
+    "role": "form",
+    "keyboard": [
+      "Tab: moves through name, email, role, status, team, Cancel and Save, then the danger zone",
+      "Enter in a text field: saves",
+      "Escape: with unsaved changes asks \"Discard changes?\"; without them it does nothing here",
+      "Delete user and Suspend open a confirmation that you answer with Tab and Enter"
+    ],
+    "requirements": [
+      "Save is disabled until a value changes",
+      "Cancel with unsaved changes opens an alert dialog; Keep editing returns focus to where it was",
+      "A failed save moves focus to the error summary; each item moves to its field",
+      "A field the person may not change is read-only, stays focusable, and its description gives the reason",
+      "The email in edit mode is read-only with a hint saying why",
+      "The danger zone is a labelled group, so it is announced as its own part of the page"
+    ],
+    "screenReader": [
+      "\"Email, edit text, read only\" with \"Email cannot be changed here\"",
+      "\"Active, switch, on\" with \"Suspended users cannot sign in\"",
+      "\"Discard changes?, alert dialog\"",
+      "\"User saved.\" after a successful save"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "Creating a user, or editing one in a Sheet, a page or a card"
+    ],
+    "avoid_when": [
+      "Inviting several people by email: use InviteDialog",
+      "Editing your own profile and password: use a settings page"
+    ],
+    "anti_patterns": [
+      "Treating the permissions prop as protection: UI permission is not security, so the server must check again",
+      "Hiding a field the person may see but not change: use disabled with a reason",
+      "Closing a Sheet around the form in a way that skips onCancel, which loses the Discard changes question"
+    ]
+  },
+  "contract": {
+    "data": "The user's current values (defaultValues), the roles and teams to choose from, and async onSubmit, onDelete and onSuspend.",
+    "dataStates": [
+      "ready"
+    ],
+    "permissions": [
+      "edit",
+      "delete",
+      "changeRole"
+    ],
+    "events": [
+      "onSubmit",
+      "onCancel",
+      "onDelete",
+      "onSuspend"
+    ],
+    "customization": [
+      "classNames for each part",
+      "dangerZone slot for extra actions",
+      "mode, layout, title, submitLabel and successMessage",
+      "roles and teams"
+    ]
+  },
+  "examples": [
+    "create",
+    "edit",
+    "in-a-sheet",
+    "permissions"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {}
+  }
+}

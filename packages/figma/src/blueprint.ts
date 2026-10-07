@@ -724,6 +724,40 @@ const blueprints: Record<string, Blueprint> = {
     ]);
   },
 
+  DataTable: () => {
+    const cell = (label: string, w: number | "fill", head = false, right = false) =>
+      frame({ name: head ? "head" : "cell", dir: "row", w, pad: [10, 12], align: right ? "end" : "start", cross: "center" }, [text(label, head ? 12 : 14, head ? "color.text.muted" : "color.text.default", head ? "Semi Bold" : "Regular")]);
+    const check = () => frame({ name: "select", dir: "row", w: 44, pad: [10, 12], cross: "center" }, [box(16, 16, { stroke: "color.border.strong", radius: 4, name: "checkbox" })]);
+    const row = (order: string, customer: string, status: string, tone: string, total: string) =>
+      frame({ name: "row", dir: "row", w: "fill", cross: "center", stroke: "color.border.default" }, [
+        check(),
+        cell(order, 110),
+        cell(customer, 200),
+        frame({ name: "status", dir: "row", w: 110, pad: [10, 12], cross: "center" }, [
+          frame({ name: "badge", dir: "row", gap: 6, pad: [2, 8], cross: "center", fill: `color.feedback.${tone}-subtle`, radius: 999 }, [box(6, 6, { fill: `color.feedback.${tone}`, radius: 999 }), text(status, 12, "color.text.default", "Medium")]),
+        ]),
+        cell(total, "fill", false, true),
+        frame({ name: "more", dir: "row", w: 44, pad: [10, 12], cross: "center" }, [text("...", 14, "color.text.muted")]),
+      ]);
+    const filter = (label: string) => frame({ name: "filter", dir: "row", gap: 8, pad: [0, 12], w: 140, h: 40, cross: "center", fill: "color.surface.default", stroke: "color.border.default", radius: "radius.control" }, [text(label, 14, "color.text.muted")]);
+    return frame({ name: "data table", dir: "col", gap: 12, w: 760 }, [
+      frame({ name: "toolbar", dir: "row", gap: 8, w: "fill", cross: "center" }, [
+        frame({ name: "search", dir: "row", gap: 8, pad: [0, 12], w: "fill", h: 40, cross: "center", fill: "color.surface.default", stroke: "color.border.default", radius: "radius.control" }, [text("Search", 14, "color.text.muted")]),
+        filter("Status: all"),
+        filter("Region: all"),
+        button("Export CSV", "secondary"),
+      ]),
+      frame({ name: "table", dir: "col", w: "fill", fill: "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, [
+        frame({ name: "header row", dir: "row", w: "fill", fill: "color.surface.subtle" }, [check(), cell("ORDER", 110, true), cell("CUSTOMER", 200, true), cell("STATUS", 110, true), cell("TOTAL", "fill", true, true), cell("", 44, true)]),
+        row("#1042", "Northgate Foods", "Paid", "success", "$2,310"),
+        row("#1041", "Harbor Mills", "Pending", "warning", "$860"),
+        row("#1040", "Brightwater Supplies", "Paid", "success", "$1,240"),
+        row("#1039", "Lindqvist Textiles", "Refunded", "info", "$415"),
+      ]),
+      frame({ name: "pagination", dir: "row", w: "fill", align: "between", cross: "center" }, [text("Showing 1 to 4 of 48", 14, "color.text.muted"), button("1  2  3  ›", "secondary", "sm")]),
+    ]);
+  },
+
   Sidebar: (c) => {
     const appearance = String(c.appearance ?? "bordered");
     const item = (label: string, current = false, badge?: string) =>
@@ -894,6 +928,45 @@ const blueprints: Record<string, Blueprint> = {
       field("Password"),
       button("Sign in", "primary"),
       text("Create an account", 14, "color.text.muted"),
+    ]);
+  },
+
+  InviteDialog: () => {
+    const input = (label: string, value: string, w: number | "fill") =>
+      frame({ name: "field", dir: "col", gap: 6, w }, [
+        text(label, 14, "color.text.default", "Medium"),
+        frame({ name: "input", dir: "row", w: "fill", h: 40, pad: 12, cross: "center", stroke: "color.border.default", radius: "radius.control" }, [text(value, 14, "color.text.default")]),
+      ]);
+    const row = (n: number, email: string, role: string) =>
+      frame({ name: `invitation ${n}`, dir: "row", gap: 12, pad: 12, w: "fill", stroke: "color.border.default", radius: "radius.overlay", fill: "color.surface.default" }, [
+        input("Email", email, "fill"),
+        input("Role", role, 160),
+      ]);
+    return frame({ name: "invite dialog", dir: "col", gap: 16, pad: 24, w: 672, fill: "color.surface.raised", stroke: "color.border.default", radius: "radius.overlay" }, [
+      frame({ name: "header", dir: "col", gap: 4 }, [text("Invite people", 18, "color.text.default", "Semi Bold"), text("They get an email with a link to join your workspace.", 14, "color.text.muted")]),
+      row(1, "amara.okafor@example.com", "Editor"),
+      row(2, "lena.fischer@example.com", "Viewer"),
+      button("Add another", "secondary"),
+      frame({ name: "actions", dir: "row", gap: 8, w: "fill", align: "end" }, [button("Cancel", "secondary"), button("Send 2 invitations", "primary")]),
+    ]);
+  },
+
+  UserForm: (c) => {
+    const edit = c.mode === "edit";
+    const input = (label: string, value: string, hint?: string) =>
+      frame({ name: "field", dir: "col", gap: 6, w: "fill" }, [
+        text(label, 14, "color.text.default", "Medium"),
+        frame({ name: "input", dir: "row", w: "fill", h: 40, pad: 12, cross: "center", stroke: "color.border.default", radius: "radius.control" }, [text(value, 14, "color.text.default")]),
+        ...(hint ? [text(hint, 12, "color.text.muted")] : []),
+      ]);
+    return frame({ name: "user form", dir: "col", gap: 20, pad: 24, w: 448, fill: "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, [
+      text(edit ? "Edit Lena Fischer" : "New user", 18, "color.text.default", "Semi Bold"),
+      input("Name", edit ? "Lena Fischer" : "Full name"),
+      input("Email", edit ? "lena.fischer@example.com" : "name@example.com", edit ? "Email cannot be changed here." : undefined),
+      input("Role", "Editor", "Can create and change records."),
+      frame({ name: "status", dir: "col", gap: 4 }, [text("Active", 14, "color.text.default", "Medium"), text("Suspended users cannot sign in.", 12, "color.text.muted")]),
+      frame({ name: "actions", dir: "row", gap: 8, w: "fill", align: "end" }, [button("Cancel", "secondary"), button(edit ? "Save changes" : "Create user", "primary")]),
+      ...(edit ? [frame({ name: "danger zone", dir: "row", gap: 8, w: "fill" }, [button("Suspend", "secondary"), button("Delete user", "danger")])] : []),
     ]);
   },
 

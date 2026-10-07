@@ -182,6 +182,12 @@
       "description": "A fast, accessible data grid for thousands of rows: sorting, filtering, grouping, editing, copy and paste, export and server-side data. Columns are TanStack Table column definitions."
     },
     {
+      "name": "data-table",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "The list screen every admin, ERP and SaaS app has: a table of rows with search, filters, sorting, pages, selection with bulk actions, a row menu with confirmed actions, CSV export, loading, empty and error states, and cards on a narrow screen. It never fetches: you pass the rows (or one page of them with serverSide) and handle the actions. Permissions only change what people see and can try; they are not security, so the server must check every action again."
+    },
+    {
       "name": "date-picker",
       "type": "registry:ui",
       "version": "0.1.1",
@@ -264,6 +270,12 @@
       "type": "registry:ui",
       "version": "0.1.0",
       "description": "One-time code input for verification and two-factor sign in. One real input holds the code and drawn cells show it, so paste, autofill from SMS and screen readers all work."
+    },
+    {
+      "name": "invite-dialog",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A dialog for inviting one or many people: rows of email and role, Add another, checks for format, duplicates and people who are already members, an error summary, and a submit button that says how many invitations it sends. Your onInvite does the work. UI permission is not security: the server must check again."
     },
     {
       "name": "kbd",
@@ -516,6 +528,12 @@
       "type": "registry:ui",
       "version": "0.1.0",
       "description": "An expandable hierarchy such as folders and files or a nested menu, with keyboard navigation and optional selection. Build it from nested TreeItem elements."
+    },
+    {
+      "name": "user-form",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A form to create or edit a user: name, email, role, status and team, with a danger zone for suspending and deleting. Save stays disabled until something changes, and Cancel asks before throwing changes away. Your onSubmit does the work. UI permission is not security: the server must check again."
     }
   ]
 }

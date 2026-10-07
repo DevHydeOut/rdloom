@@ -1,0 +1,339 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "DataTable",
+  "version": "0.1.0",
+  "category": "block",
+  "status": "experimental",
+  "description": "The list screen every admin, ERP and SaaS app has: a table of rows with search, filters, sorting, pages, selection with bulk actions, a row menu with confirmed actions, CSV export, loading, empty and error states, and cards on a narrow screen. It never fetches: you pass the rows (or one page of them with serverSide) and handle the actions. Permissions only change what people see and can try; they are not security, so the server must check every action again.",
+  "props": {
+    "rows": {
+      "type": "custom",
+      "description": "The rows to show. With serverSide, only the current page.",
+      "tsType": "readonly any[]",
+      "required": true
+    },
+    "columns": {
+      "type": "custom",
+      "description": "The columns: { id, header, cell?(row), value?(row), sortable?, align?, hideOnMobile?, width? }. The first column names each row (and is the title of a phone card). value is what sorting, searching and the CSV read; without it the row's field named id is used.",
+      "tsType": "import(\"../data-table/query\").DataTableColumn<any>[]",
+      "required": true
+    },
+    "getRowId": {
+      "type": "callback",
+      "description": "A stable, unique id for a row, such as its database id. Used for selection, focus after a delete and the open link.",
+      "tsType": "(row: any) => string",
+      "required": true
+    },
+    "label": {
+      "type": "string",
+      "description": "Accessible name of the table and the section, e.g. \"Orders\".",
+      "default": "Table"
+    },
+    "state": {
+      "type": "custom",
+      "description": "The data state, when your data layer gives you one: loading, empty, error or ready. It wins over isLoading and error. A ready table with no matching rows says nothing matches.",
+      "tsType": "import(\"../utils/state\").DataState"
+    },
+    "isLoading": {
+      "type": "boolean",
+      "description": "Show loading rows and skeleton cards, disable the controls, and mark the section busy.",
+      "default": false
+    },
+    "error": {
+      "type": "custom",
+      "description": "Something went wrong loading: a message to show instead of the rows (true uses a general one).",
+      "tsType": "string | boolean"
+    },
+    "onRetry": {
+      "type": "callback",
+      "description": "Adds a Try again button to the error state.",
+      "tsType": "() => void"
+    },
+    "emptyTitle": {
+      "type": "string",
+      "description": "Title shown when there are no rows at all. Defaults to \"Nothing here yet\"."
+    },
+    "emptyDescription": {
+      "type": "string",
+      "description": "Text under the empty title."
+    },
+    "emptyAction": {
+      "type": "custom",
+      "description": "A control shown in the empty state when there are no rows at all (not when a search found nothing), such as an Add button.",
+      "tsType": "import(\"react\").ReactNode"
+    },
+    "searchable": {
+      "type": "custom",
+      "description": "Add a search box. true looks in every column; or list the column ids to look in.",
+      "tsType": "boolean | string[]"
+    },
+    "searchPlaceholder": {
+      "type": "string",
+      "description": "Placeholder of the search box.",
+      "default": "Search"
+    },
+    "filters": {
+      "type": "custom",
+      "description": "Filters shown as selects in the toolbar and in a sheet on a narrow screen: { id, label, options, match? }. Options are text or { value, label }.",
+      "tsType": "import(\"../data-table/query\").DataTableFilter<any>[]"
+    },
+    "pageSize": {
+      "type": "number",
+      "description": "Rows per page.",
+      "default": 10
+    },
+    "query": {
+      "type": "custom",
+      "description": "The search, filters, sort and page, when you keep them yourself (for example in the address). Without it the table keeps them.",
+      "tsType": "import(\"../data-table/query\").DataTableQuery"
+    },
+    "defaultQuery": {
+      "type": "custom",
+      "description": "Start with a search, filters, a sort or a page already set.",
+      "tsType": "Partial<import(\"../data-table/query\").DataTableQuery>"
+    },
+    "onQueryChange": {
+      "type": "callback",
+      "description": "Called with the new query whenever the search, a filter, the sort or the page changes (typing waits for a short pause with serverSide). With serverSide, answer it with new rows.",
+      "tsType": "(query: import(\"../data-table/query\").DataTableQuery) => void"
+    },
+    "onSearch": {
+      "type": "callback",
+      "description": "Called with the search text whenever it changes.",
+      "tsType": "(search: string) => void"
+    },
+    "onFilter": {
+      "type": "callback",
+      "description": "Called with the chosen values of every filter whenever a filter changes or the filters are cleared.",
+      "tsType": "(filters: Record<string, string[]>) => void"
+    },
+    "serverSide": {
+      "type": "boolean",
+      "description": "The rows live on a server. The table then shows exactly the rows you pass and asks for new ones through onQueryChange.",
+      "default": false
+    },
+    "totalCount": {
+      "type": "number",
+      "description": "With serverSide: how many rows match in all, so the pages and the count are right."
+    },
+    "selectionMode": {
+      "type": "enum",
+      "description": "Add checkboxes to pick rows. The header box selects the rows on the page.",
+      "values": [
+        "none",
+        "multiple"
+      ],
+      "default": "none"
+    },
+    "selectedKeys": {
+      "type": "custom",
+      "description": "Controlled selection: the ids of the selected rows.",
+      "tsType": "Set<string>"
+    },
+    "defaultSelectedKeys": {
+      "type": "custom",
+      "description": "Rows selected at the start.",
+      "tsType": "Iterable<string>"
+    },
+    "onSelectionChange": {
+      "type": "callback",
+      "description": "Called with the ids of the selected rows.",
+      "tsType": "(keys: Set<string>) => void"
+    },
+    "bulkActions": {
+      "type": "custom",
+      "description": "Actions for the selected rows, shown in a bar while something is selected: { id, label, icon?, variant?, permission?, confirm?, onAction(rows) }. A confirm opens a dialog that also says how many rows are affected. The selection clears when the action succeeds.",
+      "tsType": "import(\"../data-table/query\").DataTableBulkAction<any>[]"
+    },
+    "rowActions": {
+      "type": "callback",
+      "description": "The actions of one row, shown in a More menu at the end of the row and of the card: { id, label, permission?, confirm?, variant?, onAction }. Return an empty list for none. After a delete, focus moves to the next row.",
+      "tsType": "(row: any) => import(\"../data-table/query\").DataTableRowAction<any>[]"
+    },
+    "onRowOpen": {
+      "type": "callback",
+      "description": "Makes the first cell of each row a button and calls this with the row, e.g. to open a details page or panel. onSelect is called too.",
+      "tsType": "(row: any) => void"
+    },
+    "onSelect": {
+      "type": "callback",
+      "description": "The conventional name for opening a row: called together with onRowOpen.",
+      "tsType": "(row: any) => void"
+    },
+    "rowHref": {
+      "type": "callback",
+      "description": "Makes the first cell of each row a link to this address instead of a button (onRowOpen and onSelect are still called).",
+      "tsType": "(row: any) => string"
+    },
+    "onExport": {
+      "type": "callback",
+      "description": "Replaces the built-in CSV download. It gets the rows that match (all pages when the list is in memory) and the query. With serverSide the Export button is shown only when you give this.",
+      "tsType": "(rows: any[], query: import(\"../data-table/query\").DataTableQuery) => void"
+    },
+    "permissions": {
+      "type": "custom",
+      "description": "What the app allows, by action: export (Export CSV), select (the checkboxes), bulk (the bulk bar as a whole) and rowActions (the More menu). Each answer is \"allow\", \"disabled\", \"hidden\", true, false or { state, reason }. Hidden removes the control; disabled keeps it focusable with the reason where there is a button, and leaves selection off. Single actions have a permission of their own. This only changes what people see: the server must check again.",
+      "tsType": "import(\"../utils/permissions\").Permissions<\"export\" | \"select\" | \"bulk\" | \"rowActions\">"
+    },
+    "classNames": {
+      "type": "custom",
+      "description": "Class names for the parts of the block, by slot name, added after the built-in ones so you can restyle one part without editing the file. Slots: root, toolbar, search, filters, count, export, bulk-bar, table, header, row, cell, cards, card, empty, error, footer, pagination.",
+      "tsType": "Partial<Record<\"root\" | \"toolbar\" | \"search\" | \"filters\" | \"count\" | \"export\" | \"bulk-bar\" | \"table\" | \"header\" | \"row\" | \"cell\" | \"cards\" | \"card\" | \"empty\" | \"error\" | \"footer\" | \"pagination\", string>>"
+    },
+    "density": {
+      "type": "enum",
+      "description": "Row spacing of the table.",
+      "values": [
+        "compact",
+        "standard",
+        "comfortable"
+      ],
+      "default": "standard"
+    },
+    "layout": {
+      "type": "enum",
+      "description": "Table or cards. auto shows cards when the block itself is narrower than about 640px (not just the screen).",
+      "values": [
+        "auto",
+        "table",
+        "cards"
+      ],
+      "default": "auto"
+    }
+  },
+  "states": [
+    "default",
+    "loading"
+  ],
+  "slots": [
+    "root",
+    "toolbar",
+    "search",
+    "filters",
+    "count",
+    "export",
+    "bulk-bar",
+    "table",
+    "header",
+    "row",
+    "cell",
+    "cards",
+    "card",
+    "empty",
+    "error",
+    "footer",
+    "pagination"
+  ],
+  "tokens": [
+    "color.surface.default",
+    "color.surface.subtle",
+    "color.border.default",
+    "color.border.strong",
+    "color.text.default",
+    "color.text.muted",
+    "color.focus.ring",
+    "radius.control",
+    "radius.overlay",
+    "elevation.raised",
+    "size.control-md"
+  ],
+  "a11y": {
+    "role": "region",
+    "keyboard": [
+      "Tab: moves through the search, the filters, Export, the table (one stop), the open buttons, the More buttons and the page buttons",
+      "In the table: arrow keys move between cells; Enter or Space on a column header sorts; Space on a row checkbox selects",
+      "In the More menu: Enter or Space opens it, arrow keys choose, Enter runs, Escape closes",
+      "In a filter: Enter or Space opens the list, arrow keys choose, Escape closes",
+      "Escape in the search box clears it"
+    ],
+    "requirements": [
+      "A labelled region around everything; the table and the phone cards have their own names",
+      "A real table with a row header (the first column) and sortable column headers that expose their sort direction",
+      "The count of results is a polite status message, so filtering is announced; so is the number selected (\"3 selected\"), and the result of an action",
+      "The bulk bar appears without taking focus; after a delete focus moves to the next row, or to the table, never to the page top",
+      "Search, filters and the More button each have a name (the More button names the row)",
+      "Loading marks the region busy and shows skeletons; the controls are disabled while loading",
+      "An empty list says why (nothing yet, or nothing matches) and offers Clear filters when a search or filter is set; an error says what happened and offers a retry",
+      "A disabled action stays focusable and says why, instead of vanishing without a word",
+      "Below about 640px the table is replaced by cards (a list); only one of the two is in the accessibility tree at a time",
+      "CSV export neutralises cells that start with = + - or @ so a spreadsheet can't run them as formulas"
+    ],
+    "screenReader": [
+      "\"Orders, region\" then \"Search orders, search edit text\"",
+      "After typing: \"3 results\" (polite)",
+      "The table reads as \"Orders, table, 10 rows, 6 columns\"; a cell reads its row header, column and value",
+      "A sort reads \"Total, column header, sorted descending\"",
+      "Selecting rows reads \"3 selected\""
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "Any admin, ERP or SaaS list: users, orders, invoices, products",
+      "You want search, filters, sorting, paging, selection, bulk and row actions and export without wiring each one"
+    ],
+    "avoid_when": [
+      "Tens of thousands of rows you must scroll or edit like a spreadsheet: use DataGrid",
+      "A short list with no search or paging: use Table"
+    ],
+    "anti_patterns": [
+      "Loading every row into the browser when there are many thousands: use serverSide",
+      "A bulk action that deletes without a confirm",
+      "UI permission is not security: hiding or disabling an action only changes what people see, so the server must check access again for every request",
+      "Keeping the selection after rows were deleted elsewhere: let the selection clear when the action succeeds"
+    ]
+  },
+  "contract": {
+    "data": "A list of rows of any shape, described by columns, or one page of them when serverSide is on.",
+    "dataStates": [
+      "loading",
+      "empty",
+      "error",
+      "ready"
+    ],
+    "permissions": [
+      "export",
+      "select",
+      "bulk",
+      "rowActions",
+      "per bulk action and per row action (permission field)"
+    ],
+    "events": [
+      "onQueryChange",
+      "onSearch",
+      "onFilter",
+      "onSelect",
+      "onRowOpen",
+      "onSelectionChange",
+      "onExport",
+      "onRetry",
+      "bulkActions[].onAction",
+      "rowActions[].onAction"
+    ],
+    "customization": [
+      "columns (cell, value, align, width)",
+      "filters (options, match)",
+      "bulkActions and rowActions",
+      "density",
+      "layout",
+      "emptyAction",
+      "the parts it is built from (Table, Pagination, Select, Menu, ActionButton, AlertDialog)"
+    ]
+  },
+  "examples": [
+    "basic",
+    "searchable-and-filterable",
+    "with-selection-and-bulk-actions",
+    "row-actions-and-delete",
+    "states",
+    "server-side",
+    "permissions",
+    "url-state",
+    "classNames",
+    "user-management"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {}
+  }
+}

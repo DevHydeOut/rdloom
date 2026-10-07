@@ -5032,6 +5032,425 @@
       ]
     },
     {
+      "id": "data-table",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "DataTable",
+        "version": "0.1.0",
+        "category": "block",
+        "status": "experimental",
+        "description": "The list screen every admin, ERP and SaaS app has: a table of rows with search, filters, sorting, pages, selection with bulk actions, a row menu with confirmed actions, CSV export, loading, empty and error states, and cards on a narrow screen. It never fetches: you pass the rows (or one page of them with serverSide) and handle the actions. Permissions only change what people see and can try; they are not security, so the server must check every action again.",
+        "props": {
+          "rows": {
+            "type": "custom",
+            "description": "The rows to show. With serverSide, only the current page.",
+            "tsType": "readonly any[]",
+            "required": true
+          },
+          "columns": {
+            "type": "custom",
+            "description": "The columns: { id, header, cell?(row), value?(row), sortable?, align?, hideOnMobile?, width? }. The first column names each row (and is the title of a phone card). value is what sorting, searching and the CSV read; without it the row's field named id is used.",
+            "tsType": "import(\"../data-table/query\").DataTableColumn<any>[]",
+            "required": true
+          },
+          "getRowId": {
+            "type": "callback",
+            "description": "A stable, unique id for a row, such as its database id. Used for selection, focus after a delete and the open link.",
+            "tsType": "(row: any) => string",
+            "required": true
+          },
+          "label": {
+            "type": "string",
+            "description": "Accessible name of the table and the section, e.g. \"Orders\".",
+            "default": "Table"
+          },
+          "state": {
+            "type": "custom",
+            "description": "The data state, when your data layer gives you one: loading, empty, error or ready. It wins over isLoading and error. A ready table with no matching rows says nothing matches.",
+            "tsType": "import(\"../utils/state\").DataState"
+          },
+          "isLoading": {
+            "type": "boolean",
+            "description": "Show loading rows and skeleton cards, disable the controls, and mark the section busy.",
+            "default": false
+          },
+          "error": {
+            "type": "custom",
+            "description": "Something went wrong loading: a message to show instead of the rows (true uses a general one).",
+            "tsType": "string | boolean"
+          },
+          "onRetry": {
+            "type": "callback",
+            "description": "Adds a Try again button to the error state.",
+            "tsType": "() => void"
+          },
+          "emptyTitle": {
+            "type": "string",
+            "description": "Title shown when there are no rows at all. Defaults to \"Nothing here yet\"."
+          },
+          "emptyDescription": {
+            "type": "string",
+            "description": "Text under the empty title."
+          },
+          "emptyAction": {
+            "type": "custom",
+            "description": "A control shown in the empty state when there are no rows at all (not when a search found nothing), such as an Add button.",
+            "tsType": "import(\"react\").ReactNode"
+          },
+          "searchable": {
+            "type": "custom",
+            "description": "Add a search box. true looks in every column; or list the column ids to look in.",
+            "tsType": "boolean | string[]"
+          },
+          "searchPlaceholder": {
+            "type": "string",
+            "description": "Placeholder of the search box.",
+            "default": "Search"
+          },
+          "filters": {
+            "type": "custom",
+            "description": "Filters shown as selects in the toolbar and in a sheet on a narrow screen: { id, label, options, match? }. Options are text or { value, label }.",
+            "tsType": "import(\"../data-table/query\").DataTableFilter<any>[]"
+          },
+          "pageSize": {
+            "type": "number",
+            "description": "Rows per page.",
+            "default": 10
+          },
+          "query": {
+            "type": "custom",
+            "description": "The search, filters, sort and page, when you keep them yourself (for example in the address). Without it the table keeps them.",
+            "tsType": "import(\"../data-table/query\").DataTableQuery"
+          },
+          "defaultQuery": {
+            "type": "custom",
+            "description": "Start with a search, filters, a sort or a page already set.",
+            "tsType": "Partial<import(\"../data-table/query\").DataTableQuery>"
+          },
+          "onQueryChange": {
+            "type": "callback",
+            "description": "Called with the new query whenever the search, a filter, the sort or the page changes (typing waits for a short pause with serverSide). With serverSide, answer it with new rows.",
+            "tsType": "(query: import(\"../data-table/query\").DataTableQuery) => void"
+          },
+          "onSearch": {
+            "type": "callback",
+            "description": "Called with the search text whenever it changes.",
+            "tsType": "(search: string) => void"
+          },
+          "onFilter": {
+            "type": "callback",
+            "description": "Called with the chosen values of every filter whenever a filter changes or the filters are cleared.",
+            "tsType": "(filters: Record<string, string[]>) => void"
+          },
+          "serverSide": {
+            "type": "boolean",
+            "description": "The rows live on a server. The table then shows exactly the rows you pass and asks for new ones through onQueryChange.",
+            "default": false
+          },
+          "totalCount": {
+            "type": "number",
+            "description": "With serverSide: how many rows match in all, so the pages and the count are right."
+          },
+          "selectionMode": {
+            "type": "enum",
+            "description": "Add checkboxes to pick rows. The header box selects the rows on the page.",
+            "values": [
+              "none",
+              "multiple"
+            ],
+            "default": "none"
+          },
+          "selectedKeys": {
+            "type": "custom",
+            "description": "Controlled selection: the ids of the selected rows.",
+            "tsType": "Set<string>"
+          },
+          "defaultSelectedKeys": {
+            "type": "custom",
+            "description": "Rows selected at the start.",
+            "tsType": "Iterable<string>"
+          },
+          "onSelectionChange": {
+            "type": "callback",
+            "description": "Called with the ids of the selected rows.",
+            "tsType": "(keys: Set<string>) => void"
+          },
+          "bulkActions": {
+            "type": "custom",
+            "description": "Actions for the selected rows, shown in a bar while something is selected: { id, label, icon?, variant?, permission?, confirm?, onAction(rows) }. A confirm opens a dialog that also says how many rows are affected. The selection clears when the action succeeds.",
+            "tsType": "import(\"../data-table/query\").DataTableBulkAction<any>[]"
+          },
+          "rowActions": {
+            "type": "callback",
+            "description": "The actions of one row, shown in a More menu at the end of the row and of the card: { id, label, permission?, confirm?, variant?, onAction }. Return an empty list for none. After a delete, focus moves to the next row.",
+            "tsType": "(row: any) => import(\"../data-table/query\").DataTableRowAction<any>[]"
+          },
+          "onRowOpen": {
+            "type": "callback",
+            "description": "Makes the first cell of each row a button and calls this with the row, e.g. to open a details page or panel. onSelect is called too.",
+            "tsType": "(row: any) => void"
+          },
+          "onSelect": {
+            "type": "callback",
+            "description": "The conventional name for opening a row: called together with onRowOpen.",
+            "tsType": "(row: any) => void"
+          },
+          "rowHref": {
+            "type": "callback",
+            "description": "Makes the first cell of each row a link to this address instead of a button (onRowOpen and onSelect are still called).",
+            "tsType": "(row: any) => string"
+          },
+          "onExport": {
+            "type": "callback",
+            "description": "Replaces the built-in CSV download. It gets the rows that match (all pages when the list is in memory) and the query. With serverSide the Export button is shown only when you give this.",
+            "tsType": "(rows: any[], query: import(\"../data-table/query\").DataTableQuery) => void"
+          },
+          "permissions": {
+            "type": "custom",
+            "description": "What the app allows, by action: export (Export CSV), select (the checkboxes), bulk (the bulk bar as a whole) and rowActions (the More menu). Each answer is \"allow\", \"disabled\", \"hidden\", true, false or { state, reason }. Hidden removes the control; disabled keeps it focusable with the reason where there is a button, and leaves selection off. Single actions have a permission of their own. This only changes what people see: the server must check again.",
+            "tsType": "import(\"../utils/permissions\").Permissions<\"export\" | \"select\" | \"bulk\" | \"rowActions\">"
+          },
+          "classNames": {
+            "type": "custom",
+            "description": "Class names for the parts of the block, by slot name, added after the built-in ones so you can restyle one part without editing the file. Slots: root, toolbar, search, filters, count, export, bulk-bar, table, header, row, cell, cards, card, empty, error, footer, pagination.",
+            "tsType": "Partial<Record<\"root\" | \"toolbar\" | \"search\" | \"filters\" | \"count\" | \"export\" | \"bulk-bar\" | \"table\" | \"header\" | \"row\" | \"cell\" | \"cards\" | \"card\" | \"empty\" | \"error\" | \"footer\" | \"pagination\", string>>"
+          },
+          "density": {
+            "type": "enum",
+            "description": "Row spacing of the table.",
+            "values": [
+              "compact",
+              "standard",
+              "comfortable"
+            ],
+            "default": "standard"
+          },
+          "layout": {
+            "type": "enum",
+            "description": "Table or cards. auto shows cards when the block itself is narrower than about 640px (not just the screen).",
+            "values": [
+              "auto",
+              "table",
+              "cards"
+            ],
+            "default": "auto"
+          }
+        },
+        "states": [
+          "default",
+          "loading"
+        ],
+        "slots": [
+          "root",
+          "toolbar",
+          "search",
+          "filters",
+          "count",
+          "export",
+          "bulk-bar",
+          "table",
+          "header",
+          "row",
+          "cell",
+          "cards",
+          "card",
+          "empty",
+          "error",
+          "footer",
+          "pagination"
+        ],
+        "tokens": [
+          "color.surface.default",
+          "color.surface.subtle",
+          "color.border.default",
+          "color.border.strong",
+          "color.text.default",
+          "color.text.muted",
+          "color.focus.ring",
+          "radius.control",
+          "radius.overlay",
+          "elevation.raised",
+          "size.control-md"
+        ],
+        "a11y": {
+          "role": "region",
+          "keyboard": [
+            "Tab: moves through the search, the filters, Export, the table (one stop), the open buttons, the More buttons and the page buttons",
+            "In the table: arrow keys move between cells; Enter or Space on a column header sorts; Space on a row checkbox selects",
+            "In the More menu: Enter or Space opens it, arrow keys choose, Enter runs, Escape closes",
+            "In a filter: Enter or Space opens the list, arrow keys choose, Escape closes",
+            "Escape in the search box clears it"
+          ],
+          "requirements": [
+            "A labelled region around everything; the table and the phone cards have their own names",
+            "A real table with a row header (the first column) and sortable column headers that expose their sort direction",
+            "The count of results is a polite status message, so filtering is announced; so is the number selected (\"3 selected\"), and the result of an action",
+            "The bulk bar appears without taking focus; after a delete focus moves to the next row, or to the table, never to the page top",
+            "Search, filters and the More button each have a name (the More button names the row)",
+            "Loading marks the region busy and shows skeletons; the controls are disabled while loading",
+            "An empty list says why (nothing yet, or nothing matches) and offers Clear filters when a search or filter is set; an error says what happened and offers a retry",
+            "A disabled action stays focusable and says why, instead of vanishing without a word",
+            "Below about 640px the table is replaced by cards (a list); only one of the two is in the accessibility tree at a time",
+            "CSV export neutralises cells that start with = + - or @ so a spreadsheet can't run them as formulas"
+          ],
+          "screenReader": [
+            "\"Orders, region\" then \"Search orders, search edit text\"",
+            "After typing: \"3 results\" (polite)",
+            "The table reads as \"Orders, table, 10 rows, 6 columns\"; a cell reads its row header, column and value",
+            "A sort reads \"Total, column header, sorted descending\"",
+            "Selecting rows reads \"3 selected\""
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "Any admin, ERP or SaaS list: users, orders, invoices, products",
+            "You want search, filters, sorting, paging, selection, bulk and row actions and export without wiring each one"
+          ],
+          "avoid_when": [
+            "Tens of thousands of rows you must scroll or edit like a spreadsheet: use DataGrid",
+            "A short list with no search or paging: use Table"
+          ],
+          "anti_patterns": [
+            "Loading every row into the browser when there are many thousands: use serverSide",
+            "A bulk action that deletes without a confirm",
+            "UI permission is not security: hiding or disabling an action only changes what people see, so the server must check access again for every request",
+            "Keeping the selection after rows were deleted elsewhere: let the selection clear when the action succeeds"
+          ]
+        },
+        "contract": {
+          "data": "A list of rows of any shape, described by columns, or one page of them when serverSide is on.",
+          "dataStates": [
+            "loading",
+            "empty",
+            "error",
+            "ready"
+          ],
+          "permissions": [
+            "export",
+            "select",
+            "bulk",
+            "rowActions",
+            "per bulk action and per row action (permission field)"
+          ],
+          "events": [
+            "onQueryChange",
+            "onSearch",
+            "onFilter",
+            "onSelect",
+            "onRowOpen",
+            "onSelectionChange",
+            "onExport",
+            "onRetry",
+            "bulkActions[].onAction",
+            "rowActions[].onAction"
+          ],
+          "customization": [
+            "columns (cell, value, align, width)",
+            "filters (options, match)",
+            "bulkActions and rowActions",
+            "density",
+            "layout",
+            "emptyAction",
+            "the parts it is built from (Table, Pagination, Select, Menu, ActionButton, AlertDialog)"
+          ]
+        },
+        "examples": [
+          "basic",
+          "searchable-and-filterable",
+          "with-selection-and-bulk-actions",
+          "row-actions-and-delete",
+          "states",
+          "server-side",
+          "permissions",
+          "url-state",
+          "classNames",
+          "user-management"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {}
+        }
+      },
+      "install": {
+        "command": "npx rdloom add data-table",
+        "dependencies": [
+          "react-aria-components@^1.21.1"
+        ],
+        "registryDependencies": [
+          "tokens",
+          "action-button",
+          "alert-dialog",
+          "button",
+          "empty-state",
+          "error-state",
+          "menu",
+          "pagination",
+          "select",
+          "sheet",
+          "skeleton",
+          "table",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import type { ReactNode } from \"react\";\nimport { Badge, DataTable, type DataTableColumn } from \"@rdloom/react\";\n\ntype Order = { id: string; number: string; customer: string; status: \"Paid\" | \"Pending\" | \"Refunded\" | \"Overdue\"; region: string; total: number; placed: string };\n\nconst names = [\"Northgate Foods\", \"Harbor Mills\", \"Brightwater Supplies\", \"Lindqvist Textiles\", \"Orchard Row Cafe\", \"Kestrel Logistics\", \"Maplewood Dental\", \"Ironbridge Tools\", \"Saltmarsh Bakery\", \"Tidewater Outfitters\", \"Quarry Lane Books\", \"Fernhill Nursery\"];\nconst statuses: Order[\"status\"][] = [\"Paid\", \"Pending\", \"Paid\", \"Overdue\", \"Refunded\", \"Paid\"];\nconst regions = [\"North\", \"South\", \"East\", \"West\"];\nconst makeOrders = (count: number): Order[] =>\n  Array.from({ length: count }, (_, i) => ({\n    id: `o${1042 - i}`,\n    number: `#${1042 - i}`,\n    customer: names[i % names.length],\n    status: statuses[i % statuses.length],\n    region: regions[(i * 3) % regions.length],\n    total: 240 + ((i * 377) % 2400),\n    placed: `2026-${String(9 - (i % 6)).padStart(2, \"0\")}-${String(3 + ((i * 7) % 24)).padStart(2, \"0\")}`,\n  }));\nconst orders = makeOrders(24);\n\nconst tone = { Paid: \"success\", Pending: \"info\", Overdue: \"warning\", Refunded: \"neutral\" } as const;\nconst money = (n: number) => new Intl.NumberFormat(\"en-US\", { style: \"currency\", currency: \"USD\", maximumFractionDigits: 0 }).format(n);\nconst day = (iso: string) => new Intl.DateTimeFormat(\"en-US\", { dateStyle: \"medium\", timeZone: \"UTC\" }).format(new Date(iso));\n\nconst columns: DataTableColumn<Order>[] = [\n  { id: \"number\", header: \"Order\", sortable: true },\n  { id: \"customer\", header: \"Customer\", sortable: true },\n  { id: \"status\", header: \"Status\", sortable: true, cell: (o) => <Badge variant={tone[o.status]} size=\"sm\">{o.status}</Badge> },\n  { id: \"region\", header: \"Region\", hideOnMobile: true },\n  { id: \"total\", header: \"Total\", align: \"end\", sortable: true, cell: (o) => money(o.total) },\n  { id: \"placed\", header: \"Placed\", sortable: true, cell: (o) => day(o.placed) },\n];\nconst statusFilter = { id: \"status\", label: \"Status\", options: [\"Paid\", \"Pending\", \"Overdue\", \"Refunded\"] };\nconst regionFilter = { id: \"region\", label: \"Region\", options: regions };\n\nconst Frame = ({ children }: { children: ReactNode }) => (\n  <div className=\"flex w-full justify-center\">\n    <div className=\"w-full max-w-5xl\">{children}</div>\n  </div>\n);\n\n// Rows and columns in, a working table out: sorting, pages and a count come for free.\nexport default function DataTableBasicExample() {\n  return (\n    <Frame>\n      <DataTable label=\"Orders\" rows={orders} columns={columns} getRowId={(o) => o.id} pageSize={8} />\n    </Frame>\n  );\n}\n"
+        },
+        {
+          "name": "searchable-and-filterable",
+          "code": "import type { ReactNode } from \"react\";\nimport { Badge, DataTable, type DataTableColumn } from \"@rdloom/react\";\n\ntype Order = { id: string; number: string; customer: string; status: \"Paid\" | \"Pending\" | \"Refunded\" | \"Overdue\"; region: string; total: number; placed: string };\n\nconst names = [\"Northgate Foods\", \"Harbor Mills\", \"Brightwater Supplies\", \"Lindqvist Textiles\", \"Orchard Row Cafe\", \"Kestrel Logistics\", \"Maplewood Dental\", \"Ironbridge Tools\", \"Saltmarsh Bakery\", \"Tidewater Outfitters\", \"Quarry Lane Books\", \"Fernhill Nursery\"];\nconst statuses: Order[\"status\"][] = [\"Paid\", \"Pending\", \"Paid\", \"Overdue\", \"Refunded\", \"Paid\"];\nconst regions = [\"North\", \"South\", \"East\", \"West\"];\nconst makeOrders = (count: number): Order[] =>\n  Array.from({ length: count }, (_, i) => ({\n    id: `o${1042 - i}`,\n    number: `#${1042 - i}`,\n    customer: names[i % names.length],\n    status: statuses[i % statuses.length],\n    region: regions[(i * 3) % regions.length],\n    total: 240 + ((i * 377) % 2400),\n    placed: `2026-${String(9 - (i % 6)).padStart(2, \"0\")}-${String(3 + ((i * 7) % 24)).padStart(2, \"0\")}`,\n  }));\nconst orders = makeOrders(24);\n\nconst tone = { Paid: \"success\", Pending: \"info\", Overdue: \"warning\", Refunded: \"neutral\" } as const;\nconst money = (n: number) => new Intl.NumberFormat(\"en-US\", { style: \"currency\", currency: \"USD\", maximumFractionDigits: 0 }).format(n);\nconst day = (iso: string) => new Intl.DateTimeFormat(\"en-US\", { dateStyle: \"medium\", timeZone: \"UTC\" }).format(new Date(iso));\n\nconst columns: DataTableColumn<Order>[] = [\n  { id: \"number\", header: \"Order\", sortable: true },\n  { id: \"customer\", header: \"Customer\", sortable: true },\n  { id: \"status\", header: \"Status\", sortable: true, cell: (o) => <Badge variant={tone[o.status]} size=\"sm\">{o.status}</Badge> },\n  { id: \"region\", header: \"Region\", hideOnMobile: true },\n  { id: \"total\", header: \"Total\", align: \"end\", sortable: true, cell: (o) => money(o.total) },\n  { id: \"placed\", header: \"Placed\", sortable: true, cell: (o) => day(o.placed) },\n];\nconst statusFilter = { id: \"status\", label: \"Status\", options: [\"Paid\", \"Pending\", \"Overdue\", \"Refunded\"] };\nconst regionFilter = { id: \"region\", label: \"Region\", options: regions };\n\nconst Frame = ({ children }: { children: ReactNode }) => (\n  <div className=\"flex w-full justify-center\">\n    <div className=\"w-full max-w-5xl\">{children}</div>\n  </div>\n);\n\n// Search looks in the columns you name; each filter is a select (a sheet on a narrow screen).\nexport default function DataTableSearchableAndFilterableExample() {\n  return (\n    <Frame>\n      <DataTable\n        label=\"Orders\"\n        rows={orders}\n        columns={columns}\n        getRowId={(o) => o.id}\n        pageSize={8}\n        searchable={[\"number\", \"customer\"]}\n        searchPlaceholder=\"Search by order or customer\"\n        filters={[statusFilter, regionFilter]}\n        defaultQuery={{ sort: { column: \"placed\", direction: \"descending\" } }}\n      />\n    </Frame>\n  );\n}\n"
+        },
+        {
+          "name": "with-selection-and-bulk-actions",
+          "code": "import { useState } from \"react\";\nimport type { ReactNode } from \"react\";\nimport { Badge, DataTable, type DataTableColumn } from \"@rdloom/react\";\n\ntype Order = { id: string; number: string; customer: string; status: \"Paid\" | \"Pending\" | \"Refunded\" | \"Overdue\"; region: string; total: number; placed: string };\n\nconst names = [\"Northgate Foods\", \"Harbor Mills\", \"Brightwater Supplies\", \"Lindqvist Textiles\", \"Orchard Row Cafe\", \"Kestrel Logistics\", \"Maplewood Dental\", \"Ironbridge Tools\", \"Saltmarsh Bakery\", \"Tidewater Outfitters\", \"Quarry Lane Books\", \"Fernhill Nursery\"];\nconst statuses: Order[\"status\"][] = [\"Paid\", \"Pending\", \"Paid\", \"Overdue\", \"Refunded\", \"Paid\"];\nconst regions = [\"North\", \"South\", \"East\", \"West\"];\nconst makeOrders = (count: number): Order[] =>\n  Array.from({ length: count }, (_, i) => ({\n    id: `o${1042 - i}`,\n    number: `#${1042 - i}`,\n    customer: names[i % names.length],\n    status: statuses[i % statuses.length],\n    region: regions[(i * 3) % regions.length],\n    total: 240 + ((i * 377) % 2400),\n    placed: `2026-${String(9 - (i % 6)).padStart(2, \"0\")}-${String(3 + ((i * 7) % 24)).padStart(2, \"0\")}`,\n  }));\nconst orders = makeOrders(24);\n\nconst tone = { Paid: \"success\", Pending: \"info\", Overdue: \"warning\", Refunded: \"neutral\" } as const;\nconst money = (n: number) => new Intl.NumberFormat(\"en-US\", { style: \"currency\", currency: \"USD\", maximumFractionDigits: 0 }).format(n);\nconst day = (iso: string) => new Intl.DateTimeFormat(\"en-US\", { dateStyle: \"medium\", timeZone: \"UTC\" }).format(new Date(iso));\n\nconst columns: DataTableColumn<Order>[] = [\n  { id: \"number\", header: \"Order\", sortable: true },\n  { id: \"customer\", header: \"Customer\", sortable: true },\n  { id: \"status\", header: \"Status\", sortable: true, cell: (o) => <Badge variant={tone[o.status]} size=\"sm\">{o.status}</Badge> },\n  { id: \"region\", header: \"Region\", hideOnMobile: true },\n  { id: \"total\", header: \"Total\", align: \"end\", sortable: true, cell: (o) => money(o.total) },\n  { id: \"placed\", header: \"Placed\", sortable: true, cell: (o) => day(o.placed) },\n];\nconst statusFilter = { id: \"status\", label: \"Status\", options: [\"Paid\", \"Pending\", \"Overdue\", \"Refunded\"] };\nconst regionFilter = { id: \"region\", label: \"Region\", options: regions };\n\nconst Frame = ({ children }: { children: ReactNode }) => (\n  <div className=\"flex w-full justify-center\">\n    <div className=\"w-full max-w-5xl\">{children}</div>\n  </div>\n);\n\n// Tick rows and a bar appears with what you can do to them. The danger action asks first and says how many rows it touches.\nexport default function DataTableWithSelectionAndBulkActionsExample() {\n  const [rows, setRows] = useState(orders);\n  return (\n    <Frame>\n      <DataTable\n        label=\"Orders\"\n        rows={rows}\n        columns={columns}\n        getRowId={(o) => o.id}\n        pageSize={8}\n        selectionMode=\"multiple\"\n        searchable\n        bulkActions={[\n          {\n            id: \"paid\",\n            label: \"Mark as paid\",\n            onAction: (picked) => setRows((all) => all.map((o) => (picked.some((p) => p.id === o.id) ? { ...o, status: \"Paid\" as const } : o))),\n          },\n          {\n            id: \"delete\",\n            label: \"Delete\",\n            variant: \"danger\",\n            confirm: { title: \"Delete these orders?\", description: \"Deleted orders cannot be restored.\", confirmLabel: \"Delete orders\" },\n            onAction: (picked) => setRows((all) => all.filter((o) => !picked.some((p) => p.id === o.id))),\n          },\n        ]}\n      />\n    </Frame>\n  );\n}\n"
+        },
+        {
+          "name": "row-actions-and-delete",
+          "code": "import { useState } from \"react\";\nimport type { ReactNode } from \"react\";\nimport { Badge, DataTable, type DataTableColumn } from \"@rdloom/react\";\n\ntype Order = { id: string; number: string; customer: string; status: \"Paid\" | \"Pending\" | \"Refunded\" | \"Overdue\"; region: string; total: number; placed: string };\n\nconst names = [\"Northgate Foods\", \"Harbor Mills\", \"Brightwater Supplies\", \"Lindqvist Textiles\", \"Orchard Row Cafe\", \"Kestrel Logistics\", \"Maplewood Dental\", \"Ironbridge Tools\", \"Saltmarsh Bakery\", \"Tidewater Outfitters\", \"Quarry Lane Books\", \"Fernhill Nursery\"];\nconst statuses: Order[\"status\"][] = [\"Paid\", \"Pending\", \"Paid\", \"Overdue\", \"Refunded\", \"Paid\"];\nconst regions = [\"North\", \"South\", \"East\", \"West\"];\nconst makeOrders = (count: number): Order[] =>\n  Array.from({ length: count }, (_, i) => ({\n    id: `o${1042 - i}`,\n    number: `#${1042 - i}`,\n    customer: names[i % names.length],\n    status: statuses[i % statuses.length],\n    region: regions[(i * 3) % regions.length],\n    total: 240 + ((i * 377) % 2400),\n    placed: `2026-${String(9 - (i % 6)).padStart(2, \"0\")}-${String(3 + ((i * 7) % 24)).padStart(2, \"0\")}`,\n  }));\nconst orders = makeOrders(24);\n\nconst tone = { Paid: \"success\", Pending: \"info\", Overdue: \"warning\", Refunded: \"neutral\" } as const;\nconst money = (n: number) => new Intl.NumberFormat(\"en-US\", { style: \"currency\", currency: \"USD\", maximumFractionDigits: 0 }).format(n);\nconst day = (iso: string) => new Intl.DateTimeFormat(\"en-US\", { dateStyle: \"medium\", timeZone: \"UTC\" }).format(new Date(iso));\n\nconst columns: DataTableColumn<Order>[] = [\n  { id: \"number\", header: \"Order\", sortable: true },\n  { id: \"customer\", header: \"Customer\", sortable: true },\n  { id: \"status\", header: \"Status\", sortable: true, cell: (o) => <Badge variant={tone[o.status]} size=\"sm\">{o.status}</Badge> },\n  { id: \"region\", header: \"Region\", hideOnMobile: true },\n  { id: \"total\", header: \"Total\", align: \"end\", sortable: true, cell: (o) => money(o.total) },\n  { id: \"placed\", header: \"Placed\", sortable: true, cell: (o) => day(o.placed) },\n];\nconst statusFilter = { id: \"status\", label: \"Status\", options: [\"Paid\", \"Pending\", \"Overdue\", \"Refunded\"] };\nconst regionFilter = { id: \"region\", label: \"Region\", options: regions };\n\nconst Frame = ({ children }: { children: ReactNode }) => (\n  <div className=\"flex w-full justify-center\">\n    <div className=\"w-full max-w-5xl\">{children}</div>\n  </div>\n);\n\n// The More menu at the end of each row. Delete asks first; afterwards focus moves to the next row.\nexport default function DataTableRowActionsAndDeleteExample() {\n  const [rows, setRows] = useState(makeOrders(6));\n  return (\n    <Frame>\n      <DataTable\n        label=\"Orders\"\n        rows={rows}\n        columns={columns}\n        getRowId={(o) => o.id}\n        onRowOpen={(o) => console.log(\"Open\", o.number)}\n        rowActions={(order) => [\n          { id: \"duplicate\", label: \"Duplicate\", onAction: () => setRows((all) => [{ ...order, id: `${order.id}-copy`, number: `${order.number} copy` }, ...all]) },\n          {\n            id: \"delete\",\n            label: \"Delete order\",\n            variant: \"danger\",\n            confirm: { title: `Delete order ${order.number}?`, description: `${order.customer} will no longer see it.`, confirmLabel: \"Delete order\" },\n            onAction: () => setRows((all) => all.filter((o) => o.id !== order.id)),\n          },\n        ]}\n      />\n    </Frame>\n  );\n}\n"
+        },
+        {
+          "name": "states",
+          "code": "import { useState } from \"react\";\nimport type { ReactNode } from \"react\";\nimport { Badge, Button, DataTable, type DataState, type DataTableColumn } from \"@rdloom/react\";\n\ntype Order = { id: string; number: string; customer: string; status: \"Paid\" | \"Pending\" | \"Refunded\" | \"Overdue\"; region: string; total: number; placed: string };\n\nconst names = [\"Northgate Foods\", \"Harbor Mills\", \"Brightwater Supplies\", \"Lindqvist Textiles\", \"Orchard Row Cafe\", \"Kestrel Logistics\", \"Maplewood Dental\", \"Ironbridge Tools\", \"Saltmarsh Bakery\", \"Tidewater Outfitters\", \"Quarry Lane Books\", \"Fernhill Nursery\"];\nconst statuses: Order[\"status\"][] = [\"Paid\", \"Pending\", \"Paid\", \"Overdue\", \"Refunded\", \"Paid\"];\nconst regions = [\"North\", \"South\", \"East\", \"West\"];\nconst makeOrders = (count: number): Order[] =>\n  Array.from({ length: count }, (_, i) => ({\n    id: `o${1042 - i}`,\n    number: `#${1042 - i}`,\n    customer: names[i % names.length],\n    status: statuses[i % statuses.length],\n    region: regions[(i * 3) % regions.length],\n    total: 240 + ((i * 377) % 2400),\n    placed: `2026-${String(9 - (i % 6)).padStart(2, \"0\")}-${String(3 + ((i * 7) % 24)).padStart(2, \"0\")}`,\n  }));\nconst orders = makeOrders(24);\n\nconst tone = { Paid: \"success\", Pending: \"info\", Overdue: \"warning\", Refunded: \"neutral\" } as const;\nconst money = (n: number) => new Intl.NumberFormat(\"en-US\", { style: \"currency\", currency: \"USD\", maximumFractionDigits: 0 }).format(n);\nconst day = (iso: string) => new Intl.DateTimeFormat(\"en-US\", { dateStyle: \"medium\", timeZone: \"UTC\" }).format(new Date(iso));\n\nconst columns: DataTableColumn<Order>[] = [\n  { id: \"number\", header: \"Order\", sortable: true },\n  { id: \"customer\", header: \"Customer\", sortable: true },\n  { id: \"status\", header: \"Status\", sortable: true, cell: (o) => <Badge variant={tone[o.status]} size=\"sm\">{o.status}</Badge> },\n  { id: \"region\", header: \"Region\", hideOnMobile: true },\n  { id: \"total\", header: \"Total\", align: \"end\", sortable: true, cell: (o) => money(o.total) },\n  { id: \"placed\", header: \"Placed\", sortable: true, cell: (o) => day(o.placed) },\n];\nconst statusFilter = { id: \"status\", label: \"Status\", options: [\"Paid\", \"Pending\", \"Overdue\", \"Refunded\"] };\nconst regionFilter = { id: \"region\", label: \"Region\", options: regions };\n\nconst Frame = ({ children }: { children: ReactNode }) => (\n  <div className=\"flex w-full justify-center\">\n    <div className=\"w-full max-w-5xl\">{children}</div>\n  </div>\n);\n\n// Pretend the data is loading, empty, failed or ready. Your own data layer gives you the state.\nexport default function DataTableStatesExample() {\n  const [state, setState] = useState<DataState>(\"ready\");\n  return (\n    <Frame>\n      <div className=\"flex flex-col gap-4\">\n        <div role=\"group\" aria-label=\"Pretend the data is\" className=\"flex flex-wrap gap-2\">\n          {([\"loading\", \"empty\", \"error\", \"ready\"] as const).map((s) => (\n            <Button key={s} size=\"sm\" variant={state === s ? \"primary\" : \"secondary\"} aria-pressed={state === s} onPress={() => setState(s)}>\n              {s}\n            </Button>\n          ))}\n        </div>\n        <DataTable\n          label=\"Orders\"\n          rows={state === \"ready\" ? orders : []}\n          columns={columns}\n          getRowId={(o) => o.id}\n          pageSize={6}\n          state={state}\n          searchable\n          error=\"The orders service did not answer.\"\n          onRetry={() => setState(\"loading\")}\n          emptyTitle=\"No orders yet\"\n          emptyDescription=\"Orders show up here as soon as a customer checks out.\"\n          emptyAction={<Button onPress={() => setState(\"ready\")}>Create a test order</Button>}\n        />\n      </div>\n    </Frame>\n  );\n}\n"
+        },
+        {
+          "name": "server-side",
+          "code": "import { useEffect, useRef, useState } from \"react\";\nimport type { ReactNode } from \"react\";\nimport { Badge, DataTable, applyDataTableQuery, type DataTableColumn, type DataTableQuery } from \"@rdloom/react\";\n\ntype Order = { id: string; number: string; customer: string; status: \"Paid\" | \"Pending\" | \"Refunded\" | \"Overdue\"; region: string; total: number; placed: string };\n\nconst names = [\"Northgate Foods\", \"Harbor Mills\", \"Brightwater Supplies\", \"Lindqvist Textiles\", \"Orchard Row Cafe\", \"Kestrel Logistics\", \"Maplewood Dental\", \"Ironbridge Tools\", \"Saltmarsh Bakery\", \"Tidewater Outfitters\", \"Quarry Lane Books\", \"Fernhill Nursery\"];\nconst statuses: Order[\"status\"][] = [\"Paid\", \"Pending\", \"Paid\", \"Overdue\", \"Refunded\", \"Paid\"];\nconst regions = [\"North\", \"South\", \"East\", \"West\"];\nconst makeOrders = (count: number): Order[] =>\n  Array.from({ length: count }, (_, i) => ({\n    id: `o${1042 - i}`,\n    number: `#${1042 - i}`,\n    customer: names[i % names.length],\n    status: statuses[i % statuses.length],\n    region: regions[(i * 3) % regions.length],\n    total: 240 + ((i * 377) % 2400),\n    placed: `2026-${String(9 - (i % 6)).padStart(2, \"0\")}-${String(3 + ((i * 7) % 24)).padStart(2, \"0\")}`,\n  }));\nconst orders = makeOrders(24);\n\nconst tone = { Paid: \"success\", Pending: \"info\", Overdue: \"warning\", Refunded: \"neutral\" } as const;\nconst money = (n: number) => new Intl.NumberFormat(\"en-US\", { style: \"currency\", currency: \"USD\", maximumFractionDigits: 0 }).format(n);\nconst day = (iso: string) => new Intl.DateTimeFormat(\"en-US\", { dateStyle: \"medium\", timeZone: \"UTC\" }).format(new Date(iso));\n\nconst columns: DataTableColumn<Order>[] = [\n  { id: \"number\", header: \"Order\", sortable: true },\n  { id: \"customer\", header: \"Customer\", sortable: true },\n  { id: \"status\", header: \"Status\", sortable: true, cell: (o) => <Badge variant={tone[o.status]} size=\"sm\">{o.status}</Badge> },\n  { id: \"region\", header: \"Region\", hideOnMobile: true },\n  { id: \"total\", header: \"Total\", align: \"end\", sortable: true, cell: (o) => money(o.total) },\n  { id: \"placed\", header: \"Placed\", sortable: true, cell: (o) => day(o.placed) },\n];\nconst statusFilter = { id: \"status\", label: \"Status\", options: [\"Paid\", \"Pending\", \"Overdue\", \"Refunded\"] };\nconst regionFilter = { id: \"region\", label: \"Region\", options: regions };\n\nconst Frame = ({ children }: { children: ReactNode }) => (\n  <div className=\"flex w-full justify-center\">\n    <div className=\"w-full max-w-5xl\">{children}</div>\n  </div>\n);\n\nconst everything = makeOrders(240);\n\n// A stand-in for your API: it answers after a short wait. In your app, send the query to the server and\n// return that page and the number of matches. (applyDataTableQuery is the logic the table uses in memory.)\nconst fetchOrders = (query: DataTableQuery) =>\n  new Promise<{ rows: Order[]; total: number }>((resolve) => {\n    const { rows, total } = applyDataTableQuery(everything, columns, query, { pageSize: 8, searchColumns: [\"number\", \"customer\"], filters: [statusFilter] });\n    setTimeout(() => resolve({ rows, total }), 600);\n  });\n\nexport default function DataTableServerSideExample() {\n  const [page, setPage] = useState<{ rows: Order[]; total: number }>({ rows: [], total: 0 });\n  const [loading, setLoading] = useState(true);\n  const [error, setError] = useState<string>();\n  const last = useRef<DataTableQuery | undefined>(undefined);\n\n  const load = (query: DataTableQuery) => {\n    last.current = query;\n    setLoading(true);\n    setError(undefined);\n    fetchOrders(query)\n      .then((result) => last.current === query && setPage(result)) // ignore an answer that arrives late\n      .catch(() => setError(\"The server did not answer.\"))\n      .finally(() => last.current === query && setLoading(false));\n  };\n  useEffect(() => load({ search: \"\", filters: {}, sort: null, page: 1 }), []);\n\n  return (\n    <Frame>\n      <DataTable\n        label=\"Orders\"\n        rows={page.rows}\n        totalCount={page.total}\n        columns={columns}\n        getRowId={(o) => o.id}\n        pageSize={8}\n        serverSide\n        isLoading={loading}\n        error={error}\n        onRetry={() => last.current && load(last.current)}\n        onQueryChange={load}\n        searchable\n        filters={[statusFilter]}\n        onExport={(rows) => console.log(`Export ${rows.length} orders`)}\n      />\n    </Frame>\n  );\n}\n"
+        },
+        {
+          "name": "permissions",
+          "code": "import type { ReactNode } from \"react\";\nimport { Badge, DataTable, type DataTableColumn } from \"@rdloom/react\";\n\ntype Order = { id: string; number: string; customer: string; status: \"Paid\" | \"Pending\" | \"Refunded\" | \"Overdue\"; region: string; total: number; placed: string };\n\nconst names = [\"Northgate Foods\", \"Harbor Mills\", \"Brightwater Supplies\", \"Lindqvist Textiles\", \"Orchard Row Cafe\", \"Kestrel Logistics\", \"Maplewood Dental\", \"Ironbridge Tools\", \"Saltmarsh Bakery\", \"Tidewater Outfitters\", \"Quarry Lane Books\", \"Fernhill Nursery\"];\nconst statuses: Order[\"status\"][] = [\"Paid\", \"Pending\", \"Paid\", \"Overdue\", \"Refunded\", \"Paid\"];\nconst regions = [\"North\", \"South\", \"East\", \"West\"];\nconst makeOrders = (count: number): Order[] =>\n  Array.from({ length: count }, (_, i) => ({\n    id: `o${1042 - i}`,\n    number: `#${1042 - i}`,\n    customer: names[i % names.length],\n    status: statuses[i % statuses.length],\n    region: regions[(i * 3) % regions.length],\n    total: 240 + ((i * 377) % 2400),\n    placed: `2026-${String(9 - (i % 6)).padStart(2, \"0\")}-${String(3 + ((i * 7) % 24)).padStart(2, \"0\")}`,\n  }));\nconst orders = makeOrders(24);\n\nconst tone = { Paid: \"success\", Pending: \"info\", Overdue: \"warning\", Refunded: \"neutral\" } as const;\nconst money = (n: number) => new Intl.NumberFormat(\"en-US\", { style: \"currency\", currency: \"USD\", maximumFractionDigits: 0 }).format(n);\nconst day = (iso: string) => new Intl.DateTimeFormat(\"en-US\", { dateStyle: \"medium\", timeZone: \"UTC\" }).format(new Date(iso));\n\nconst columns: DataTableColumn<Order>[] = [\n  { id: \"number\", header: \"Order\", sortable: true },\n  { id: \"customer\", header: \"Customer\", sortable: true },\n  { id: \"status\", header: \"Status\", sortable: true, cell: (o) => <Badge variant={tone[o.status]} size=\"sm\">{o.status}</Badge> },\n  { id: \"region\", header: \"Region\", hideOnMobile: true },\n  { id: \"total\", header: \"Total\", align: \"end\", sortable: true, cell: (o) => money(o.total) },\n  { id: \"placed\", header: \"Placed\", sortable: true, cell: (o) => day(o.placed) },\n];\nconst statusFilter = { id: \"status\", label: \"Status\", options: [\"Paid\", \"Pending\", \"Overdue\", \"Refunded\"] };\nconst regionFilter = { id: \"region\", label: \"Region\", options: regions };\n\nconst Frame = ({ children }: { children: ReactNode }) => (\n  <div className=\"flex w-full justify-center\">\n    <div className=\"w-full max-w-5xl\">{children}</div>\n  </div>\n);\n\n// The app answers per action. Here this person may look but not select, export or delete. Disabled actions say why.\n// The server must check every action again: what the page shows is not security.\nexport default function DataTablePermissionsExample() {\n  return (\n    <Frame>\n      <DataTable\n        label=\"Orders\"\n        rows={orders}\n        columns={columns}\n        getRowId={(o) => o.id}\n        pageSize={6}\n        selectionMode=\"multiple\"\n        permissions={{ export: { state: \"disabled\", reason: \"Only finance can export orders\" }, select: \"hidden\" }}\n        rowActions={(order) => [\n          { id: \"view\", label: \"View receipt\", onAction: () => {} },\n          { id: \"refund\", label: \"Refund\", permission: { state: \"disabled\", reason: \"Only managers can refund\" }, onAction: () => {} },\n          { id: \"delete\", label: `Delete ${order.number}`, variant: \"danger\", permission: \"hidden\", onAction: () => {} },\n        ]}\n      />\n    </Frame>\n  );\n}\n"
+        },
+        {
+          "name": "url-state",
+          "code": "import { useMemo } from \"react\";\nimport type { ReactNode } from \"react\";\nimport { Badge, DataTable, dataTableQueryFromState, dataTableQuerySchema, dataTableQueryToState, useWindowQueryState, type DataTableColumn, type DataTableQuery } from \"@rdloom/react\";\n\ntype Order = { id: string; number: string; customer: string; status: \"Paid\" | \"Pending\" | \"Refunded\" | \"Overdue\"; region: string; total: number; placed: string };\n\nconst names = [\"Northgate Foods\", \"Harbor Mills\", \"Brightwater Supplies\", \"Lindqvist Textiles\", \"Orchard Row Cafe\", \"Kestrel Logistics\", \"Maplewood Dental\", \"Ironbridge Tools\", \"Saltmarsh Bakery\", \"Tidewater Outfitters\", \"Quarry Lane Books\", \"Fernhill Nursery\"];\nconst statuses: Order[\"status\"][] = [\"Paid\", \"Pending\", \"Paid\", \"Overdue\", \"Refunded\", \"Paid\"];\nconst regions = [\"North\", \"South\", \"East\", \"West\"];\nconst makeOrders = (count: number): Order[] =>\n  Array.from({ length: count }, (_, i) => ({\n    id: `o${1042 - i}`,\n    number: `#${1042 - i}`,\n    customer: names[i % names.length],\n    status: statuses[i % statuses.length],\n    region: regions[(i * 3) % regions.length],\n    total: 240 + ((i * 377) % 2400),\n    placed: `2026-${String(9 - (i % 6)).padStart(2, \"0\")}-${String(3 + ((i * 7) % 24)).padStart(2, \"0\")}`,\n  }));\nconst orders = makeOrders(24);\n\nconst tone = { Paid: \"success\", Pending: \"info\", Overdue: \"warning\", Refunded: \"neutral\" } as const;\nconst money = (n: number) => new Intl.NumberFormat(\"en-US\", { style: \"currency\", currency: \"USD\", maximumFractionDigits: 0 }).format(n);\nconst day = (iso: string) => new Intl.DateTimeFormat(\"en-US\", { dateStyle: \"medium\", timeZone: \"UTC\" }).format(new Date(iso));\n\nconst columns: DataTableColumn<Order>[] = [\n  { id: \"number\", header: \"Order\", sortable: true },\n  { id: \"customer\", header: \"Customer\", sortable: true },\n  { id: \"status\", header: \"Status\", sortable: true, cell: (o) => <Badge variant={tone[o.status]} size=\"sm\">{o.status}</Badge> },\n  { id: \"region\", header: \"Region\", hideOnMobile: true },\n  { id: \"total\", header: \"Total\", align: \"end\", sortable: true, cell: (o) => money(o.total) },\n  { id: \"placed\", header: \"Placed\", sortable: true, cell: (o) => day(o.placed) },\n];\nconst statusFilter = { id: \"status\", label: \"Status\", options: [\"Paid\", \"Pending\", \"Overdue\", \"Refunded\"] };\nconst regionFilter = { id: \"region\", label: \"Region\", options: regions };\n\nconst Frame = ({ children }: { children: ReactNode }) => (\n  <div className=\"flex w-full justify-center\">\n    <div className=\"w-full max-w-5xl\">{children}</div>\n  </div>\n);\n\n// The search, filters, sort and page live in the address (?q=acme&status=Paid&sort=total:desc&page=2), so a refresh,\n// a shared link and the back button bring the same screen back. useWindowQueryState reads the address only after mount,\n// so the first render is the same on the server.\nconst options = { filters: [\"status\", \"region\"], sortColumns: [\"number\", \"customer\", \"status\", \"total\", \"placed\"] };\nconst schema = dataTableQuerySchema(options);\n\nexport default function DataTableUrlStateExample() {\n  const [state, setState] = useWindowQueryState(schema, { mode: \"replace\" });\n  const query = useMemo(() => dataTableQueryFromState(state, options), [state]);\n  return (\n    <Frame>\n      <DataTable\n        label=\"Orders\"\n        rows={orders}\n        columns={columns}\n        getRowId={(o) => o.id}\n        pageSize={8}\n        searchable\n        filters={[statusFilter, regionFilter]}\n        query={query}\n        onQueryChange={(next: DataTableQuery) => setState(dataTableQueryToState(next, options))}\n      />\n    </Frame>\n  );\n}\n"
+        },
+        {
+          "name": "classNames",
+          "code": "import type { ReactNode } from \"react\";\nimport { Badge, DataTable, type DataTableColumn } from \"@rdloom/react\";\n\ntype Order = { id: string; number: string; customer: string; status: \"Paid\" | \"Pending\" | \"Refunded\" | \"Overdue\"; region: string; total: number; placed: string };\n\nconst names = [\"Northgate Foods\", \"Harbor Mills\", \"Brightwater Supplies\", \"Lindqvist Textiles\", \"Orchard Row Cafe\", \"Kestrel Logistics\", \"Maplewood Dental\", \"Ironbridge Tools\", \"Saltmarsh Bakery\", \"Tidewater Outfitters\", \"Quarry Lane Books\", \"Fernhill Nursery\"];\nconst statuses: Order[\"status\"][] = [\"Paid\", \"Pending\", \"Paid\", \"Overdue\", \"Refunded\", \"Paid\"];\nconst regions = [\"North\", \"South\", \"East\", \"West\"];\nconst makeOrders = (count: number): Order[] =>\n  Array.from({ length: count }, (_, i) => ({\n    id: `o${1042 - i}`,\n    number: `#${1042 - i}`,\n    customer: names[i % names.length],\n    status: statuses[i % statuses.length],\n    region: regions[(i * 3) % regions.length],\n    total: 240 + ((i * 377) % 2400),\n    placed: `2026-${String(9 - (i % 6)).padStart(2, \"0\")}-${String(3 + ((i * 7) % 24)).padStart(2, \"0\")}`,\n  }));\nconst orders = makeOrders(24);\n\nconst tone = { Paid: \"success\", Pending: \"info\", Overdue: \"warning\", Refunded: \"neutral\" } as const;\nconst money = (n: number) => new Intl.NumberFormat(\"en-US\", { style: \"currency\", currency: \"USD\", maximumFractionDigits: 0 }).format(n);\nconst day = (iso: string) => new Intl.DateTimeFormat(\"en-US\", { dateStyle: \"medium\", timeZone: \"UTC\" }).format(new Date(iso));\n\nconst columns: DataTableColumn<Order>[] = [\n  { id: \"number\", header: \"Order\", sortable: true },\n  { id: \"customer\", header: \"Customer\", sortable: true },\n  { id: \"status\", header: \"Status\", sortable: true, cell: (o) => <Badge variant={tone[o.status]} size=\"sm\">{o.status}</Badge> },\n  { id: \"region\", header: \"Region\", hideOnMobile: true },\n  { id: \"total\", header: \"Total\", align: \"end\", sortable: true, cell: (o) => money(o.total) },\n  { id: \"placed\", header: \"Placed\", sortable: true, cell: (o) => day(o.placed) },\n];\nconst statusFilter = { id: \"status\", label: \"Status\", options: [\"Paid\", \"Pending\", \"Overdue\", \"Refunded\"] };\nconst regionFilter = { id: \"region\", label: \"Region\", options: regions };\n\nconst Frame = ({ children }: { children: ReactNode }) => (\n  <div className=\"flex w-full justify-center\">\n    <div className=\"w-full max-w-5xl\">{children}</div>\n  </div>\n);\n\n// Restyle one part without editing the block: every slot takes a class name.\nexport default function DataTableClassNamesExample() {\n  return (\n    <Frame>\n      <DataTable\n        label=\"Orders\"\n        rows={orders}\n        columns={columns}\n        getRowId={(o) => o.id}\n        pageSize={6}\n        searchable\n        selectionMode=\"multiple\"\n        filters={[statusFilter]}\n        bulkActions={[{ id: \"archive\", label: \"Archive\", onAction: () => {} }]}\n        classNames={{\n          toolbar: \"rounded-[var(--rd-radius-overlay)] bg-[var(--rd-color-surface-subtle)] p-2\",\n          table: \"border-2\",\n          header: \"[&_th]:text-[var(--rd-color-text-default)]\",\n          row: \"data-[hovered]:bg-[var(--rd-color-surface-selected)]\",\n          \"bulk-bar\": \"border-dashed\",\n          count: \"font-medium\",\n          footer: \"border-t border-[var(--rd-color-border-default)] pt-3\",\n        }}\n      />\n    </Frame>\n  );\n}\n"
+        },
+        {
+          "name": "user-management",
+          "code": "import { useState } from \"react\";\nimport {\n  ActionButton,\n  Avatar,\n  Badge,\n  BreadcrumbItem,\n  Breadcrumbs,\n  Button,\n  DataTable,\n  DialogTrigger,\n  InviteDialog,\n  PageHeader,\n  SegmentedControl,\n  SegmentedControlItem,\n  Sheet,\n  UserForm,\n  type DataTableColumn,\n  type PermissionValue,\n} from \"@rdloom/react\";\n\ntype User = { id: string; name: string; email: string; role: string; status: \"active\" | \"invited\" | \"suspended\"; lastActive: string };\n\nconst roles = [\n  { id: \"viewer\", label: \"Viewer\", description: \"Can read everything, change nothing.\" },\n  { id: \"editor\", label: \"Editor\", description: \"Can create and change records.\" },\n  { id: \"admin\", label: \"Admin\", description: \"Can also manage members and billing.\" },\n];\n\nconst people = [\"Amara Okafor\", \"Lena Fischer\", \"Tomas Novak\", \"Priya Raman\", \"Mateo Silva\", \"Hana Sato\", \"Jonas Berg\", \"Imani Brooks\", \"Noor Haddad\", \"Elif Demir\", \"Rafael Costa\", \"Sofia Lindqvist\"];\nconst initialUsers: User[] = people.map((name, i) => ({\n  id: `u${i + 1}`,\n  name,\n  email: `${name.toLowerCase().replace(\" \", \".\")}@example.com`,\n  role: roles[i % 3].id,\n  status: ([\"active\", \"active\", \"invited\", \"active\", \"suspended\"] as const)[i % 5],\n  lastActive: `2026-10-${String(1 + ((i * 5) % 28)).padStart(2, \"0\")}`,\n}));\n\nconst statusTone = { active: \"success\", invited: \"info\", suspended: \"warning\" } as const;\nconst day = (iso: string) => new Intl.DateTimeFormat(\"en-US\", { dateStyle: \"medium\", timeZone: \"UTC\" }).format(new Date(iso));\nconst wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));\n\ntype Viewer = \"admin\" | \"manager\" | \"viewer\";\n\n// What each kind of person may do. The app decides; the blocks only receive the answers.\n// The server must check every one of these again: what the page shows is not security.\nfunction permissionsFor(viewer: Viewer) {\n  const no = (reason: string): PermissionValue => ({ state: \"disabled\", reason });\n  return {\n    invite: viewer === \"viewer\" ? no(\"Only managers and admins can invite people\") : true,\n    edit: viewer === \"viewer\" ? \"hidden\" : true,\n    suspend: viewer === \"viewer\" ? \"hidden\" : true,\n    remove: viewer === \"admin\" ? true : viewer === \"manager\" ? no(\"Only admins can remove people\") : (\"hidden\" as PermissionValue),\n    select: viewer === \"viewer\" ? \"hidden\" : true,\n  } as const;\n}\n\nexport default function DataTableUserManagementExample() {\n  const [users, setUsers] = useState(initialUsers);\n  const [viewer, setViewer] = useState<Viewer>(\"admin\");\n  const [editing, setEditing] = useState<User | null>(null);\n  const can = permissionsFor(viewer);\n\n  const columns: DataTableColumn<User>[] = [\n    {\n      id: \"name\",\n      header: \"Name\",\n      sortable: true,\n      cell: (u) => (\n        <span className=\"flex items-center gap-3\">\n          <Avatar name={u.name} size=\"sm\" decorative />\n          <span className=\"font-medium\">{u.name}</span>\n        </span>\n      ),\n    },\n    { id: \"email\", header: \"Email\", hideOnMobile: true },\n    { id: \"role\", header: \"Role\", sortable: true, cell: (u) => roles.find((r) => r.id === u.role)?.label ?? u.role },\n    { id: \"status\", header: \"Status\", sortable: true, cell: (u) => <Badge variant={statusTone[u.status]} size=\"sm\">{u.status}</Badge> },\n    { id: \"lastActive\", header: \"Last active\", sortable: true, hideOnMobile: true, cell: (u) => day(u.lastActive) },\n  ];\n\n  const setStatus = (ids: string[], status: User[\"status\"]) =>\n    wait(500).then(() => setUsers((all) => all.map((u) => (ids.includes(u.id) ? { ...u, status } : u))));\n  const remove = (ids: string[]) => wait(500).then(() => setUsers((all) => all.filter((u) => !ids.includes(u.id))));\n\n  return (\n    <div className=\"flex w-full justify-center\">\n      <div className=\"flex w-full max-w-5xl flex-col gap-6\">\n        <div className=\"flex flex-wrap items-center gap-3\">\n          <span className=\"text-sm text-[var(--rd-color-text-muted)]\">View as</span>\n          <SegmentedControl label=\"View as\" size=\"sm\" selectedKey={viewer} onChange={(key) => setViewer(String(key) as Viewer)}>\n            <SegmentedControlItem id=\"admin\">Admin</SegmentedControlItem>\n            <SegmentedControlItem id=\"manager\">Manager</SegmentedControlItem>\n            <SegmentedControlItem id=\"viewer\">Viewer</SegmentedControlItem>\n          </SegmentedControl>\n        </div>\n\n        <PageHeader\n          title=\"Users\"\n          description=\"Everyone with access to this workspace.\"\n          breadcrumbs={\n            <Breadcrumbs label=\"You are here\">\n              <BreadcrumbItem>Settings</BreadcrumbItem>\n              <BreadcrumbItem>Users</BreadcrumbItem>\n            </Breadcrumbs>\n          }\n          actions={\n            viewer === \"viewer\" ? (\n              <ActionButton permission={can.invite} onAction={() => {}}>\n                Invite people\n              </ActionButton>\n            ) : (\n              <DialogTrigger>\n                <Button>Invite people</Button>\n                <InviteDialog\n                  roles={roles}\n                  defaultRole=\"viewer\"\n                  existingEmails={users.map((u) => u.email)}\n                  description=\"They get an email with a link to join your workspace.\"\n                  onInvite={async (invites) => {\n                    await wait(600);\n                    setUsers((all) => [\n                      ...invites.map((invite, i) => ({\n                        id: `new-${Date.now()}-${i}`,\n                        name: invite.email.split(\"@\")[0].replace(\".\", \" \"),\n                        email: invite.email,\n                        role: invite.role,\n                        status: \"invited\" as const,\n                        lastActive: \"2026-10-07\",\n                      })),\n                      ...all,\n                    ]);\n                  }}\n                />\n              </DialogTrigger>\n            )\n          }\n        />\n\n        <DataTable\n          label=\"Users\"\n          rows={users}\n          columns={columns}\n          getRowId={(u) => u.id}\n          searchable={[\"name\", \"email\"]}\n          searchPlaceholder=\"Search people\"\n          filters={[\n            { id: \"role\", label: \"Role\", options: roles.map((r) => r.label) },\n            { id: \"status\", label: \"Status\", options: [\"active\", \"invited\", \"suspended\"] },\n          ]}\n          pageSize={8}\n          selectionMode=\"multiple\"\n          permissions={{ select: can.select, rowActions: can.edit === \"hidden\" ? \"hidden\" : true }}\n          bulkActions={[\n            {\n              id: \"suspend\",\n              label: \"Suspend\",\n              permission: can.suspend,\n              confirm: { title: \"Suspend the selected people?\", confirmLabel: \"Suspend\" },\n              onAction: (rows) => setStatus(rows.map((u) => u.id), \"suspended\"),\n            },\n            {\n              id: \"remove\",\n              label: \"Remove\",\n              variant: \"danger\",\n              permission: can.remove,\n              confirm: { title: \"Remove the selected people?\", description: \"They lose access right away.\", confirmLabel: \"Remove\" },\n              onAction: (rows) => remove(rows.map((u) => u.id)),\n            },\n          ]}\n          rowActions={(user) => [\n            { id: \"edit\", label: \"Edit user\", permission: can.edit, onAction: () => setEditing(user) },\n            {\n              id: \"suspend\",\n              label: user.status === \"suspended\" ? \"Reinstate\" : \"Suspend\",\n              permission: can.suspend,\n              onAction: () => setStatus([user.id], user.status === \"suspended\" ? \"active\" : \"suspended\"),\n            },\n            {\n              id: \"remove\",\n              label: \"Remove from workspace\",\n              variant: \"danger\",\n              permission: can.remove,\n              confirm: { title: `Remove ${user.name}?`, description: \"They lose access right away.\", confirmLabel: \"Remove\" },\n              onAction: () => remove([user.id]),\n            },\n          ]}\n          onRowOpen={(user) => can.edit !== \"hidden\" && setEditing(user)}\n        />\n\n        <Sheet title=\"Edit user\" description=\"Changes apply when you save.\" isDismissable={false} isOpen={editing !== null} onOpenChange={(open) => !open && setEditing(null)}>\n          {editing && (\n            <div className=\"min-h-0 flex-1 overflow-auto p-6\">\n              <UserForm\n                layout=\"plain\"\n                mode=\"edit\"\n                roles={roles}\n                defaultValues={{ name: editing.name, email: editing.email, role: editing.role, status: editing.status === \"suspended\" ? \"suspended\" : \"active\" }}\n                onSubmit={async (values) => {\n                  await wait(600);\n                  setUsers((all) => all.map((u) => (u.id === editing.id ? { ...u, name: values.name, role: values.role, status: values.status } : u)));\n                  setEditing(null);\n                }}\n                onCancel={() => setEditing(null)}\n                onDelete={async () => {\n                  await remove([editing.id]);\n                  setEditing(null);\n                }}\n                permissions={{ delete: can.remove }}\n              />\n            </div>\n          )}\n        </Sheet>\n      </div>\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "data-table/data-table.tsx",
+          "content": "\"use client\";\n\nimport { useEffect, useMemo, useRef, useState, type ReactNode } from \"react\";\nimport { Button as AriaButton, Checkbox as AriaCheckbox, Input, Label, Link as AriaLink, SearchField, type Selection } from \"react-aria-components\";\nimport { dataTableDefaults, type DataTableSpecProps } from \"../generated/data-table.types\";\nimport { ActionButton } from \"../action-button/action-button\";\nimport { AlertDialog } from \"../alert-dialog/alert-dialog\";\nimport { Button } from \"../button/button\";\nimport { EmptyState } from \"../empty-state/empty-state\";\nimport { ErrorState } from \"../error-state/error-state\";\nimport { Menu, MenuItem, MenuTrigger } from \"../menu/menu\";\nimport { Pagination } from \"../pagination/pagination\";\nimport { Select, SelectItem } from \"../select/select\";\nimport { Sheet } from \"../sheet/sheet\";\nimport { Skeleton } from \"../skeleton/skeleton\";\nimport { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from \"../table/table\";\nimport { cx } from \"../utils/cx\";\nimport { CheckIcon, CloseIcon, DotsIcon, MinusIcon, SearchIcon } from \"../utils/icons\";\nimport { permissionFor, resolvePermission, type PermissionValue } from \"../utils/permissions\";\nimport { toDataState } from \"../utils/state\";\nimport {\n  applyDataTableQuery,\n  cellValue,\n  completeQuery,\n  filterCount,\n  isFiltered,\n  normalizeOptions,\n  pageCountOf,\n  rowsToCsv,\n  valueText,\n  type DataTableBulkAction,\n  type DataTableColumn,\n  type DataTableFilter,\n  type DataTableQuery,\n  type DataTableRowAction,\n} from \"./query\";\n\ntype Generic = \"rows\" | \"columns\" | \"getRowId\" | \"filters\" | \"bulkActions\" | \"rowActions\" | \"onRowOpen\" | \"onSelect\" | \"rowHref\" | \"onExport\";\n\nexport interface DataTableProps<Row> extends Omit<DataTableSpecProps, Generic> {\n  rows: readonly Row[];\n  columns: DataTableColumn<Row>[];\n  getRowId: (row: Row) => string;\n  filters?: DataTableFilter<Row>[];\n  bulkActions?: DataTableBulkAction<Row>[];\n  rowActions?: (row: Row) => DataTableRowAction<Row>[];\n  onRowOpen?: (row: Row) => void;\n  onSelect?: (row: Row) => void;\n  rowHref?: (row: Row) => string;\n  onExport?: (rows: Row[], query: DataTableQuery) => void;\n  className?: string;\n}\n\n/** The parts of the block that take a class name of their own. */\nexport type DataTableSlot = \"root\" | \"toolbar\" | \"search\" | \"filters\" | \"count\" | \"export\" | \"bulk-bar\" | \"table\" | \"header\" | \"row\" | \"cell\" | \"cards\" | \"card\" | \"empty\" | \"error\" | \"footer\" | \"pagination\";\nexport type DataTableClassNames = Partial<Record<DataTableSlot, string>>;\n\nconst NARROW = 640;\nconst ALL = \"__all\";\n\nconst control =\n  \"h-[var(--rd-size-control-md)] w-full rounded-[var(--rd-radius-control)] border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-default)] \" +\n  \"ps-9 pe-9 text-sm text-[var(--rd-color-text-default)] [box-shadow:var(--rd-elevation-raised)] outline-none transition-colors \" +\n  \"placeholder:text-[var(--rd-color-text-muted)] data-[hovered]:border-[var(--rd-color-border-strong)] \" +\n  \"data-[focused]:border-[var(--rd-color-focus-ring)] data-[focused]:ring-2 data-[focused]:ring-[var(--rd-color-focus-ring)] [&::-webkit-search-cancel-button]:hidden\";\n\nconst checkbox =\n  \"flex size-4 shrink-0 items-center justify-center rounded-[var(--rd-radius-sm,4px)] border border-[var(--rd-color-border-strong)] outline-none \" +\n  \"data-[selected]:border-transparent data-[selected]:bg-[var(--rd-color-action-primary)] data-[indeterminate]:border-transparent data-[indeterminate]:bg-[var(--rd-color-action-primary)] \" +\n  \"data-[focus-visible]:ring-2 data-[focus-visible]:ring-offset-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)]\";\n\nconst open =\n  \"w-fit max-w-full rounded text-start font-medium text-[var(--rd-color-text-default)] underline-offset-2 outline-none \" +\n  \"data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)] data-[hovered]:underline\";\n\nconst slug = (text: string) => text.toLowerCase().replace(/[^a-z0-9]+/g, \"-\").replace(/^-|-$/g, \"\") || \"table\";\nconst plural = (n: number, one: string, many: string) => (n === 1 ? one : many);\nconst alignClass = { start: \"\", center: \"!text-center\", end: \"!text-end tabular-nums\" } as const;\n\ntype FocusRequest = { kind: \"row\"; id: string; index: number } | { kind: \"first\" };\n\n/**\n * The list screen of an admin, ERP or SaaS app: search, filters, sorting, pages, selection with bulk\n * actions, a More menu per row, CSV export, loading, empty and error states, and cards on a narrow\n * space. It never fetches: pass the rows (or one page with `serverSide`) and handle the actions.\n */\nexport function DataTable<Row>({\n  rows,\n  columns,\n  getRowId,\n  label = dataTableDefaults.label,\n  state,\n  isLoading = dataTableDefaults.isLoading,\n  error,\n  onRetry,\n  emptyTitle,\n  emptyDescription,\n  emptyAction,\n  searchable,\n  searchPlaceholder = dataTableDefaults.searchPlaceholder,\n  filters = [],\n  pageSize = dataTableDefaults.pageSize,\n  query: controlledQuery,\n  defaultQuery,\n  onQueryChange,\n  onSearch,\n  onFilter,\n  serverSide = dataTableDefaults.serverSide,\n  totalCount,\n  selectionMode = dataTableDefaults.selectionMode,\n  selectedKeys: controlledSelection,\n  defaultSelectedKeys,\n  onSelectionChange,\n  bulkActions = [],\n  rowActions,\n  onRowOpen,\n  onSelect,\n  rowHref,\n  onExport,\n  permissions,\n  classNames,\n  density = dataTableDefaults.density,\n  layout = dataTableDefaults.layout,\n  className,\n}: DataTableProps<Row>) {\n  const all = rows as Row[];\n  const root = useRef<HTMLElement>(null);\n  const body = useRef<HTMLDivElement>(null);\n  const [narrow, setNarrow] = useState(false);\n  const [filtersOpen, setFiltersOpen] = useState(false);\n  const [notice, setNotice] = useState(\"\");\n  const [focusRequest, setFocusRequest] = useState<FocusRequest | null>(null);\n  const [confirming, setConfirming] = useState<{ row: Row; action: DataTableRowAction<Row> } | null>(null);\n\n  // The block's own width decides between table and cards, not the screen's.\n  useEffect(() => {\n    const el = root.current;\n    if (!el || typeof ResizeObserver === \"undefined\") return;\n    const observer = new ResizeObserver(([entry]) => setNarrow(entry.contentRect.width < NARROW));\n    observer.observe(el);\n    return () => observer.disconnect();\n  }, []);\n  const compact = layout === \"cards\" || (layout === \"auto\" && narrow);\n\n  // --- The query: kept here, or by the app\n  const [inner, setInner] = useState<DataTableQuery>(() => completeQuery(defaultQuery));\n  const query = useMemo(() => (controlledQuery ? completeQuery(controlledQuery) : inner), [controlledQuery, inner]);\n  const [searchText, setSearchText] = useState(query.search);\n  const latest = useRef(query);\n  latest.current = query;\n  const lastSearch = useRef(query.search);\n  const debounce = useRef<ReturnType<typeof setTimeout>>(undefined);\n  useEffect(() => () => clearTimeout(debounce.current), []);\n  // A search changed from outside (the back button, a shared link) shows in the box.\n  useEffect(() => {\n    if (query.search !== lastSearch.current) {\n      lastSearch.current = query.search;\n      setSearchText(query.search);\n    }\n  }, [query.search]);\n\n  const update = (patch: Partial<DataTableQuery>) => {\n    const before = latest.current;\n    const next: DataTableQuery = { ...before, ...patch, page: patch.page ?? 1 };\n    latest.current = next;\n    if (!controlledQuery) setInner(next);\n    onQueryChange?.(next);\n    if (next.search !== before.search) {\n      lastSearch.current = next.search;\n      onSearch?.(next.search);\n    }\n    if (JSON.stringify(next.filters) !== JSON.stringify(before.filters)) onFilter?.(next.filters);\n  };\n  const changeSearch = (text: string) => {\n    setSearchText(text);\n    clearTimeout(debounce.current);\n    // A server is asked once typing pauses; a list in memory is filtered at every key.\n    if (serverSide) debounce.current = setTimeout(() => update({ search: text }), 250);\n    else update({ search: text });\n  };\n  const setFilter = (id: string, values: string[]) => {\n    const next = { ...latest.current.filters };\n    if (values.length) next[id] = values;\n    else delete next[id];\n    update({ filters: next });\n  };\n  const clearFilters = () => {\n    clearTimeout(debounce.current);\n    setSearchText(\"\");\n    update({ search: \"\", filters: {} });\n  };\n\n  // --- The rows\n  const searchColumns = Array.isArray(searchable) ? searchable : undefined;\n  const client = useMemo(() => (serverSide ? null : applyDataTableQuery(all, columns, query, { pageSize, searchColumns, filters })), [serverSide, all, columns, query, pageSize, searchColumns?.join(\",\"), filters]);\n  const total = serverSide ? (totalCount ?? all.length) : client!.total;\n  const pageCount = pageCountOf(total, pageSize);\n  const page = Math.min(query.page, pageCount);\n  const shown = serverSide ? all : client!.rows;\n  const shownIds = shown.map(getRowId);\n  const filtered = isFiltered(query);\n\n  const dataState = state ?? toDataState({ isLoading, error });\n  const loading = dataState === \"loading\";\n  const failed = dataState === \"error\";\n  const errorText = typeof error === \"string\" ? error : \"Something went wrong. Try again in a moment.\";\n  const empty = !loading && !failed && (dataState === \"empty\" || shown.length === 0);\n  const showRows = !failed && !empty && (loading || shown.length > 0);\n\n  const lowerLabel = label.toLowerCase();\n  const first = columns[0];\n  const nameOf = (row: Row) => (first ? valueText(cellValue(row, first)) : \"\") || getRowId(row);\n  const plain = (row: Row, column: DataTableColumn<Row>) => {\n    const value = cellValue(row, column);\n    return value instanceof Date ? value.toLocaleDateString() : valueText(value);\n  };\n  const cellOf = (row: Row, column: DataTableColumn<Row>): ReactNode => (column.cell ? column.cell(row) : plain(row, column));\n\n  // --- Opening a row\n  const canOpen = !!onRowOpen || !!onSelect || !!rowHref;\n  const openRow = (row: Row) => {\n    onRowOpen?.(row);\n    onSelect?.(row);\n  };\n  const primary = (row: Row) => {\n    const content = cellOf(row, first);\n    if (rowHref) {\n      return (\n        <AriaLink href={rowHref(row)} onPress={() => openRow(row)} className={open}>\n          {content}\n        </AriaLink>\n      );\n    }\n    if (canOpen) {\n      return (\n        <AriaButton onPress={() => openRow(row)} className={open}>\n          {content}\n        </AriaButton>\n      );\n    }\n    return <span className=\"font-medium text-[var(--rd-color-text-default)]\">{content}</span>;\n  };\n\n  // --- Selection (by row id, kept across pages; the header box selects the page)\n  const selectPermission = permissionFor(permissions, \"select\");\n  const selectable = selectionMode === \"multiple\" && selectPermission.isAllowed && !loading;\n  const [innerSelection, setInnerSelection] = useState<Set<string>>(() => new Set(defaultSelectedKeys));\n  const selected = controlledSelection ?? innerSelection;\n  const changeSelection = (next: Set<string>) => {\n    if (!controlledSelection) setInnerSelection(next);\n    onSelectionChange?.(next);\n  };\n  const racSelection = (keys: Selection) => {\n    const visible = new Set(shownIds);\n    const off = [...selected].filter((k) => !visible.has(k));\n    const picked = keys === \"all\" ? shownIds : [...keys].map(String).filter((k) => visible.has(k));\n    changeSelection(new Set([...off, ...picked]));\n  };\n  // Rows that no longer exist (deleted, filtered out of the data) leave the selection.\n  useEffect(() => {\n    if (serverSide || loading || selected.size === 0) return;\n    const known = new Set(all.map(getRowId));\n    const kept = [...selected].filter((k) => known.has(k));\n    if (kept.length !== selected.size) changeSelection(new Set(kept));\n  });\n  const selectedRows = all.filter((row) => selected.has(getRowId(row)));\n  const pageSelected = shownIds.filter((id) => selected.has(id)).length;\n\n  // --- Focus after something is removed or a bulk action ends: the next row, else the table, else the block\n  useEffect(() => {\n    if (!focusRequest) return;\n    if (focusRequest.kind === \"row\" && shownIds.includes(focusRequest.id)) {\n      // The row is still there: the app has not removed it (yet). Give up after a while.\n      const t = setTimeout(() => setFocusRequest(null), 4000);\n      return () => clearTimeout(t);\n    }\n    const t = setTimeout(() => {\n      const items = body.current?.querySelectorAll<HTMLElement>(compact ? \"[data-card]\" : \"tbody tr\");\n      const index = focusRequest.kind === \"row\" ? Math.min(focusRequest.index, (items?.length ?? 1) - 1) : 0;\n      (items && items.length > 0 ? items[Math.max(0, index)] : root.current)?.focus();\n      setFocusRequest(null);\n    }, 50);\n    return () => clearTimeout(t);\n  }, [focusRequest, shownIds.join(\"\\u0000\"), compact]);\n\n  // --- Row actions\n  const rowActionsPermission = permissionFor(permissions, \"rowActions\");\n  const hasRowActions = !!rowActions && rowActionsPermission.isVisible;\n  const performRowAction = async (row: Row, action: DataTableRowAction<Row>) => {\n    const index = shownIds.indexOf(getRowId(row));\n    try {\n      await action.onAction(row);\n    } catch (e) {\n      setNotice(`${action.label} failed for ${nameOf(row)}`);\n      throw e;\n    }\n    setNotice(`${action.label} done for ${nameOf(row)}`);\n    setFocusRequest({ kind: \"row\", id: getRowId(row), index: Math.max(0, index) });\n  };\n  const rowMenu = (row: Row): ReactNode => {\n    const name = nameOf(row);\n    const actions = (rowActions?.(row) ?? []).map((action) => ({ action, access: resolvePermission(action.permission) })).filter((x) => x.access.isVisible);\n    if (!hasRowActions || actions.length === 0) return null;\n    if (rowActionsPermission.isDisabled) {\n      return (\n        <Button variant=\"ghost\" size=\"sm\" aria-disabled=\"true\" aria-label={`More actions for ${name}${rowActionsPermission.reason ? `, unavailable: ${rowActionsPermission.reason}` : \"\"}`} onPress={() => {}} className=\"cursor-not-allowed opacity-50\">\n          <DotsIcon />\n        </Button>\n      );\n    }\n    return (\n      <MenuTrigger>\n        <Button variant=\"ghost\" size=\"sm\" aria-label={`More actions for ${name}`}>\n          <DotsIcon />\n        </Button>\n        <Menu\n          placement=\"bottom end\"\n          onAction={(key) => {\n            const found = actions.find((x) => x.action.id === key);\n            if (!found || !found.access.isAllowed) return;\n            if (found.action.confirm) setConfirming({ row, action: found.action });\n            else void performRowAction(row, found.action).catch(() => {});\n          }}\n        >\n          {actions.map(({ action, access }) => (\n            <MenuItem key={action.id} id={action.id} variant={action.variant} isDisabled={!access.isAllowed} textValue={access.reason ? `${action.label}, ${access.reason}` : action.label}>\n              {access.reason && !access.isAllowed ? (\n                <span className=\"flex flex-col\">\n                  {action.label}\n                  <span className=\"text-xs font-normal text-[var(--rd-color-text-muted)]\">{access.reason}</span>\n                </span>\n              ) : (\n                action.label\n              )}\n            </MenuItem>\n          ))}\n        </Menu>\n      </MenuTrigger>\n    );\n  };\n\n  // --- Bulk actions\n  const bulkPermission = permissionFor(permissions, \"bulk\");\n  const showBulk = selectable && selected.size > 0 && bulkActions.length > 0 && bulkPermission.isVisible;\n  const bulkAccess = (action: DataTableBulkAction<Row>): PermissionValue | undefined => (bulkPermission.isDisabled ? { state: \"disabled\", reason: bulkPermission.reason } : action.permission);\n  const count = selected.size;\n  const rowWord = (n: number) => plural(n, \"row\", \"rows\");\n\n  // --- Export\n  const exportPermission = permissionFor(permissions, \"export\");\n  const canExport = (!!onExport || !serverSide) && exportPermission.isVisible;\n  const exportAccess: PermissionValue | undefined = exportPermission.isAllowed && (loading || failed || total === 0) ? \"disabled\" : permissions?.export;\n  const exportRows = () => {\n    const out = serverSide ? all : client!.filtered;\n    if (onExport) {\n      onExport(out, latest.current);\n      return;\n    }\n    const url = URL.createObjectURL(new Blob([\"﻿\" + rowsToCsv(out, columns)], { type: \"text/csv;charset=utf-8\" }));\n    const link = document.createElement(\"a\");\n    link.href = url;\n    link.download = `${slug(label)}.csv`;\n    link.click();\n    URL.revokeObjectURL(url);\n    setNotice(`Exported ${out.length} ${rowWord(out.length)} to ${slug(label)}.csv`);\n  };\n\n  // --- Filters and sort controls\n  const filterSelect = (f: DataTableFilter<Row>, inSheet: boolean) => (\n    <Select\n      key={f.id}\n      label={f.label}\n      placeholder={`${f.label}: all`}\n      size=\"md\"\n      className={cx(inSheet ? \"w-full\" : \"min-w-0 sm:w-44 [&>span:first-of-type]:sr-only\", classNames?.filters)}\n      selectedKey={query.filters[f.id]?.[0] ?? ALL}\n      onSelectionChange={(key) => setFilter(f.id, key === ALL || key === null ? [] : [String(key)])}\n      isDisabled={loading}\n    >\n      <SelectItem id={ALL} textValue={`${f.label}: all`}>{`${f.label}: all`}</SelectItem>\n      {normalizeOptions(f.options).map((o) => (\n        <SelectItem key={o.value} id={o.value} textValue={o.label}>\n          {o.label}\n        </SelectItem>\n      ))}\n    </Select>\n  );\n  const sortChoices = columns.filter((c) => c.sortable).flatMap((c) => [`${c.id}:ascending`, `${c.id}:descending`]);\n  const sortLabel = (choice: string) => {\n    const [id, direction] = choice.split(\":\");\n    return `${columns.find((c) => c.id === id)?.header ?? id}, ${direction}`;\n  };\n  const appliedFilters = filterCount(query.filters);\n\n  // --- Pieces\n  const cardCheckbox = (id: string, name: string) => (\n    <AriaCheckbox\n      aria-label={`Select ${name}`}\n      isSelected={selected.has(id)}\n      onChange={(on) => {\n        const next = new Set(selected);\n        if (on) next.add(id);\n        else next.delete(id);\n        changeSelection(next);\n      }}\n      className={checkbox}\n    >\n      {({ isSelected }) => (isSelected ? <CheckIcon className=\"size-3.5 text-[var(--rd-color-action-on-primary)]\" /> : null)}\n    </AriaCheckbox>\n  );\n  const skeletonCount = Math.min(Math.max(1, pageSize), 5);\n  const skeletonWidths = [\"70%\", \"50%\", \"60%\", \"40%\", \"55%\"];\n\n  const countText = loading ? `Loading ${lowerLabel}` : failed ? `Could not load ${lowerLabel}` : `${total.toLocaleString()} ${plural(total, \"result\", \"results\")}`;\n  const firstShown = total === 0 ? 0 : (page - 1) * pageSize + 1;\n  const lastShown = Math.min(page * pageSize, total);\n\n  return (\n    <section ref={root} tabIndex={-1} aria-label={label} aria-busy={loading || undefined} className={cx(\"flex flex-col gap-3 outline-none\", className, classNames?.root)}>\n      {/* Search, filters and export */}\n      <div className={cx(\"flex flex-wrap items-center gap-2\", classNames?.toolbar)}>\n        {searchable && (\n          <SearchField value={searchText} onChange={changeSearch} onClear={() => changeSearch(\"\")} isDisabled={loading && all.length === 0} className={cx(\"group relative min-w-0 flex-1 basis-56\", classNames?.search)}>\n            <Label className=\"sr-only\">{`Search ${lowerLabel}`}</Label>\n            <SearchIcon className=\"pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-[var(--rd-color-text-muted)]\" />\n            <Input placeholder={searchPlaceholder} className={control} />\n            <AriaButton\n              aria-label=\"Clear search\"\n              className=\"absolute end-2 top-1/2 flex size-6 -translate-y-1/2 items-center justify-center rounded-full text-[var(--rd-color-text-muted)] outline-none group-data-[empty]:hidden data-[hovered]:bg-[var(--rd-color-surface-subtle)] data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)]\"\n            >\n              <CloseIcon className=\"size-3\" />\n            </AriaButton>\n          </SearchField>\n        )}\n        {!compact && filters.map((f) => filterSelect(f, false))}\n        {compact && (filters.length > 0 || sortChoices.length > 0) && (\n          <Button variant=\"secondary\" onPress={() => setFiltersOpen(true)} className={classNames?.filters}>\n            {appliedFilters > 0 ? `Filters (${appliedFilters})` : \"Filters\"}\n          </Button>\n        )}\n        {filtered && (\n          <Button variant=\"ghost\" onPress={clearFilters}>\n            Clear filters\n          </Button>\n        )}\n        <div className=\"ms-auto flex items-center gap-3\">\n          <p role=\"status\" className={cx(\"text-sm whitespace-nowrap text-[var(--rd-color-text-muted)]\", classNames?.count)}>\n            {countText}\n          </p>\n          {canExport && (\n            <ActionButton variant=\"secondary\" permission={exportAccess} onAction={exportRows} className={classNames?.export}>\n              Export CSV\n            </ActionButton>\n          )}\n        </div>\n      </div>\n\n      {/* What to do with the selected rows. It does not take focus. */}\n      {showBulk && (\n        <div role=\"group\" aria-label=\"Bulk actions\" className={cx(\"flex flex-wrap items-center gap-2 rounded-[var(--rd-radius-overlay)] border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-selected)] px-3 py-2\", classNames?.[\"bulk-bar\"])}>\n          <span aria-hidden=\"true\" className=\"me-1 text-sm font-medium text-[var(--rd-color-text-default)]\">\n            {count} selected\n          </span>\n          {bulkActions.map((action) => (\n            <ActionButton\n              key={action.id}\n              size=\"sm\"\n              variant={action.variant === \"danger\" ? \"danger\" : \"secondary\"}\n              icon={action.icon}\n              permission={bulkAccess(action)}\n              confirm={\n                action.confirm && {\n                  title: action.confirm.title,\n                  description: `${action.confirm.description ? `${action.confirm.description} ` : \"\"}This affects ${count} selected ${rowWord(count)}.`,\n                  confirmLabel: action.confirm.confirmLabel,\n                }\n              }\n              onAction={() => action.onAction(selectedRows)}\n              onSuccess={() => {\n                setNotice(`${action.label} done for ${count} ${rowWord(count)}`);\n                changeSelection(new Set());\n                setFocusRequest({ kind: \"first\" });\n              }}\n              onError={() => setNotice(`${action.label} failed`)}\n            >\n              {action.label}\n            </ActionButton>\n          ))}\n          <Button variant=\"ghost\" size=\"sm\" onPress={() => changeSelection(new Set())}>\n            Clear selection\n          </Button>\n        </div>\n      )}\n\n      <div ref={body} className=\"flex flex-col gap-3 outline-none\">\n        {failed && (\n          <ErrorState\n            variant=\"inline\"\n            title={`Couldn't load ${lowerLabel}`}\n            description={errorText}\n            className={classNames?.error}\n            actions={\n              onRetry && (\n                <Button variant=\"secondary\" onPress={onRetry}>\n                  Try again\n                </Button>\n              )\n            }\n          />\n        )}\n\n        {empty && (\n          <EmptyState\n            size=\"md\"\n            className={classNames?.empty}\n            title={filtered ? \"No results\" : (emptyTitle ?? \"Nothing here yet\")}\n            description={filtered ? \"Try a different search, or clear the filters to see everything.\" : emptyDescription}\n          >\n            {filtered ? (\n              <Button variant=\"secondary\" onPress={clearFilters}>\n                Clear filters\n              </Button>\n            ) : (\n              emptyAction\n            )}\n          </EmptyState>\n        )}\n\n        {showRows && !compact && (\n          <Table\n            label={label}\n            density={density}\n            className={classNames?.table}\n            selectionMode={selectable ? \"multiple\" : \"none\"}\n            selectedKeys={selected}\n            onSelectionChange={racSelection}\n            sortDescriptor={query.sort ? { column: query.sort.column, direction: query.sort.direction } : undefined}\n            onSortChange={(d) => update({ sort: { column: String(d.column), direction: d.direction } })}\n          >\n            <TableHeader className={classNames?.header}>\n              {columns.map((c, i) => (\n                <TableColumn key={c.id} id={c.id} isRowHeader={i === 0} allowsSorting={!!c.sortable} className={cx(c.align === \"end\" && \"!text-end\", c.align === \"center\" && \"!text-center\")} style={c.width ? { width: c.width } : undefined}>\n                  {c.header}\n                </TableColumn>\n              ))}\n              {hasRowActions && (\n                <TableColumn id=\"__actions\" className=\"w-12\">\n                  <span className=\"sr-only\">Actions</span>\n                </TableColumn>\n              )}\n            </TableHeader>\n            <TableBody>\n              {loading\n                ? Array.from({ length: skeletonCount }, (_, r) => (\n                    <TableRow key={`loading-${r}`} id={`loading-${r}`} textValue=\"Loading\" className={classNames?.row}>\n                      {columns.map((c, i) => (\n                        <TableCell key={c.id} className={classNames?.cell}>\n                          {/* A row header with nothing in it would be an empty header for a screen reader. */}\n                          {i === 0 && <span className=\"sr-only\">Loading row</span>}\n                          <Skeleton variant=\"text\" width={skeletonWidths[(i + r) % skeletonWidths.length]} className={c.align === \"end\" ? \"ms-auto\" : undefined} />\n                        </TableCell>\n                      ))}\n                      {hasRowActions && <TableCell className={classNames?.cell}>{null}</TableCell>}\n                    </TableRow>\n                  ))\n                : shown.map((row) => (\n                    <TableRow key={getRowId(row)} id={getRowId(row)} textValue={nameOf(row)} className={classNames?.row}>\n                      {columns.map((c, i) => (\n                        <TableCell key={c.id} className={cx(alignClass[c.align ?? \"start\"], classNames?.cell)}>\n                          {i === 0 ? primary(row) : cellOf(row, c)}\n                        </TableCell>\n                      ))}\n                      {hasRowActions && <TableCell className={cx(\"!text-end\", classNames?.cell)}>{rowMenu(row)}</TableCell>}\n                    </TableRow>\n                  ))}\n            </TableBody>\n          </Table>\n        )}\n\n        {showRows && compact && (\n          <>\n            {selectable && (\n              <AriaCheckbox\n                aria-label=\"Select all on this page\"\n                isSelected={pageSelected > 0 && pageSelected === shownIds.length}\n                isIndeterminate={pageSelected > 0 && pageSelected < shownIds.length}\n                onChange={(on) => racSelection(on ? \"all\" : new Set())}\n                className=\"group/all flex items-center gap-2 text-sm text-[var(--rd-color-text-muted)] outline-none\"\n              >\n                {({ isSelected, isIndeterminate }) => (\n                  <>\n                    <span className={checkbox} data-selected={isSelected || undefined} data-indeterminate={isIndeterminate || undefined}>\n                      {isIndeterminate ? <MinusIcon className=\"size-3.5 text-[var(--rd-color-action-on-primary)]\" /> : isSelected ? <CheckIcon className=\"size-3.5 text-[var(--rd-color-action-on-primary)]\" /> : null}\n                    </span>\n                    Select all on this page\n                  </>\n                )}\n              </AriaCheckbox>\n            )}\n            <ul aria-label={`${label}, as a list`} className={cx(\"flex flex-col gap-3\", classNames?.cards)}>\n              {loading\n                ? Array.from({ length: 3 }, (_, i) => (\n                    <li key={i} className={cx(\"rounded-[var(--rd-radius-overlay)] border border-[var(--rd-color-border-default)] p-4\", classNames?.card)}>\n                      <Skeleton variant=\"text\" lines={3} />\n                    </li>\n                  ))\n                : shown.map((row) => {\n                    const id = getRowId(row);\n                    return (\n                      <li\n                        key={id}\n                        data-card=\"\"\n                        tabIndex={-1}\n                        className={cx(\n                          \"flex flex-col gap-3 rounded-[var(--rd-radius-overlay)] border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-default)] p-4 outline-none [box-shadow:var(--rd-elevation-raised)]\",\n                          selected.has(id) && \"bg-[var(--rd-color-surface-selected)]\",\n                          classNames?.card,\n                        )}\n                      >\n                        <div className=\"flex items-start gap-3\">\n                          {selectable && <span className=\"pt-0.5\">{cardCheckbox(id, nameOf(row))}</span>}\n                          <div className=\"min-w-0 flex-1\">{primary(row)}</div>\n                          {rowMenu(row)}\n                        </div>\n                        <dl className=\"grid grid-cols-2 gap-x-3 gap-y-2 text-sm\">\n                          {columns.slice(1).filter((c) => !c.hideOnMobile).map((c) => (\n                            <div key={c.id} className=\"min-w-0\">\n                              <dt className=\"text-xs text-[var(--rd-color-text-muted)]\">{c.header}</dt>\n                              <dd className=\"break-words\">{cellOf(row, c)}</dd>\n                            </div>\n                          ))}\n                        </dl>\n                      </li>\n                    );\n                  })}\n            </ul>\n          </>\n        )}\n      </div>\n\n      {/* Where you are, and the pages */}\n      {showRows && !loading && total > 0 && (\n        <div className={cx(\"flex flex-wrap items-center justify-between gap-3\", classNames?.footer)}>\n          <p className=\"text-sm text-[var(--rd-color-text-muted)]\">\n            Showing {firstShown.toLocaleString()} to {lastShown.toLocaleString()} of {total.toLocaleString()}\n          </p>\n          {pageCount > 1 && <Pagination pageCount={pageCount} page={page} onChange={(p) => update({ page: p })} size=\"sm\" label={`${label} pages`} className={classNames?.pagination} />}\n        </div>\n      )}\n\n      {/* On a narrow space the filters and the sort live in a sheet */}\n      {compact && (\n        <Sheet title=\"Filters\" side=\"bottom\" size=\"md\" isOpen={filtersOpen} onOpenChange={setFiltersOpen}>\n          <div className=\"flex flex-col gap-4\">\n            {filters.map((f) => filterSelect(f, true))}\n            {sortChoices.length > 0 && (\n              <Select\n                label=\"Sort by\"\n                size=\"md\"\n                className=\"w-full\"\n                selectedKey={query.sort ? `${query.sort.column}:${query.sort.direction}` : ALL}\n                onSelectionChange={(key) => {\n                  if (key === ALL || key === null) update({ sort: null });\n                  else {\n                    const [column, direction] = String(key).split(\":\");\n                    update({ sort: { column, direction: direction === \"descending\" ? \"descending\" : \"ascending\" } });\n                  }\n                }}\n              >\n                <SelectItem id={ALL}>Default order</SelectItem>\n                {sortChoices.map((choice) => (\n                  <SelectItem key={choice} id={choice} textValue={sortLabel(choice)}>\n                    {sortLabel(choice)}\n                  </SelectItem>\n                ))}\n              </Select>\n            )}\n            <div className=\"flex justify-end gap-2\">\n              {filtered && (\n                <Button variant=\"ghost\" onPress={clearFilters}>\n                  Clear filters\n                </Button>\n              )}\n              <Button onPress={() => setFiltersOpen(false)}>Show {total.toLocaleString()} {plural(total, \"result\", \"results\")}</Button>\n            </div>\n          </div>\n        </Sheet>\n      )}\n\n      {confirming && (\n        <AlertDialog\n          isOpen\n          onOpenChange={(isOpen) => {\n            if (!isOpen) setConfirming(null);\n          }}\n          tone={confirming.action.variant === \"danger\" ? \"danger\" : \"default\"}\n          title={confirming.action.confirm!.title}\n          description={confirming.action.confirm!.description ?? `This applies to ${nameOf(confirming.row)}.`}\n          confirmLabel={confirming.action.confirm!.confirmLabel}\n          onConfirm={() => performRowAction(confirming.row, confirming.action)}\n        />\n      )}\n\n      {/* Announcements: how many are selected, and what an action did */}\n      <span role=\"status\" className=\"sr-only\">\n        {showBulk || (selectable && count > 0) ? `${count} selected` : \"\"}\n      </span>\n      <span role=\"status\" className=\"sr-only\">\n        {notice}\n      </span>\n    </section>\n  );\n}\n"
+        },
+        {
+          "path": "data-table/query.ts",
+          "content": "// The plain logic behind DataTable: no React in here, so it is easy to test and to reuse on a server.\n// It works on any row type: columns say how to read a value from a row.\n\nimport type { ReactNode } from \"react\";\nimport type { PermissionValue } from \"../utils/permissions\";\nimport type { QuerySchema } from \"../utils/url-state\";\n\n/** What a column can read from a row: text, a number, a date, a flag, or nothing. */\nexport type DataTableValue = string | number | boolean | Date | null | undefined;\n\nexport interface DataTableColumn<Row> {\n  /** Unique name of the column. Also the field read from the row when there is no `value`. */\n  id: string;\n  /** The column heading, and the label of the value on a phone card. */\n  header: string;\n  /** What to draw in the cell. Defaults to the value as text. */\n  cell?: (row: Row) => ReactNode;\n  /** What the column holds, for sorting, searching and the CSV. Defaults to the row's field named `id`. */\n  value?: (row: Row) => DataTableValue;\n  /** Click the heading to sort by this column. */\n  sortable?: boolean;\n  /** Align the cell. Use \"end\" for numbers and money. */\n  align?: \"start\" | \"center\" | \"end\";\n  /** Leave this column off the phone cards. */\n  hideOnMobile?: boolean;\n  /** A CSS width such as \"8rem\". */\n  width?: string;\n}\n\nexport interface DataTableFilterOption {\n  value: string;\n  label: string;\n}\n\nexport interface DataTableFilter<Row> {\n  /** Unique name. Also the column whose value is compared, unless you give `match`. */\n  id: string;\n  /** What the filter is called, e.g. \"Status\". */\n  label: string;\n  /** The choices: plain text, or { value, label }. */\n  options: ReadonlyArray<string | DataTableFilterOption>;\n  /** Decide whether a row passes for one chosen value. Defaults to comparing the column's value as text. */\n  match?: (row: Row, value: string) => boolean;\n}\n\nexport type DataTableSortDirection = \"ascending\" | \"descending\";\n\nexport interface DataTableQuery {\n  /** Text to look for. */\n  search: string;\n  /** The chosen values of each filter, by filter id. A missing or empty list means everything. */\n  filters: Record<string, string[]>;\n  sort: { column: string; direction: DataTableSortDirection } | null;\n  /** The page, starting at 1. */\n  page: number;\n}\n\nexport interface DataTableRowAction<Row> {\n  id: string;\n  label: string;\n  permission?: PermissionValue;\n  /** Ask first. The row's name is added to the dialog. */\n  confirm?: { title: string; description?: string; confirmLabel?: string };\n  /** Shown in the danger color. */\n  variant?: \"default\" | \"danger\";\n  onAction: (row: Row) => void | Promise<unknown>;\n}\n\nexport interface DataTableBulkAction<Row> {\n  id: string;\n  label: string;\n  icon?: ReactNode;\n  variant?: \"default\" | \"danger\";\n  permission?: PermissionValue;\n  /** Ask first. The dialog also says how many rows are affected. */\n  confirm?: { title: string; description?: string; confirmLabel?: string };\n  onAction: (rows: Row[]) => void | Promise<unknown>;\n}\n\nexport const emptyDataTableQuery = (): DataTableQuery => ({ search: \"\", filters: {}, sort: null, page: 1 });\n\n/** The query with every part present, from a partial one. */\nexport const completeQuery = (query?: Partial<DataTableQuery>): DataTableQuery => ({ ...emptyDataTableQuery(), ...query, filters: { ...query?.filters } });\n\nconst activeFilters = (filters: DataTableQuery[\"filters\"]) => Object.entries(filters).filter(([, values]) => values.length > 0);\n\n/** True when a search or any filter is set. */\nexport const isFiltered = (query: Pick<DataTableQuery, \"search\" | \"filters\">) => query.search.trim() !== \"\" || activeFilters(query.filters).length > 0;\n\n/** How many filters are set (the search is not counted). */\nexport const filterCount = (filters: DataTableQuery[\"filters\"]) => activeFilters(filters).length;\n\nexport const normalizeOptions = (options: DataTableFilter<unknown>[\"options\"]): DataTableFilterOption[] => options.map((o) => (typeof o === \"string\" ? { value: o, label: o } : o));\n\n/** What a column holds for one row. */\nexport function cellValue<Row>(row: Row, column: DataTableColumn<Row>): DataTableValue {\n  const raw = column.value ? column.value(row) : (row as Record<string, unknown>)[column.id];\n  if (raw === null || raw === undefined) return raw;\n  if (raw instanceof Date || typeof raw === \"string\" || typeof raw === \"number\" || typeof raw === \"boolean\") return raw;\n  return String(raw);\n}\n\n/** A value as plain text. */\nexport function valueText(value: DataTableValue): string {\n  if (value === null || value === undefined) return \"\";\n  if (value instanceof Date) return Number.isFinite(value.getTime()) ? value.toISOString() : \"\";\n  return String(value);\n}\n\nconst same = (a: string, b: string) => a.localeCompare(b, undefined, { sensitivity: \"base\" }) === 0;\n\n/** The rows whose searched columns contain the text, ignoring case. `columnIds` limits where to look (default: every column). */\nexport function searchRows<Row>(rows: Row[], columns: DataTableColumn<Row>[], search: string, columnIds?: readonly string[]): Row[] {\n  const needle = search.trim().toLowerCase();\n  if (!needle) return rows;\n  const where = columns.filter((c) => !columnIds || columnIds.includes(c.id));\n  return rows.filter((row) => where.some((c) => valueText(cellValue(row, c)).toLowerCase().includes(needle)));\n}\n\n/** The rows that pass every filter that has a choice (any of the chosen values, all filters together). */\nexport function filterRows<Row>(rows: Row[], columns: DataTableColumn<Row>[], filters: ReadonlyArray<DataTableFilter<Row>>, chosen: DataTableQuery[\"filters\"]): Row[] {\n  const active = filters.map((f) => ({ filter: f, values: chosen[f.id] ?? [] })).filter((x) => x.values.length > 0);\n  if (!active.length) return rows;\n  return rows.filter((row) =>\n    active.every(({ filter, values }) => {\n      if (filter.match) return values.some((v) => filter.match!(row, v));\n      const column = columns.find((c) => c.id === filter.id);\n      const text = column ? valueText(cellValue(row, column)) : valueText((row as Record<string, DataTableValue>)[filter.id]);\n      return values.some((v) => same(v, text));\n    }),\n  );\n}\n\nconst time = (v: DataTableValue) => (v instanceof Date ? v.getTime() : typeof v === \"number\" ? v : typeof v === \"boolean\" ? Number(v) : NaN);\n\nfunction compareValues(a: NonNullable<DataTableValue>, b: NonNullable<DataTableValue>): number {\n  const x = time(a);\n  const y = time(b);\n  if (Number.isFinite(x) && Number.isFinite(y)) return x - y;\n  return valueText(a).localeCompare(valueText(b), undefined, { numeric: true, sensitivity: \"base\" });\n}\n\n/** A sorted copy. Text sorts in natural order (\"Plan 2\" before \"Plan 10\"), numbers and dates by value, empty values last in either direction. Equal rows keep their order. */\nexport function sortRows<Row>(rows: Row[], columns: DataTableColumn<Row>[], sort: DataTableQuery[\"sort\"]): Row[] {\n  const column = sort && columns.find((c) => c.id === sort.column);\n  if (!sort || !column) return rows;\n  const direction = sort.direction === \"descending\" ? -1 : 1;\n  return rows\n    .map((row, index) => ({ row, index, value: cellValue(row, column) }))\n    .sort((x, y) => {\n      const xe = x.value === null || x.value === undefined || x.value === \"\";\n      const ye = y.value === null || y.value === undefined || y.value === \"\";\n      if (xe || ye) return xe && ye ? x.index - y.index : xe ? 1 : -1;\n      return compareValues(x.value!, y.value!) * direction || x.index - y.index;\n    })\n    .map((x) => x.row);\n}\n\n/** How many pages there are (never fewer than one). */\nexport const pageCountOf = (total: number, pageSize: number) => Math.max(1, Math.ceil(total / Math.max(1, pageSize)));\n\n/** One page of the list. A page past the end gives the last page. */\nexport function paginate<T>(items: T[], page: number, pageSize: number): T[] {\n  const size = Math.max(1, pageSize);\n  const safe = Math.min(Math.max(1, page), pageCountOf(items.length, size));\n  return items.slice((safe - 1) * size, safe * size);\n}\n\nexport interface ApplyOptions<Row> {\n  pageSize: number;\n  /** Which columns the search looks in (default: all). */\n  searchColumns?: readonly string[];\n  filters?: ReadonlyArray<DataTableFilter<Row>>;\n}\n\n/** The whole pipeline in the order people expect: search and filter, then sort, then the page. `filtered` is every match on every page. */\nexport function applyDataTableQuery<Row>(rows: Row[], columns: DataTableColumn<Row>[], query: DataTableQuery, { pageSize, searchColumns, filters = [] }: ApplyOptions<Row>): { rows: Row[]; total: number; filtered: Row[] } {\n  const found = filterRows(searchRows(rows, columns, query.search, searchColumns), columns, filters, query.filters);\n  const filtered = sortRows(found, columns, query.sort);\n  return { rows: paginate(filtered, query.page, pageSize), total: filtered.length, filtered };\n}\n\n// --- Export\n\nconst csvCell = (value: DataTableValue): string => {\n  let text = valueText(value);\n  // A cell that starts with = + - or @ would run as a formula in a spreadsheet: make it plain text.\n  if (typeof value === \"string\" && /^[=+\\-@\\t\\r]/.test(text)) text = `'${text}`;\n  return /[\",\\n\\r]/.test(text) ? `\"${text.replace(/\"/g, '\"\"')}\"` : text;\n};\n\n/** The rows as CSV text, one column per table column (its value, not its drawing), with a header. */\nexport function rowsToCsv<Row>(rows: Row[], columns: DataTableColumn<Row>[]): string {\n  const lines = [columns.map((c) => csvCell(c.header)), ...rows.map((row) => columns.map((c) => csvCell(cellValue(row, c))))];\n  return lines.map((line) => line.join(\",\")).join(\"\\r\\n\");\n}\n\n// --- The address bar\n\nexport interface DataTableQuerySchemaOptions {\n  /** The ids of the filters, so each gets a parameter of its own. */\n  filters?: readonly string[];\n  /** The ids of the columns that can be sorted, so only those are accepted from the address. */\n  sortColumns?: readonly string[];\n}\n\nconst RESERVED = [\"q\", \"page\", \"sort\"];\nconst filterKey = (id: string) => `filter:${id}`;\nconst filterParam = (id: string) => (RESERVED.includes(id) ? `filter-${id}` : id);\n\n/**\n * A schema for parseQueryState, serializeQueryState and useQueryState that describes a DataTable query:\n * ?q=text&status=paid&sort=total:desc&page=2. Turn the state it gives into a query with\n * dataTableQueryFromState, and a query into state with dataTableQueryToState.\n */\nexport function dataTableQuerySchema({ filters = [], sortColumns = [] }: DataTableQuerySchemaOptions = {}): QuerySchema {\n  const schema: QuerySchema = {\n    search: { type: \"string\", default: \"\", name: \"q\" },\n    page: { type: \"number\", default: 1, min: 1, integer: true },\n    sort: { type: \"enum\", values: [\"\", ...sortColumns.flatMap((c) => [`${c}:asc`, `${c}:desc`])], default: \"\", name: \"sort\" },\n  };\n  for (const id of filters) schema[filterKey(id)] = { type: \"array\", default: [], name: filterParam(id) };\n  return schema;\n}\n\n/** The state read from the address (by dataTableQuerySchema) as a DataTable query. */\nexport function dataTableQueryFromState(state: Record<string, unknown>, { filters = [] }: DataTableQuerySchemaOptions = {}): DataTableQuery {\n  const sort = String(state.sort ?? \"\");\n  const cut = sort.lastIndexOf(\":\");\n  const chosen: Record<string, string[]> = {};\n  for (const id of filters) {\n    const list = state[filterKey(id)];\n    if (Array.isArray(list) && list.length) chosen[id] = list.map(String);\n  }\n  return {\n    search: String(state.search ?? \"\"),\n    filters: chosen,\n    sort: cut > 0 ? { column: sort.slice(0, cut), direction: sort.slice(cut + 1) === \"desc\" ? \"descending\" : \"ascending\" } : null,\n    page: Math.max(1, Math.trunc(Number(state.page) || 1)),\n  };\n}\n\n/** A DataTable query as the state dataTableQuerySchema describes, to write to the address. */\nexport function dataTableQueryToState(query: DataTableQuery, { filters = [] }: DataTableQuerySchemaOptions = {}): Record<string, string | number | string[]> {\n  const state: Record<string, string | number | string[]> = {\n    search: query.search,\n    page: query.page,\n    sort: query.sort ? `${query.sort.column}:${query.sort.direction === \"descending\" ? \"desc\" : \"asc\"}` : \"\",\n  };\n  for (const id of filters) state[filterKey(id)] = query.filters[id] ?? [];\n  return state;\n}\n"
+        },
+        {
+          "path": "generated/data-table.types.ts",
+          "content": "// Generated by rdloom codegen from specs/data-table.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nimport type { ReactNode } from \"react\";\n\nexport const dataTableSelectionModeValues = [\"none\", \"multiple\"] as const;\nexport const dataTableDensityValues = [\"compact\", \"standard\", \"comfortable\"] as const;\nexport const dataTableLayoutValues = [\"auto\", \"table\", \"cards\"] as const;\n\n/** The list screen every admin, ERP and SaaS app has: a table of rows with search, filters, sorting, pages, selection with bulk actions, a row menu with confirmed actions, CSV export, loading, empty and error states, and cards on a narrow screen. It never fetches: you pass the rows (or one page of them with serverSide) and handle the actions. Permissions only change what people see and can try; they are not security, so the server must check every action again. */\nexport interface DataTableSpecProps {\n  /**\n   * The rows to show. With serverSide, only the current page.\n   */\n  rows: readonly any[];\n  /**\n   * The columns: { id, header, cell?(row), value?(row), sortable?, align?, hideOnMobile?, width? }. The first column names each row (and is the title of a phone card). value is what sorting, searching and the CSV read; without it the row's field named id is used.\n   */\n  columns: import(\"../data-table/query\").DataTableColumn<any>[];\n  /**\n   * A stable, unique id for a row, such as its database id. Used for selection, focus after a delete and the open link.\n   */\n  getRowId: (row: any) => string;\n  /**\n   * Accessible name of the table and the section, e.g. \"Orders\".\n   * @default \"Table\"\n   */\n  label?: string;\n  /**\n   * The data state, when your data layer gives you one: loading, empty, error or ready. It wins over isLoading and error. A ready table with no matching rows says nothing matches.\n   */\n  state?: import(\"../utils/state\").DataState;\n  /**\n   * Show loading rows and skeleton cards, disable the controls, and mark the section busy.\n   * @default false\n   */\n  isLoading?: boolean;\n  /**\n   * Something went wrong loading: a message to show instead of the rows (true uses a general one).\n   */\n  error?: string | boolean;\n  /**\n   * Adds a Try again button to the error state.\n   */\n  onRetry?: () => void;\n  /**\n   * Title shown when there are no rows at all. Defaults to \"Nothing here yet\".\n   */\n  emptyTitle?: string;\n  /**\n   * Text under the empty title.\n   */\n  emptyDescription?: string;\n  /**\n   * A control shown in the empty state when there are no rows at all (not when a search found nothing), such as an Add button.\n   */\n  emptyAction?: import(\"react\").ReactNode;\n  /**\n   * Add a search box. true looks in every column; or list the column ids to look in.\n   */\n  searchable?: boolean | string[];\n  /**\n   * Placeholder of the search box.\n   * @default \"Search\"\n   */\n  searchPlaceholder?: string;\n  /**\n   * Filters shown as selects in the toolbar and in a sheet on a narrow screen: { id, label, options, match? }. Options are text or { value, label }.\n   */\n  filters?: import(\"../data-table/query\").DataTableFilter<any>[];\n  /**\n   * Rows per page.\n   * @default 10\n   */\n  pageSize?: number;\n  /**\n   * The search, filters, sort and page, when you keep them yourself (for example in the address). Without it the table keeps them.\n   */\n  query?: import(\"../data-table/query\").DataTableQuery;\n  /**\n   * Start with a search, filters, a sort or a page already set.\n   */\n  defaultQuery?: Partial<import(\"../data-table/query\").DataTableQuery>;\n  /**\n   * Called with the new query whenever the search, a filter, the sort or the page changes (typing waits for a short pause with serverSide). With serverSide, answer it with new rows.\n   */\n  onQueryChange?: (query: import(\"../data-table/query\").DataTableQuery) => void;\n  /**\n   * Called with the search text whenever it changes.\n   */\n  onSearch?: (search: string) => void;\n  /**\n   * Called with the chosen values of every filter whenever a filter changes or the filters are cleared.\n   */\n  onFilter?: (filters: Record<string, string[]>) => void;\n  /**\n   * The rows live on a server. The table then shows exactly the rows you pass and asks for new ones through onQueryChange.\n   * @default false\n   */\n  serverSide?: boolean;\n  /**\n   * With serverSide: how many rows match in all, so the pages and the count are right.\n   */\n  totalCount?: number;\n  /**\n   * Add checkboxes to pick rows. The header box selects the rows on the page.\n   * @default \"none\"\n   */\n  selectionMode?: \"none\" | \"multiple\";\n  /**\n   * Controlled selection: the ids of the selected rows.\n   */\n  selectedKeys?: Set<string>;\n  /**\n   * Rows selected at the start.\n   */\n  defaultSelectedKeys?: Iterable<string>;\n  /**\n   * Called with the ids of the selected rows.\n   */\n  onSelectionChange?: (keys: Set<string>) => void;\n  /**\n   * Actions for the selected rows, shown in a bar while something is selected: { id, label, icon?, variant?, permission?, confirm?, onAction(rows) }. A confirm opens a dialog that also says how many rows are affected. The selection clears when the action succeeds.\n   */\n  bulkActions?: import(\"../data-table/query\").DataTableBulkAction<any>[];\n  /**\n   * The actions of one row, shown in a More menu at the end of the row and of the card: { id, label, permission?, confirm?, variant?, onAction }. Return an empty list for none. After a delete, focus moves to the next row.\n   */\n  rowActions?: (row: any) => import(\"../data-table/query\").DataTableRowAction<any>[];\n  /**\n   * Makes the first cell of each row a button and calls this with the row, e.g. to open a details page or panel. onSelect is called too.\n   */\n  onRowOpen?: (row: any) => void;\n  /**\n   * The conventional name for opening a row: called together with onRowOpen.\n   */\n  onSelect?: (row: any) => void;\n  /**\n   * Makes the first cell of each row a link to this address instead of a button (onRowOpen and onSelect are still called).\n   */\n  rowHref?: (row: any) => string;\n  /**\n   * Replaces the built-in CSV download. It gets the rows that match (all pages when the list is in memory) and the query. With serverSide the Export button is shown only when you give this.\n   */\n  onExport?: (rows: any[], query: import(\"../data-table/query\").DataTableQuery) => void;\n  /**\n   * What the app allows, by action: export (Export CSV), select (the checkboxes), bulk (the bulk bar as a whole) and rowActions (the More menu). Each answer is \"allow\", \"disabled\", \"hidden\", true, false or { state, reason }. Hidden removes the control; disabled keeps it focusable with the reason where there is a button, and leaves selection off. Single actions have a permission of their own. This only changes what people see: the server must check again.\n   */\n  permissions?: import(\"../utils/permissions\").Permissions<\"export\" | \"select\" | \"bulk\" | \"rowActions\">;\n  /**\n   * Class names for the parts of the block, by slot name, added after the built-in ones so you can restyle one part without editing the file. Slots: root, toolbar, search, filters, count, export, bulk-bar, table, header, row, cell, cards, card, empty, error, footer, pagination.\n   */\n  classNames?: Partial<Record<\"root\" | \"toolbar\" | \"search\" | \"filters\" | \"count\" | \"export\" | \"bulk-bar\" | \"table\" | \"header\" | \"row\" | \"cell\" | \"cards\" | \"card\" | \"empty\" | \"error\" | \"footer\" | \"pagination\", string>>;\n  /**\n   * Row spacing of the table.\n   * @default \"standard\"\n   */\n  density?: \"compact\" | \"standard\" | \"comfortable\";\n  /**\n   * Table or cards. auto shows cards when the block itself is narrower than about 640px (not just the screen).\n   * @default \"auto\"\n   */\n  layout?: \"auto\" | \"table\" | \"cards\";\n}\n\nexport const dataTableDefaults = {\n  label: \"Table\",\n  isLoading: false,\n  searchPlaceholder: \"Search\",\n  pageSize: 10,\n  serverSide: false,\n  selectionMode: \"none\",\n  density: \"standard\",\n  layout: \"auto\",\n} as const;\n\nexport const dataTableMeta = {\n  \"name\": \"DataTable\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"region\"\n} as const;\n"
+        }
+      ]
+    },
+    {
       "id": "date-picker",
       "spec": {
         "$schema": "./schema/component.schema.json",
@@ -7335,6 +7754,231 @@
         {
           "path": "generated/input-otp.types.ts",
           "content": "// Generated by rdloom codegen from specs/input-otp.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nexport const inputOTPTypeValues = [\"numeric\", \"alphanumeric\"] as const;\n\n/** One-time code input for verification and two-factor sign in. One real input holds the code and drawn cells show it, so paste, autofill from SMS and screen readers all work. */\nexport interface InputOTPSpecProps {\n  /**\n   * Visible label, such as Verification code. Names the group.\n   */\n  label: string;\n  /**\n   * Help text shown under the cells.\n   */\n  description?: string;\n  /**\n   * Shown when the code is invalid.\n   */\n  errorMessage?: string;\n  /**\n   * Number of characters in the code.\n   * @default 6\n   */\n  length?: number;\n  /**\n   * Characters accepted. Numeric also opens the numeric keypad on phones.\n   * @default \"numeric\"\n   */\n  type?: \"numeric\" | \"alphanumeric\";\n  /**\n   * Controlled value.\n   */\n  value?: string;\n  /**\n   * Initial value when uncontrolled.\n   */\n  defaultValue?: string;\n  /**\n   * Called with the code on every edit.\n   */\n  onChange?: (value: string) => void;\n  /**\n   * Called once when every cell is filled.\n   */\n  onComplete?: (value: string) => void;\n  /**\n   * Draws a separator after these cell counts, for example [3] groups a 6 digit code as 3 + 3.\n   */\n  separatorAt?: number[];\n  /**\n   * Shows dots instead of the characters.\n   * @default false\n   */\n  mask?: boolean;\n  /**\n   * Focuses the input on mount.\n   * @default false\n   */\n  autoFocus?: boolean;\n  /**\n   * Prevents editing and dims the cells.\n   * @default false\n   */\n  isDisabled?: boolean;\n  /**\n   * Marks the code as wrong and shows errorMessage.\n   * @default false\n   */\n  isInvalid?: boolean;\n}\n\nexport const inputOTPDefaults = {\n  length: 6,\n  type: \"numeric\",\n  mask: false,\n  autoFocus: false,\n  isDisabled: false,\n  isInvalid: false,\n} as const;\n\nexport const inputOTPMeta = {\n  \"name\": \"InputOTP\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"group\"\n} as const;\n"
+        }
+      ]
+    },
+    {
+      "id": "invite-dialog",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "InviteDialog",
+        "version": "0.1.0",
+        "category": "block",
+        "status": "experimental",
+        "description": "A dialog for inviting one or many people: rows of email and role, Add another, checks for format, duplicates and people who are already members, an error summary, and a submit button that says how many invitations it sends. Your onInvite does the work. UI permission is not security: the server must check again.",
+        "props": {
+          "roles": {
+            "type": "custom",
+            "required": true,
+            "tsType": "Array<{ id: string; label: string; description?: string }>",
+            "description": "The roles a person can be invited as. The description of the chosen role is shown under its Select."
+          },
+          "defaultRole": {
+            "type": "string",
+            "description": "The id of the role each new row starts with. Defaults to the first role."
+          },
+          "existingEmails": {
+            "type": "custom",
+            "tsType": "string[]",
+            "description": "Emails that are already members. Typing one is an error on that row. Compared without case."
+          },
+          "maxInvites": {
+            "type": "number",
+            "default": 10,
+            "description": "The most rows one send can hold. Add another is disabled at the limit and says so."
+          },
+          "title": {
+            "type": "string",
+            "default": "Invite people",
+            "description": "The dialog's title, shown as its heading."
+          },
+          "description": {
+            "type": "string",
+            "description": "One sentence under the title."
+          },
+          "showMessage": {
+            "type": "boolean",
+            "default": true,
+            "description": "Shows an optional message field that goes with every invitation."
+          },
+          "messageLabel": {
+            "type": "string",
+            "default": "Message (optional)",
+            "description": "The label of the message field."
+          },
+          "submitLabel": {
+            "type": "custom",
+            "tsType": "(count: number) => string",
+            "description": "The text of the submit button for a number of invitations. Default: \"Send invitation\" and \"Send 3 invitations\"."
+          },
+          "successMessage": {
+            "type": "custom",
+            "tsType": "(count: number) => string",
+            "description": "The status message announced once the dialog has closed after a send. Default: \"3 invitations sent\"."
+          },
+          "onInvite": {
+            "type": "callback",
+            "required": true,
+            "tsType": "(invites: Array<{ email: string; role: string }>, details: { message?: string }) => void | import(\"../form/form\").SubmitResult | Promise<void | import(\"../form/form\").SubmitResult>",
+            "description": "Sends the invitations; yours, async. Resolve for success. Return { fieldErrors: { \"invites[1].email\": \"...\" } } to show a problem on a row, or { formError } for the whole form; a throw also keeps the dialog open."
+          },
+          "onCancel": {
+            "type": "callback",
+            "tsType": "() => void",
+            "description": "Called when the person cancels: the Cancel button or Escape."
+          },
+          "onOpenChange": {
+            "type": "callback",
+            "tsType": "(isOpen: boolean) => void",
+            "description": "Called with false when the dialog closes after a cancel or a successful send. Needed with isOpen."
+          },
+          "isOpen": {
+            "type": "boolean",
+            "description": "Controlled open state, for a dialog opened without a DialogTrigger."
+          },
+          "permissions": {
+            "type": "custom",
+            "tsType": "import(\"../utils/permissions\").Permissions<\"invite\">",
+            "description": "What the app allows: invite. Hidden renders nothing; disabled keeps the dialog but the submit button stays focusable with aria-disabled and the reason shown and read, and nothing is sent. This only changes what people see: the server must check again."
+          },
+          "classNames": {
+            "type": "custom",
+            "description": "Extra class names for single parts, so you can restyle one part without editing the file. Keys: dialog, form, list, message, actions, cancelButton, submitButton, reason, status.",
+            "tsType": "Partial<Record<\"dialog\" | \"form\" | \"list\" | \"message\" | \"actions\" | \"cancelButton\" | \"submitButton\" | \"reason\" | \"status\", string>>"
+          }
+        },
+        "states": [
+          "default",
+          "disabled",
+          "invalid",
+          "loading"
+        ],
+        "slots": [
+          "dialog",
+          "form",
+          "list",
+          "message",
+          "actions",
+          "cancelButton",
+          "submitButton",
+          "reason",
+          "status"
+        ],
+        "tokens": [
+          "color.surface.raised",
+          "color.border.default",
+          "color.text.default",
+          "color.text.muted",
+          "color.feedback.danger",
+          "color.focus.ring",
+          "radius.overlay",
+          "elevation.overlay"
+        ],
+        "a11y": {
+          "role": "dialog",
+          "keyboard": [
+            "Tab: moves through the rows, Add another, the message, Cancel and the submit button; focus stays inside the dialog",
+            "Escape: cancels and closes",
+            "Enter in an email field: sends",
+            "Each row has buttons to move it, insert below and remove it, all reachable by Tab"
+          ],
+          "requirements": [
+            "Focus lands on the first email field when the dialog opens",
+            "After a send that worked the dialog closes and focus returns to the control that opened it",
+            "A failed send keeps the dialog open and moves focus to the error summary; each item moves to its field",
+            "Row errors are linked to their field with aria-describedby and aria-invalid",
+            "Adding and removing a row is announced; a status message tells the result after the dialog closes",
+            "A disabled invite stays focusable and the reason is its description"
+          ],
+          "screenReader": [
+            "\"Invite people, dialog\"",
+            "\"Invitation 2, group\", then \"Email, edit text, required\"",
+            "\"Send 3 invitations, button\"",
+            "\"3 invitations sent\" after the dialog closes"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "Inviting people to a team, workspace or account by email, one or many at a time"
+          ],
+          "avoid_when": [
+            "Adding a user with a full profile: use UserForm",
+            "Importing hundreds of people: use a file import flow"
+          ],
+          "anti_patterns": [
+            "Treating the permissions prop as protection: UI permission is not security, so the server must check again",
+            "Sending the invitations from inside the component: onInvite is yours",
+            "Closing the dialog yourself after a failed onInvite: it stays open on purpose so the person can fix the rows"
+          ]
+        },
+        "contract": {
+          "data": "The roles people can be invited as, the emails of existing members, and an async onInvite that does the sending.",
+          "dataStates": [
+            "ready"
+          ],
+          "permissions": [
+            "invite"
+          ],
+          "events": [
+            "onInvite",
+            "onCancel",
+            "onOpenChange"
+          ],
+          "customization": [
+            "classNames for each part",
+            "title, description, messageLabel, submitLabel and successMessage",
+            "roles, maxInvites and showMessage",
+            "works inside DialogTrigger or controlled with isOpen"
+          ]
+        },
+        "examples": [
+          "basic",
+          "with-server-errors",
+          "permissions"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {}
+        }
+      },
+      "install": {
+        "command": "npx rdloom add invite-dialog",
+        "dependencies": [],
+        "registryDependencies": [
+          "tokens",
+          "button",
+          "dialog",
+          "error-summary",
+          "field-array",
+          "form",
+          "select",
+          "text-field",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import { Button, DialogTrigger, InviteDialog } from \"@rdloom/react\";\n\nconst roles = [\n  { id: \"viewer\", label: \"Viewer\", description: \"Can read everything, change nothing.\" },\n  { id: \"editor\", label: \"Editor\", description: \"Can create and change records.\" },\n  { id: \"admin\", label: \"Admin\", description: \"Can also manage members and billing.\" },\n];\n\n// Stands in for your own request.\nasync function sendInvites(invites: { email: string; role: string }[]) {\n  await new Promise((resolve) => setTimeout(resolve, 600));\n  console.log(\"Invited\", invites);\n}\n\nexport default function InviteDialogBasicExample() {\n  return (\n    <div className=\"flex w-full justify-center\">\n      <DialogTrigger>\n        <Button>Invite people</Button>\n        <InviteDialog\n          roles={roles}\n          defaultRole=\"viewer\"\n          existingEmails={[\"amara.okafor@example.com\", \"lena.fischer@example.com\"]}\n          description=\"They get an email with a link to join your workspace.\"\n          onInvite={sendInvites}\n        />\n      </DialogTrigger>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "with-server-errors",
+          "code": "import { Button, DialogTrigger, InviteDialog } from \"@rdloom/react\";\n\nconst roles = [\n  { id: \"viewer\", label: \"Viewer\" },\n  { id: \"editor\", label: \"Editor\" },\n];\n\n// Stands in for your own request. The server knows one address already belongs to another workspace,\n// and answers with the row it belongs to: names look like invites[1].email.\nasync function sendInvites(invites: { email: string; role: string }[]) {\n  await new Promise((resolve) => setTimeout(resolve, 600));\n  const index = invites.findIndex((invite) => invite.email.toLowerCase() === \"tomas.novak@example.com\");\n  if (index >= 0) {\n    return { fieldErrors: { [`invites[${index}].email`]: \"tomas.novak@example.com belongs to another workspace.\" } };\n  }\n}\n\nexport default function InviteDialogWithServerErrorsExample() {\n  return (\n    <div className=\"flex w-full justify-center\">\n      <DialogTrigger>\n        <Button>Invite people</Button>\n        <InviteDialog\n          roles={roles}\n          maxInvites={5}\n          description=\"Try tomas.novak@example.com to see an error from the server on its row.\"\n          onInvite={sendInvites}\n        />\n      </DialogTrigger>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "permissions",
+          "code": "import { Button, DialogTrigger, InviteDialog } from \"@rdloom/react\";\n\nconst roles = [\n  { id: \"viewer\", label: \"Viewer\" },\n  { id: \"editor\", label: \"Editor\" },\n];\n\n// Shown, but this person may not send: the button stays reachable and says why.\n// The server must still refuse the request: UI permission is not security.\nexport default function InviteDialogPermissionsExample() {\n  return (\n    <div className=\"flex w-full justify-center\">\n      <DialogTrigger>\n        <Button>Invite people</Button>\n        <InviteDialog\n          roles={roles}\n          permissions={{ invite: { state: \"disabled\", reason: \"Your plan allows 5 members. Ask an owner to upgrade.\" } }}\n          onInvite={() => {}}\n        />\n      </DialogTrigger>\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "invite-dialog/invite-dialog.tsx",
+          "content": "\"use client\";\n\nimport { useId, useState } from \"react\";\nimport { inviteDialogDefaults, type InviteDialogSpecProps } from \"../generated/invite-dialog.types\";\nimport { Button } from \"../button/button\";\nimport { Dialog } from \"../dialog/dialog\";\nimport { FieldArray } from \"../field-array/field-array\";\nimport { ErrorSummary } from \"../error-summary/error-summary\";\nimport { Field } from \"../form/field\";\nimport { Form, FormSubmitButton, useFormState, useFormValues, type SubmitResult } from \"../form/form\";\nimport { Select, SelectItem } from \"../select/select\";\nimport { TextField } from \"../text-field/text-field\";\nimport { cx } from \"../utils/cx\";\nimport { resolvePermission } from \"../utils/permissions\";\n\nexport interface InviteDialogProps extends InviteDialogSpecProps {\n  className?: string;\n}\n\ntype Invite = { email: string; role: string };\ntype Values = { invites: Invite[]; message: string };\n\n// A plain shape check; whether the address really exists is for your server to find out.\nconst emailShape = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;\n\nconst defaultSubmitLabel = (count: number) => (count === 1 ? \"Send invitation\" : `Send ${count} invitations`);\nconst defaultSuccessMessage = (count: number) => (count === 1 ? \"1 invitation sent\" : `${count} invitations sent`);\n\n/**\n * A dialog for inviting people by email, one or many. It checks the rows, asks your onInvite to send,\n * and closes when that worked. It sends nothing itself. UI permission is not security: the server must check again.\n */\nexport function InviteDialog({\n  roles,\n  defaultRole,\n  existingEmails,\n  maxInvites = inviteDialogDefaults.maxInvites,\n  title = \"Invite people\",\n  description,\n  showMessage = inviteDialogDefaults.showMessage,\n  messageLabel = inviteDialogDefaults.messageLabel,\n  submitLabel = defaultSubmitLabel,\n  successMessage = defaultSuccessMessage,\n  onInvite,\n  onCancel,\n  onOpenChange,\n  isOpen,\n  permissions,\n  classNames,\n}: InviteDialogProps) {\n  const [status, setStatus] = useState(\"\");\n  const [sent, setSent] = useState(0);\n  const access = resolvePermission(permissions?.invite);\n  if (!access.isVisible) return null;\n\n  const startRole = defaultRole ?? roles[0]?.id ?? \"\";\n  const known = new Set((existingEmails ?? []).map((e) => e.trim().toLowerCase()));\n\n  return (\n    <>\n      <Dialog\n        title={title}\n        description={description}\n        size=\"lg\"\n        isDismissable={false}\n        isOpen={isOpen}\n        onOpenChange={onOpenChange}\n        className={classNames?.dialog}\n      >\n        {({ close }) => (\n          <InviteForm\n            roles={roles}\n            startRole={startRole}\n            known={known}\n            maxInvites={maxInvites}\n            showMessage={showMessage}\n            messageLabel={messageLabel}\n            submitLabel={submitLabel}\n            access={access}\n            classNames={classNames}\n            onInvite={onInvite}\n            onCancel={() => {\n              onCancel?.();\n              onOpenChange?.(false);\n              close();\n            }}\n            onEscape={() => onCancel?.()}\n            onSent={(count) => {\n              setStatus(successMessage(count));\n              setSent((n) => n + 1);\n              onOpenChange?.(false);\n              close();\n            }}\n          />\n        )}\n      </Dialog>\n      {/* Outside the dialog, so it is still there to be read after the dialog has closed. */}\n      <span role=\"status\" aria-live=\"polite\" className={cx(\"sr-only\", classNames?.status)}>\n        {status}\n        {sent % 2 === 1 ? \"\" : \" \"}\n      </span>\n    </>\n  );\n}\n\ninterface InviteFormProps {\n  roles: InviteDialogProps[\"roles\"];\n  startRole: string;\n  known: Set<string>;\n  maxInvites: number;\n  showMessage: boolean;\n  messageLabel: string;\n  submitLabel: (count: number) => string;\n  access: ReturnType<typeof resolvePermission>;\n  classNames: InviteDialogProps[\"classNames\"];\n  onInvite: InviteDialogProps[\"onInvite\"];\n  onCancel: () => void;\n  onEscape: () => void;\n  onSent: (count: number) => void;\n}\n\nfunction InviteForm({ roles, startRole, known, maxInvites, showMessage, messageLabel, submitLabel, access, classNames, onInvite, onCancel, onEscape, onSent }: InviteFormProps) {\n  const submit = async (values: Values): Promise<void | SubmitResult> => {\n    if (!access.isAllowed) return { formError: access.reason ?? \"You cannot invite people.\" };\n    const invites = values.invites.map((row) => ({ email: row.email.trim(), role: row.role }));\n    const message = values.message?.trim();\n    const result = await onInvite(invites, { message: message || undefined });\n    if (result && (result.formError || (result.fieldErrors && Object.keys(result.fieldErrors).length))) return result;\n    onSent(invites.length);\n  };\n\n  return (\n    <Form<Values>\n      defaultValues={{ invites: [{ email: \"\", role: startRole }], message: \"\" }}\n      onSubmit={submit}\n      className={cx(\"gap-4\", classNames?.form)}\n      onKeyDown={(event) => {\n        if (event.key === \"Escape\" && !event.defaultPrevented) onEscape();\n      }}\n    >\n      <ErrorSummary />\n      <FieldArray\n        name=\"invites\"\n        label=\"People to invite\"\n        itemLabel=\"Invitation\"\n        addLabel=\"Add another\"\n        emptyText=\"No one to invite yet. Add the first person.\"\n        defaultRow={{ email: \"\", role: startRole }}\n        minRows={1}\n        maxRows={maxInvites}\n        className={classNames?.list}\n        messages={{ maxReached: (max) => `You can invite up to ${max} people at once.` }}\n      >\n        {(row) => (\n          <div className=\"grid gap-3 sm:grid-cols-[minmax(0,1fr)_12rem]\">\n            <Field<string>\n              name={row.name(\"email\")}\n              label=\"Email\"\n              isRequired\n              validate={(value, all) => {\n                const email = String(value ?? \"\").trim();\n                if (!emailShape.test(email)) return \"Enter a valid email address.\";\n                const lower = email.toLowerCase();\n                if (known.has(lower)) return `${email} is already a member.`;\n                const rows = ((all as Values).invites ?? []) as Invite[];\n                if (rows.findIndex((r) => r.email.trim().toLowerCase() === lower) !== row.index) return `${email} is already in this list.`;\n              }}\n            >\n              {(f) => <TextField {...f.inputProps} label=\"Email\" type=\"email\" autoComplete=\"off\" autoFocus={row.index === 0} />}\n            </Field>\n            <RoleSelect name={row.name(\"role\")} roles={roles} />\n          </div>\n        )}\n      </FieldArray>\n      {showMessage && (\n        <Field<string> name=\"message\" label={messageLabel}>\n          {(f) => <TextField {...f.inputProps} label={messageLabel} multiline className={classNames?.message} />}\n        </Field>\n      )}\n      <Actions access={access} classNames={classNames} submitLabel={submitLabel} onCancel={onCancel} />\n    </Form>\n  );\n}\n\nfunction RoleSelect({ name, roles }: { name: string; roles: InviteDialogProps[\"roles\"] }) {\n  return (\n    <Field<string> name={name} label=\"Role\" isRequired>\n      {(f) => (\n        <Select\n          {...f.selectProps}\n          label=\"Role\"\n          description={roles.find((r) => r.id === f.value)?.description}\n        >\n          {roles.map((role) => (\n            <SelectItem key={role.id} id={role.id}>\n              {role.label}\n            </SelectItem>\n          ))}\n        </Select>\n      )}\n    </Field>\n  );\n}\n\nfunction Actions({\n  access,\n  classNames,\n  submitLabel,\n  onCancel,\n}: {\n  access: ReturnType<typeof resolvePermission>;\n  classNames: InviteDialogProps[\"classNames\"];\n  submitLabel: (count: number) => string;\n  onCancel: () => void;\n}) {\n  const { isPending } = useFormState();\n  const count = useFormValues<Values, number>((v) => v.invites.length);\n  const label = submitLabel(count);\n  const reasonId = useId();\n  return (\n    <>\n      {access.isDisabled && access.reason && (\n        <p id={reasonId} className={cx(\"text-sm text-[var(--rd-color-text-muted)]\", classNames?.reason)}>\n          {access.reason}\n        </p>\n      )}\n      <div className={cx(\"flex justify-end gap-2\", classNames?.actions)}>\n        <Button type=\"button\" variant=\"secondary\" isDisabled={isPending} onPress={onCancel} className={classNames?.cancelButton}>\n          Cancel\n        </Button>\n        {access.isDisabled ? (\n          // Looks disabled but stays in the tab order, so the reason can be reached.\n          <Button\n            type=\"button\"\n            aria-disabled=\"true\"\n            aria-describedby={access.reason ? reasonId : undefined}\n            onPress={() => {}}\n            className={cx(\"opacity-50 cursor-not-allowed\", classNames?.submitButton)}\n          >\n            {label}\n          </Button>\n        ) : (\n          <FormSubmitButton className={classNames?.submitButton}>{label}</FormSubmitButton>\n        )}\n      </div>\n    </>\n  );\n}\n"
+        },
+        {
+          "path": "generated/invite-dialog.types.ts",
+          "content": "// Generated by rdloom codegen from specs/invite-dialog.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\n/** A dialog for inviting one or many people: rows of email and role, Add another, checks for format, duplicates and people who are already members, an error summary, and a submit button that says how many invitations it sends. Your onInvite does the work. UI permission is not security: the server must check again. */\nexport interface InviteDialogSpecProps {\n  /**\n   * The roles a person can be invited as. The description of the chosen role is shown under its Select.\n   */\n  roles: Array<{ id: string; label: string; description?: string }>;\n  /**\n   * The id of the role each new row starts with. Defaults to the first role.\n   */\n  defaultRole?: string;\n  /**\n   * Emails that are already members. Typing one is an error on that row. Compared without case.\n   */\n  existingEmails?: string[];\n  /**\n   * The most rows one send can hold. Add another is disabled at the limit and says so.\n   * @default 10\n   */\n  maxInvites?: number;\n  /**\n   * The dialog's title, shown as its heading.\n   * @default \"Invite people\"\n   */\n  title?: string;\n  /**\n   * One sentence under the title.\n   */\n  description?: string;\n  /**\n   * Shows an optional message field that goes with every invitation.\n   * @default true\n   */\n  showMessage?: boolean;\n  /**\n   * The label of the message field.\n   * @default \"Message (optional)\"\n   */\n  messageLabel?: string;\n  /**\n   * The text of the submit button for a number of invitations. Default: \"Send invitation\" and \"Send 3 invitations\".\n   */\n  submitLabel?: (count: number) => string;\n  /**\n   * The status message announced once the dialog has closed after a send. Default: \"3 invitations sent\".\n   */\n  successMessage?: (count: number) => string;\n  /**\n   * Sends the invitations; yours, async. Resolve for success. Return { fieldErrors: { \"invites[1].email\": \"...\" } } to show a problem on a row, or { formError } for the whole form; a throw also keeps the dialog open.\n   */\n  onInvite: (invites: Array<{ email: string; role: string }>, details: { message?: string }) => void | import(\"../form/form\").SubmitResult | Promise<void | import(\"../form/form\").SubmitResult>;\n  /**\n   * Called when the person cancels: the Cancel button or Escape.\n   */\n  onCancel?: () => void;\n  /**\n   * Called with false when the dialog closes after a cancel or a successful send. Needed with isOpen.\n   */\n  onOpenChange?: (isOpen: boolean) => void;\n  /**\n   * Controlled open state, for a dialog opened without a DialogTrigger.\n   */\n  isOpen?: boolean;\n  /**\n   * What the app allows: invite. Hidden renders nothing; disabled keeps the dialog but the submit button stays focusable with aria-disabled and the reason shown and read, and nothing is sent. This only changes what people see: the server must check again.\n   */\n  permissions?: import(\"../utils/permissions\").Permissions<\"invite\">;\n  /**\n   * Extra class names for single parts, so you can restyle one part without editing the file. Keys: dialog, form, list, message, actions, cancelButton, submitButton, reason, status.\n   */\n  classNames?: Partial<Record<\"dialog\" | \"form\" | \"list\" | \"message\" | \"actions\" | \"cancelButton\" | \"submitButton\" | \"reason\" | \"status\", string>>;\n}\n\nexport const inviteDialogDefaults = {\n  maxInvites: 10,\n  title: \"Invite people\",\n  showMessage: true,\n  messageLabel: \"Message (optional)\",\n} as const;\n\nexport const inviteDialogMeta = {\n  \"name\": \"InviteDialog\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"dialog\"\n} as const;\n"
         }
       ]
     },
@@ -14066,6 +14710,249 @@
         {
           "path": "generated/tree.types.ts",
           "content": "// Generated by rdloom codegen from specs/tree.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nimport type { ReactNode } from \"react\";\n\nexport const treeSelectionModeValues = [\"none\", \"single\", \"multiple\"] as const;\n\n/** An expandable hierarchy such as folders and files or a nested menu, with keyboard navigation and optional selection. Build it from nested TreeItem elements. */\nexport interface TreeSpecProps {\n  /**\n   * Accessible name of the tree, e.g. \"Files\".\n   */\n  label: string;\n  /**\n   * TreeItem elements. Nest TreeItems inside a TreeItem to make children.\n   */\n  children: ReactNode;\n  /**\n   * Whether items can be selected.\n   * @default \"none\"\n   */\n  selectionMode?: \"none\" | \"single\" | \"multiple\";\n  /**\n   * Controlled selection, by item id.\n   */\n  selectedKeys?: \"all\" | Iterable<import(\"react-aria-components\").Key>;\n  /**\n   * Initial selection when uncontrolled.\n   */\n  defaultSelectedKeys?: \"all\" | Iterable<import(\"react-aria-components\").Key>;\n  /**\n   * Called with the selected item ids.\n   */\n  onSelectionChange?: (keys: \"all\" | Set<import(\"react-aria-components\").Key>) => void;\n  /**\n   * Controlled set of expanded items, by id.\n   */\n  expandedKeys?: Iterable<import(\"react-aria-components\").Key>;\n  /**\n   * Items expanded at first.\n   */\n  defaultExpandedKeys?: Iterable<import(\"react-aria-components\").Key>;\n  /**\n   * Called when items are expanded or collapsed.\n   */\n  onExpandedChange?: (keys: Set<import(\"react-aria-components\").Key>) => void;\n  /**\n   * Called when an item is activated with Enter or a double-click.\n   */\n  onAction?: (key: import(\"react-aria-components\").Key) => void;\n}\n\nexport const treeDefaults = {\n  selectionMode: \"none\",\n} as const;\n\nexport const treeMeta = {\n  \"name\": \"Tree\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"tree\"\n} as const;\n"
+        }
+      ]
+    },
+    {
+      "id": "user-form",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "UserForm",
+        "version": "0.1.0",
+        "category": "block",
+        "status": "experimental",
+        "description": "A form to create or edit a user: name, email, role, status and team, with a danger zone for suspending and deleting. Save stays disabled until something changes, and Cancel asks before throwing changes away. Your onSubmit does the work. UI permission is not security: the server must check again.",
+        "props": {
+          "mode": {
+            "type": "enum",
+            "values": [
+              "create",
+              "edit"
+            ],
+            "default": "create",
+            "description": "create starts empty and shows no danger zone. edit makes the email read-only, with a hint, and shows the danger zone."
+          },
+          "defaultValues": {
+            "type": "custom",
+            "tsType": "Partial<{ name: string; email: string; role: string; status: \"active\" | \"suspended\"; team: string | null }>",
+            "description": "The starting values. Only read when the form mounts; give it a key to start over."
+          },
+          "roles": {
+            "type": "custom",
+            "required": true,
+            "tsType": "Array<{ id: string; label: string; description?: string }>",
+            "description": "The roles a user can have. The description of the chosen role is shown under its Select."
+          },
+          "teams": {
+            "type": "custom",
+            "tsType": "Array<{ id: string; label: string }>",
+            "description": "The teams a user can belong to. Without teams the team field is left out."
+          },
+          "title": {
+            "type": "node",
+            "description": "A heading for the form. Leave it out when the form sits in a Sheet that already has a title."
+          },
+          "headingLevel": {
+            "type": "number",
+            "default": 2,
+            "description": "Heading level of the title, 1 to 6."
+          },
+          "layout": {
+            "type": "enum",
+            "values": [
+              "card",
+              "plain"
+            ],
+            "default": "card",
+            "description": "card draws a bordered card with padding; plain has no chrome, for a Sheet or a page that already has one."
+          },
+          "submitLabel": {
+            "type": "string",
+            "description": "The text of the Save button. Default: \"Create user\" or \"Save changes\"."
+          },
+          "successMessage": {
+            "type": "string",
+            "default": "User saved.",
+            "description": "Announced and shown when onSubmit worked."
+          },
+          "dangerZone": {
+            "type": "node",
+            "description": "More actions for the danger zone, shown next to Suspend and Delete user. Edit mode only."
+          },
+          "onSubmit": {
+            "type": "callback",
+            "required": true,
+            "tsType": "(values: { name: string; email: string; role: string; status: \"active\" | \"suspended\"; team: string | null }) => void | import(\"../form/form\").SubmitResult | Promise<void | import(\"../form/form\").SubmitResult>",
+            "description": "Saves the user; yours, async. Return { fieldErrors } to show a server problem on a field (for example email) or { formError } for the whole form."
+          },
+          "onCancel": {
+            "type": "callback",
+            "tsType": "() => void",
+            "description": "Called when the person cancels. With unsaved changes it is called after they confirm Discard."
+          },
+          "onDelete": {
+            "type": "callback",
+            "tsType": "() => void | Promise<unknown>",
+            "description": "Deletes the user; yours. The Delete user button asks first. Without it the button is left out."
+          },
+          "onSuspend": {
+            "type": "callback",
+            "tsType": "() => void | Promise<unknown>",
+            "description": "Suspends the user right away; yours. The Suspend button asks first. Without it the button is left out."
+          },
+          "permissions": {
+            "type": "custom",
+            "tsType": "import(\"../utils/permissions\").Permissions<\"edit\" | \"delete\" | \"changeRole\">",
+            "description": "What the app allows: edit (the whole form, and Suspend), delete (Delete user) and changeRole (the role field). Hidden removes it; disabled makes a field read-only but focusable with the reason as its description, and a button stays focusable with the reason. This only changes what people see: the server must check again."
+          },
+          "classNames": {
+            "type": "custom",
+            "description": "Extra class names for single parts, so you can restyle one part without editing the file. Keys: root, header, title, form, fields, actions, saveButton, cancelButton, dangerZone, status.",
+            "tsType": "Partial<Record<\"root\" | \"header\" | \"title\" | \"form\" | \"fields\" | \"actions\" | \"saveButton\" | \"cancelButton\" | \"dangerZone\" | \"status\", string>>"
+          }
+        },
+        "states": [
+          "default",
+          "disabled",
+          "invalid",
+          "loading",
+          "readonly"
+        ],
+        "slots": [
+          "root",
+          "header",
+          "title",
+          "form",
+          "fields",
+          "actions",
+          "saveButton",
+          "cancelButton",
+          "dangerZone",
+          "status"
+        ],
+        "tokens": [
+          "color.surface.default",
+          "color.border.default",
+          "color.text.default",
+          "color.text.muted",
+          "color.feedback.danger",
+          "radius.overlay",
+          "elevation.raised"
+        ],
+        "a11y": {
+          "role": "form",
+          "keyboard": [
+            "Tab: moves through name, email, role, status, team, Cancel and Save, then the danger zone",
+            "Enter in a text field: saves",
+            "Escape: with unsaved changes asks \"Discard changes?\"; without them it does nothing here",
+            "Delete user and Suspend open a confirmation that you answer with Tab and Enter"
+          ],
+          "requirements": [
+            "Save is disabled until a value changes",
+            "Cancel with unsaved changes opens an alert dialog; Keep editing returns focus to where it was",
+            "A failed save moves focus to the error summary; each item moves to its field",
+            "A field the person may not change is read-only, stays focusable, and its description gives the reason",
+            "The email in edit mode is read-only with a hint saying why",
+            "The danger zone is a labelled group, so it is announced as its own part of the page"
+          ],
+          "screenReader": [
+            "\"Email, edit text, read only\" with \"Email cannot be changed here\"",
+            "\"Active, switch, on\" with \"Suspended users cannot sign in\"",
+            "\"Discard changes?, alert dialog\"",
+            "\"User saved.\" after a successful save"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "Creating a user, or editing one in a Sheet, a page or a card"
+          ],
+          "avoid_when": [
+            "Inviting several people by email: use InviteDialog",
+            "Editing your own profile and password: use a settings page"
+          ],
+          "anti_patterns": [
+            "Treating the permissions prop as protection: UI permission is not security, so the server must check again",
+            "Hiding a field the person may see but not change: use disabled with a reason",
+            "Closing a Sheet around the form in a way that skips onCancel, which loses the Discard changes question"
+          ]
+        },
+        "contract": {
+          "data": "The user's current values (defaultValues), the roles and teams to choose from, and async onSubmit, onDelete and onSuspend.",
+          "dataStates": [
+            "ready"
+          ],
+          "permissions": [
+            "edit",
+            "delete",
+            "changeRole"
+          ],
+          "events": [
+            "onSubmit",
+            "onCancel",
+            "onDelete",
+            "onSuspend"
+          ],
+          "customization": [
+            "classNames for each part",
+            "dangerZone slot for extra actions",
+            "mode, layout, title, submitLabel and successMessage",
+            "roles and teams"
+          ]
+        },
+        "examples": [
+          "create",
+          "edit",
+          "in-a-sheet",
+          "permissions"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {}
+        }
+      },
+      "install": {
+        "command": "npx rdloom add user-form",
+        "dependencies": [],
+        "registryDependencies": [
+          "tokens",
+          "action-button",
+          "alert-dialog",
+          "button",
+          "error-summary",
+          "form",
+          "select",
+          "switch",
+          "text-field",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "create",
+          "code": "import { UserForm } from \"@rdloom/react\";\n\nconst roles = [\n  { id: \"viewer\", label: \"Viewer\", description: \"Can read everything, change nothing.\" },\n  { id: \"editor\", label: \"Editor\", description: \"Can create and change records.\" },\n  { id: \"admin\", label: \"Admin\", description: \"Can also manage members and billing.\" },\n];\nconst teams = [\n  { id: \"support\", label: \"Support\" },\n  { id: \"finance\", label: \"Finance\" },\n  { id: \"operations\", label: \"Operations\" },\n];\n\n// Stands in for your own request; it refuses one address so the server error shows.\nasync function createUser(values: { email: string }) {\n  await new Promise((resolve) => setTimeout(resolve, 700));\n  if (values.email === \"amara.okafor@example.com\") {\n    return { fieldErrors: { email: \"A user with this email already exists.\" } };\n  }\n}\n\nexport default function UserFormCreateExample() {\n  return (\n    <div className=\"flex w-full justify-center\">\n      <div className=\"w-full max-w-md\">\n        <UserForm\n          mode=\"create\"\n          title=\"New user\"\n          roles={roles}\n          teams={teams}\n          defaultValues={{ role: \"viewer\" }}\n          onSubmit={createUser}\n          onCancel={() => {}}\n        />\n      </div>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "edit",
+          "code": "import { UserForm } from \"@rdloom/react\";\n\nconst roles = [\n  { id: \"viewer\", label: \"Viewer\", description: \"Can read everything, change nothing.\" },\n  { id: \"editor\", label: \"Editor\", description: \"Can create and change records.\" },\n  { id: \"admin\", label: \"Admin\", description: \"Can also manage members and billing.\" },\n];\nconst teams = [\n  { id: \"support\", label: \"Support\" },\n  { id: \"finance\", label: \"Finance\" },\n];\n\nconst wait = () => new Promise<void>((resolve) => setTimeout(resolve, 700));\n\nexport default function UserFormEditExample() {\n  return (\n    <div className=\"flex w-full justify-center\">\n      <div className=\"w-full max-w-md\">\n        <UserForm\n          mode=\"edit\"\n          title=\"Edit Lena Fischer\"\n          roles={roles}\n          teams={teams}\n          defaultValues={{ name: \"Lena Fischer\", email: \"lena.fischer@example.com\", role: \"editor\", status: \"active\", team: \"finance\" }}\n          onSubmit={wait}\n          onCancel={() => {}}\n          onSuspend={wait}\n          onDelete={wait}\n        />\n      </div>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "in-a-sheet",
+          "code": "import { useState } from \"react\";\nimport { Button, Sheet, UserForm } from \"@rdloom/react\";\n\nconst roles = [\n  { id: \"viewer\", label: \"Viewer\" },\n  { id: \"editor\", label: \"Editor\" },\n  { id: \"admin\", label: \"Admin\" },\n];\n\n// The form asks \"Discard changes?\" itself, also for Escape, and calls onCancel only after the answer.\nexport default function UserFormInASheetExample() {\n  const [isOpen, setOpen] = useState(false);\n  return (\n    <div className=\"flex w-full justify-center\">\n      <Button onPress={() => setOpen(true)}>Edit Tomas Novak</Button>\n      <Sheet title=\"Edit user\" description=\"Changes apply when you save.\" isDismissable={false} isOpen={isOpen} onOpenChange={setOpen}>\n        <div className=\"min-h-0 flex-1 overflow-auto p-6\">\n          <UserForm\n            layout=\"plain\"\n            mode=\"edit\"\n            roles={roles}\n            defaultValues={{ name: \"Tomas Novak\", email: \"tomas.novak@example.com\", role: \"viewer\", status: \"active\" }}\n            onSubmit={async () => {\n              await new Promise((resolve) => setTimeout(resolve, 600));\n              setOpen(false);\n            }}\n            onCancel={() => setOpen(false)}\n          />\n        </div>\n      </Sheet>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "permissions",
+          "code": "import { UserForm } from \"@rdloom/react\";\n\nconst roles = [\n  { id: \"viewer\", label: \"Viewer\" },\n  { id: \"editor\", label: \"Editor\" },\n  { id: \"admin\", label: \"Admin\" },\n];\n\n// This person may edit details but not roles, and may not delete. The disabled parts stay reachable and say why.\n// The server must still refuse those requests: UI permission is not security.\nexport default function UserFormPermissionsExample() {\n  return (\n    <div className=\"flex w-full justify-center\">\n      <div className=\"w-full max-w-md\">\n        <UserForm\n          mode=\"edit\"\n          title=\"Edit Priya Raman\"\n          roles={roles}\n          defaultValues={{ name: \"Priya Raman\", email: \"priya.raman@example.com\", role: \"admin\", status: \"active\" }}\n          permissions={{\n            changeRole: { state: \"disabled\", reason: \"Only owners can change roles.\" },\n            delete: { state: \"disabled\", reason: \"Only owners can delete users.\" },\n          }}\n          onSubmit={() => {}}\n          onCancel={() => {}}\n          onDelete={() => {}}\n        />\n      </div>\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "user-form/user-form.tsx",
+          "content": "\"use client\";\n\nimport { createElement, useEffect, useId, useRef, useState, type ReactNode } from \"react\";\nimport { userFormDefaults, type UserFormSpecProps } from \"../generated/user-form.types\";\nimport { ActionButton } from \"../action-button/action-button\";\nimport { AlertDialog } from \"../alert-dialog/alert-dialog\";\nimport { Button } from \"../button/button\";\nimport { ErrorSummary } from \"../error-summary/error-summary\";\nimport { Field } from \"../form/field\";\nimport { Form, FormSubmitButton, useFormState, useFormValues, type SubmitResult } from \"../form/form\";\nimport { Select, SelectItem } from \"../select/select\";\nimport { Switch } from \"../switch/switch\";\nimport { TextField } from \"../text-field/text-field\";\nimport { cx } from \"../utils/cx\";\nimport { CheckIcon } from \"../utils/icons\";\nimport { resolvePermission, type PermissionValue, type ResolvedPermission } from \"../utils/permissions\";\n\nexport interface UserFormProps extends UserFormSpecProps {\n  className?: string;\n}\n\ntype UserValues = NonNullable<Parameters<UserFormProps[\"onSubmit\"]>[0]>;\n// Inside the form the team is always a string, so a Select can show \"No team\".\ntype Values = Omit<UserValues, \"team\"> & { team: string };\ntype Choice = { id: string; label: string; description?: string };\n\nconst NO_TEAM = \"none\";\nconst emailShape = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;\n\n/**\n * Creates or edits a user. Save waits for a change, Cancel asks before discarding one, and the danger zone\n * holds Suspend and Delete user behind a confirmation. It saves nothing itself.\n * UI permission is not security: the server must check again.\n */\nexport function UserForm({\n  mode = userFormDefaults.mode,\n  defaultValues,\n  roles,\n  teams,\n  title,\n  headingLevel = userFormDefaults.headingLevel,\n  layout = userFormDefaults.layout,\n  submitLabel,\n  successMessage = userFormDefaults.successMessage,\n  dangerZone,\n  onSubmit,\n  onCancel,\n  onDelete,\n  onSuspend,\n  permissions,\n  classNames,\n  className,\n}: UserFormProps) {\n  const edit = resolvePermission(permissions?.edit);\n  const changeRole = resolvePermission(permissions?.changeRole);\n  const del = resolvePermission(permissions?.delete);\n\n  const initial: Values = {\n    name: defaultValues?.name ?? \"\",\n    email: defaultValues?.email ?? \"\",\n    role: defaultValues?.role ?? \"\",\n    status: defaultValues?.status ?? \"active\",\n    team: defaultValues?.team ?? NO_TEAM,\n  };\n  const [initialValues] = useState(initial);\n  const [baseline, setBaseline] = useState(() => JSON.stringify(initial));\n  const [discardOpen, setDiscardOpen] = useState(false);\n  const dirtyRef = useRef(false);\n  const headingId = useId();\n  if (!edit.isVisible) return null;\n\n  const isEdit = mode === \"edit\";\n  const Heading = `h${Math.min(6, Math.max(1, Math.round(headingLevel)))}` as \"h2\";\n  const hasDanger = isEdit && ((Boolean(onDelete) && del.isVisible) || Boolean(onSuspend) || Boolean(dangerZone));\n\n  const submit = async (values: Values): Promise<void | SubmitResult> => {\n    if (!edit.isAllowed) return { formError: edit.reason ?? \"You cannot change this user.\" };\n    const result = await onSubmit({ ...values, team: values.team === NO_TEAM ? null : values.team });\n    if (result && (result.formError || (result.fieldErrors && Object.keys(result.fieldErrors).length))) return result;\n    setBaseline(JSON.stringify(values));\n  };\n\n  const askToCancel = () => {\n    if (dirtyRef.current) setDiscardOpen(true);\n    else onCancel?.();\n  };\n\n  return (\n    <div\n      className={cx(\n        \"flex w-full flex-col gap-6\",\n        layout === \"card\" &&\n          \"rounded-[var(--rd-radius-overlay)] border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-default)] p-6 [box-shadow:var(--rd-elevation-raised)]\",\n        classNames?.root,\n        className,\n      )}\n    >\n      {title && (\n        <div className={cx(\"flex flex-col gap-1\", classNames?.header)}>\n          {createElement(Heading, { id: headingId, className: cx(\"text-lg font-semibold text-[var(--rd-color-text-default)]\", classNames?.title) }, title)}\n        </div>\n      )}\n      <Form<Values>\n        defaultValues={initialValues}\n        onSubmit={submit}\n        aria-labelledby={title ? headingId : undefined}\n        aria-label={title ? undefined : isEdit ? \"Edit user\" : \"Create user\"}\n        className={cx(\"gap-5\", classNames?.form)}\n        onKeyDown={(event) => {\n          // A Sheet or page around the form would close on Escape and lose the changes; ask first.\n          if (event.key === \"Escape\" && !event.defaultPrevented && dirtyRef.current) {\n            event.preventDefault();\n            event.stopPropagation();\n            setDiscardOpen(true);\n          }\n        }}\n      >\n        <DirtyTracker baseline={baseline} dirtyRef={dirtyRef} />\n        <ErrorSummary />\n        <div className={cx(\"flex flex-col gap-4\", classNames?.fields)}>\n          <Field<string> name=\"name\" label=\"Name\" isRequired>\n            {(f) => <TextField {...f.inputProps} label=\"Name\" autoComplete=\"off\" isReadOnly={!edit.isAllowed} description={edit.isAllowed ? undefined : edit.reason} />}\n          </Field>\n          <Field<string>\n            name=\"email\"\n            label=\"Email\"\n            isRequired={!isEdit}\n            validate={(value) => (value && !emailShape.test(String(value).trim()) ? \"Enter a valid email address.\" : null)}\n          >\n            {(f) => (\n              <TextField\n                {...f.inputProps}\n                label=\"Email\"\n                type=\"email\"\n                autoComplete=\"off\"\n                isReadOnly={isEdit || !edit.isAllowed}\n                isRequired={isEdit ? undefined : f.inputProps.isRequired}\n                description={isEdit ? \"Email cannot be changed here.\" : edit.isAllowed ? undefined : edit.reason}\n              />\n            )}\n          </Field>\n          {changeRole.isVisible && (\n            <ChoiceField\n              name=\"role\"\n              label=\"Role\"\n              items={roles}\n              isRequired\n              readOnly={!edit.isAllowed || !changeRole.isAllowed}\n              reason={!edit.isAllowed ? edit.reason : changeRole.reason}\n              showDescription\n            />\n          )}\n          <StatusSwitch readOnly={!edit.isAllowed} reason={edit.reason} />\n          {teams && teams.length > 0 && (\n            <ChoiceField\n              name=\"team\"\n              label=\"Team\"\n              items={[{ id: NO_TEAM, label: \"No team\" }, ...teams]}\n              readOnly={!edit.isAllowed}\n              reason={edit.reason}\n            />\n          )}\n        </div>\n        <Actions\n          edit={edit}\n          label={submitLabel ?? (isEdit ? \"Save changes\" : \"Create user\")}\n          baseline={baseline}\n          successMessage={successMessage}\n          classNames={classNames}\n          onCancel={askToCancel}\n        />\n      </Form>\n      {hasDanger && (\n        <DangerZone\n          classNames={classNames}\n          onDelete={onDelete}\n          onSuspend={onSuspend}\n          deletePermission={permissions?.delete}\n          editPermission={permissions?.edit}\n          extra={dangerZone}\n        />\n      )}\n      <AlertDialog\n        tone=\"danger\"\n        title=\"Discard changes?\"\n        description=\"You have unsaved changes. If you leave now, they will be lost.\"\n        confirmLabel=\"Discard\"\n        cancelLabel=\"Keep editing\"\n        isOpen={discardOpen}\n        onOpenChange={setDiscardOpen}\n        onConfirm={() => onCancel?.()}\n      />\n    </div>\n  );\n}\n\n/** Tells the outside whether the form differs from what was last saved. */\nfunction DirtyTracker({ baseline, dirtyRef }: { baseline: string; dirtyRef: { current: boolean } }) {\n  const dirty = useFormValues<Values, boolean>((v) => JSON.stringify(v) !== baseline);\n  useEffect(() => {\n    dirtyRef.current = dirty;\n  }, [dirty, dirtyRef]);\n  return null;\n}\n\ninterface ChoiceFieldProps {\n  name: string;\n  label: string;\n  items: Choice[];\n  isRequired?: boolean;\n  readOnly: boolean;\n  reason?: string;\n  showDescription?: boolean;\n}\n\n/** A Select, or when the person may not change it a read-only field that can still be reached and says why. */\nfunction ChoiceField({ name, label, items, isRequired, readOnly, reason, showDescription }: ChoiceFieldProps) {\n  return (\n    <Field<string> name={name} label={label} isRequired={isRequired && !readOnly}>\n      {(f) => {\n        const chosen = items.find((item) => item.id === f.value);\n        const description = readOnly ? reason : showDescription ? chosen?.description : undefined;\n        if (readOnly) {\n          return <TextField name={name} label={label} value={chosen?.label ?? \"\"} isReadOnly description={description} />;\n        }\n        return (\n          <Select {...f.selectProps} label={label} description={description}>\n            {items.map((item) => (\n              <SelectItem key={item.id} id={item.id}>\n                {item.label}\n              </SelectItem>\n            ))}\n          </Select>\n        );\n      }}\n    </Field>\n  );\n}\n\nfunction StatusSwitch({ readOnly, reason }: { readOnly: boolean; reason?: string }) {\n  const hintId = useId();\n  return (\n    <Field<string> name=\"status\" label=\"Status\">\n      {(f) => (\n        <div className=\"flex flex-col gap-1\">\n          <Switch\n            name=\"status\"\n            isSelected={f.value !== \"suspended\"}\n            onChange={(on) => f.setValue(on ? \"active\" : \"suspended\")}\n            onBlur={f.onBlur}\n            isReadOnly={readOnly}\n            aria-describedby={hintId}\n          >\n            Active\n          </Switch>\n          <p id={hintId} className=\"text-xs text-[var(--rd-color-text-muted)]\">\n            {readOnly && reason ? reason : \"Suspended users cannot sign in.\"}\n          </p>\n        </div>\n      )}\n    </Field>\n  );\n}\n\ninterface ActionsProps {\n  edit: ResolvedPermission;\n  label: string;\n  baseline: string;\n  successMessage: string;\n  classNames: UserFormProps[\"classNames\"];\n  onCancel: () => void;\n}\n\nfunction Actions({ edit, label, baseline, successMessage, classNames, onCancel }: ActionsProps) {\n  const { state, isPending } = useFormState();\n  const dirty = useFormValues<Values, boolean>((v) => JSON.stringify(v) !== baseline);\n  const reasonId = useId();\n  return (\n    <>\n      {state === \"success\" && !dirty && (\n        <p className={cx(\"flex items-center gap-2 text-sm text-[var(--rd-color-feedback-success)]\", classNames?.status)}>\n          <CheckIcon className=\"size-4 shrink-0\" />\n          {successMessage}\n        </p>\n      )}\n      {edit.isDisabled && edit.reason && (\n        <p id={reasonId} className=\"text-sm text-[var(--rd-color-text-muted)]\">\n          {edit.reason}\n        </p>\n      )}\n      <div className={cx(\"flex justify-end gap-2\", classNames?.actions)}>\n        <Button type=\"button\" variant=\"secondary\" isDisabled={isPending} onPress={onCancel} className={classNames?.cancelButton}>\n          Cancel\n        </Button>\n        {edit.isDisabled ? (\n          // Looks disabled but stays in the tab order, so the reason can be reached.\n          <Button\n            type=\"button\"\n            aria-disabled=\"true\"\n            aria-describedby={edit.reason ? reasonId : undefined}\n            onPress={() => {}}\n            className={cx(\"opacity-50 cursor-not-allowed\", classNames?.saveButton)}\n          >\n            {label}\n          </Button>\n        ) : (\n          <FormSubmitButton isDisabled={!dirty} className={classNames?.saveButton}>\n            {label}\n          </FormSubmitButton>\n        )}\n      </div>\n    </>\n  );\n}\n\ninterface DangerZoneProps {\n  classNames: UserFormProps[\"classNames\"];\n  onDelete: UserFormProps[\"onDelete\"];\n  onSuspend: UserFormProps[\"onSuspend\"];\n  deletePermission?: PermissionValue;\n  editPermission?: PermissionValue;\n  extra?: ReactNode;\n}\n\nfunction DangerZone({ classNames, onDelete, onSuspend, deletePermission, editPermission, extra }: DangerZoneProps) {\n  const headingId = useId();\n  return (\n    <section\n      role=\"group\"\n      aria-labelledby={headingId}\n      className={cx(\n        \"flex flex-col gap-3 border-t border-[var(--rd-color-border-default)] pt-5\",\n        classNames?.dangerZone,\n      )}\n    >\n      <div className=\"flex flex-col gap-1\">\n        <h3 id={headingId} className=\"text-sm font-semibold text-[var(--rd-color-feedback-danger)]\">\n          Danger zone\n        </h3>\n        <p className=\"text-sm text-[var(--rd-color-text-muted)]\">These actions affect this person&apos;s access to everything.</p>\n      </div>\n      <div className=\"flex flex-wrap gap-2\">\n        {onSuspend && (\n          <ActionButton\n            variant=\"secondary\"\n            permission={editPermission}\n            onAction={onSuspend}\n            confirm={{\n              title: \"Suspend this user?\",\n              description: \"They are signed out and cannot sign in until you make them active again.\",\n              confirmLabel: \"Suspend\",\n            }}\n          >\n            Suspend\n          </ActionButton>\n        )}\n        {onDelete && (\n          <ActionButton\n            variant=\"danger\"\n            permission={deletePermission}\n            onAction={onDelete}\n            confirm={{ title: \"Delete this user?\", description: \"This removes the user for good. It cannot be undone.\", confirmLabel: \"Delete user\" }}\n          >\n            Delete user\n          </ActionButton>\n        )}\n        {extra}\n      </div>\n    </section>\n  );\n}\n"
+        },
+        {
+          "path": "generated/user-form.types.ts",
+          "content": "// Generated by rdloom codegen from specs/user-form.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nimport type { ReactNode } from \"react\";\n\nexport const userFormModeValues = [\"create\", \"edit\"] as const;\nexport const userFormLayoutValues = [\"card\", \"plain\"] as const;\n\n/** A form to create or edit a user: name, email, role, status and team, with a danger zone for suspending and deleting. Save stays disabled until something changes, and Cancel asks before throwing changes away. Your onSubmit does the work. UI permission is not security: the server must check again. */\nexport interface UserFormSpecProps {\n  /**\n   * create starts empty and shows no danger zone. edit makes the email read-only, with a hint, and shows the danger zone.\n   * @default \"create\"\n   */\n  mode?: \"create\" | \"edit\";\n  /**\n   * The starting values. Only read when the form mounts; give it a key to start over.\n   */\n  defaultValues?: Partial<{ name: string; email: string; role: string; status: \"active\" | \"suspended\"; team: string | null }>;\n  /**\n   * The roles a user can have. The description of the chosen role is shown under its Select.\n   */\n  roles: Array<{ id: string; label: string; description?: string }>;\n  /**\n   * The teams a user can belong to. Without teams the team field is left out.\n   */\n  teams?: Array<{ id: string; label: string }>;\n  /**\n   * A heading for the form. Leave it out when the form sits in a Sheet that already has a title.\n   */\n  title?: ReactNode;\n  /**\n   * Heading level of the title, 1 to 6.\n   * @default 2\n   */\n  headingLevel?: number;\n  /**\n   * card draws a bordered card with padding; plain has no chrome, for a Sheet or a page that already has one.\n   * @default \"card\"\n   */\n  layout?: \"card\" | \"plain\";\n  /**\n   * The text of the Save button. Default: \"Create user\" or \"Save changes\".\n   */\n  submitLabel?: string;\n  /**\n   * Announced and shown when onSubmit worked.\n   * @default \"User saved.\"\n   */\n  successMessage?: string;\n  /**\n   * More actions for the danger zone, shown next to Suspend and Delete user. Edit mode only.\n   */\n  dangerZone?: ReactNode;\n  /**\n   * Saves the user; yours, async. Return { fieldErrors } to show a server problem on a field (for example email) or { formError } for the whole form.\n   */\n  onSubmit: (values: { name: string; email: string; role: string; status: \"active\" | \"suspended\"; team: string | null }) => void | import(\"../form/form\").SubmitResult | Promise<void | import(\"../form/form\").SubmitResult>;\n  /**\n   * Called when the person cancels. With unsaved changes it is called after they confirm Discard.\n   */\n  onCancel?: () => void;\n  /**\n   * Deletes the user; yours. The Delete user button asks first. Without it the button is left out.\n   */\n  onDelete?: () => void | Promise<unknown>;\n  /**\n   * Suspends the user right away; yours. The Suspend button asks first. Without it the button is left out.\n   */\n  onSuspend?: () => void | Promise<unknown>;\n  /**\n   * What the app allows: edit (the whole form, and Suspend), delete (Delete user) and changeRole (the role field). Hidden removes it; disabled makes a field read-only but focusable with the reason as its description, and a button stays focusable with the reason. This only changes what people see: the server must check again.\n   */\n  permissions?: import(\"../utils/permissions\").Permissions<\"edit\" | \"delete\" | \"changeRole\">;\n  /**\n   * Extra class names for single parts, so you can restyle one part without editing the file. Keys: root, header, title, form, fields, actions, saveButton, cancelButton, dangerZone, status.\n   */\n  classNames?: Partial<Record<\"root\" | \"header\" | \"title\" | \"form\" | \"fields\" | \"actions\" | \"saveButton\" | \"cancelButton\" | \"dangerZone\" | \"status\", string>>;\n}\n\nexport const userFormDefaults = {\n  mode: \"create\",\n  headingLevel: 2,\n  layout: \"card\",\n  successMessage: \"User saved.\",\n} as const;\n\nexport const userFormMeta = {\n  \"name\": \"UserForm\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"form\"\n} as const;\n"
         }
       ]
     }

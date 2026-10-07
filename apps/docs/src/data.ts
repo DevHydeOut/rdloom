@@ -105,7 +105,7 @@ export const componentGroupDefs: Array<{ id: string; label: string; ids: string[
   { id: "display", label: "Content and layout", ids: ["card", "accordion", "avatar", "kbd", "collapsible", "separator", "avatar-group"] },
   { id: "ai", label: "AI chat and agents", ids: ["chat", "message", "prompt-input", "response", "tool-call", "agent-activity", "approval-box", "citation", "sources", "generated-table", "generated-chart"] },
   { id: "motion", label: "Motion and effects", ids: ["text-shimmer", "gradient-text", "blur-fade", "shine-border", "shuttle-border", "ripple"] },
-  { id: "blocks", label: "Blocks", ids: ["dashboard-shell", "dashboard-page", "page-header", "section-header", "app-footer", "auth-card", "sidebar", "customer-table"] },
+  { id: "blocks", label: "Blocks", ids: ["dashboard-shell", "dashboard-page", "page-header", "section-header", "app-footer", "auth-card", "sidebar", "customer-table", "data-table", "invite-dialog", "user-form"] },
 ];
 
 export interface ComponentGroup {

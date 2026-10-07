@@ -91,6 +91,14 @@ test -e src/components/rdloom/utils/url-state.ts || { echo "✗ the address-stat
 test -e src/components/rdloom/utils/permissions.ts || { echo "✗ the permission helpers (utils/permissions.ts) were not installed"; exit 1; }
 echo "✓ page structure and actions installed"
 
+step "The users workflow: data table, invite dialog, user form"
+npx rdloom add data-table invite-dialog user-form --install
+for part in data-table invite-dialog user-form action-button alert-dialog field-array error-summary menu sheet pagination empty-state error-state; do
+  test -e "src/components/rdloom/$part/$part.tsx" || { echo "✗ rdloom add data-table did not bring $part"; exit 1; }
+done
+test -e src/components/rdloom/data-table/query.ts || { echo "✗ the table logic (data-table/query.ts) was not installed"; exit 1; }
+echo "✓ users workflow installed"
+
 step "Typecheck and production build"
 npm run build --silent
 # The keyframes must be in the CSS the browser actually loads, with no <style> tag in the markup.

@@ -829,6 +829,13 @@
       ]
     },
     {
+      "name": "DataTable",
+      "id": "data-table",
+      "version": "0.1.0",
+      "description": "The list screen every admin, ERP and SaaS app has: a table of rows with search, filters, sorting, pages, selection with bulk actions, a row menu with confirmed actions, CSV export, loading, empty and error states, and cards on a narrow screen. It never fetches: you pass the rows (or one page of them with serverSide) and handle the actions. Permissions only change what people see and can try; they are not security, so the server must check every action again.",
+      "properties": []
+    },
+    {
       "name": "DatePicker",
       "id": "date-picker",
       "version": "0.1.1",
@@ -1131,6 +1138,13 @@
           "default": "false"
         }
       ]
+    },
+    {
+      "name": "InviteDialog",
+      "id": "invite-dialog",
+      "version": "0.1.0",
+      "description": "A dialog for inviting one or many people: rows of email and role, Add another, checks for format, duplicates and people who are already members, an error summary, and a submit button that says how many invitations it sends. Your onInvite does the work. UI permission is not security: the server must check again.",
+      "properties": []
     },
     {
       "name": "Kbd",
@@ -2120,6 +2134,13 @@
           "default": "none"
         }
       ]
+    },
+    {
+      "name": "UserForm",
+      "id": "user-form",
+      "version": "0.1.0",
+      "description": "A form to create or edit a user: name, email, role, status and team, with a danger zone for suspending and deleting. Save stays disabled until something changes, and Cancel asks before throwing changes away. Your onSubmit does the work. UI permission is not security: the server must check again.",
+      "properties": []
     }
   ]
 }

@@ -1,0 +1,183 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "InviteDialog",
+  "version": "0.1.0",
+  "category": "block",
+  "status": "experimental",
+  "description": "A dialog for inviting one or many people: rows of email and role, Add another, checks for format, duplicates and people who are already members, an error summary, and a submit button that says how many invitations it sends. Your onInvite does the work. UI permission is not security: the server must check again.",
+  "props": {
+    "roles": {
+      "type": "custom",
+      "required": true,
+      "tsType": "Array<{ id: string; label: string; description?: string }>",
+      "description": "The roles a person can be invited as. The description of the chosen role is shown under its Select."
+    },
+    "defaultRole": {
+      "type": "string",
+      "description": "The id of the role each new row starts with. Defaults to the first role."
+    },
+    "existingEmails": {
+      "type": "custom",
+      "tsType": "string[]",
+      "description": "Emails that are already members. Typing one is an error on that row. Compared without case."
+    },
+    "maxInvites": {
+      "type": "number",
+      "default": 10,
+      "description": "The most rows one send can hold. Add another is disabled at the limit and says so."
+    },
+    "title": {
+      "type": "string",
+      "default": "Invite people",
+      "description": "The dialog's title, shown as its heading."
+    },
+    "description": {
+      "type": "string",
+      "description": "One sentence under the title."
+    },
+    "showMessage": {
+      "type": "boolean",
+      "default": true,
+      "description": "Shows an optional message field that goes with every invitation."
+    },
+    "messageLabel": {
+      "type": "string",
+      "default": "Message (optional)",
+      "description": "The label of the message field."
+    },
+    "submitLabel": {
+      "type": "custom",
+      "tsType": "(count: number) => string",
+      "description": "The text of the submit button for a number of invitations. Default: \"Send invitation\" and \"Send 3 invitations\"."
+    },
+    "successMessage": {
+      "type": "custom",
+      "tsType": "(count: number) => string",
+      "description": "The status message announced once the dialog has closed after a send. Default: \"3 invitations sent\"."
+    },
+    "onInvite": {
+      "type": "callback",
+      "required": true,
+      "tsType": "(invites: Array<{ email: string; role: string }>, details: { message?: string }) => void | import(\"../form/form\").SubmitResult | Promise<void | import(\"../form/form\").SubmitResult>",
+      "description": "Sends the invitations; yours, async. Resolve for success. Return { fieldErrors: { \"invites[1].email\": \"...\" } } to show a problem on a row, or { formError } for the whole form; a throw also keeps the dialog open."
+    },
+    "onCancel": {
+      "type": "callback",
+      "tsType": "() => void",
+      "description": "Called when the person cancels: the Cancel button or Escape."
+    },
+    "onOpenChange": {
+      "type": "callback",
+      "tsType": "(isOpen: boolean) => void",
+      "description": "Called with false when the dialog closes after a cancel or a successful send. Needed with isOpen."
+    },
+    "isOpen": {
+      "type": "boolean",
+      "description": "Controlled open state, for a dialog opened without a DialogTrigger."
+    },
+    "permissions": {
+      "type": "custom",
+      "tsType": "import(\"../utils/permissions\").Permissions<\"invite\">",
+      "description": "What the app allows: invite. Hidden renders nothing; disabled keeps the dialog but the submit button stays focusable with aria-disabled and the reason shown and read, and nothing is sent. This only changes what people see: the server must check again."
+    },
+    "classNames": {
+      "type": "custom",
+      "description": "Extra class names for single parts, so you can restyle one part without editing the file. Keys: dialog, form, list, message, actions, cancelButton, submitButton, reason, status.",
+      "tsType": "Partial<Record<\"dialog\" | \"form\" | \"list\" | \"message\" | \"actions\" | \"cancelButton\" | \"submitButton\" | \"reason\" | \"status\", string>>"
+    }
+  },
+  "states": [
+    "default",
+    "disabled",
+    "invalid",
+    "loading"
+  ],
+  "slots": [
+    "dialog",
+    "form",
+    "list",
+    "message",
+    "actions",
+    "cancelButton",
+    "submitButton",
+    "reason",
+    "status"
+  ],
+  "tokens": [
+    "color.surface.raised",
+    "color.border.default",
+    "color.text.default",
+    "color.text.muted",
+    "color.feedback.danger",
+    "color.focus.ring",
+    "radius.overlay",
+    "elevation.overlay"
+  ],
+  "a11y": {
+    "role": "dialog",
+    "keyboard": [
+      "Tab: moves through the rows, Add another, the message, Cancel and the submit button; focus stays inside the dialog",
+      "Escape: cancels and closes",
+      "Enter in an email field: sends",
+      "Each row has buttons to move it, insert below and remove it, all reachable by Tab"
+    ],
+    "requirements": [
+      "Focus lands on the first email field when the dialog opens",
+      "After a send that worked the dialog closes and focus returns to the control that opened it",
+      "A failed send keeps the dialog open and moves focus to the error summary; each item moves to its field",
+      "Row errors are linked to their field with aria-describedby and aria-invalid",
+      "Adding and removing a row is announced; a status message tells the result after the dialog closes",
+      "A disabled invite stays focusable and the reason is its description"
+    ],
+    "screenReader": [
+      "\"Invite people, dialog\"",
+      "\"Invitation 2, group\", then \"Email, edit text, required\"",
+      "\"Send 3 invitations, button\"",
+      "\"3 invitations sent\" after the dialog closes"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "Inviting people to a team, workspace or account by email, one or many at a time"
+    ],
+    "avoid_when": [
+      "Adding a user with a full profile: use UserForm",
+      "Importing hundreds of people: use a file import flow"
+    ],
+    "anti_patterns": [
+      "Treating the permissions prop as protection: UI permission is not security, so the server must check again",
+      "Sending the invitations from inside the component: onInvite is yours",
+      "Closing the dialog yourself after a failed onInvite: it stays open on purpose so the person can fix the rows"
+    ]
+  },
+  "contract": {
+    "data": "The roles people can be invited as, the emails of existing members, and an async onInvite that does the sending.",
+    "dataStates": [
+      "ready"
+    ],
+    "permissions": [
+      "invite"
+    ],
+    "events": [
+      "onInvite",
+      "onCancel",
+      "onOpenChange"
+    ],
+    "customization": [
+      "classNames for each part",
+      "title, description, messageLabel, submitLabel and successMessage",
+      "roles, maxInvites and showMessage",
+      "works inside DialogTrigger or controlled with isOpen"
+    ]
+  },
+  "examples": [
+    "basic",
+    "with-server-errors",
+    "permissions"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {}
+  }
+}

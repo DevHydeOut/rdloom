@@ -186,6 +186,24 @@ export {
   type CustomerStatInput,
   type CustomerSummary,
 } from "./customer-table/query";
+export { DataTable, type DataTableClassNames, type DataTableProps, type DataTableSlot } from "./data-table/data-table";
+export {
+  applyDataTableQuery,
+  dataTableQueryFromState,
+  dataTableQuerySchema,
+  dataTableQueryToState,
+  emptyDataTableQuery,
+  rowsToCsv,
+  type DataTableBulkAction,
+  type DataTableColumn,
+  type DataTableFilter,
+  type DataTableFilterOption,
+  type DataTableQuery,
+  type DataTableQuerySchemaOptions,
+  type DataTableRowAction,
+  type DataTableSortDirection,
+  type DataTableValue,
+} from "./data-table/query";
 export { DashboardShell, type DashboardShellProps } from "./dashboard-shell/dashboard-shell";
 export { currentTopLevel, findNavItem, flattenNav, trailOf, type NavGroup, type NavItem, type ShellUser } from "./sidebar/nav";
 export { Sidebar, type SidebarProps } from "./sidebar/sidebar";
@@ -197,6 +215,8 @@ export { AppFooter, type AppFooterProps } from "./app-footer/app-footer";
 export type { FooterLink, FooterLinkGroup } from "./app-footer/links";
 export { ErrorState, type ErrorStateProps } from "./error-state/error-state";
 export { AuthCard, type AuthCardProps } from "./auth-card/auth-card";
+export { InviteDialog, type InviteDialogProps } from "./invite-dialog/invite-dialog";
+export { UserForm, type UserFormProps } from "./user-form/user-form";
 // The icon family the components use, for your own buttons and menu entries.
 export * from "./utils/icons";
 // Forms: the Form, its fields, the error summary and repeating rows. The engine behind them is one adapter file.
