@@ -25,6 +25,7 @@ export interface Spec {
   tokens?: string[];
   a11y: { role: string; keyboard: string[]; requirements?: string[]; screenReader?: string[]; wcag: string };
   usage: { use_when: string[]; avoid_when: string[]; anti_patterns?: string[] };
+  contract?: { data: string; dataStates: string[]; permissions: string[]; events: string[]; customization: string[] };
   examples?: string[];
 }
 
@@ -92,16 +93,16 @@ export const EagerExamples = createContext<Record<string, ComponentType> | null>
 export const componentGroupDefs: Array<{ id: string; label: string; ids: string[] }> = [
   { id: "buttons", label: "Buttons", ids: ["button", "shimmer-button", "ripple-button", "pulse-button", "gradient-button", "reveal-button"] },
   { id: "search", label: "Search and commands", ids: ["command-palette", "combobox"] },
-  { id: "text-inputs", label: "Text and number inputs", ids: ["text-field", "number-field", "tag-input", "file-upload"] },
-  { id: "choice", label: "Choices and toggles", ids: ["select", "checkbox", "radio-group", "switch", "slider", "segmented-control"] },
+  { id: "text-inputs", label: "Text and number inputs", ids: ["text-field", "input-otp", "number-field", "tag-input", "file-upload"] },
+  { id: "choice", label: "Choices and toggles", ids: ["select", "checkbox", "radio-group", "switch", "slider", "segmented-control", "toggle-button"] },
   { id: "forms", label: "Forms", ids: ["form", "error-summary", "field-array"] },
   { id: "date-time", label: "Dates and times", ids: ["calendar", "date-picker", "date-range-picker", "time-field"] },
   { id: "data", label: "Tables and data", ids: ["data-grid", "table", "tree", "pagination"] },
   { id: "charts", label: "Charts and stats", ids: ["chart", "sparkline", "stat"] },
   { id: "navigation", label: "Navigation", ids: ["tabs", "breadcrumbs", "steps", "menu"] },
-  { id: "overlays", label: "Dialogs and popovers", ids: ["dialog", "sheet", "popover", "tooltip"] },
+  { id: "overlays", label: "Dialogs and popovers", ids: ["dialog", "alert-dialog", "sheet", "popover", "tooltip"] },
   { id: "feedback", label: "Feedback and status", ids: ["alert", "toast", "progress", "skeleton", "empty-state", "badge"] },
-  { id: "display", label: "Content and layout", ids: ["card", "accordion", "avatar", "kbd"] },
+  { id: "display", label: "Content and layout", ids: ["card", "accordion", "avatar", "kbd", "collapsible", "separator", "avatar-group"] },
   { id: "ai", label: "AI chat and agents", ids: ["chat", "message", "prompt-input", "response", "tool-call", "agent-activity", "approval-box", "citation", "sources", "generated-table", "generated-chart"] },
   { id: "motion", label: "Motion and effects", ids: ["text-shimmer", "gradient-text", "blur-fade", "shine-border", "shuttle-border", "ripple"] },
   { id: "blocks", label: "Blocks", ids: ["dashboard-shell", "dashboard-page", "sidebar", "customer-table"] },

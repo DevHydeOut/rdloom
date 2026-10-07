@@ -28,6 +28,7 @@ export {
   type DateRangePreset,
 } from "./date-range-picker/date-range-picker";
 export { Dialog, DialogTrigger, type DialogProps } from "./dialog/dialog";
+export { AlertDialog, type AlertDialogProps } from "./alert-dialog/alert-dialog";
 export {
   Menu,
   MenuItem,
@@ -46,6 +47,7 @@ export { Slider, type SliderProps } from "./slider/slider";
 export { Switch, type SwitchProps } from "./switch/switch";
 export { Tab, TabList, TabPanel, Tabs, type TabListProps, type TabPanelProps, type TabProps, type TabsProps } from "./tabs/tabs";
 export { TextField, type TextFieldProps } from "./text-field/text-field";
+export { InputOTP, type InputOTPProps } from "./input-otp/input-otp";
 export { toast, toastQueue, ToastRegion } from "./toast/toast";
 export { Tooltip, TooltipTrigger, type TooltipProps } from "./tooltip/tooltip";
 export { NumberField, type NumberFieldProps } from "./number-field/number-field";
@@ -201,3 +203,8 @@ export { FieldArray, type FieldArrayMessages, type FieldArrayProps, type FieldAr
 // The two kinds of state (what a screen shows, what an action did) and the boundary that renders by DataState.
 export { toActionState, toDataState, type ActionState, type DataState } from "./utils/state";
 export { StateBoundary, type StateBoundaryProps } from "./utils/state-boundary";
+export { can, permissionFor, permissionsFrom, resolvePermission, type PermissionState, type PermissionValue, type Permissions, type ResolvedPermission } from "./utils/permissions";
+export { Collapsible, type CollapsibleProps } from "./collapsible/collapsible";
+export { Separator, type SeparatorProps } from "./separator/separator";
+export { ToggleButton, ToggleButtonGroup, type ToggleButtonGroupProps, type ToggleButtonProps } from "./toggle-button/toggle-button";
+export { AvatarGroup, avatarGroupName, type AvatarGroupProps } from "./avatar-group/avatar-group";

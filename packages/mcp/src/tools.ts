@@ -23,6 +23,7 @@ export interface Spec {
   tokens?: string[];
   a11y: { role: string; keyboard: string[]; requirements?: string[]; screenReader?: string[]; wcag: string };
   usage: { use_when: string[]; avoid_when: string[]; anti_patterns?: string[] };
+  contract?: { data: string; dataStates: string[]; permissions: string[]; events: string[]; customization: string[] };
   examples?: string[];
 }
 
@@ -145,6 +146,18 @@ export function getComponent(ctx: Context, name: string): string {
     ],
     ["Props", props.length ? ["The props defined by the spec. Components also accept the underlying React Aria props.", "", "| Prop | Type | Default | Description |", "|---|---|---|---|", ...props].join("\n") : ""],
     ["Variants and states", [s.variants?.length ? `Variants: ${s.variants.join(", ")}` : "", s.states?.length ? `States: ${s.states.join(", ")}` : "", s.slots?.length ? `Slots: ${s.slots.join(", ")}` : ""].filter(Boolean).join("\n")],
+    [
+      "Block contract",
+      s.contract
+        ? [
+            `Data: ${s.contract.data}`,
+            `Data states it handles: ${s.contract.dataStates.length ? s.contract.dataStates.join(", ") : "none (it shows what it is given)"}`,
+            `Actions it asks permission for: ${s.contract.permissions.length ? s.contract.permissions.join(", ") : "none yet"}`,
+            `Events (callback props): ${s.contract.events.length ? s.contract.events.join(", ") : "none"}`,
+            `What you can replace or restyle: ${s.contract.customization.join("; ")}`,
+          ].join("\n")
+        : "",
+    ],
     ["Use when", bullets(s.usage.use_when)],
     ["Avoid when", bullets(s.usage.avoid_when)],
     ["Anti-patterns (don't generate these)", bullets(s.usage.anti_patterns)],

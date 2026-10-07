@@ -277,6 +277,189 @@
       ]
     },
     {
+      "id": "alert-dialog",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "AlertDialog",
+        "version": "0.1.0",
+        "category": "overlay",
+        "status": "experimental",
+        "description": "Confirmation dialog for destructive or irreversible actions. It cannot be dismissed by clicking outside, and can ask the user to type a word before the confirm button works. Open it with DialogTrigger.",
+        "props": {
+          "title": {
+            "type": "string",
+            "required": true,
+            "description": "Heading, also the dialog's accessible name. Phrase it as the question being asked, such as Delete this user?"
+          },
+          "description": {
+            "type": "string",
+            "description": "What will happen and whether it can be undone. Wired to the dialog with aria-describedby."
+          },
+          "confirmLabel": {
+            "type": "string",
+            "default": "Confirm",
+            "description": "Label of the confirm button. Name the action, such as Delete user."
+          },
+          "cancelLabel": {
+            "type": "string",
+            "default": "Cancel",
+            "description": "Label of the cancel button."
+          },
+          "tone": {
+            "type": "enum",
+            "values": [
+              "default",
+              "danger"
+            ],
+            "default": "default",
+            "description": "Danger styles the confirm button as destructive and starts focus on the cancel button."
+          },
+          "confirmText": {
+            "type": "string",
+            "description": "A word the user must type exactly (such as the resource name) before the confirm button is enabled."
+          },
+          "onConfirm": {
+            "type": "callback",
+            "tsType": "() => void | Promise<void>",
+            "description": "Called when the user confirms. If it returns a promise, the confirm button shows a pending state and the dialog cannot be dismissed until it settles. The dialog closes when it resolves and stays open if it rejects."
+          },
+          "onCancel": {
+            "type": "callback",
+            "tsType": "() => void",
+            "description": "Called when the user cancels with the cancel button or Esc."
+          },
+          "isOpen": {
+            "type": "boolean",
+            "description": "Controlled open state, for dialogs opened without a DialogTrigger."
+          },
+          "defaultOpen": {
+            "type": "boolean",
+            "description": "Initial open state when uncontrolled and used without a DialogTrigger."
+          },
+          "onOpenChange": {
+            "type": "callback",
+            "tsType": "(isOpen: boolean) => void",
+            "description": "Called when the dialog opens or closes (without a DialogTrigger)."
+          }
+        },
+        "variants": [
+          "tone"
+        ],
+        "states": [
+          "open",
+          "loading"
+        ],
+        "slots": [
+          "backdrop",
+          "panel",
+          "title",
+          "description",
+          "confirm-field",
+          "cancel",
+          "confirm"
+        ],
+        "tokens": [
+          "color.overlay.backdrop",
+          "color.surface.raised",
+          "color.border.default",
+          "color.text.default",
+          "color.text.muted",
+          "radius.overlay"
+        ],
+        "a11y": {
+          "role": "alertdialog",
+          "keyboard": [
+            "Esc cancels",
+            "Tab and Shift+Tab stay inside the dialog",
+            "Enter in the confirmation field confirms once the word matches"
+          ],
+          "requirements": [
+            "Focus moves into the dialog on open (to Cancel for the danger tone) and returns to the trigger on close",
+            "Clicking outside does not dismiss it",
+            "The description is linked with aria-describedby so it is read on open",
+            "While a confirm is pending, Esc and Cancel are blocked and the confirm button is marked busy",
+            "Content behind the dialog is hidden from assistive technology"
+          ],
+          "screenReader": [
+            "Opening announces an alert dialog with its title, then reads the description",
+            "In the danger tone focus lands on Cancel, so a stray Enter does not destroy anything",
+            "With confirmText, the field is labelled with the word to type, and Confirm is announced as dimmed until it matches",
+            "While pending the confirm button is announced as busy",
+            "Closing announces the button that opened it (focus is back there)"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "Confirming a destructive or irreversible action such as deleting a record",
+            "Making the user prove intent by typing a resource name"
+          ],
+          "avoid_when": [
+            "Non-destructive choices: use Dialog",
+            "Actions that can be undone: use a toast with Undo",
+            "Forms with several fields: use Dialog or Sheet"
+          ],
+          "anti_patterns": [
+            "Vague buttons like OK or Yes: name the action",
+            "Using it for routine confirmations, which trains people to click through",
+            "Closing the dialog yourself before an async onConfirm settles"
+          ]
+        },
+        "examples": [
+          "basic",
+          "danger-delete",
+          "type-to-confirm",
+          "async-confirm"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {
+            "tone": "Tone"
+          }
+        }
+      },
+      "install": {
+        "command": "npx rdloom add alert-dialog",
+        "dependencies": [
+          "react-aria-components@^1.21.1"
+        ],
+        "registryDependencies": [
+          "tokens",
+          "button",
+          "text-field",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import { AlertDialog, Button, DialogTrigger } from \"@rdloom/react\";\n\nexport default function AlertDialogBasicExample() {\n  return (\n    <DialogTrigger>\n      <Button variant=\"secondary\">Discard draft</Button>\n      <AlertDialog\n        title=\"Discard this draft?\"\n        description=\"Your changes have not been saved and will be lost.\"\n        confirmLabel=\"Discard draft\"\n        cancelLabel=\"Keep editing\"\n      />\n    </DialogTrigger>\n  );\n}\n"
+        },
+        {
+          "name": "danger-delete",
+          "code": "import { AlertDialog, Button, DialogTrigger } from \"@rdloom/react\";\n\nexport default function AlertDialogDangerDeleteExample() {\n  return (\n    <DialogTrigger>\n      <Button variant=\"danger\">Delete user</Button>\n      <AlertDialog\n        tone=\"danger\"\n        title=\"Delete this user?\"\n        description=\"Asha Menon will lose access immediately. This cannot be undone.\"\n        confirmLabel=\"Delete user\"\n        onConfirm={() => {\n          // Remove the user here.\n        }}\n      />\n    </DialogTrigger>\n  );\n}\n"
+        },
+        {
+          "name": "type-to-confirm",
+          "code": "import { AlertDialog, Button, DialogTrigger } from \"@rdloom/react\";\n\nexport default function AlertDialogTypeToConfirmExample() {\n  return (\n    <DialogTrigger>\n      <Button variant=\"danger\">Delete workspace</Button>\n      <AlertDialog\n        tone=\"danger\"\n        title=\"Delete the Northwind workspace?\"\n        description=\"All projects, invoices and members in this workspace are removed for good.\"\n        confirmLabel=\"Delete workspace\"\n        confirmText=\"Northwind\"\n        onConfirm={() => {\n          // Remove the workspace here.\n        }}\n      />\n    </DialogTrigger>\n  );\n}\n"
+        },
+        {
+          "name": "async-confirm",
+          "code": "import { AlertDialog, Button, DialogTrigger } from \"@rdloom/react\";\n\nexport default function AlertDialogAsyncConfirmExample() {\n  return (\n    <DialogTrigger>\n      <Button variant=\"danger\">Archive invoices</Button>\n      <AlertDialog\n        tone=\"danger\"\n        title=\"Archive 24 invoices?\"\n        description=\"They move out of the active list. The dialog stays open until the request finishes.\"\n        confirmLabel=\"Archive invoices\"\n        onConfirm={() => new Promise<void>((resolve) => setTimeout(resolve, 1500))}\n      />\n    </DialogTrigger>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "alert-dialog/alert-dialog.tsx",
+          "content": "\"use client\";\n\nimport { forwardRef, useId, useState, type FormEvent, type KeyboardEvent } from \"react\";\nimport { Dialog as AriaDialog, Heading, Modal, ModalOverlay } from \"react-aria-components\";\nimport { alertDialogDefaults, type AlertDialogSpecProps } from \"../generated/alert-dialog.types\";\nimport { Button } from \"../button/button\";\nimport { TextField } from \"../text-field/text-field\";\nimport { cx } from \"../utils/cx\";\n\nexport interface AlertDialogProps extends AlertDialogSpecProps {\n  className?: string;\n}\n\nexport const AlertDialog = forwardRef<HTMLElement, AlertDialogProps>(function AlertDialog(\n  {\n    title,\n    description,\n    confirmLabel = alertDialogDefaults.confirmLabel,\n    cancelLabel = alertDialogDefaults.cancelLabel,\n    tone = alertDialogDefaults.tone,\n    confirmText,\n    onConfirm,\n    onCancel,\n    isOpen,\n    defaultOpen,\n    onOpenChange,\n    className,\n  },\n  ref,\n) {\n  const descriptionId = useId();\n  const [pending, setPending] = useState(false);\n  const [typed, setTyped] = useState(\"\");\n  const danger = tone === \"danger\";\n  const needsText = confirmText != null && confirmText !== \"\";\n  const matches = !needsText || typed === confirmText;\n\n  async function confirm(close: () => void) {\n    if (pending || !matches) return;\n    let result: void | Promise<void>;\n    try {\n      result = onConfirm?.();\n    } catch (error) {\n      setPending(false);\n      throw error;\n    }\n    if (result && typeof (result as Promise<void>).then === \"function\") {\n      setPending(true);\n      try {\n        await result;\n      } catch {\n        // A failed confirm leaves the dialog open so the user can retry or cancel.\n        setPending(false);\n        return;\n      }\n      setPending(false);\n    }\n    close();\n    setTyped(\"\");\n  }\n\n  function cancel(close: () => void) {\n    if (pending) return;\n    onCancel?.();\n    close();\n    setTyped(\"\");\n  }\n\n  return (\n    <ModalOverlay\n      isDismissable={false}\n      isKeyboardDismissDisabled={pending}\n      isOpen={isOpen}\n      defaultOpen={defaultOpen}\n      onOpenChange={onOpenChange}\n      className=\"fixed inset-0 z-50 flex items-center justify-center p-4 bg-[var(--rd-color-overlay-backdrop)] backdrop-blur-[2px]\"\n    >\n      <Modal\n        className={\n          \"w-full max-w-sm overflow-hidden [box-shadow:var(--rd-elevation-overlay)] bg-[var(--rd-color-surface-raised)] text-[var(--rd-color-text-default)] \" +\n          \"border border-[var(--rd-color-border-default)] rounded-[var(--rd-radius-overlay)]\"\n        }\n      >\n        <AriaDialog\n          ref={ref}\n          role=\"alertdialog\"\n          aria-describedby={description ? descriptionId : undefined}\n          className={cx(\"flex flex-col gap-4 p-6 outline-none\", className)}\n        >\n          {({ close }) => (\n            <form\n              className=\"flex flex-col gap-4\"\n              onSubmit={(event: FormEvent) => {\n                event.preventDefault();\n                void confirm(close);\n              }}\n              onKeyDown={(event: KeyboardEvent) => {\n                // The modal closes itself on Escape; report it as a cancel.\n                if (event.key === \"Escape\" && !pending) {\n                  onCancel?.();\n                  setTyped(\"\");\n                }\n              }}\n            >\n              <div className=\"flex flex-col gap-1\">\n                <Heading slot=\"title\" className=\"text-lg font-semibold\">\n                  {title}\n                </Heading>\n                {description && (\n                  <p id={descriptionId} className=\"text-sm text-[var(--rd-color-text-muted)]\">\n                    {description}\n                  </p>\n                )}\n              </div>\n              {needsText && (\n                <TextField\n                  label={`Type ${confirmText} to confirm`}\n                  value={typed}\n                  onChange={setTyped}\n                  isDisabled={pending}\n                  autoFocus={!danger}\n                  autoComplete=\"off\"\n                />\n              )}\n              <div className=\"flex justify-end gap-2\">\n                <Button\n                  type=\"button\"\n                  variant=\"secondary\"\n                  autoFocus={danger}\n                  isDisabled={pending}\n                  onPress={() => cancel(close)}\n                >\n                  {cancelLabel}\n                </Button>\n                <Button\n                  type=\"submit\"\n                  variant={danger ? \"danger\" : \"primary\"}\n                  isLoading={pending}\n                  isDisabled={!matches}\n                  autoFocus={!danger && !needsText}\n                >\n                  {confirmLabel}\n                </Button>\n              </div>\n            </form>\n          )}\n        </AriaDialog>\n      </Modal>\n    </ModalOverlay>\n  );\n});\n"
+        },
+        {
+          "path": "generated/alert-dialog.types.ts",
+          "content": "// Generated by rdloom codegen from specs/alert-dialog.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nexport const alertDialogToneValues = [\"default\", \"danger\"] as const;\n\n/** Confirmation dialog for destructive or irreversible actions. It cannot be dismissed by clicking outside, and can ask the user to type a word before the confirm button works. Open it with DialogTrigger. */\nexport interface AlertDialogSpecProps {\n  /**\n   * Heading, also the dialog's accessible name. Phrase it as the question being asked, such as Delete this user?\n   */\n  title: string;\n  /**\n   * What will happen and whether it can be undone. Wired to the dialog with aria-describedby.\n   */\n  description?: string;\n  /**\n   * Label of the confirm button. Name the action, such as Delete user.\n   * @default \"Confirm\"\n   */\n  confirmLabel?: string;\n  /**\n   * Label of the cancel button.\n   * @default \"Cancel\"\n   */\n  cancelLabel?: string;\n  /**\n   * Danger styles the confirm button as destructive and starts focus on the cancel button.\n   * @default \"default\"\n   */\n  tone?: \"default\" | \"danger\";\n  /**\n   * A word the user must type exactly (such as the resource name) before the confirm button is enabled.\n   */\n  confirmText?: string;\n  /**\n   * Called when the user confirms. If it returns a promise, the confirm button shows a pending state and the dialog cannot be dismissed until it settles. The dialog closes when it resolves and stays open if it rejects.\n   */\n  onConfirm?: () => void | Promise<void>;\n  /**\n   * Called when the user cancels with the cancel button or Esc.\n   */\n  onCancel?: () => void;\n  /**\n   * Controlled open state, for dialogs opened without a DialogTrigger.\n   */\n  isOpen?: boolean;\n  /**\n   * Initial open state when uncontrolled and used without a DialogTrigger.\n   */\n  defaultOpen?: boolean;\n  /**\n   * Called when the dialog opens or closes (without a DialogTrigger).\n   */\n  onOpenChange?: (isOpen: boolean) => void;\n}\n\nexport const alertDialogDefaults = {\n  confirmLabel: \"Confirm\",\n  cancelLabel: \"Cancel\",\n  tone: \"default\",\n} as const;\n\nexport const alertDialogMeta = {\n  \"name\": \"AlertDialog\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"alertdialog\"\n} as const;\n"
+        }
+      ]
+    },
+    {
       "id": "alert",
       "spec": {
         "$schema": "./schema/component.schema.json",
@@ -586,6 +769,135 @@
         {
           "path": "generated/approval-box.types.ts",
           "content": "// Generated by rdloom codegen from specs/approval-box.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nimport type { ReactNode } from \"react\";\n\nexport const approvalBoxRiskValues = [\"low\", \"medium\", \"high\"] as const;\n\n/** Asks someone to approve or decline something the assistant wants to do. It says what will happen, how risky it is and whether it can be undone, in words as well as color. */\nexport interface ApprovalBoxSpecProps {\n  /**\n   * What is about to happen, in plain words, e.g. \"Delete 12 draft invoices\".\n   */\n  summary: string;\n  /**\n   * How much could go wrong. High risk uses the danger style and interrupts speech.\n   * @default \"medium\"\n   */\n  risk?: \"low\" | \"medium\" | \"high\";\n  /**\n   * Whether the action can be undone. Unset says nothing about it.\n   */\n  reversible?: boolean;\n  /**\n   * Called when the person approves.\n   */\n  onApprove?: () => void;\n  /**\n   * Called when the person declines.\n   */\n  onDeny?: () => void;\n  /**\n   * Text of the approve button. Say the action: \"Delete invoices\" beats \"OK\".\n   * @default \"Approve\"\n   */\n  approveLabel?: string;\n  /**\n   * Text of the decline button.\n   * @default \"Deny\"\n   */\n  denyLabel?: string;\n  /**\n   * True while the approval is being processed: shows a spinner and blocks a second press.\n   * @default false\n   */\n  isPending?: boolean;\n  /**\n   * Move focus to the box when it appears, so a keyboard user lands on the question.\n   * @default false\n   */\n  autoFocus?: boolean;\n  /**\n   * Extra detail, e.g. the list of items affected.\n   */\n  children?: ReactNode;\n}\n\nexport const approvalBoxDefaults = {\n  risk: \"medium\",\n  approveLabel: \"Approve\",\n  denyLabel: \"Deny\",\n  isPending: false,\n  autoFocus: false,\n} as const;\n\nexport const approvalBoxMeta = {\n  \"name\": \"ApprovalBox\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"group\"\n} as const;\n"
+        }
+      ]
+    },
+    {
+      "id": "avatar-group",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "AvatarGroup",
+        "version": "0.1.0",
+        "category": "display",
+        "status": "experimental",
+        "description": "An overlapping stack of avatars with a +N chip for the rest, for showing who is on a team, thread or file.",
+        "props": {
+          "avatars": {
+            "type": "custom",
+            "required": true,
+            "tsType": "Array<{ name: string; src?: string }>",
+            "description": "The people, each with a name and an optional image URL."
+          },
+          "max": {
+            "type": "number",
+            "default": 4,
+            "description": "How many avatars to show before the +N chip."
+          },
+          "size": {
+            "type": "enum",
+            "values": [
+              "xs",
+              "sm",
+              "md",
+              "lg"
+            ],
+            "default": "md",
+            "description": "Avatar size, as for Avatar."
+          },
+          "label": {
+            "type": "string",
+            "default": "Members",
+            "description": "What the group is, e.g. \"Team members\". It starts the accessible name, followed by the names."
+          }
+        },
+        "variants": [
+          "size"
+        ],
+        "states": [
+          "default"
+        ],
+        "slots": [
+          "group",
+          "avatar",
+          "overflow"
+        ],
+        "tokens": [
+          "color.surface.subtle",
+          "color.surface.default",
+          "color.text.default",
+          "color.border.default"
+        ],
+        "a11y": {
+          "role": "img",
+          "keyboard": [],
+          "requirements": [
+            "The group is an image with one accessible name listing the people, e.g. \"Team members: Ada Lovelace, Grace Hopper and 3 more\"",
+            "Individual avatars inside it are hidden from assistive technology so nothing is read twice",
+            "The +N chip is part of the same name, not separate text",
+            "Initials and the chip text meet 4.5:1 against their background"
+          ],
+          "screenReader": [
+            "Announced once as an image with the full list and the count of the rest"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "Showing the people on a project, thread or document",
+            "A compact list where full names appear elsewhere"
+          ],
+          "avoid_when": [
+            "Each person needs to be reached or opened: use a list of links",
+            "One person: use Avatar"
+          ],
+          "anti_patterns": [
+            "An empty label",
+            "Using it as the only place the people are named when it matters who they are"
+          ]
+        },
+        "examples": [
+          "basic",
+          "with-overflow",
+          "sizes"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {
+            "size": "Size"
+          }
+        }
+      },
+      "install": {
+        "command": "npx rdloom add avatar-group",
+        "dependencies": [],
+        "registryDependencies": [
+          "tokens",
+          "avatar",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import { AvatarGroup } from \"@rdloom/react\";\n\nexport default function AvatarGroupBasicExample() {\n  return (\n    <AvatarGroup\n      label=\"Team members\"\n      avatars={[{ name: \"Ada Lovelace\" }, { name: \"Grace Hopper\" }, { name: \"Katherine Johnson\" }]}\n    />\n  );\n}\n"
+        },
+        {
+          "name": "with-overflow",
+          "code": "import { AvatarGroup } from \"@rdloom/react\";\n\nexport default function AvatarGroupWithOverflowExample() {\n  return (\n    <AvatarGroup\n      label=\"Team members\"\n      max={3}\n      avatars={[\n        { name: \"Ada Lovelace\" },\n        { name: \"Grace Hopper\" },\n        { name: \"Katherine Johnson\" },\n        { name: \"Margaret Hamilton\" },\n        { name: \"Hedy Lamarr\" },\n      ]}\n    />\n  );\n}\n"
+        },
+        {
+          "name": "sizes",
+          "code": "import { AvatarGroup } from \"@rdloom/react\";\n\nconst people = [{ name: \"Ada Lovelace\" }, { name: \"Grace Hopper\" }, { name: \"Katherine Johnson\" }, { name: \"Hedy Lamarr\" }];\n\nexport default function AvatarGroupSizesExample() {\n  return (\n    <div className=\"flex flex-col items-start gap-3\">\n      <AvatarGroup label=\"Reviewers\" size=\"xs\" max={3} avatars={people} />\n      <AvatarGroup label=\"Reviewers\" size=\"sm\" max={3} avatars={people} />\n      <AvatarGroup label=\"Reviewers\" size=\"md\" max={3} avatars={people} />\n      <AvatarGroup label=\"Reviewers\" size=\"lg\" max={3} avatars={people} />\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "avatar-group/avatar-group.tsx",
+          "content": "import { forwardRef, type HTMLAttributes } from \"react\";\nimport { Avatar } from \"../avatar/avatar\";\nimport { avatarGroupDefaults, type AvatarGroupSpecProps } from \"../generated/avatar-group.types\";\nimport { cx } from \"../utils/cx\";\n\nexport interface AvatarGroupProps\n  extends AvatarGroupSpecProps,\n    Omit<HTMLAttributes<HTMLDivElement>, keyof AvatarGroupSpecProps | \"className\" | \"children\" | \"role\"> {\n  className?: string;\n}\n\nconst sizes: Record<NonNullable<AvatarGroupSpecProps[\"size\"]>, { overlap: string; chip: string }> = {\n  xs: { overlap: \"-ms-1.5\", chip: \"size-6 text-[10px]\" },\n  sm: { overlap: \"-ms-2\", chip: \"size-8 text-xs\" },\n  md: { overlap: \"-ms-2.5\", chip: \"size-10 text-sm\" },\n  lg: { overlap: \"-ms-3.5\", chip: \"size-14 text-base\" },\n};\n\n/** \"Team members: Ada Lovelace, Grace Hopper and 3 more\". */\nexport function avatarGroupName(label: string, names: string[], shown: number): string {\n  const list = names.slice(0, shown);\n  const more = names.length - list.length;\n  const people =\n    more > 0\n      ? `${list.join(\", \")} and ${more} more`\n      : list.length > 1\n        ? `${list.slice(0, -1).join(\", \")} and ${list[list.length - 1]}`\n        : list.join(\"\");\n  return people ? `${label}: ${people}` : label;\n}\n\nexport const AvatarGroup = forwardRef<HTMLDivElement, AvatarGroupProps>(function AvatarGroup(\n  { avatars, max = avatarGroupDefaults.max, size = avatarGroupDefaults.size, label = avatarGroupDefaults.label, className, ...rest },\n  ref,\n) {\n  const shown = Math.max(0, Math.floor(max));\n  const visible = avatars.slice(0, shown);\n  const more = avatars.length - visible.length;\n  const s = sizes[size];\n  // The group is one picture with one name; the avatars inside are decorative so nothing is read twice.\n  const name = avatarGroupName(label, avatars.map((a) => a.name), visible.length);\n  const ring = \"ring-2 ring-[var(--rd-color-surface-default)]\";\n  return (\n    <div {...rest} ref={ref} role=\"img\" aria-label={name} className={cx(\"inline-flex items-center\", className)}>\n      {visible.map((a, i) => (\n        <Avatar key={`${a.name}-${i}`} name={a.name} src={a.src} size={size} decorative className={cx(ring, i > 0 && s.overlap)} />\n      ))}\n      {more > 0 && (\n        <span\n          aria-hidden=\"true\"\n          className={cx(\n            \"inline-flex shrink-0 select-none items-center justify-center rounded-full border border-[var(--rd-color-border-default)] \" +\n              \"bg-[var(--rd-color-surface-subtle)] font-medium text-[var(--rd-color-text-default)]\",\n            ring,\n            s.chip,\n            visible.length > 0 && s.overlap,\n          )}\n        >\n          {`+${more}`}\n        </span>\n      )}\n    </div>\n  );\n});\n"
+        },
+        {
+          "path": "generated/avatar-group.types.ts",
+          "content": "// Generated by rdloom codegen from specs/avatar-group.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nexport const avatarGroupSizeValues = [\"xs\", \"sm\", \"md\", \"lg\"] as const;\n\n/** An overlapping stack of avatars with a +N chip for the rest, for showing who is on a team, thread or file. */\nexport interface AvatarGroupSpecProps {\n  /**\n   * The people, each with a name and an optional image URL.\n   */\n  avatars: Array<{ name: string; src?: string }>;\n  /**\n   * How many avatars to show before the +N chip.\n   * @default 4\n   */\n  max?: number;\n  /**\n   * Avatar size, as for Avatar.\n   * @default \"md\"\n   */\n  size?: \"xs\" | \"sm\" | \"md\" | \"lg\";\n  /**\n   * What the group is, e.g. \"Team members\". It starts the accessible name, followed by the names.\n   * @default \"Members\"\n   */\n  label?: string;\n}\n\nexport const avatarGroupDefaults = {\n  max: 4,\n  size: \"md\",\n  label: \"Members\",\n} as const;\n\nexport const avatarGroupMeta = {\n  \"name\": \"AvatarGroup\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"img\"\n} as const;\n"
         }
       ]
     },
@@ -2298,6 +2610,151 @@
       ]
     },
     {
+      "id": "collapsible",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "Collapsible",
+        "version": "0.1.0",
+        "category": "display",
+        "status": "experimental",
+        "description": "One region that opens and closes under a trigger, for detail most people do not need at first. For a stack of related sections, use Accordion.",
+        "props": {
+          "title": {
+            "type": "node",
+            "required": true,
+            "description": "The trigger content. It is also the accessible name of the trigger button."
+          },
+          "summary": {
+            "type": "node",
+            "description": "A short line under the title that stays visible when the region is closed, e.g. a count or a status."
+          },
+          "defaultExpanded": {
+            "type": "boolean",
+            "default": false,
+            "description": "Open at first when uncontrolled."
+          },
+          "isExpanded": {
+            "type": "boolean",
+            "description": "Controlled open state."
+          },
+          "onExpandedChange": {
+            "type": "callback",
+            "tsType": "(isExpanded: boolean) => void",
+            "description": "Called when the region opens or closes."
+          },
+          "isDisabled": {
+            "type": "boolean",
+            "default": false,
+            "description": "Disables the trigger."
+          },
+          "children": {
+            "type": "node",
+            "required": true,
+            "description": "The content that opens and closes."
+          }
+        },
+        "variants": [
+          "isDisabled"
+        ],
+        "states": [
+          "default",
+          "open",
+          "disabled"
+        ],
+        "slots": [
+          "trigger",
+          "chevron",
+          "summary",
+          "panel"
+        ],
+        "tokens": [
+          "color.border.default",
+          "color.text.default",
+          "color.text.muted",
+          "color.surface.subtle",
+          "color.focus.ring",
+          "radius.control"
+        ],
+        "a11y": {
+          "role": "group",
+          "keyboard": [
+            "Tab moves to the trigger",
+            "Enter or Space opens or closes the region"
+          ],
+          "requirements": [
+            "The trigger is a button exposing aria-expanded and aria-controls",
+            "The region is labelled by the trigger",
+            "Closed content is removed from the tab order and hidden from screen readers",
+            "Opening and closing respect reduced motion"
+          ],
+          "screenReader": [
+            "The trigger is announced as a button, expanded or collapsed",
+            "Opening it announces it as expanded; the content follows in reading order"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "A single block of optional detail: advanced options, a long note, raw output",
+            "A summary with a way to see more"
+          ],
+          "avoid_when": [
+            "Several related sections: use Accordion",
+            "Content everyone needs: show it"
+          ],
+          "anti_patterns": [
+            "Hiding the only way to complete a task inside a closed region",
+            "A title that does not say what is inside"
+          ]
+        },
+        "examples": [
+          "basic",
+          "controlled",
+          "with-summary-line"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {
+            "isDisabled": "Disabled"
+          }
+        }
+      },
+      "install": {
+        "command": "npx rdloom add collapsible",
+        "dependencies": [
+          "react-aria-components@^1.21.1"
+        ],
+        "registryDependencies": [
+          "tokens",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import { Collapsible } from \"@rdloom/react\";\n\nexport default function CollapsibleBasicExample() {\n  return (\n    <div className=\"w-full max-w-md\">\n      <Collapsible title=\"Advanced options\">\n        <p>Retries, timeouts and the region used for this request. Most people never need to change these.</p>\n      </Collapsible>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "controlled",
+          "code": "import { useState } from \"react\";\nimport { Button, Collapsible } from \"@rdloom/react\";\n\nexport default function CollapsibleControlledExample() {\n  const [open, setOpen] = useState(false);\n  return (\n    <div className=\"flex w-full max-w-md flex-col gap-3\">\n      <Button variant=\"secondary\" size=\"sm\" onPress={() => setOpen((v) => !v)}>\n        {open ? \"Close details\" : \"Open details\"}\n      </Button>\n      <Collapsible title=\"Delivery details\" isExpanded={open} onExpandedChange={setOpen}>\n        <p>Delivered by courier on weekdays between 9:00 and 17:00. Someone must be there to sign.</p>\n      </Collapsible>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "with-summary-line",
+          "code": "import { Collapsible } from \"@rdloom/react\";\n\nexport default function CollapsibleWithSummaryLineExample() {\n  return (\n    <div className=\"w-full max-w-md\">\n      <Collapsible title=\"Changed files\" summary=\"3 files, 42 lines added\" defaultExpanded>\n        <ul className=\"list-disc ps-5\">\n          <li>src/invoice.ts</li>\n          <li>src/totals.ts</li>\n          <li>test/totals.test.ts</li>\n        </ul>\n      </Collapsible>\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "collapsible/collapsible.tsx",
+          "content": "\"use client\";\n\nimport { Button, Disclosure, DisclosurePanel, type DisclosureProps } from \"react-aria-components\";\nimport { collapsibleDefaults, type CollapsibleSpecProps } from \"../generated/collapsible.types\";\nimport { cx } from \"../utils/cx\";\nimport { ChevronDownIcon } from \"../utils/icons\";\n\nexport interface CollapsibleProps\n  extends CollapsibleSpecProps,\n    Omit<DisclosureProps, keyof CollapsibleSpecProps | \"defaultExpanded\" | \"className\" | \"children\" | \"title\"> {\n  className?: string;\n}\n\n/** One region that opens and closes. For a group of sections where opening one can close the others, use Accordion. */\nexport function Collapsible({\n  title,\n  summary,\n  defaultExpanded = collapsibleDefaults.defaultExpanded,\n  isExpanded,\n  onExpandedChange,\n  isDisabled = collapsibleDefaults.isDisabled,\n  children,\n  className,\n  ...rest\n}: CollapsibleProps) {\n  return (\n    <Disclosure\n      {...rest}\n      defaultExpanded={defaultExpanded}\n      isExpanded={isExpanded}\n      onExpandedChange={onExpandedChange}\n      isDisabled={isDisabled}\n      className={cx(\"group w-full rounded-[var(--rd-radius-overlay)] border border-[var(--rd-color-border-default)]\", className)}\n    >\n      <Button\n        slot=\"trigger\"\n        className={cx(\n          \"flex w-full items-center justify-between gap-4 rounded-[inherit] px-4 py-3 text-start outline-none\",\n          \"text-[var(--rd-color-text-default)] data-[hovered]:bg-[var(--rd-color-surface-subtle)]\",\n          \"data-[focus-visible]:ring-2 data-[focus-visible]:ring-inset data-[focus-visible]:ring-[var(--rd-color-focus-ring)]\",\n          \"data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50 data-[disabled]:bg-transparent\",\n        )}\n      >\n        <span className=\"flex min-w-0 flex-col\">\n          <span className=\"text-sm font-medium\">{title}</span>\n          {summary ? <span className=\"text-sm text-[var(--rd-color-text-muted)]\">{summary}</span> : null}\n        </span>\n        <span\n          aria-hidden=\"true\"\n          className=\"shrink-0 text-[var(--rd-color-text-muted)] transition-transform duration-200 group-data-[expanded]:rotate-180 motion-reduce:transition-none\"\n        >\n          <ChevronDownIcon />\n        </span>\n      </Button>\n      <DisclosurePanel className=\"h-[var(--disclosure-panel-height)] overflow-clip text-sm text-[var(--rd-color-text-default)] transition-[height] duration-200 motion-reduce:transition-none\">\n        <div className=\"px-4 pb-4\">{children}</div>\n      </DisclosurePanel>\n    </Disclosure>\n  );\n}\n"
+        },
+        {
+          "path": "generated/collapsible.types.ts",
+          "content": "// Generated by rdloom codegen from specs/collapsible.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nimport type { ReactNode } from \"react\";\n\n/** One region that opens and closes under a trigger, for detail most people do not need at first. For a stack of related sections, use Accordion. */\nexport interface CollapsibleSpecProps {\n  /**\n   * The trigger content. It is also the accessible name of the trigger button.\n   */\n  title: ReactNode;\n  /**\n   * A short line under the title that stays visible when the region is closed, e.g. a count or a status.\n   */\n  summary?: ReactNode;\n  /**\n   * Open at first when uncontrolled.\n   * @default false\n   */\n  defaultExpanded?: boolean;\n  /**\n   * Controlled open state.\n   */\n  isExpanded?: boolean;\n  /**\n   * Called when the region opens or closes.\n   */\n  onExpandedChange?: (isExpanded: boolean) => void;\n  /**\n   * Disables the trigger.\n   * @default false\n   */\n  isDisabled?: boolean;\n  /**\n   * The content that opens and closes.\n   */\n  children: ReactNode;\n}\n\nexport const collapsibleDefaults = {\n  defaultExpanded: false,\n  isDisabled: false,\n} as const;\n\nexport const collapsibleMeta = {\n  \"name\": \"Collapsible\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"group\"\n} as const;\n"
+        }
+      ]
+    },
+    {
       "id": "combobox",
       "spec": {
         "$schema": "./schema/component.schema.json",
@@ -2880,6 +3337,29 @@
             "Showing the totals of one page of a server's list as if they were the totals of all customers"
           ]
         },
+        "contract": {
+          "data": "A list of customers, or one page of them when serverSide is on, with a plain status tone map.",
+          "dataStates": [
+            "loading",
+            "empty",
+            "error",
+            "ready"
+          ],
+          "permissions": [],
+          "events": [
+            "onQueryChange",
+            "onExport",
+            "onOpenCustomer",
+            "onRetry"
+          ],
+          "customization": [
+            "statusTones",
+            "insights",
+            "density",
+            "currency and locale",
+            "the parts it is built from (Table, Pagination, Chart, Select)"
+          ]
+        },
         "examples": [
           "basic",
           "server-side",
@@ -3040,6 +3520,20 @@
           "anti_patterns": [
             "More than one h1 on a page",
             "Showing placeholder numbers while data loads"
+          ]
+        },
+        "contract": {
+          "data": "A title, an optional description, and stats as plain objects.",
+          "dataStates": [
+            "loading",
+            "ready"
+          ],
+          "permissions": [],
+          "events": [],
+          "customization": [
+            "actions slot",
+            "children",
+            "the Stat cards it draws"
           ]
         },
         "examples": [
@@ -3263,6 +3757,23 @@
             "Putting the shell inside another shell",
             "Hiding the only way to a section behind the folded sidebar's tooltip: give every item an icon people can tell apart",
             "More than about 7 top-level items in one group without headings"
+          ]
+        },
+        "contract": {
+          "data": "The navigation as plain data: groups of items, each with an id, label, optional href, icon, badge and sub-items.",
+          "dataStates": [],
+          "permissions": [],
+          "events": [
+            "onNavigate",
+            "onTeamChange",
+            "onSearch",
+            "onCollapsedChange"
+          ],
+          "customization": [
+            "renderLink (your router's link)",
+            "brand or team",
+            "header and actions slots",
+            "the Sidebar it is built on"
           ]
         },
         "examples": [
@@ -4783,7 +5294,7 @@
       "examples": [
         {
           "name": "invoice-lines",
-          "code": "import { FieldArray, Form, FormNumberField, FormSubmitButton, FormTextField, useFormValues } from \"@rdloom/react\";\n\ntype Line = { description: string; qty: number | null; price: number | null };\ntype Values = { lines: Line[] };\n\n// The total is this app's own arithmetic: the library only hands over the values.\nfunction Total() {\n  const total = useFormValues<Values, number>((v) => v.lines.reduce((sum, line) => sum + (line.qty ?? 0) * (line.price ?? 0), 0));\n  return (\n    <p className=\"text-sm font-medium text-[var(--rd-color-text-default)]\">\n      Total: {new Intl.NumberFormat(\"en-US\", { style: \"currency\", currency: \"USD\" }).format(total)}\n    </p>\n  );\n}\n\nexport default function FieldArrayInvoiceLinesExample() {\n  return (\n    <Form<Values>\n      className=\"w-full max-w-2xl\"\n      defaultValues={{ lines: [{ description: \"Design work\", qty: 10, price: 80 }] }}\n      onSubmit={() => {}}\n    >\n      <FieldArray\n        name=\"lines\"\n        label=\"Invoice lines\"\n        itemLabel=\"Line\"\n        addLabel=\"Add line\"\n        emptyText=\"No lines yet. Add the first one.\"\n        defaultRow={{ description: \"\", qty: 1, price: null }}\n        minRows={1}\n        maxRows={8}\n        allowInsert\n      >\n        {(row) => (\n          <div className=\"grid gap-3 sm:grid-cols-[1fr_6rem_8rem]\">\n            <FormTextField name={row.name(\"description\")} label=\"Description\" isRequired />\n            <FormNumberField name={row.name(\"qty\")} label=\"Qty\" minValue={1} isRequired />\n            <FormNumberField\n              name={row.name(\"price\")}\n              label=\"Price\"\n              minValue={0}\n              formatOptions={{ style: \"currency\", currency: \"USD\" }}\n              isRequired\n            />\n          </div>\n        )}\n      </FieldArray>\n      <Total />\n      <FormSubmitButton>Save invoice</FormSubmitButton>\n    </Form>\n  );\n}\n"
+          "code": "import { FieldArray, Form, FormNumberField, FormSubmitButton, FormTextField, useFormValues } from \"@rdloom/react\";\n\ntype Line = { description: string; qty: number | null; price: number | null };\ntype Values = { lines: Line[] };\n\n// The total is this app's own arithmetic: the library only hands over the values.\nfunction Total() {\n  const total = useFormValues<Values, number>((v) => v.lines.reduce((sum, line) => sum + (line.qty ?? 0) * (line.price ?? 0), 0));\n  return (\n    <p className=\"text-sm font-medium text-[var(--rd-color-text-default)]\">\n      Total: {new Intl.NumberFormat(\"en-US\", { style: \"currency\", currency: \"USD\" }).format(total)}\n    </p>\n  );\n}\n\nexport default function FieldArrayInvoiceLinesExample() {\n  return (\n    <Form<Values>\n      className=\"w-full max-w-3xl\"\n      defaultValues={{ lines: [{ description: \"Design work\", qty: 10, price: 80 }] }}\n      onSubmit={() => {}}\n    >\n      <FieldArray\n        name=\"lines\"\n        label=\"Invoice lines\"\n        itemLabel=\"Line\"\n        addLabel=\"Add line\"\n        emptyText=\"No lines yet. Add the first one.\"\n        defaultRow={{ description: \"\", qty: 1, price: null }}\n        minRows={1}\n        maxRows={8}\n        allowInsert\n      >\n        {(row) => (\n          <div className=\"grid grid-cols-2 gap-3\">\n            <div className=\"col-span-2\">\n              <FormTextField name={row.name(\"description\")} label=\"Description\" isRequired />\n            </div>\n            <FormNumberField name={row.name(\"qty\")} label=\"Qty\" minValue={1} isRequired />\n            <FormNumberField\n              name={row.name(\"price\")}\n              label=\"Price\"\n              minValue={0}\n              formatOptions={{ style: \"currency\", currency: \"USD\" }}\n              isRequired\n            />\n          </div>\n        )}\n      </FieldArray>\n      <Total />\n      <FormSubmitButton>Save invoice</FormSubmitButton>\n    </Form>\n  );\n}\n"
         }
       ],
       "files": [
@@ -5731,6 +6242,209 @@
         {
           "path": "generated/gradient-text.types.ts",
           "content": "// Generated by rdloom codegen from specs/gradient-text.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nimport type { ReactNode } from \"react\";\n\n/** Text filled with a gradient that keeps flowing, for a short headline or a highlighted word. The words stay real text. */\nexport interface GradientTextSpecProps {\n  /**\n   * The text.\n   */\n  children: ReactNode;\n  /**\n   * Colours of the gradient, any CSS colours. Two or more. Each should be readable on the page by itself.\n   */\n  colors?: readonly string[];\n  /**\n   * Seconds for the colours to flow once around.\n   * @default 6\n   */\n  duration?: number;\n  /**\n   * Stops the animation. Moving content that lasts more than five seconds should be stoppable.\n   * @default false\n   */\n  isPaused?: boolean;\n}\n\nexport const gradientTextDefaults = {\n  duration: 6,\n  isPaused: false,\n} as const;\n\nexport const gradientTextMeta = {\n  \"name\": \"GradientText\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"text\"\n} as const;\n"
+        }
+      ]
+    },
+    {
+      "id": "input-otp",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "InputOTP",
+        "version": "0.1.0",
+        "category": "input",
+        "status": "experimental",
+        "description": "One-time code input for verification and two-factor sign in. One real input holds the code and drawn cells show it, so paste, autofill from SMS and screen readers all work.",
+        "props": {
+          "label": {
+            "type": "string",
+            "required": true,
+            "description": "Visible label, such as Verification code. Names the group."
+          },
+          "description": {
+            "type": "string",
+            "description": "Help text shown under the cells."
+          },
+          "errorMessage": {
+            "type": "string",
+            "description": "Shown when the code is invalid."
+          },
+          "length": {
+            "type": "number",
+            "default": 6,
+            "description": "Number of characters in the code."
+          },
+          "type": {
+            "type": "enum",
+            "values": [
+              "numeric",
+              "alphanumeric"
+            ],
+            "default": "numeric",
+            "description": "Characters accepted. Numeric also opens the numeric keypad on phones."
+          },
+          "value": {
+            "type": "string",
+            "description": "Controlled value."
+          },
+          "defaultValue": {
+            "type": "string",
+            "description": "Initial value when uncontrolled."
+          },
+          "onChange": {
+            "type": "callback",
+            "tsType": "(value: string) => void",
+            "description": "Called with the code on every edit."
+          },
+          "onComplete": {
+            "type": "callback",
+            "tsType": "(value: string) => void",
+            "description": "Called once when every cell is filled."
+          },
+          "separatorAt": {
+            "type": "custom",
+            "tsType": "number[]",
+            "description": "Draws a separator after these cell counts, for example [3] groups a 6 digit code as 3 + 3."
+          },
+          "mask": {
+            "type": "boolean",
+            "default": false,
+            "description": "Shows dots instead of the characters."
+          },
+          "autoFocus": {
+            "type": "boolean",
+            "default": false,
+            "description": "Focuses the input on mount."
+          },
+          "isDisabled": {
+            "type": "boolean",
+            "default": false,
+            "description": "Prevents editing and dims the cells."
+          },
+          "isInvalid": {
+            "type": "boolean",
+            "default": false,
+            "description": "Marks the code as wrong and shows errorMessage."
+          }
+        },
+        "variants": [
+          "type",
+          "mask",
+          "isDisabled",
+          "isInvalid"
+        ],
+        "states": [
+          "default",
+          "focus",
+          "disabled",
+          "invalid"
+        ],
+        "slots": [
+          "label",
+          "cell",
+          "separator",
+          "description",
+          "error"
+        ],
+        "tokens": [
+          "color.surface.default",
+          "color.border.default",
+          "color.border.strong",
+          "color.text.default",
+          "color.text.muted",
+          "color.feedback.danger",
+          "color.focus.ring",
+          "radius.control"
+        ],
+        "a11y": {
+          "role": "group",
+          "keyboard": [
+            "Type to fill and move forward",
+            "Backspace deletes and moves back",
+            "Left and Right Arrow move between cells",
+            "Paste fills every cell",
+            "Tab moves out"
+          ],
+          "requirements": [
+            "The group is named by its label",
+            "One real input carries the value, so autofill and paste work",
+            "autocomplete=one-time-code lets phones offer the SMS code",
+            "The current cell is announced as digit N of the total",
+            "The error is linked with aria-describedby and the input exposes aria-invalid"
+          ],
+          "screenReader": [
+            "On focus: the label, then edit text, then the description",
+            "Moving between cells announces the position, such as Digit 2 of 6",
+            "Invalid: announced as invalid, and the error message is read",
+            "Masked codes are announced as a protected field and the characters are never read aloud"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "Verifying an SMS, email or authenticator code",
+            "Any short fixed-length code"
+          ],
+          "avoid_when": [
+            "Free-form or variable-length text: use TextField",
+            "Long recovery keys: use TextField"
+          ],
+          "anti_patterns": [
+            "Splitting the code into separate inputs, which breaks paste and autofill",
+            "Clearing the code silently on error: say what went wrong"
+          ]
+        },
+        "examples": [
+          "basic",
+          "alphanumeric-grouped",
+          "with-error",
+          "masked"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {
+            "type": "Type",
+            "mask": "Mask",
+            "isDisabled": "Disabled",
+            "isInvalid": "Invalid"
+          }
+        }
+      },
+      "install": {
+        "command": "npx rdloom add input-otp",
+        "dependencies": [
+          "react-aria-components@^1.21.1"
+        ],
+        "registryDependencies": [
+          "tokens",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import { InputOTP } from \"@rdloom/react\";\n\nexport default function InputOTPBasicExample() {\n  return <InputOTP label=\"Verification code\" description=\"Enter the 6 digit code we sent to your phone.\" onComplete={() => {}} />;\n}\n"
+        },
+        {
+          "name": "alphanumeric-grouped",
+          "code": "import { InputOTP } from \"@rdloom/react\";\n\nexport default function InputOTPAlphanumericGroupedExample() {\n  return <InputOTP label=\"Backup code\" type=\"alphanumeric\" separatorAt={[3]} description=\"Letters and digits, in two groups of three.\" />;\n}\n"
+        },
+        {
+          "name": "with-error",
+          "code": "import { InputOTP } from \"@rdloom/react\";\n\nexport default function InputOTPWithErrorExample() {\n  return <InputOTP label=\"Verification code\" defaultValue=\"123456\" isInvalid errorMessage=\"That code is not right. Check it and try again.\" />;\n}\n"
+        },
+        {
+          "name": "masked",
+          "code": "import { InputOTP } from \"@rdloom/react\";\n\nexport default function InputOTPMaskedExample() {\n  return <InputOTP label=\"Security PIN\" length={4} mask description=\"Your 4 digit PIN is hidden as you type.\" />;\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "input-otp/input-otp.tsx",
+          "content": "\"use client\";\n\nimport { forwardRef, useState, type SyntheticEvent } from \"react\";\nimport {\n  FieldError,\n  Input,\n  Label,\n  Text,\n  TextField as AriaTextField,\n  type TextFieldProps as AriaTextFieldProps,\n} from \"react-aria-components\";\nimport { inputOTPDefaults, type InputOTPSpecProps } from \"../generated/input-otp.types\";\nimport { cx } from \"../utils/cx\";\n\nexport interface InputOTPProps\n  extends InputOTPSpecProps,\n    Omit<AriaTextFieldProps, keyof InputOTPSpecProps | \"className\" | \"children\" | \"type\" | \"isRequired\"> {\n  className?: string;\n}\n\nconst cell =\n  \"relative flex h-[var(--rd-size-control-lg)] w-[var(--rd-size-control-md)] items-center justify-center text-base font-medium \" +\n  \"bg-[var(--rd-color-surface-default)] text-[var(--rd-color-text-default)] border border-[var(--rd-color-border-default)] \" +\n  \"rounded-[var(--rd-radius-control)] [box-shadow:var(--rd-elevation-raised)] transition-colors \" +\n  \"data-[active]:border-[var(--rd-color-focus-ring)] data-[active]:ring-2 data-[active]:ring-[var(--rd-color-focus-ring)] \" +\n  \"data-[invalid]:border-[var(--rd-color-feedback-danger)]\";\n\nfunction clean(raw: string, type: \"numeric\" | \"alphanumeric\", length: number) {\n  const pattern = type === \"numeric\" ? /[^0-9]/g : /[^a-zA-Z0-9]/g;\n  return raw.replace(pattern, \"\").slice(0, length);\n}\n\nexport const InputOTP = forwardRef<HTMLDivElement, InputOTPProps>(function InputOTP(\n  {\n    label,\n    description,\n    errorMessage,\n    length = inputOTPDefaults.length,\n    type = inputOTPDefaults.type,\n    value,\n    defaultValue,\n    onChange,\n    onComplete,\n    separatorAt,\n    mask = inputOTPDefaults.mask,\n    autoFocus = inputOTPDefaults.autoFocus,\n    isDisabled = inputOTPDefaults.isDisabled,\n    isInvalid,\n    className,\n    ...rest\n  },\n  ref,\n) {\n  const [inner, setInner] = useState(() => clean(defaultValue ?? \"\", type, length));\n  const [caret, setCaret] = useState(0);\n  const [focused, setFocused] = useState(false);\n  const current = value != null ? clean(value, type, length) : inner;\n  const active = Math.min(caret, current.length, length - 1);\n\n  function change(raw: string) {\n    const next = clean(raw, type, length);\n    if (next === current) return;\n    if (value == null) setInner(next);\n    onChange?.(next);\n    if (next.length === length) onComplete?.(next);\n  }\n\n  function track(event: SyntheticEvent<HTMLInputElement>) {\n    setCaret(event.currentTarget.selectionStart ?? current.length);\n  }\n\n  const separators = new Set(separatorAt ?? []);\n\n  return (\n    <AriaTextField\n      {...rest}\n      ref={ref}\n      value={current}\n      onChange={change}\n      isDisabled={isDisabled}\n      isInvalid={isInvalid}\n      className={cx(\"flex flex-col gap-2\", className)}\n    >\n      <Label className=\"text-sm font-medium text-[var(--rd-color-text-default)]\">{label}</Label>\n      <div role=\"group\" aria-label={label} className=\"relative inline-flex w-fit items-center gap-2\">\n        {Array.from({ length }, (_, index) => {\n          const char = current[index];\n          const isActive = focused && index === active;\n          return (\n            <span key={index} className=\"contents\">\n              <span\n                aria-hidden=\"true\"\n                data-active={isActive || undefined}\n                data-invalid={isInvalid || undefined}\n                data-filled={char ? \"\" : undefined}\n                className={cx(cell, isDisabled && \"opacity-50 cursor-not-allowed\")}\n              >\n                {char ? (\n                  mask ? (\n                    <span className=\"size-2 rounded-full bg-[var(--rd-color-text-default)]\" />\n                  ) : (\n                    char\n                  )\n                ) : (\n                  isActive && <span className=\"h-5 w-px animate-pulse bg-[var(--rd-color-text-default)]\" />\n                )}\n              </span>\n              {separators.has(index + 1) && index + 1 < length && (\n                <span aria-hidden=\"true\" data-separator=\"\" className=\"h-px w-3 bg-[var(--rd-color-border-strong)]\" />\n              )}\n            </span>\n          );\n        })}\n        <Input\n          type={mask ? \"password\" : \"text\"}\n          inputMode={type === \"numeric\" ? \"numeric\" : \"text\"}\n          autoComplete=\"one-time-code\"\n          autoCapitalize=\"off\"\n          autoCorrect=\"off\"\n          spellCheck={false}\n          autoFocus={autoFocus}\n          pattern={type === \"numeric\" ? \"[0-9]*\" : undefined}\n          onFocus={(event) => {\n            setFocused(true);\n            track(event);\n          }}\n          onBlur={() => setFocused(false)}\n          onSelect={track}\n          onKeyUp={track}\n          onClick={track}\n          className=\"absolute inset-0 h-full w-full cursor-text bg-transparent text-transparent caret-transparent opacity-0 outline-none selection:bg-transparent disabled:cursor-not-allowed\"\n        />\n      </div>\n      <span role=\"status\" aria-live=\"polite\" className=\"sr-only\">\n        {focused ? `Digit ${active + 1} of ${length}` : \"\"}\n      </span>\n      {description && (\n        <Text slot=\"description\" className=\"text-xs text-[var(--rd-color-text-muted)]\">\n          {description}\n        </Text>\n      )}\n      <FieldError className=\"text-xs text-[var(--rd-color-feedback-danger)]\">{errorMessage}</FieldError>\n    </AriaTextField>\n  );\n});\n"
+        },
+        {
+          "path": "generated/input-otp.types.ts",
+          "content": "// Generated by rdloom codegen from specs/input-otp.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nexport const inputOTPTypeValues = [\"numeric\", \"alphanumeric\"] as const;\n\n/** One-time code input for verification and two-factor sign in. One real input holds the code and drawn cells show it, so paste, autofill from SMS and screen readers all work. */\nexport interface InputOTPSpecProps {\n  /**\n   * Visible label, such as Verification code. Names the group.\n   */\n  label: string;\n  /**\n   * Help text shown under the cells.\n   */\n  description?: string;\n  /**\n   * Shown when the code is invalid.\n   */\n  errorMessage?: string;\n  /**\n   * Number of characters in the code.\n   * @default 6\n   */\n  length?: number;\n  /**\n   * Characters accepted. Numeric also opens the numeric keypad on phones.\n   * @default \"numeric\"\n   */\n  type?: \"numeric\" | \"alphanumeric\";\n  /**\n   * Controlled value.\n   */\n  value?: string;\n  /**\n   * Initial value when uncontrolled.\n   */\n  defaultValue?: string;\n  /**\n   * Called with the code on every edit.\n   */\n  onChange?: (value: string) => void;\n  /**\n   * Called once when every cell is filled.\n   */\n  onComplete?: (value: string) => void;\n  /**\n   * Draws a separator after these cell counts, for example [3] groups a 6 digit code as 3 + 3.\n   */\n  separatorAt?: number[];\n  /**\n   * Shows dots instead of the characters.\n   * @default false\n   */\n  mask?: boolean;\n  /**\n   * Focuses the input on mount.\n   * @default false\n   */\n  autoFocus?: boolean;\n  /**\n   * Prevents editing and dims the cells.\n   * @default false\n   */\n  isDisabled?: boolean;\n  /**\n   * Marks the code as wrong and shows errorMessage.\n   * @default false\n   */\n  isInvalid?: boolean;\n}\n\nexport const inputOTPDefaults = {\n  length: 6,\n  type: \"numeric\",\n  mask: false,\n  autoFocus: false,\n  isDisabled: false,\n  isInvalid: false,\n} as const;\n\nexport const inputOTPMeta = {\n  \"name\": \"InputOTP\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"group\"\n} as const;\n"
         }
       ]
     },
@@ -8315,6 +9029,125 @@
       ]
     },
     {
+      "id": "separator",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "Separator",
+        "version": "0.1.0",
+        "category": "display",
+        "status": "experimental",
+        "description": "A thin line that divides content, horizontal or vertical, with an optional label in the middle such as \"or\".",
+        "props": {
+          "orientation": {
+            "type": "enum",
+            "values": [
+              "horizontal",
+              "vertical"
+            ],
+            "default": "horizontal",
+            "description": "Direction of the line. A vertical one needs a parent with a height."
+          },
+          "label": {
+            "type": "string",
+            "description": "Short text in the middle of a horizontal line, e.g. \"or\"."
+          },
+          "decorative": {
+            "type": "boolean",
+            "default": false,
+            "description": "Removes the separator from the accessibility tree (role none) when it is only visual. Leave off when the line marks a real change of topic."
+          }
+        },
+        "variants": [
+          "orientation",
+          "decorative"
+        ],
+        "states": [
+          "default"
+        ],
+        "slots": [
+          "line",
+          "label"
+        ],
+        "tokens": [
+          "color.border.default",
+          "color.text.muted"
+        ],
+        "a11y": {
+          "role": "separator",
+          "keyboard": [],
+          "requirements": [
+            "A semantic separator has role separator and aria-orientation when vertical",
+            "With decorative set it has role none and is skipped by assistive technology",
+            "A label is real text, not an image, and meets 4.5:1 against the background",
+            "A vertical separator is never the only thing that marks a boundary"
+          ],
+          "screenReader": [
+            "A semantic separator may be announced as a separator, with its orientation",
+            "A decorative one is not announced",
+            "A label is read as ordinary text"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "Dividing groups in a menu, toolbar or form",
+            "Splitting alternatives with a word, like sign in with a password or with a link"
+          ],
+          "avoid_when": [
+            "Space or a heading already makes the grouping clear",
+            "Dividing every row of a list: use the styling of the list itself"
+          ],
+          "anti_patterns": [
+            "Using a separator for layout spacing",
+            "A long label: a separator label is one or two words"
+          ]
+        },
+        "examples": [
+          "basic",
+          "with-label",
+          "vertical"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {
+            "orientation": "Orientation"
+          }
+        }
+      },
+      "install": {
+        "command": "npx rdloom add separator",
+        "dependencies": [],
+        "registryDependencies": [
+          "tokens",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import { Separator } from \"@rdloom/react\";\n\nexport default function SeparatorBasicExample() {\n  return (\n    <div className=\"flex w-full max-w-sm flex-col gap-3 text-sm\">\n      <p>Account settings</p>\n      <Separator />\n      <p>Notification settings</p>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "with-label",
+          "code": "import { Button, Separator } from \"@rdloom/react\";\n\nexport default function SeparatorWithLabelExample() {\n  return (\n    <div className=\"flex w-full max-w-sm flex-col gap-4\">\n      <Button variant=\"primary\">Sign in with a password</Button>\n      <Separator label=\"or\" />\n      <Button variant=\"secondary\">Email me a sign-in link</Button>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "vertical",
+          "code": "import { Separator } from \"@rdloom/react\";\n\nexport default function SeparatorVerticalExample() {\n  return (\n    <div className=\"flex h-6 items-center gap-3 text-sm\">\n      <span>Docs</span>\n      <Separator orientation=\"vertical\" decorative />\n      <span>Blog</span>\n      <Separator orientation=\"vertical\" decorative />\n      <span>Changelog</span>\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "separator/separator.tsx",
+          "content": "import { forwardRef, type HTMLAttributes } from \"react\";\nimport { separatorDefaults, type SeparatorSpecProps } from \"../generated/separator.types\";\nimport { cx } from \"../utils/cx\";\n\nexport interface SeparatorProps\n  extends SeparatorSpecProps,\n    Omit<HTMLAttributes<HTMLDivElement>, keyof SeparatorSpecProps | \"className\" | \"children\" | \"role\"> {\n  className?: string;\n}\n\nconst line = \"bg-[var(--rd-color-border-default)]\";\n\n/** A divider. Semantic by default (role separator); with `decorative` it has role none and is skipped by assistive technology. */\nexport const Separator = forwardRef<HTMLDivElement, SeparatorProps>(function Separator(\n  {\n    orientation = separatorDefaults.orientation,\n    label,\n    decorative = separatorDefaults.decorative,\n    className,\n    ...rest\n  },\n  ref,\n) {\n  const vertical = orientation === \"vertical\";\n  const a11y = decorative\n    ? { role: \"none\" as const }\n    : { role: \"separator\" as const, \"aria-orientation\": vertical ? (\"vertical\" as const) : undefined };\n\n  if (vertical) {\n    return <div {...rest} {...a11y} ref={ref} className={cx(\"h-full min-h-4 w-px self-stretch\", line, className)} />;\n  }\n\n  if (!label) {\n    return <div {...rest} {...a11y} ref={ref} className={cx(\"h-px w-full\", line, className)} />;\n  }\n\n  // The label is real text inside the separator, so it is read once, as part of it.\n  return (\n    <div {...rest} {...a11y} ref={ref} className={cx(\"flex w-full items-center gap-3\", className)}>\n      <span aria-hidden=\"true\" className={cx(\"h-px flex-1\", line)} />\n      <span className=\"text-sm text-[var(--rd-color-text-muted)]\">{label}</span>\n      <span aria-hidden=\"true\" className={cx(\"h-px flex-1\", line)} />\n    </div>\n  );\n});\n"
+        },
+        {
+          "path": "generated/separator.types.ts",
+          "content": "// Generated by rdloom codegen from specs/separator.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nexport const separatorOrientationValues = [\"horizontal\", \"vertical\"] as const;\n\n/** A thin line that divides content, horizontal or vertical, with an optional label in the middle such as \"or\". */\nexport interface SeparatorSpecProps {\n  /**\n   * Direction of the line. A vertical one needs a parent with a height.\n   * @default \"horizontal\"\n   */\n  orientation?: \"horizontal\" | \"vertical\";\n  /**\n   * Short text in the middle of a horizontal line, e.g. \"or\".\n   */\n  label?: string;\n  /**\n   * Removes the separator from the accessibility tree (role none) when it is only visual. Leave off when the line marks a real change of topic.\n   * @default false\n   */\n  decorative?: boolean;\n}\n\nexport const separatorDefaults = {\n  orientation: \"horizontal\",\n  decorative: false,\n} as const;\n\nexport const separatorMeta = {\n  \"name\": \"Separator\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"separator\"\n} as const;\n"
+        }
+      ]
+    },
+    {
       "id": "sheet",
       "spec": {
         "$schema": "./schema/component.schema.json",
@@ -9074,6 +9907,24 @@
             "Putting a second navigation landmark with the same name on the page: give each one its own label",
             "Hiding the only way to a section behind the folded sidebar's tooltip: give every item an icon people can tell apart",
             "More than about 7 top-level items in one group without headings"
+          ]
+        },
+        "contract": {
+          "data": "The navigation as plain data: groups of items, each with an id, label, optional href, icon, badge and sub-items.",
+          "dataStates": [],
+          "permissions": [],
+          "events": [
+            "onNavigate",
+            "onPick",
+            "onTeamChange",
+            "onSearch",
+            "onCollapsedChange"
+          ],
+          "customization": [
+            "appearance (bordered, subtle, floating)",
+            "renderLink (your router's link)",
+            "footer slot",
+            "--rd-sidebar-width and --rd-sidebar-rail"
           ]
         },
         "examples": [
@@ -11378,6 +12229,173 @@
       ]
     },
     {
+      "id": "toggle-button",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "ToggleButton",
+        "version": "0.1.0",
+        "category": "input",
+        "status": "experimental",
+        "description": "A button that stays pressed until pressed again, for turning a mode on or off, like Bold or Mute. Group several with ToggleButtonGroup for single or multiple choice.",
+        "props": {
+          "size": {
+            "type": "enum",
+            "values": [
+              "sm",
+              "md",
+              "lg"
+            ],
+            "default": "md",
+            "description": "Control height, from the shared control sizes."
+          },
+          "variant": {
+            "type": "enum",
+            "values": [
+              "default",
+              "outline"
+            ],
+            "default": "default",
+            "description": "Default is filled when pressed; outline keeps a visible border."
+          },
+          "isSelected": {
+            "type": "boolean",
+            "description": "Controlled pressed state."
+          },
+          "defaultSelected": {
+            "type": "boolean",
+            "default": false,
+            "description": "Pressed at first when uncontrolled."
+          },
+          "onChange": {
+            "type": "callback",
+            "tsType": "(isSelected: boolean) => void",
+            "description": "Called when the pressed state changes."
+          },
+          "isDisabled": {
+            "type": "boolean",
+            "default": false,
+            "description": "Disables the button."
+          },
+          "children": {
+            "type": "node",
+            "description": "Text or an icon. An icon-only button needs an aria-label."
+          }
+        },
+        "variants": [
+          "size",
+          "variant"
+        ],
+        "states": [
+          "default",
+          "hover",
+          "focus",
+          "pressed",
+          "selected",
+          "disabled"
+        ],
+        "slots": [
+          "button",
+          "group"
+        ],
+        "tokens": [
+          "color.surface.default",
+          "color.surface.subtle",
+          "color.border.default",
+          "color.border.strong",
+          "color.action.primary",
+          "color.action.on-primary",
+          "color.text.default",
+          "color.focus.ring",
+          "radius.control"
+        ],
+        "a11y": {
+          "role": "button",
+          "keyboard": [
+            "Tab moves to the button; in a group, to the group",
+            "Space or Enter toggles the focused button",
+            "In a group, arrow keys move focus between buttons"
+          ],
+          "requirements": [
+            "A toggle button exposes aria-pressed (in a single-choice group, the group is a radiogroup and each button a radio)",
+            "The pressed state is shown by fill and weight, not only by color",
+            "An icon-only button has an accessible name",
+            "A group has an accessible name"
+          ],
+          "screenReader": [
+            "Announced as a toggle button, pressed or not pressed",
+            "In a single-choice group, as a radio button, checked or not checked"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "A mode that stays on: bold, mute, pin",
+            "A toolbar of formatting options, several allowed at once"
+          ],
+          "avoid_when": [
+            "An on or off setting inside a form: use Switch or Checkbox",
+            "Mutually exclusive views of data: use SegmentedControl",
+            "A one-time action: use Button"
+          ],
+          "anti_patterns": [
+            "Changing the label when pressed as well as the state, which reads as the opposite",
+            "Icon-only buttons with no accessible name"
+          ]
+        },
+        "examples": [
+          "basic",
+          "group-multiple",
+          "icon-only",
+          "outline"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {
+            "size": "Size",
+            "variant": "Variant"
+          }
+        }
+      },
+      "install": {
+        "command": "npx rdloom add toggle-button",
+        "dependencies": [
+          "react-aria-components@^1.21.1"
+        ],
+        "registryDependencies": [
+          "tokens",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import { ToggleButton } from \"@rdloom/react\";\n\nexport default function ToggleButtonBasicExample() {\n  return <ToggleButton>Pin to top</ToggleButton>;\n}\n"
+        },
+        {
+          "name": "group-multiple",
+          "code": "import { ToggleButton, ToggleButtonGroup } from \"@rdloom/react\";\n\nexport default function ToggleButtonGroupMultipleExample() {\n  return (\n    <ToggleButtonGroup label=\"Text style\" selectionMode=\"multiple\" defaultSelectedKeys={[\"bold\"]}>\n      <ToggleButton id=\"bold\">Bold</ToggleButton>\n      <ToggleButton id=\"italic\">Italic</ToggleButton>\n      <ToggleButton id=\"underline\">Underline</ToggleButton>\n    </ToggleButtonGroup>\n  );\n}\n"
+        },
+        {
+          "name": "icon-only",
+          "code": "import { BellIcon, GlobeIcon, ImageIcon, ToggleButton, ToggleButtonGroup } from \"@rdloom/react\";\n\nexport default function ToggleButtonIconOnlyExample() {\n  return (\n    <ToggleButtonGroup label=\"Show in the feed\" selectionMode=\"multiple\" defaultSelectedKeys={[\"images\"]}>\n      <ToggleButton id=\"images\" aria-label=\"Images\">\n        <ImageIcon />\n      </ToggleButton>\n      <ToggleButton id=\"links\" aria-label=\"Links\">\n        <GlobeIcon />\n      </ToggleButton>\n      <ToggleButton id=\"alerts\" aria-label=\"Alerts\">\n        <BellIcon />\n      </ToggleButton>\n    </ToggleButtonGroup>\n  );\n}\n"
+        },
+        {
+          "name": "outline",
+          "code": "import { ToggleButton, ToggleButtonGroup } from \"@rdloom/react\";\n\nexport default function ToggleButtonOutlineExample() {\n  return (\n    <div className=\"flex flex-col items-start gap-4\">\n      <ToggleButton variant=\"outline\">Mute</ToggleButton>\n      <ToggleButtonGroup label=\"Alignment\" variant=\"outline\" defaultSelectedKeys={[\"left\"]}>\n        <ToggleButton id=\"left\">Left</ToggleButton>\n        <ToggleButton id=\"center\">Center</ToggleButton>\n        <ToggleButton id=\"right\">Right</ToggleButton>\n      </ToggleButtonGroup>\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "toggle-button/toggle-button.tsx",
+          "content": "\"use client\";\n\nimport { createContext, forwardRef, useContext, type ReactNode } from \"react\";\nimport {\n  ToggleButton as AriaToggleButton,\n  ToggleButtonGroup as AriaToggleButtonGroup,\n  type Key,\n  type ToggleButtonProps as AriaToggleButtonProps,\n} from \"react-aria-components\";\nimport { toggleButtonDefaults, type ToggleButtonSpecProps } from \"../generated/toggle-button.types\";\nimport { cx } from \"../utils/cx\";\n\ntype Size = NonNullable<ToggleButtonSpecProps[\"size\"]>;\ntype Variant = NonNullable<ToggleButtonSpecProps[\"variant\"]>;\n\n/** A group tells its buttons the size and look to share, so each button stays a plain ToggleButton. */\nconst GroupContext = createContext<{ size?: Size; variant?: Variant }>({});\n\nexport interface ToggleButtonProps\n  extends ToggleButtonSpecProps,\n    Omit<AriaToggleButtonProps, keyof ToggleButtonSpecProps | \"className\" | \"children\"> {\n  className?: string;\n}\n\nconst base =\n  \"inline-flex items-center justify-center gap-2 font-medium tracking-[-0.005em] select-none whitespace-nowrap \" +\n  \"rounded-[var(--rd-radius-control)] border outline-none transition-[background-color,border-color,color] \" +\n  \"text-[var(--rd-color-text-default)] data-[focus-visible]:ring-2 data-[focus-visible]:ring-offset-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)] \" +\n  \"data-[disabled]:opacity-50 data-[disabled]:cursor-not-allowed \" +\n  \"data-[selected]:font-semibold\";\n\nconst variants: Record<Variant, string> = {\n  default:\n    \"border-transparent bg-transparent data-[hovered]:bg-[var(--rd-color-surface-subtle)] \" +\n    \"data-[selected]:bg-[var(--rd-color-action-primary)] data-[selected]:text-[var(--rd-color-action-on-primary)] data-[selected]:data-[hovered]:bg-[var(--rd-color-action-primary-hover)]\",\n  outline:\n    \"border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-default)] [box-shadow:var(--rd-elevation-raised)] \" +\n    \"data-[hovered]:border-[var(--rd-color-border-strong)] data-[hovered]:bg-[var(--rd-color-surface-subtle)] \" +\n    \"data-[selected]:border-[var(--rd-color-action-primary)] data-[selected]:bg-[var(--rd-color-surface-subtle)]\",\n};\n\n// Icon-only buttons are square: the width follows the height.\nconst sizes: Record<Size, string> = {\n  sm: \"h-[var(--rd-size-control-sm)] min-w-[var(--rd-size-control-sm)] px-[var(--rd-space-control-x-sm)] text-sm\",\n  md: \"h-[var(--rd-size-control-md)] min-w-[var(--rd-size-control-md)] px-[var(--rd-space-control-x)] text-sm\",\n  lg: \"h-[var(--rd-size-control-lg)] min-w-[var(--rd-size-control-lg)] px-[var(--rd-space-control-x-lg)] text-base\",\n};\n\nexport const ToggleButton = forwardRef<HTMLButtonElement, ToggleButtonProps>(function ToggleButton(\n  { size, variant, isDisabled = toggleButtonDefaults.isDisabled, className, children, ...rest },\n  ref,\n) {\n  const group = useContext(GroupContext);\n  const s = size ?? group.size ?? toggleButtonDefaults.size;\n  const v = variant ?? group.variant ?? toggleButtonDefaults.variant;\n  return (\n    <AriaToggleButton {...rest} ref={ref} isDisabled={isDisabled} className={cx(base, variants[v], sizes[s], className)}>\n      {children}\n    </AriaToggleButton>\n  );\n});\n\nexport interface ToggleButtonGroupProps {\n  /** What the group is, e.g. \"Text style\". It is the accessible name of the group. */\n  label: string;\n  /** ToggleButton elements, each with an id. */\n  children: ReactNode;\n  /** One pressed button at most (default), or any number. */\n  selectionMode?: \"single\" | \"multiple\";\n  selectedKeys?: Iterable<Key>;\n  defaultSelectedKeys?: Iterable<Key>;\n  onSelectionChange?: (keys: Set<Key>) => void;\n  /** Keep one button pressed at all times. */\n  disallowEmptySelection?: boolean;\n  size?: Size;\n  variant?: Variant;\n  isDisabled?: boolean;\n  className?: string;\n}\n\n/** Toggle buttons that share a name and arrow-key navigation, like a toolbar. */\nexport const ToggleButtonGroup = forwardRef<HTMLDivElement, ToggleButtonGroupProps>(function ToggleButtonGroup(\n  {\n    label,\n    children,\n    selectionMode = \"single\",\n    selectedKeys,\n    defaultSelectedKeys,\n    onSelectionChange,\n    disallowEmptySelection,\n    size = toggleButtonDefaults.size,\n    variant = toggleButtonDefaults.variant,\n    isDisabled,\n    className,\n  },\n  ref,\n) {\n  return (\n    <GroupContext.Provider value={{ size, variant }}>\n      <AriaToggleButtonGroup\n        ref={ref}\n        aria-label={label}\n        selectionMode={selectionMode}\n        selectedKeys={selectedKeys}\n        defaultSelectedKeys={defaultSelectedKeys}\n        onSelectionChange={onSelectionChange}\n        disallowEmptySelection={disallowEmptySelection}\n        isDisabled={isDisabled}\n        className={cx(\"inline-flex items-center gap-1\", className)}\n      >\n        {children}\n      </AriaToggleButtonGroup>\n    </GroupContext.Provider>\n  );\n});\n"
+        },
+        {
+          "path": "generated/toggle-button.types.ts",
+          "content": "// Generated by rdloom codegen from specs/toggle-button.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nimport type { ReactNode } from \"react\";\n\nexport const toggleButtonSizeValues = [\"sm\", \"md\", \"lg\"] as const;\nexport const toggleButtonVariantValues = [\"default\", \"outline\"] as const;\n\n/** A button that stays pressed until pressed again, for turning a mode on or off, like Bold or Mute. Group several with ToggleButtonGroup for single or multiple choice. */\nexport interface ToggleButtonSpecProps {\n  /**\n   * Control height, from the shared control sizes.\n   * @default \"md\"\n   */\n  size?: \"sm\" | \"md\" | \"lg\";\n  /**\n   * Default is filled when pressed; outline keeps a visible border.\n   * @default \"default\"\n   */\n  variant?: \"default\" | \"outline\";\n  /**\n   * Controlled pressed state.\n   */\n  isSelected?: boolean;\n  /**\n   * Pressed at first when uncontrolled.\n   * @default false\n   */\n  defaultSelected?: boolean;\n  /**\n   * Called when the pressed state changes.\n   */\n  onChange?: (isSelected: boolean) => void;\n  /**\n   * Disables the button.\n   * @default false\n   */\n  isDisabled?: boolean;\n  /**\n   * Text or an icon. An icon-only button needs an aria-label.\n   */\n  children?: ReactNode;\n}\n\nexport const toggleButtonDefaults = {\n  size: \"md\",\n  variant: \"default\",\n  defaultSelected: false,\n  isDisabled: false,\n} as const;\n\nexport const toggleButtonMeta = {\n  \"name\": \"ToggleButton\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"button\"\n} as const;\n"
+        }
+      ]
+    },
+    {
       "id": "tool-call",
       "spec": {
         "$schema": "./schema/component.schema.json",
@@ -12148,6 +13166,10 @@
         {
           "path": "utils/motion.tsx",
           "content": "\"use client\";\n\nimport { useEffect, useLayoutEffect, useState } from \"react\";\n\n// Shared by the motion components. They are optional extras: a project that never\n// adds one never carries this file's callers. Every effect follows the same rules:\n//   - it is decoration, so the animated layers are hidden from assistive technology\n//   - it stands still for people who ask for less motion\n//   - it can be paused (isPaused), because moving content must be stoppable\n//   - its keyframes and still rules live in one CSS file (motion/rdloom-motion.css) that\n//     `rdloom add` installs and imports from your tokens file, so there is nothing to set up\n\n/** useLayoutEffect in the browser, useEffect on the server (which would otherwise warn). */\nexport const useIsomorphicLayoutEffect = typeof window === \"undefined\" ? useEffect : useLayoutEffect;\n\n/** Does the visitor ask for less motion? Reads the setting at call time, so it is safe to use in a layout effect. */\nexport const prefersReducedMotion = () =>\n  typeof window !== \"undefined\" && typeof window.matchMedia === \"function\" && window.matchMedia(\"(prefers-reduced-motion: reduce)\").matches;\n\n/** True when the visitor asks for less motion, and updates if they change the setting. */\nexport function useReducedMotion(): boolean {\n  const [reduced, setReduced] = useState(false);\n  useEffect(() => {\n    if (typeof window.matchMedia !== \"function\") return;\n    const query = window.matchMedia(\"(prefers-reduced-motion: reduce)\");\n    const update = () => setReduced(query.matches);\n    update();\n    query.addEventListener(\"change\", update);\n    return () => query.removeEventListener(\"change\", update);\n  }, []);\n  return reduced;\n}\n\n/** The inline style for the optional CSS variables an effect reads: only the ones that were given. */\nexport function motionVars(vars: Record<string, string | number | undefined>): React.CSSProperties {\n  return Object.fromEntries(Object.entries(vars).filter(([, v]) => v !== undefined)) as React.CSSProperties;\n}\n"
+        },
+        {
+          "path": "utils/permissions.ts",
+          "content": "// How a block learns what the person may do. Your app decides (from roles, plans, record state, anything);\n// the block only receives the answer for each action. This is for what people see and can try: the server\n// must check every action again, because anything in the browser can be changed.\n\n/** What a block does with an action: show it normally, show it but not allow it, or leave it out. */\nexport type PermissionState = \"allow\" | \"disabled\" | \"hidden\";\n\n/**\n * An answer for one action. true and false are the short forms (false means disabled). Use an object to say\n * why, so the person is told: { state: \"disabled\", reason: \"Only admins can delete\" }.\n */\nexport type PermissionValue = boolean | PermissionState | { state: PermissionState; reason?: string };\n\n/** The answers for a block's actions, by action name. An action you leave out is allowed. */\nexport type Permissions<Action extends string = string> = Partial<Record<Action, PermissionValue>>;\n\nexport interface ResolvedPermission {\n  state: PermissionState;\n  /** Why the action is disabled or hidden, when the app said. */\n  reason?: string;\n  /** Show the control at all. */\n  isVisible: boolean;\n  /** Show it but do not allow it. */\n  isDisabled: boolean;\n  /** Run it. */\n  isAllowed: boolean;\n}\n\nfunction resolved(state: PermissionState, reason?: string): ResolvedPermission {\n  return { state, reason, isVisible: state !== \"hidden\", isDisabled: state === \"disabled\", isAllowed: state === \"allow\" };\n}\n\n/** Turns any form of answer into one shape. A missing answer means allowed. */\nexport function resolvePermission(value: PermissionValue | undefined): ResolvedPermission {\n  if (value === undefined || value === true) return resolved(\"allow\");\n  if (value === false) return resolved(\"disabled\");\n  if (typeof value === \"string\") return resolved(value);\n  return resolved(value.state, value.reason);\n}\n\n/** The answer for one action in a block's permissions. */\nexport function permissionFor<Action extends string>(permissions: Permissions<Action> | undefined, action: Action): ResolvedPermission {\n  return resolvePermission(permissions?.[action]);\n}\n\n/** True when the action may run. */\nexport const can = <Action extends string>(permissions: Permissions<Action> | undefined, action: Action) => permissionFor(permissions, action).isAllowed;\n\n/** Builds a Permissions object from yes/no answers, e.g. from a function you already have. */\nexport function permissionsFrom<Action extends string>(actions: readonly Action[], check: (action: Action) => boolean, reason?: (action: Action) => string | undefined): Permissions<Action> {\n  const result: Permissions<Action> = {};\n  for (const action of actions) result[action] = check(action) ? true : { state: \"disabled\", reason: reason?.(action) };\n  return result;\n}\n"
         },
         {
           "path": "utils/state-boundary.tsx",

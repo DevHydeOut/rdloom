@@ -324,6 +324,23 @@
       "properties": []
     },
     {
+      "name": "AlertDialog",
+      "id": "alert-dialog",
+      "version": "0.1.0",
+      "description": "Confirmation dialog for destructive or irreversible actions. It cannot be dismissed by clicking outside, and can ask the user to type a word before the confirm button works. Open it with DialogTrigger.",
+      "properties": [
+        {
+          "prop": "tone",
+          "name": "Tone",
+          "values": [
+            "default",
+            "danger"
+          ],
+          "default": "default"
+        }
+      ]
+    },
+    {
       "name": "Alert",
       "id": "alert",
       "version": "0.1.0",
@@ -357,6 +374,25 @@
             "high"
           ],
           "default": "medium"
+        }
+      ]
+    },
+    {
+      "name": "AvatarGroup",
+      "id": "avatar-group",
+      "version": "0.1.0",
+      "description": "An overlapping stack of avatars with a +N chip for the rest, for showing who is on a team, thread or file.",
+      "properties": [
+        {
+          "prop": "size",
+          "name": "Size",
+          "values": [
+            "xs",
+            "sm",
+            "md",
+            "lg"
+          ],
+          "default": "md"
         }
       ]
     },
@@ -581,6 +617,23 @@
       "version": "0.1.0",
       "description": "A small numbered marker, like [1], inside a reply that jumps to the source it refers to.",
       "properties": []
+    },
+    {
+      "name": "Collapsible",
+      "id": "collapsible",
+      "version": "0.1.0",
+      "description": "One region that opens and closes under a trigger, for detail most people do not need at first. For a stack of related sections, use Accordion.",
+      "properties": [
+        {
+          "prop": "isDisabled",
+          "name": "Disabled",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
     },
     {
       "name": "Combobox",
@@ -918,6 +971,50 @@
         {
           "prop": "isPaused",
           "name": "Paused",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
+      "name": "InputOTP",
+      "id": "input-otp",
+      "version": "0.1.0",
+      "description": "One-time code input for verification and two-factor sign in. One real input holds the code and drawn cells show it, so paste, autofill from SMS and screen readers all work.",
+      "properties": [
+        {
+          "prop": "type",
+          "name": "Type",
+          "values": [
+            "numeric",
+            "alphanumeric"
+          ],
+          "default": "numeric"
+        },
+        {
+          "prop": "mask",
+          "name": "Mask",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        },
+        {
+          "prop": "isDisabled",
+          "name": "Disabled",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        },
+        {
+          "prop": "isInvalid",
+          "name": "Invalid",
           "values": [
             "false",
             "true"
@@ -1302,6 +1399,32 @@
         {
           "prop": "isInvalid",
           "name": "Invalid",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
+      "name": "Separator",
+      "id": "separator",
+      "version": "0.1.0",
+      "description": "A thin line that divides content, horizontal or vertical, with an optional label in the middle such as \"or\".",
+      "properties": [
+        {
+          "prop": "orientation",
+          "name": "Orientation",
+          "values": [
+            "horizontal",
+            "vertical"
+          ],
+          "default": "horizontal"
+        },
+        {
+          "prop": "decorative",
+          "name": "decorative",
           "values": [
             "false",
             "true"
@@ -1753,6 +1876,33 @@
             "danger"
           ],
           "default": "neutral"
+        }
+      ]
+    },
+    {
+      "name": "ToggleButton",
+      "id": "toggle-button",
+      "version": "0.1.0",
+      "description": "A button that stays pressed until pressed again, for turning a mode on or off, like Bold or Mute. Group several with ToggleButtonGroup for single or multiple choice.",
+      "properties": [
+        {
+          "prop": "size",
+          "name": "Size",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "default": "md"
+        },
+        {
+          "prop": "variant",
+          "name": "Variant",
+          "values": [
+            "default",
+            "outline"
+          ],
+          "default": "default"
         }
       ]
     },

@@ -1,0 +1,37 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "AvatarGroup",
+  "version": "0.1.0",
+  "category": "display",
+  "status": "experimental",
+  "description": "An overlapping stack of avatars with a +N chip for the rest, for showing who is on a team, thread or file.",
+  "props": {
+    "avatars": { "type": "custom", "required": true, "tsType": "Array<{ name: string; src?: string }>", "description": "The people, each with a name and an optional image URL." },
+    "max": { "type": "number", "default": 4, "description": "How many avatars to show before the +N chip." },
+    "size": { "type": "enum", "values": ["xs", "sm", "md", "lg"], "default": "md", "description": "Avatar size, as for Avatar." },
+    "label": { "type": "string", "default": "Members", "description": "What the group is, e.g. \"Team members\". It starts the accessible name, followed by the names." }
+  },
+  "variants": ["size"],
+  "states": ["default"],
+  "slots": ["group", "avatar", "overflow"],
+  "tokens": ["color.surface.subtle", "color.surface.default", "color.text.default", "color.border.default"],
+  "a11y": {
+    "role": "img",
+    "keyboard": [],
+    "requirements": [
+      "The group is an image with one accessible name listing the people, e.g. \"Team members: Ada Lovelace, Grace Hopper and 3 more\"",
+      "Individual avatars inside it are hidden from assistive technology so nothing is read twice",
+      "The +N chip is part of the same name, not separate text",
+      "Initials and the chip text meet 4.5:1 against their background"
+    ],
+    "screenReader": ["Announced once as an image with the full list and the count of the rest"],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["Showing the people on a project, thread or document", "A compact list where full names appear elsewhere"],
+    "avoid_when": ["Each person needs to be reached or opened: use a list of links", "One person: use Avatar"],
+    "anti_patterns": ["An empty label", "Using it as the only place the people are named when it matters who they are"]
+  },
+  "examples": ["basic", "with-overflow", "sizes"],
+  "figma": { "componentKey": null, "variantMap": { "size": "Size" } }
+}

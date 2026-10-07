@@ -83,6 +83,13 @@
       "Showing placeholder numbers while data loads"
     ]
   },
+  "contract": {
+    "data": "A title, an optional description, and stats as plain objects.",
+    "dataStates": ["loading", "ready"],
+    "permissions": [],
+    "events": [],
+    "customization": ["actions slot", "children", "the Stat cards it draws"]
+  },
   "examples": [
     "basic",
     "loading"

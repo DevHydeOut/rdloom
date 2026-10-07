@@ -75,6 +75,13 @@ test -e src/components/rdloom/form/form-engine.ts || { echo "✗ the form engine
 grep -q '@tanstack/react-form' package.json || { echo "✗ the form engine dependency was not added to package.json"; exit 1; }
 echo "✓ forms and their parts installed"
 
+step "Small components: confirm dialog, one-time code, collapsible, separator, toggle button, avatar group"
+npx rdloom add alert-dialog input-otp collapsible separator toggle-button avatar-group --install
+for part in alert-dialog input-otp collapsible separator toggle-button avatar-group text-field; do
+  test -e "src/components/rdloom/$part/$part.tsx" || { echo "✗ rdloom add did not bring $part"; exit 1; }
+done
+echo "✓ small components installed"
+
 step "Typecheck and production build"
 npm run build --silent
 # The keyframes must be in the CSS the browser actually loads, with no <style> tag in the markup.

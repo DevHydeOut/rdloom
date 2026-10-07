@@ -6,6 +6,8 @@
   "type": "object",
   "required": ["name", "version", "category", "description", "props", "a11y", "usage"],
   "additionalProperties": false,
+  "if": { "properties": { "category": { "const": "block" } }, "required": ["category"] },
+  "then": { "required": ["contract"] },
   "properties": {
     "$schema": { "type": "string" },
     "name": { "type": "string", "pattern": "^[A-Z][A-Za-z0-9]*$" },
@@ -56,6 +58,19 @@
         "use_when": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
         "avoid_when": { "type": "array", "items": { "type": "string" } },
         "anti_patterns": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "contract": {
+      "description": "What a block takes and gives, in the same shape for every block: its data, the data states it handles, the actions it asks permission for, the events it calls, and what you can replace.",
+      "type": "object",
+      "required": ["data", "dataStates", "permissions", "events", "customization"],
+      "additionalProperties": false,
+      "properties": {
+        "data": { "type": "string", "description": "One sentence: what the block is given." },
+        "dataStates": { "type": "array", "items": { "enum": ["loading", "empty", "error", "ready"] } },
+        "permissions": { "type": "array", "items": { "type": "string" }, "description": "Action names the block asks permission for." },
+        "events": { "type": "array", "items": { "type": "string" }, "description": "Callback props the block calls." },
+        "customization": { "type": "array", "items": { "type": "string" }, "description": "What can be replaced or restyled: slots, render props, tokens." }
       }
     },
     "examples": { "type": "array", "items": { "type": "string" } },

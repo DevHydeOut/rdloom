@@ -169,6 +169,13 @@
       "Showing the totals of one page of a server's list as if they were the totals of all customers"
     ]
   },
+  "contract": {
+    "data": "A list of customers, or one page of them when serverSide is on, with a plain status tone map.",
+    "dataStates": ["loading", "empty", "error", "ready"],
+    "permissions": [],
+    "events": ["onQueryChange", "onExport", "onOpenCustomer", "onRetry"],
+    "customization": ["statusTones", "insights", "density", "currency and locale", "the parts it is built from (Table, Pagination, Chart, Select)"]
+  },
   "examples": [
     "basic",
     "server-side",

@@ -1,0 +1,40 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Separator",
+  "version": "0.1.0",
+  "category": "display",
+  "status": "experimental",
+  "description": "A thin line that divides content, horizontal or vertical, with an optional label in the middle such as \"or\".",
+  "props": {
+    "orientation": { "type": "enum", "values": ["horizontal", "vertical"], "default": "horizontal", "description": "Direction of the line. A vertical one needs a parent with a height." },
+    "label": { "type": "string", "description": "Short text in the middle of a horizontal line, e.g. \"or\"." },
+    "decorative": { "type": "boolean", "default": false, "description": "Removes the separator from the accessibility tree (role none) when it is only visual. Leave off when the line marks a real change of topic." }
+  },
+  "variants": ["orientation", "decorative"],
+  "states": ["default"],
+  "slots": ["line", "label"],
+  "tokens": ["color.border.default", "color.text.muted"],
+  "a11y": {
+    "role": "separator",
+    "keyboard": [],
+    "requirements": [
+      "A semantic separator has role separator and aria-orientation when vertical",
+      "With decorative set it has role none and is skipped by assistive technology",
+      "A label is real text, not an image, and meets 4.5:1 against the background",
+      "A vertical separator is never the only thing that marks a boundary"
+    ],
+    "screenReader": [
+      "A semantic separator may be announced as a separator, with its orientation",
+      "A decorative one is not announced",
+      "A label is read as ordinary text"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["Dividing groups in a menu, toolbar or form", "Splitting alternatives with a word, like sign in with a password or with a link"],
+    "avoid_when": ["Space or a heading already makes the grouping clear", "Dividing every row of a list: use the styling of the list itself"],
+    "anti_patterns": ["Using a separator for layout spacing", "A long label: a separator label is one or two words"]
+  },
+  "examples": ["basic", "with-label", "vertical"],
+  "figma": { "componentKey": null, "variantMap": { "orientation": "Orientation" } }
+}

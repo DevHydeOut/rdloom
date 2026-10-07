@@ -1,0 +1,43 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Collapsible",
+  "version": "0.1.0",
+  "category": "display",
+  "status": "experimental",
+  "description": "One region that opens and closes under a trigger, for detail most people do not need at first. For a stack of related sections, use Accordion.",
+  "props": {
+    "title": { "type": "node", "required": true, "description": "The trigger content. It is also the accessible name of the trigger button." },
+    "summary": { "type": "node", "description": "A short line under the title that stays visible when the region is closed, e.g. a count or a status." },
+    "defaultExpanded": { "type": "boolean", "default": false, "description": "Open at first when uncontrolled." },
+    "isExpanded": { "type": "boolean", "description": "Controlled open state." },
+    "onExpandedChange": { "type": "callback", "tsType": "(isExpanded: boolean) => void", "description": "Called when the region opens or closes." },
+    "isDisabled": { "type": "boolean", "default": false, "description": "Disables the trigger." },
+    "children": { "type": "node", "required": true, "description": "The content that opens and closes." }
+  },
+  "variants": ["isDisabled"],
+  "states": ["default", "open", "disabled"],
+  "slots": ["trigger", "chevron", "summary", "panel"],
+  "tokens": ["color.border.default", "color.text.default", "color.text.muted", "color.surface.subtle", "color.focus.ring", "radius.control"],
+  "a11y": {
+    "role": "group",
+    "keyboard": ["Tab moves to the trigger", "Enter or Space opens or closes the region"],
+    "requirements": [
+      "The trigger is a button exposing aria-expanded and aria-controls",
+      "The region is labelled by the trigger",
+      "Closed content is removed from the tab order and hidden from screen readers",
+      "Opening and closing respect reduced motion"
+    ],
+    "screenReader": [
+      "The trigger is announced as a button, expanded or collapsed",
+      "Opening it announces it as expanded; the content follows in reading order"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["A single block of optional detail: advanced options, a long note, raw output", "A summary with a way to see more"],
+    "avoid_when": ["Several related sections: use Accordion", "Content everyone needs: show it"],
+    "anti_patterns": ["Hiding the only way to complete a task inside a closed region", "A title that does not say what is inside"]
+  },
+  "examples": ["basic", "controlled", "with-summary-line"],
+  "figma": { "componentKey": null, "variantMap": { "isDisabled": "Disabled" } }
+}

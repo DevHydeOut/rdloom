@@ -1,0 +1,65 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "InputOTP",
+  "version": "0.1.0",
+  "category": "input",
+  "status": "experimental",
+  "description": "One-time code input for verification and two-factor sign in. One real input holds the code and drawn cells show it, so paste, autofill from SMS and screen readers all work.",
+  "props": {
+    "label": { "type": "string", "required": true, "description": "Visible label, such as Verification code. Names the group." },
+    "description": { "type": "string", "description": "Help text shown under the cells." },
+    "errorMessage": { "type": "string", "description": "Shown when the code is invalid." },
+    "length": { "type": "number", "default": 6, "description": "Number of characters in the code." },
+    "type": { "type": "enum", "values": ["numeric", "alphanumeric"], "default": "numeric", "description": "Characters accepted. Numeric also opens the numeric keypad on phones." },
+    "value": { "type": "string", "description": "Controlled value." },
+    "defaultValue": { "type": "string", "description": "Initial value when uncontrolled." },
+    "onChange": { "type": "callback", "tsType": "(value: string) => void", "description": "Called with the code on every edit." },
+    "onComplete": { "type": "callback", "tsType": "(value: string) => void", "description": "Called once when every cell is filled." },
+    "separatorAt": { "type": "custom", "tsType": "number[]", "description": "Draws a separator after these cell counts, for example [3] groups a 6 digit code as 3 + 3." },
+    "mask": { "type": "boolean", "default": false, "description": "Shows dots instead of the characters." },
+    "autoFocus": { "type": "boolean", "default": false, "description": "Focuses the input on mount." },
+    "isDisabled": { "type": "boolean", "default": false, "description": "Prevents editing and dims the cells." },
+    "isInvalid": { "type": "boolean", "default": false, "description": "Marks the code as wrong and shows errorMessage." }
+  },
+  "variants": ["type", "mask", "isDisabled", "isInvalid"],
+  "states": ["default", "focus", "disabled", "invalid"],
+  "slots": ["label", "cell", "separator", "description", "error"],
+  "tokens": [
+    "color.surface.default",
+    "color.border.default",
+    "color.border.strong",
+    "color.text.default",
+    "color.text.muted",
+    "color.feedback.danger",
+    "color.focus.ring",
+    "radius.control"
+  ],
+  "a11y": {
+    "role": "group",
+    "keyboard": ["Type to fill and move forward", "Backspace deletes and moves back", "Left and Right Arrow move between cells", "Paste fills every cell", "Tab moves out"],
+    "requirements": [
+      "The group is named by its label",
+      "One real input carries the value, so autofill and paste work",
+      "autocomplete=one-time-code lets phones offer the SMS code",
+      "The current cell is announced as digit N of the total",
+      "The error is linked with aria-describedby and the input exposes aria-invalid"
+    ],
+    "screenReader": [
+      "On focus: the label, then edit text, then the description",
+      "Moving between cells announces the position, such as Digit 2 of 6",
+      "Invalid: announced as invalid, and the error message is read",
+      "Masked codes are announced as a protected field and the characters are never read aloud"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["Verifying an SMS, email or authenticator code", "Any short fixed-length code"],
+    "avoid_when": ["Free-form or variable-length text: use TextField", "Long recovery keys: use TextField"],
+    "anti_patterns": ["Splitting the code into separate inputs, which breaks paste and autofill", "Clearing the code silently on error: say what went wrong"]
+  },
+  "examples": ["basic", "alphanumeric-grouped", "with-error", "masked"],
+  "figma": {
+    "componentKey": null,
+    "variantMap": { "type": "Type", "mask": "Mask", "isDisabled": "Disabled", "isInvalid": "Invalid" }
+  }
+}

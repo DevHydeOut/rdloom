@@ -299,6 +299,18 @@ function toMarkdown(component: DocComponent): string {
     `Install: \`npx rdloom add ${id}\``,
     "## Props",
     props,
+    ...(spec.contract
+      ? [
+          "## Block contract",
+          list([
+            `Data: ${spec.contract.data}`,
+            `Data states: ${spec.contract.dataStates.join(", ") || "none"}`,
+            `Permissions: ${spec.contract.permissions.join(", ") || "none yet"}`,
+            `Events: ${spec.contract.events.join(", ") || "none"}`,
+            `Customization: ${spec.contract.customization.join("; ")}`,
+          ]),
+        ]
+      : []),
     "## Use it when",
     list(spec.usage.use_when),
     "## Avoid it when",
@@ -552,6 +564,24 @@ export function ComponentPage({ component, layout = "page" }: { component: DocCo
         <div className="mt-4 rounded-xl border border-[var(--site-border)] p-4">
           <H3>What your code must do</H3>
           <List items={a.requirements} />
+        </div>
+      ) : null}
+
+      {spec.contract ? (
+        <div className="mb-8 rounded-xl border border-[var(--site-border)] p-4">
+          <H3>Block contract</H3>
+          <dl className="mt-2 grid gap-x-6 gap-y-2 text-sm sm:grid-cols-[9rem_1fr]">
+            <dt className="text-[var(--site-muted)]">Data</dt>
+            <dd>{spec.contract.data}</dd>
+            <dt className="text-[var(--site-muted)]">Data states</dt>
+            <dd>{spec.contract.dataStates.length ? spec.contract.dataStates.join(", ") : "None: it shows what it is given"}</dd>
+            <dt className="text-[var(--site-muted)]">Permissions</dt>
+            <dd>{spec.contract.permissions.length ? spec.contract.permissions.join(", ") : "None yet"}</dd>
+            <dt className="text-[var(--site-muted)]">Events</dt>
+            <dd>{spec.contract.events.length ? spec.contract.events.join(", ") : "None"}</dd>
+            <dt className="text-[var(--site-muted)]">You can replace</dt>
+            <dd>{spec.contract.customization.join("; ")}</dd>
+          </dl>
         </div>
       ) : null}
 

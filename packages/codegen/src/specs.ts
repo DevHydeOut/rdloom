@@ -24,6 +24,7 @@ export interface ComponentSpec {
   tokens?: string[];
   a11y: { role: string; keyboard: string[]; requirements?: string[]; screenReader?: string[]; wcag: string };
   usage: { use_when: string[]; avoid_when: string[]; anti_patterns?: string[] };
+  contract?: { data: string; dataStates: string[]; permissions: string[]; events: string[]; customization: string[] };
   examples?: string[];
   figma?: { componentKey?: string | null; variantMap?: Record<string, string> };
 }

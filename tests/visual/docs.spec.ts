@@ -21,9 +21,9 @@ test.describe("component page", () => {
     await page.goto("/components/alert");
     await page.getByRole("tab", { name: "pnpm" }).first().click();
     await expect(page.getByLabel("Add command for pnpm")).toContainText("pnpm dlx rdloom add alert");
-    await page.getByRole("link", { name: "Next: Approval Box" }).click();
-    await expect(page.getByRole("heading", { level: 1, name: "Approval Box" })).toBeVisible();
-    await expect(page.getByLabel("Add command for pnpm")).toContainText("pnpm dlx rdloom add approval-box");
+    await page.getByRole("link", { name: "Next: Alert Dialog" }).click();
+    await expect(page.getByRole("heading", { level: 1, name: "Alert Dialog" })).toBeVisible();
+    await expect(page.getByLabel("Add command for pnpm")).toContainText("pnpm dlx rdloom add alert-dialog");
   });
 
   test("folds the code until you ask for it", async ({ page }) => {
@@ -247,8 +247,8 @@ test.describe("component page", () => {
 
   test("steps to the neighbouring components", async ({ page }) => {
     await page.goto("/components/alert");
-    await page.getByRole("link", { name: "Next: Approval Box" }).click();
-    await expect(page.getByRole("heading", { level: 1, name: "Approval Box" })).toBeVisible();
+    await page.getByRole("link", { name: "Next: Alert Dialog" }).click();
+    await expect(page.getByRole("heading", { level: 1, name: "Alert Dialog" })).toBeVisible();
     await page.getByRole("link", { name: "Previous: Alert" }).click();
     await expect(page.getByRole("heading", { level: 1, name: "Alert" })).toBeVisible();
   });

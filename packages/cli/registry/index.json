@@ -32,6 +32,12 @@
       "description": "A short summary of what the assistant is doing or did, such as \"Used 3 tools\", that opens into each step. It stays open while a step needs approval."
     },
     {
+      "name": "alert-dialog",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "Confirmation dialog for destructive or irreversible actions. It cannot be dismissed by clicking outside, and can ask the user to type a word before the confirm button works. Open it with DialogTrigger."
+    },
+    {
       "name": "alert",
       "type": "registry:ui",
       "version": "0.1.0",
@@ -42,6 +48,12 @@
       "type": "registry:ui",
       "version": "0.1.0",
       "description": "Asks someone to approve or decline something the assistant wants to do. It says what will happen, how risky it is and whether it can be undone, in words as well as color."
+    },
+    {
+      "name": "avatar-group",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "An overlapping stack of avatars with a +N chip for the rest, for showing who is on a team, thread or file."
     },
     {
       "name": "avatar",
@@ -108,6 +120,12 @@
       "type": "registry:ui",
       "version": "0.1.0",
       "description": "A small numbered marker, like [1], inside a reply that jumps to the source it refers to."
+    },
+    {
+      "name": "collapsible",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "One region that opens and closes under a trigger, for detail most people do not need at first. For a stack of related sections, use Accordion."
     },
     {
       "name": "combobox",
@@ -218,6 +236,12 @@
       "description": "Text filled with a gradient that keeps flowing, for a short headline or a highlighted word. The words stay real text."
     },
     {
+      "name": "input-otp",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "One-time code input for verification and two-factor sign in. One real input holds the code and drawn cells show it, so paste, autofill from SMS and screen readers all work."
+    },
+    {
       "name": "kbd",
       "type": "registry:ui",
       "version": "0.1.0",
@@ -312,6 +336,12 @@
       "type": "registry:ui",
       "version": "0.1.1",
       "description": "Picks one option from a list shown in a popover. Use with SelectItem children."
+    },
+    {
+      "name": "separator",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A thin line that divides content, horizontal or vertical, with an optional label in the middle such as \"or\"."
     },
     {
       "name": "sheet",
@@ -426,6 +456,12 @@
       "type": "registry:ui",
       "version": "0.1.0",
       "description": "Brief, non-blocking message about the result of an action. Render ToastRegion once and call toast()."
+    },
+    {
+      "name": "toggle-button",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A button that stays pressed until pressed again, for turning a mode on or off, like Bold or Mute. Group several with ToggleButtonGroup for single or multiple choice."
     },
     {
       "name": "tool-call",

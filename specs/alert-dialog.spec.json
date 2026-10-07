@@ -1,0 +1,61 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "AlertDialog",
+  "version": "0.1.0",
+  "category": "overlay",
+  "status": "experimental",
+  "description": "Confirmation dialog for destructive or irreversible actions. It cannot be dismissed by clicking outside, and can ask the user to type a word before the confirm button works. Open it with DialogTrigger.",
+  "props": {
+    "title": { "type": "string", "required": true, "description": "Heading, also the dialog's accessible name. Phrase it as the question being asked, such as Delete this user?" },
+    "description": { "type": "string", "description": "What will happen and whether it can be undone. Wired to the dialog with aria-describedby." },
+    "confirmLabel": { "type": "string", "default": "Confirm", "description": "Label of the confirm button. Name the action, such as Delete user." },
+    "cancelLabel": { "type": "string", "default": "Cancel", "description": "Label of the cancel button." },
+    "tone": { "type": "enum", "values": ["default", "danger"], "default": "default", "description": "Danger styles the confirm button as destructive and starts focus on the cancel button." },
+    "confirmText": { "type": "string", "description": "A word the user must type exactly (such as the resource name) before the confirm button is enabled." },
+    "onConfirm": { "type": "callback", "tsType": "() => void | Promise<void>", "description": "Called when the user confirms. If it returns a promise, the confirm button shows a pending state and the dialog cannot be dismissed until it settles. The dialog closes when it resolves and stays open if it rejects." },
+    "onCancel": { "type": "callback", "tsType": "() => void", "description": "Called when the user cancels with the cancel button or Esc." },
+    "isOpen": { "type": "boolean", "description": "Controlled open state, for dialogs opened without a DialogTrigger." },
+    "defaultOpen": { "type": "boolean", "description": "Initial open state when uncontrolled and used without a DialogTrigger." },
+    "onOpenChange": { "type": "callback", "tsType": "(isOpen: boolean) => void", "description": "Called when the dialog opens or closes (without a DialogTrigger)." }
+  },
+  "variants": ["tone"],
+  "states": ["open", "loading"],
+  "slots": ["backdrop", "panel", "title", "description", "confirm-field", "cancel", "confirm"],
+  "tokens": [
+    "color.overlay.backdrop",
+    "color.surface.raised",
+    "color.border.default",
+    "color.text.default",
+    "color.text.muted",
+    "radius.overlay"
+  ],
+  "a11y": {
+    "role": "alertdialog",
+    "keyboard": ["Esc cancels", "Tab and Shift+Tab stay inside the dialog", "Enter in the confirmation field confirms once the word matches"],
+    "requirements": [
+      "Focus moves into the dialog on open (to Cancel for the danger tone) and returns to the trigger on close",
+      "Clicking outside does not dismiss it",
+      "The description is linked with aria-describedby so it is read on open",
+      "While a confirm is pending, Esc and Cancel are blocked and the confirm button is marked busy",
+      "Content behind the dialog is hidden from assistive technology"
+    ],
+    "screenReader": [
+      "Opening announces an alert dialog with its title, then reads the description",
+      "In the danger tone focus lands on Cancel, so a stray Enter does not destroy anything",
+      "With confirmText, the field is labelled with the word to type, and Confirm is announced as dimmed until it matches",
+      "While pending the confirm button is announced as busy",
+      "Closing announces the button that opened it (focus is back there)"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["Confirming a destructive or irreversible action such as deleting a record", "Making the user prove intent by typing a resource name"],
+    "avoid_when": ["Non-destructive choices: use Dialog", "Actions that can be undone: use a toast with Undo", "Forms with several fields: use Dialog or Sheet"],
+    "anti_patterns": ["Vague buttons like OK or Yes: name the action", "Using it for routine confirmations, which trains people to click through", "Closing the dialog yourself before an async onConfirm settles"]
+  },
+  "examples": ["basic", "danger-delete", "type-to-confirm", "async-confirm"],
+  "figma": {
+    "componentKey": null,
+    "variantMap": { "tone": "Tone" }
+  }
+}

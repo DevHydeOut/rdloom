@@ -172,6 +172,13 @@
       "More than about 7 top-level items in one group without headings"
     ]
   },
+  "contract": {
+    "data": "The navigation as plain data: groups of items, each with an id, label, optional href, icon, badge and sub-items.",
+    "dataStates": [],
+    "permissions": [],
+    "events": ["onNavigate", "onPick", "onTeamChange", "onSearch", "onCollapsedChange"],
+    "customization": ["appearance (bordered, subtle, floating)", "renderLink (your router's link)", "footer slot", "--rd-sidebar-width and --rd-sidebar-rail"]
+  },
   "examples": [
     "basic",
     "collapsible",

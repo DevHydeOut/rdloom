@@ -25,6 +25,8 @@ async function open(page: Page, id: string, name: string, theme: string) {
   await page.goto(`/visual/${id}/${name}?theme=${theme}`);
   await page.locator("[data-visual-ready]").waitFor({ state: "attached" });
   await page.evaluate(() => document.fonts.ready);
+  // An image that fails (the avatar fallback example) swaps to its initials once the browser reports the failure.
+  await page.waitForFunction(() => [...document.images].every((img) => img.complete));
   // Examples that fetch (combobox/async) show a spinner first; wait it out.
   await expect(page.getByRole("status", { name: "Loading" })).toHaveCount(0);
 }

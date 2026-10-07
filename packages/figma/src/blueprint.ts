@@ -242,6 +242,75 @@ const blueprints: Record<string, Blueprint> = {
     );
   },
 
+  Collapsible: (c) => {
+    return frame({ name: "collapsible", dir: "col", w: 360, stroke: "color.border.default", radius: "radius.control", opacity: on(c, "isDisabled") ? 0.5 : undefined }, [
+      frame({ name: "trigger", dir: "row", pad: [12, 16], w: "fill", align: "between", cross: "center" }, [
+        frame({ dir: "col", gap: 2 }, [text("Advanced options", 14, "color.text.default", "Medium"), text("3 settings changed", 14, "color.text.muted")]),
+        text("v", 14, "color.text.muted"),
+      ]),
+    ]);
+  },
+
+  Separator: (c) => {
+    if (c.orientation === "vertical") return frame({ name: "separator", dir: "row", h: 24 }, [box(1, 24, { fill: "color.border.default", name: "line" })]);
+    return frame({ name: "separator", dir: "row", w: 320, gap: 12, cross: "center" }, [
+      box("fill", 1, { fill: "color.border.default", name: "line" }),
+      text("or", 14, "color.text.muted"),
+      box("fill", 1, { fill: "color.border.default", name: "line" }),
+    ]);
+  },
+
+  ToggleButton: (c) => {
+    const h = c.size === "sm" ? 28 : c.size === "lg" ? 44 : 36;
+    const outline = c.variant === "outline";
+    const button = (label: string, pressed: boolean) =>
+      frame(
+        {
+          name: pressed ? "pressed button" : "button",
+          dir: "row",
+          pad: [0, c.size === "sm" ? 10 : 14],
+          h,
+          align: "center",
+          cross: "center",
+          fill: pressed ? (outline ? "color.surface.subtle" : "color.action.primary") : undefined,
+          stroke: outline ? (pressed ? "color.action.primary" : "color.border.default") : undefined,
+          radius: "radius.control",
+        },
+        [text(label, c.size === "lg" ? 16 : 14, pressed && !outline ? "color.action.on-primary" : "color.text.default", pressed ? "Semi Bold" : "Medium")],
+      );
+    return frame({ name: "toggle button group", dir: "row", gap: 4, cross: "center" }, [button("Bold", true), button("Italic", false), button("Underline", false)]);
+  },
+
+  AvatarGroup: (c) => {
+    const px: Record<string, number> = { xs: 24, sm: 32, md: 40, lg: 56 };
+    const size = px[c.size ?? "md"] ?? 40;
+    const chip = (label: string, name: string) =>
+      frame({ name, dir: "row", w: size, h: size, align: "center", cross: "center", fill: "color.surface.subtle", stroke: "color.border.default", radius: PILL }, [
+        text(label, Math.round(size / 3), "color.text.default", "Medium"),
+      ]);
+    return frame({ name: "avatar group", dir: "row", gap: -Math.round(size / 4), cross: "center" }, [chip("AL", "avatar"), chip("GH", "avatar"), chip("KJ", "avatar"), chip("+3", "overflow")]);
+  },
+
+  AlertDialog: (c) => {
+    const danger = c.tone === "danger";
+    return panel({ name: "alert dialog", dir: "col", gap: 16, pad: 24, w: 448 }, [
+      frame({ dir: "col", gap: 4, w: "fill" }, [
+        text(danger ? "Delete this user?" : "Confirm this action?", 18, "color.text.default", "Semi Bold"),
+        text("Say what will happen and whether it can be undone.", 14, "color.text.muted", "Regular", "fill"),
+      ]),
+      frame({ dir: "row", gap: 8, w: "fill", align: "end" }, [button("Cancel", "secondary"), button(danger ? "Delete user" : "Confirm", danger ? "danger" : "primary")]),
+    ]);
+  },
+
+  InputOTP: () =>
+    frame({ name: "input otp", dir: "col", gap: 6 }, [
+      text("Verification code", 14, "color.text.default", "Medium"),
+      frame({ name: "cells", dir: "row", gap: 8 }, [0, 1, 2, 3, 4, 5].map((i) =>
+        frame({ name: `cell ${i + 1}`, dir: "row", w: 44, h: 48, align: "center", cross: "center", fill: "color.surface.default", stroke: i === 0 ? "color.focus.ring" : "color.border.default", radius: "radius.control" }, [text(i < 2 ? String(i + 4) : "", 18, "color.text.default", "Medium")]),
+      )),
+      text("We sent a 6-digit code to your phone.", 12, "color.text.muted"),
+    ]),
+
   Progress: (c) => {
     const tone = c.variant ?? "default";
     const bar = tone === "default" ? "color.action.primary" : `color.feedback.${tone}`;

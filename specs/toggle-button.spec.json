@@ -1,0 +1,47 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "ToggleButton",
+  "version": "0.1.0",
+  "category": "input",
+  "status": "experimental",
+  "description": "A button that stays pressed until pressed again, for turning a mode on or off, like Bold or Mute. Group several with ToggleButtonGroup for single or multiple choice.",
+  "props": {
+    "size": { "type": "enum", "values": ["sm", "md", "lg"], "default": "md", "description": "Control height, from the shared control sizes." },
+    "variant": { "type": "enum", "values": ["default", "outline"], "default": "default", "description": "Default is filled when pressed; outline keeps a visible border." },
+    "isSelected": { "type": "boolean", "description": "Controlled pressed state." },
+    "defaultSelected": { "type": "boolean", "default": false, "description": "Pressed at first when uncontrolled." },
+    "onChange": { "type": "callback", "tsType": "(isSelected: boolean) => void", "description": "Called when the pressed state changes." },
+    "isDisabled": { "type": "boolean", "default": false, "description": "Disables the button." },
+    "children": { "type": "node", "description": "Text or an icon. An icon-only button needs an aria-label." }
+  },
+  "variants": ["size", "variant"],
+  "states": ["default", "hover", "focus", "pressed", "selected", "disabled"],
+  "slots": ["button", "group"],
+  "tokens": ["color.surface.default", "color.surface.subtle", "color.border.default", "color.border.strong", "color.action.primary", "color.action.on-primary", "color.text.default", "color.focus.ring", "radius.control"],
+  "a11y": {
+    "role": "button",
+    "keyboard": [
+      "Tab moves to the button; in a group, to the group",
+      "Space or Enter toggles the focused button",
+      "In a group, arrow keys move focus between buttons"
+    ],
+    "requirements": [
+      "A toggle button exposes aria-pressed (in a single-choice group, the group is a radiogroup and each button a radio)",
+      "The pressed state is shown by fill and weight, not only by color",
+      "An icon-only button has an accessible name",
+      "A group has an accessible name"
+    ],
+    "screenReader": [
+      "Announced as a toggle button, pressed or not pressed",
+      "In a single-choice group, as a radio button, checked or not checked"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["A mode that stays on: bold, mute, pin", "A toolbar of formatting options, several allowed at once"],
+    "avoid_when": ["An on or off setting inside a form: use Switch or Checkbox", "Mutually exclusive views of data: use SegmentedControl", "A one-time action: use Button"],
+    "anti_patterns": ["Changing the label when pressed as well as the state, which reads as the opposite", "Icon-only buttons with no accessible name"]
+  },
+  "examples": ["basic", "group-multiple", "icon-only", "outline"],
+  "figma": { "componentKey": null, "variantMap": { "size": "Size", "variant": "Variant" } }
+}
