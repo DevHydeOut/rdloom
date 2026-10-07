@@ -397,6 +397,13 @@
       ]
     },
     {
+      "name": "ApiKeyList",
+      "id": "api-key-list",
+      "version": "0.1.0",
+      "description": "A list of API keys with their name, prefix, creation and last use, and scopes as badges. Create key opens a dialog with a name and scopes, then shows the secret once with a Copy button and a warning; it is never shown again. Revoke needs the key name typed to confirm. Your callbacks do the work. UI permission is not security: the server must check again.",
+      "properties": []
+    },
+    {
       "name": "AppFooter",
       "id": "app-footer",
       "version": "0.1.0",
@@ -410,6 +417,23 @@
             "columns"
           ],
           "default": "simple"
+        }
+      ]
+    },
+    {
+      "name": "AppHeader",
+      "id": "app-header",
+      "version": "0.1.0",
+      "description": "The top bar of an application: a slot for a sidebar toggle, the breadcrumbs, a search button that opens your command palette, your own actions, a notifications bell with an unread count and the account menu. In a narrow space the search folds to an icon.",
+      "properties": [
+        {
+          "prop": "size",
+          "name": "size",
+          "values": [
+            "default",
+            "compact"
+          ],
+          "default": "default"
         }
       ]
     },
@@ -643,6 +667,33 @@
       ]
     },
     {
+      "name": "Carousel",
+      "id": "carousel",
+      "version": "0.1.0",
+      "description": "A row (or column) of slides that scrolls and snaps, with previous and next buttons and slide dots, for a small set of related items such as featured cards or screenshots. Use CarouselItem for each slide. Built on native scroll snapping, so touch and trackpad swiping work without extra code.",
+      "properties": [
+        {
+          "prop": "orientation",
+          "name": "Orientation",
+          "values": [
+            "horizontal",
+            "vertical"
+          ],
+          "default": "horizontal"
+        },
+        {
+          "prop": "gap",
+          "name": "Gap",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "default": "md"
+        }
+      ]
+    },
+    {
       "name": "Chart",
       "id": "chart",
       "version": "0.1.0",
@@ -728,6 +779,32 @@
       ]
     },
     {
+      "name": "ColorPicker",
+      "id": "color-picker",
+      "version": "0.1.0",
+      "description": "Picks a color. A button shows the current color and opens a panel with a saturation and brightness area, a hue slider, an optional opacity slider, a hex field and preset swatches. ColorPickerPanel is the same panel inline. Values are hex strings.",
+      "properties": [
+        {
+          "prop": "showAlpha",
+          "name": "Opacity",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        },
+        {
+          "prop": "isDisabled",
+          "name": "Disabled",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
       "name": "Combobox",
       "id": "combobox",
       "version": "0.1.2",
@@ -778,6 +855,23 @@
       "version": "0.1.0",
       "description": "A search box in a dialog that finds and runs commands, jumps to pages and triggers actions from the keyboard. Opens with Ctrl or Cmd + K. Use CommandGroup and CommandItem for the results.",
       "properties": []
+    },
+    {
+      "name": "ContextMenu",
+      "id": "context-menu",
+      "version": "0.1.0",
+      "description": "The menu that opens at the pointer on a right click, a long press or the keyboard (Shift+F10 or the Menu key) over an area such as a file row. It never replaces a visible way to do the same thing.",
+      "properties": [
+        {
+          "prop": "isDisabled",
+          "name": "Disabled",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
     },
     {
       "name": "CustomerTable",
@@ -1096,6 +1190,25 @@
       ]
     },
     {
+      "name": "HoverCard",
+      "id": "hover-card",
+      "version": "0.1.0",
+      "description": "A richer preview that opens when a link is hovered or reached with the keyboard, like a profile summary on a user name. It only repeats information that is available elsewhere.",
+      "properties": [
+        {
+          "prop": "placement",
+          "name": "Placement",
+          "values": [
+            "top",
+            "bottom",
+            "start",
+            "end"
+          ],
+          "default": "bottom"
+        }
+      ]
+    },
+    {
       "name": "InputOTP",
       "id": "input-otp",
       "version": "0.1.0",
@@ -1277,6 +1390,20 @@
       ]
     },
     {
+      "name": "PaymentMethodCard",
+      "id": "payment-method-card",
+      "version": "0.1.0",
+      "description": "One payment method: a generic card mark, the last four digits, the expiry with an expires soon notice, a default badge, and the actions Update, Remove (confirmed) and Make default. With no method it offers Add a payment method. It never holds a full card number; your callbacks do the work. UI permission is not security: the server must check again.",
+      "properties": []
+    },
+    {
+      "name": "PlanCard",
+      "id": "plan-card",
+      "version": "0.1.0",
+      "description": "The current subscription plan: name, price and interval, status with the right text, renewal or end date, feature list, a usage hint, and the actions Change plan and Cancel subscription (confirmed, with the end date). A past due plan shows an alert. PlanPicker, exported beside it, lets people choose another plan. Your callbacks do the work. UI permission is not security: the server must check again.",
+      "properties": []
+    },
+    {
       "name": "Popover",
       "id": "popover",
       "version": "0.1.0",
@@ -1409,6 +1536,59 @@
             "true"
           ],
           "default": "false"
+        }
+      ]
+    },
+    {
+      "name": "Rating",
+      "id": "rating",
+      "version": "0.1.0",
+      "description": "A star rating. As an input it is a radio group of stars; with isReadOnly it is a display like \"4.5 out of 5 stars\" with an optional count.",
+      "properties": [
+        {
+          "prop": "size",
+          "name": "Size",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "default": "md"
+        },
+        {
+          "prop": "allowHalf",
+          "name": "Half stars",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        },
+        {
+          "prop": "isReadOnly",
+          "name": "Read only",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
+      "name": "ResizablePanels",
+      "id": "resizable-panels",
+      "version": "0.1.0",
+      "description": "Panels side by side or stacked that the person can resize by dragging or with the keyboard, for a sidebar and content, an editor and a console, or a split view. Build it from ResizablePanelGroup, ResizablePanel (id, defaultSize, minSize, maxSize, collapsible, collapsedSize) and ResizableHandle (withHandle, label).",
+      "properties": [
+        {
+          "prop": "orientation",
+          "name": "Orientation",
+          "values": [
+            "horizontal",
+            "vertical"
+          ],
+          "default": "horizontal"
         }
       ]
     },
@@ -1607,6 +1787,13 @@
           "default": "false"
         }
       ]
+    },
+    {
+      "name": "SettingsSection",
+      "id": "settings-section",
+      "version": "0.1.0",
+      "description": "The repeating unit of a settings page: a title and description on the left, a card with the content on the right, and a Save and Cancel bar that appears only when something has changed. Use SettingsRow inside for toggle lists. Your onSave does the work. UI permission is not security: the server must check again.",
+      "properties": []
     },
     {
       "name": "Sheet",
@@ -2118,6 +2305,24 @@
       ]
     },
     {
+      "name": "TopNav",
+      "id": "top-nav",
+      "version": "0.1.0",
+      "description": "Navigation across the top of an application or marketing site: your brand, links (some opening a short list), and a slot for buttons or the account menu. In a narrow space it becomes a menu button that opens the same links in a sheet. It comes plain, with a line, or as a floating pill.",
+      "properties": [
+        {
+          "prop": "variant",
+          "name": "variant",
+          "values": [
+            "plain",
+            "bordered",
+            "floating"
+          ],
+          "default": "plain"
+        }
+      ]
+    },
+    {
       "name": "Tree",
       "id": "tree",
       "version": "0.1.0",
@@ -2136,11 +2341,44 @@
       ]
     },
     {
+      "name": "UsageMeter",
+      "id": "usage-meter",
+      "version": "0.1.0",
+      "description": "A labeled meter for a limit: seats 8 of 10, storage 4.2 of 5 GB, API calls. It warns at 80 percent and at the limit with words and an icon, not only color, and can offer an upgrade when near the limit. UsageMeterList shows several. Built on role=\"meter\"; the app owns the numbers. UI permission is not security: the server must check again.",
+      "properties": []
+    },
+    {
       "name": "UserForm",
       "id": "user-form",
       "version": "0.1.0",
       "description": "A form to create or edit a user: name, email, role, status and team, with a danger zone for suspending and deleting. Save stays disabled until something changes, and Cancel asks before throwing changes away. Your onSubmit does the work. UI permission is not security: the server must check again.",
       "properties": []
+    },
+    {
+      "name": "UserMenu",
+      "id": "user-menu",
+      "version": "0.1.0",
+      "description": "The avatar button that opens the account menu: the person's name and email at the top, your own entries (settings, billing, help) in groups, a row for the theme, and a Sign out entry that can ask first, shows that it is working, and tells screen readers how it went.",
+      "properties": [
+        {
+          "prop": "size",
+          "name": "size",
+          "values": [
+            "sm",
+            "md"
+          ],
+          "default": "sm"
+        },
+        {
+          "prop": "align",
+          "name": "align",
+          "values": [
+            "start",
+            "end"
+          ],
+          "default": "end"
+        }
+      ]
     }
   ]
 }

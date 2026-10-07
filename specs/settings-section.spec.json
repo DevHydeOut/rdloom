@@ -1,0 +1,183 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "SettingsSection",
+  "version": "0.1.0",
+  "category": "block",
+  "status": "experimental",
+  "description": "The repeating unit of a settings page: a title and description on the left, a card with the content on the right, and a Save and Cancel bar that appears only when something has changed. Use SettingsRow inside for toggle lists. Your onSave does the work. UI permission is not security: the server must check again.",
+  "props": {
+    "title": {
+      "type": "string",
+      "required": true,
+      "description": "The section's heading, e.g. \"Profile\"."
+    },
+    "description": {
+      "type": "string",
+      "description": "One or two sentences on what the section controls."
+    },
+    "headingLevel": {
+      "type": "number",
+      "default": 2,
+      "description": "Heading level of the title, 2 to 6."
+    },
+    "children": {
+      "type": "node",
+      "description": "The content of the card: form fields (when onSave is set they are connected to the section's form), SettingsRow lines, or any content."
+    },
+    "layout": {
+      "type": "enum",
+      "values": [
+        "columns",
+        "stacked"
+      ],
+      "default": "columns",
+      "description": "columns puts the title on the left and the card on the right from the md breakpoint up; stacked always puts the title above the card."
+    },
+    "tone": {
+      "type": "enum",
+      "values": [
+        "default",
+        "danger"
+      ],
+      "default": "default",
+      "description": "danger marks a section with destructive actions: a danger-colored border and title. The color is never the only signal: say it in the title."
+    },
+    "defaultValues": {
+      "type": "custom",
+      "tsType": "Record<string, any>",
+      "description": "The starting values of the section's form. Needed with onSave. Fields inside are connected by name (FormTextField, FormSwitch, Field)."
+    },
+    "onSave": {
+      "type": "callback",
+      "tsType": "(values: Record<string, any>) => void | import(\"../form/form\").SubmitResult | Promise<void | import(\"../form/form\").SubmitResult>",
+      "description": "Saves the changed values; yours, async. Resolve for success. Return { fieldErrors } or { formError } to show a problem and keep the changes. Without onSave the section has no footer."
+    },
+    "onCancel": {
+      "type": "callback",
+      "tsType": "() => void",
+      "description": "Called after the person discarded their changes with Cancel."
+    },
+    "saveLabel": {
+      "type": "string",
+      "default": "Save changes",
+      "description": "The text of the save button."
+    },
+    "successMessage": {
+      "type": "string",
+      "default": "Changes saved",
+      "description": "The status message shown and announced after a save that worked."
+    },
+    "permissions": {
+      "type": "custom",
+      "tsType": "import(\"../utils/permissions\").Permissions<\"edit\">",
+      "description": "What the app allows: edit. Disabled makes the content read-only: every field inside is disabled and the reason is shown above the content and linked to it. Hidden renders nothing; disabled keeps the control reachable (aria-disabled) with the reason shown and read, and nothing runs. This only changes what people see: the server must check again."
+    },
+    "classNames": {
+      "type": "custom",
+      "description": "Extra class names for single parts, so you can restyle one part without editing the file. Keys: root, header, title, description, card, content, footer, saveButton, cancelButton, reason, status.",
+      "tsType": "Partial<Record<\"root\" | \"header\" | \"title\" | \"description\" | \"card\" | \"content\" | \"footer\" | \"saveButton\" | \"cancelButton\" | \"reason\" | \"status\", string>>"
+    }
+  },
+  "states": [
+    "default",
+    "disabled",
+    "loading"
+  ],
+  "slots": [
+    "root",
+    "header",
+    "title",
+    "description",
+    "card",
+    "content",
+    "footer",
+    "saveButton",
+    "cancelButton",
+    "reason",
+    "status"
+  ],
+  "tokens": [
+    "color.surface.default",
+    "color.surface.subtle",
+    "color.border.default",
+    "color.text.default",
+    "color.text.muted",
+    "color.feedback.danger",
+    "color.feedback.success",
+    "elevation.raised",
+    "radius.overlay"
+  ],
+  "a11y": {
+    "role": "region",
+    "keyboard": [
+      "Tab: moves through the fields, then Cancel and Save changes when they are shown",
+      "Enter in a text field: saves"
+    ],
+    "requirements": [
+      "The section is a region named by its heading, so it can be reached from a landmark list",
+      "The Save and Cancel bar appears only when a value differs from the last saved one; a polite status says \"Unsaved changes\" when it appears",
+      "After a save that worked a status says the success message and focus moves to it, because the Save button has gone",
+      "Cancel puts the saved values back and moves focus to the first field",
+      "A failed save keeps the changes, moves focus to the error summary and links each problem to its field",
+      "When editing is not allowed every field is disabled and the reason is visible text linked to the content with aria-describedby"
+    ],
+    "screenReader": [
+      "\"Profile, region\"",
+      "\"Unsaved changes\" when the first change is made",
+      "\"Save changes, button\"",
+      "\"Changes saved\" after saving"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "A settings page made of several groups of related options, each with its own Save",
+      "Toggle lists where each switch saves at once (without onSave, with SettingsRow)",
+      "A danger zone with tone=\"danger\""
+    ],
+    "avoid_when": [
+      "A single long form with one Save: use Form",
+      "A form in a dialog or sheet: use Dialog or Sheet with Form"
+    ],
+    "anti_patterns": [
+      "Treating the permissions prop as protection: UI permission is not security, so the server must check again",
+      "Saving from inside the component: onSave is yours",
+      "Putting a Save button inside the children: the footer already has one",
+      "Hiding the reason when editing is not allowed: say why, so people know whom to ask"
+    ]
+  },
+  "contract": {
+    "data": "The starting values of the section's form and an async onSave; the content comes from the app as children.",
+    "dataStates": [
+      "ready"
+    ],
+    "permissions": [
+      "edit"
+    ],
+    "events": [
+      "onSave",
+      "onCancel"
+    ],
+    "customization": [
+      "classNames for each part",
+      "layout and tone",
+      "title, description, saveLabel and successMessage",
+      "any Form fields or SettingsRow lines as children",
+      "useSettingsSection() lets your own controls read the read-only state"
+    ]
+  },
+  "examples": [
+    "basic",
+    "stacked",
+    "toggles",
+    "danger",
+    "states",
+    "permissions",
+    "classNames",
+    "settings-page"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {}
+  }
+}

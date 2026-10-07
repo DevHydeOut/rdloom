@@ -63,6 +63,18 @@ export {
   type MenuSectionProps,
 } from "./menu/menu";
 export { Popover, PopoverTrigger, type PopoverProps } from "./popover/popover";
+export { HoverCard, HoverCardContent, HoverCardTrigger, type HoverCardContentProps, type HoverCardProps, type HoverCardTriggerProps } from "./hover-card/hover-card";
+export {
+  ContextMenu,
+  ContextMenuItem,
+  ContextMenuSection,
+  ContextMenuSeparator,
+  type ContextMenuItemProps,
+  type ContextMenuProps,
+  type ContextMenuSectionProps,
+} from "./context-menu/context-menu";
+export { ColorPicker, ColorPickerPanel, type ColorPickerPanelProps, type ColorPickerProps } from "./color-picker/color-picker";
+export { Rating, type RatingProps } from "./rating/rating";
 export { Radio, RadioGroup, type RadioGroupProps, type RadioProps } from "./radio-group/radio-group";
 export { Select, SelectItem, type SelectItemProps, type SelectProps } from "./select/select";
 export { Sheet, type SheetProps } from "./sheet/sheet";
@@ -205,7 +217,7 @@ export {
   type DataTableValue,
 } from "./data-table/query";
 export { DashboardShell, type DashboardShellProps } from "./dashboard-shell/dashboard-shell";
-export { currentTopLevel, findNavItem, flattenNav, trailOf, type NavGroup, type NavItem, type ShellUser } from "./sidebar/nav";
+export { currentTopLevel, findNavItem, flattenNav, trailOf, visibleItems, type NavGroup, type NavItem, type ShellUser } from "./sidebar/nav";
 export { Sidebar, type SidebarProps } from "./sidebar/sidebar";
 export { DashboardPage, type DashboardPageProps } from "./dashboard-page/dashboard-page";
 export type { DashboardStat } from "./dashboard-page/stats";
@@ -217,6 +229,15 @@ export { ErrorState, type ErrorStateProps } from "./error-state/error-state";
 export { AuthCard, type AuthCardProps } from "./auth-card/auth-card";
 export { InviteDialog, type InviteDialogProps } from "./invite-dialog/invite-dialog";
 export { UserForm, type UserFormProps } from "./user-form/user-form";
+export { SettingsSection, SettingsRow, useSettingsSection, type SettingsSectionProps, type SettingsRowProps } from "./settings-section/settings-section";
+export { PlanCard, type PlanCardProps } from "./plan-card/plan-card";
+export { PlanPicker, type PlanPickerProps, type PlanOption, type PlanInterval } from "./plan-card/plan-picker";
+export { UsageMeter, UsageMeterList, type UsageMeterProps, type UsageMeterListProps } from "./usage-meter/usage-meter";
+export { PaymentMethodCard, type PaymentMethodCardProps } from "./payment-method-card/payment-method-card";
+export { ApiKeyList, type ApiKeyListProps } from "./api-key-list/api-key-list";
+export { UserMenu, type UserMenuProps, type UserMenuItem, type UserMenuGroup } from "./user-menu/user-menu";
+export { AppHeader, type AppHeaderProps } from "./app-header/app-header";
+export { TopNav, type TopNavProps } from "./top-nav/top-nav";
 // The icon family the components use, for your own buttons and menu entries.
 export * from "./utils/icons";
 // Forms: the Form, its fields, the error summary and repeating rows. The engine behind them is one adapter file.
@@ -233,7 +254,9 @@ export {
 export {
   Field,
   FormCheckbox,
+  FormColorPicker,
   FormNumberField,
+  FormRating,
   FormSelect,
   FormSwitch,
   FormTextField,
@@ -241,6 +264,8 @@ export {
   type FieldProps,
   type FieldState,
   type FormCheckboxProps,
+  type FormColorPickerProps,
+  type FormRatingProps,
   type FormNumberFieldProps,
   type FormSelectProps,
   type FormSwitchProps,
@@ -259,3 +284,5 @@ export { Collapsible, type CollapsibleProps } from "./collapsible/collapsible";
 export { Separator, type SeparatorProps } from "./separator/separator";
 export { ToggleButton, ToggleButtonGroup, type ToggleButtonGroupProps, type ToggleButtonProps } from "./toggle-button/toggle-button";
 export { AvatarGroup, avatarGroupName, type AvatarGroupProps } from "./avatar-group/avatar-group";
+export { Carousel, CarouselItem, type CarouselItemProps, type CarouselProps } from "./carousel/carousel";
+export { ResizableHandle, ResizablePanel, ResizablePanelGroup, ResizablePanels, type ResizableHandleProps, type ResizablePanelGroupProps, type ResizablePanelProps } from "./resizable-panels/resizable-panels";

@@ -3,7 +3,9 @@
 import { useEffect, useId, useRef, type ReactNode } from "react";
 import type { Key } from "react-aria-components";
 import { Checkbox, type CheckboxProps } from "../checkbox/checkbox";
+import { ColorPicker, type ColorPickerProps } from "../color-picker/color-picker";
 import { NumberField, type NumberFieldProps } from "../number-field/number-field";
+import { Rating, type RatingProps } from "../rating/rating";
 import { Select, type SelectProps } from "../select/select";
 import { Switch, type SwitchProps } from "../switch/switch";
 import { TextField, type TextFieldProps } from "../text-field/text-field";
@@ -224,6 +226,41 @@ export function FormSelect({ name, isRequired, requiredMessage, validate, valida
   return (
     <Field<Key | null> name={name} label={props.label} isRequired={isRequired} requiredMessage={requiredMessage} validate={validate} validateAsync={validateAsync}>
       {(f) => <Select {...props} {...f.selectProps} />}
+    </Field>
+  );
+}
+
+export type FormColorPickerProps = Omit<ColorPickerProps, "value" | "onChange" | "isInvalid" | "errorMessage"> &
+  Pick<FieldOptions, "name" | "validate" | "validateAsync">;
+
+/** A ColorPicker connected to the Form by name. The value is a hex string; set it in the form's defaultValues. */
+export function FormColorPicker({ name, validate, validateAsync, ...props }: FormColorPickerProps) {
+  return (
+    <Field<string> name={name} label={props.label} validate={validate} validateAsync={validateAsync}>
+      {(f) => (
+        <ColorPicker
+          {...props}
+          name={name}
+          value={typeof f.value === "string" ? f.value : (props.defaultValue ?? "#000000")}
+          onChange={f.setValue}
+          isInvalid={f.isInvalid || undefined}
+          errorMessage={f.errorMessage}
+        />
+      )}
+    </Field>
+  );
+}
+
+export type FormRatingProps = Omit<RatingProps, "value" | "onChange" | "isInvalid" | "errorMessage"> &
+  Pick<FieldOptions, "name" | "requiredMessage" | "validate" | "validateAsync"> & { isRequired?: boolean };
+
+/** A Rating connected to the Form by name. 0 means no rating; isRequired means at least one star. */
+export function FormRating({ name, isRequired, requiredMessage, validate, validateAsync, ...props }: FormRatingProps) {
+  const check: FieldValidator<number> = (value, all) =>
+    isRequired && !value ? (requiredMessage ?? `${props.label} is required`) : validate?.(value, all);
+  return (
+    <Field<number> name={name} label={props.label} validate={check} validateAsync={validateAsync}>
+      {(f) => <Rating {...props} name={name} value={f.value ?? 0} onChange={f.setValue} isInvalid={f.isInvalid || undefined} errorMessage={f.errorMessage} />}
     </Field>
   );
 }

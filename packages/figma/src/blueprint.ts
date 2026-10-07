@@ -264,6 +264,32 @@ const blueprints: Record<string, Blueprint> = {
     ]);
   },
 
+  Carousel: (c) => {
+    const vertical = c.orientation === "vertical";
+    const per = c.slidesPerView === "2" ? 2 : c.slidesPerView === "3" ? 3 : 1;
+    const slide = (n: number) =>
+      frame({ name: "slide", dir: "col", w: vertical ? 280 : Math.round(320 / per), stroke: "color.border.default", radius: "radius.control" }, [
+        box("fill", 96, { fill: "color.surface.subtle", name: "art" }),
+        frame({ dir: "col", gap: 2, pad: 12, w: "fill" }, [text(`Slide ${n}`, 14, "color.text.default", "Semi Bold"), text("Short description", 14, "color.text.muted")]),
+      ]);
+    const slides = Array.from({ length: vertical ? 2 : per }, (_, i) => slide(i + 1));
+    return frame({ name: "carousel", dir: "col", gap: 12, cross: "center" }, [
+      frame({ name: "viewport", dir: vertical ? "col" : "row", gap: 16 }, slides),
+      frame({ name: "dots", dir: "row", gap: 8, cross: "center" }, [0, 1, 2].map((i) => box(8, 8, { fill: i === 0 ? "color.action.primary" : "color.border.default", radius: PILL, name: "dot" }))),
+    ]);
+  },
+
+  ResizablePanels: (c) => {
+    const vertical = c.orientation === "vertical";
+    const pane = (name: string, size: number) =>
+      frame({ name, dir: "col", pad: 16, w: vertical ? "fill" : size, h: vertical ? size : 160 }, [text(name, 14, "color.text.default", "Semi Bold")]);
+    return frame({ name: "resizable panels", dir: vertical ? "col" : "row", w: vertical ? 360 : undefined, stroke: "color.border.default", radius: "radius.control" }, [
+      pane("Panel", vertical ? 100 : 120),
+      box(vertical ? "fill" : 1, vertical ? 1 : 160, { fill: "color.border.default", name: "handle" }),
+      pane("Panel", vertical ? 60 : 240),
+    ]);
+  },
+
   Separator: (c) => {
     if (c.orientation === "vertical") return frame({ name: "separator", dir: "row", h: 24 }, [box(1, 24, { fill: "color.border.default", name: "line" })]);
     return frame({ name: "separator", dir: "row", w: 320, gap: 12, cross: "center" }, [
@@ -908,6 +934,62 @@ const blueprints: Record<string, Blueprint> = {
     ]);
   },
 
+  UserMenu: (c) => {
+    const entry = (label: string, danger = false) =>
+      frame({ name: "item", dir: "row", gap: 8, pad: [0, 10], w: "fill", h: 36, cross: "center", radius: "radius.control" }, [text(label, 14, danger ? "color.feedback.danger" : "color.text.default", "Regular", "fill")]);
+    return frame({ name: "user menu", dir: "col", gap: 12, w: 280 }, [
+      frame({ name: "trigger", dir: "row", gap: 10, cross: "center" }, [box(c.size === "md" ? 40 : 32, c.size === "md" ? 40 : 32, { fill: "color.surface.subtle", stroke: "color.border.default", radius: 999, name: "avatar" })]),
+      frame({ name: "popover", dir: "col", w: "fill", fill: "color.surface.raised", stroke: "color.border.default", radius: "radius.overlay" }, [
+        frame({ name: "header", dir: "row", gap: 12, pad: [12, 16], w: "fill", cross: "center", stroke: "color.border.default" }, [
+          box(40, 40, { fill: "color.surface.subtle", stroke: "color.border.default", radius: 999, name: "avatar" }),
+          frame({ name: "who", dir: "col" }, [text("Ada Lovelace", 14, "color.text.default", "Medium"), text("ada@example.com", 12, "color.text.muted")]),
+        ]),
+        frame({ name: "list", dir: "col", gap: 2, pad: 6, w: "fill" }, [entry("Your profile"), entry("Settings"), entry("Sign out"), entry("Delete account", true)]),
+      ]),
+    ]);
+  },
+
+  AppHeader: (c) => {
+    const compact = c.size === "compact";
+    const icon = (name: string) => box(compact ? 32 : 36, compact ? 32 : 36, { stroke: "color.border.default", radius: "radius.control", name });
+    return frame({ name: `app header ${compact ? "compact" : "default"}`, dir: "row", gap: 12, pad: [0, 16], w: 880, h: compact ? 44 : 56, cross: "center", fill: "color.surface.default", stroke: "color.border.default" }, [
+      icon("sidebar toggle"),
+      text("Home / Customers / Brightwater Supplies", 14, "color.text.muted", "Regular", "fill"),
+      frame({ name: "search", dir: "row", gap: 8, pad: [0, 12], w: 224, h: compact ? 32 : 36, cross: "center", stroke: "color.border.default", radius: "radius.control" }, [text("Search", 14, "color.text.muted", "Regular", "fill"), text("Ctrl K", 11, "color.text.muted", "Medium")]),
+      icon("notifications"),
+      box(compact ? 32 : 36, compact ? 32 : 36, { fill: "color.surface.subtle", stroke: "color.border.default", radius: 999, name: "avatar" }),
+    ]);
+  },
+
+  TopNav: (c) => {
+    const variant = String(c.variant ?? "plain");
+    const link = (label: string, current = false) =>
+      frame({ name: current ? "link current" : "link", dir: "col", gap: 4, pad: [6, 12], cross: "center" }, [
+        text(label, 14, current ? "color.text.default" : "color.text.muted", current ? "Medium" : "Regular"),
+        box(40, 2, { fill: current ? "color.text.default" : undefined, radius: 999, name: "current bar" }),
+      ]);
+    return frame(
+      {
+        name: `top nav ${variant}`,
+        dir: "row",
+        gap: 16,
+        pad: [0, variant === "floating" ? 20 : 16],
+        w: 880,
+        h: 56,
+        cross: "center",
+        fill: variant === "floating" ? "color.surface.raised" : "color.surface.default",
+        stroke: variant === "plain" ? undefined : "color.border.default",
+        radius: variant === "floating" ? 999 : undefined,
+      },
+      [
+        text("Loomworks", 15, "color.text.default", "Semi Bold"),
+        frame({ name: "links", dir: "row", gap: 4, w: "fill", cross: "center" }, [link("Product"), link("Pricing", true), link("Docs")]),
+        button("Sign in", "ghost", "sm"),
+        button("Start free", "primary", "sm"),
+      ],
+    );
+  },
+
   ErrorState: (c) => {
     const page = c.variant === "page";
     return frame({ name: "error state", dir: "col", gap: 12, pad: page ? [64, 24] : [40, 24], w: page ? 480 : 400, align: "center", cross: "center", stroke: page ? undefined : "color.border.default", radius: page ? undefined : "radius.overlay" }, [
@@ -967,6 +1049,80 @@ const blueprints: Record<string, Blueprint> = {
       frame({ name: "status", dir: "col", gap: 4 }, [text("Active", 14, "color.text.default", "Medium"), text("Suspended users cannot sign in.", 12, "color.text.muted")]),
       frame({ name: "actions", dir: "row", gap: 8, w: "fill", align: "end" }, [button("Cancel", "secondary"), button(edit ? "Save changes" : "Create user", "primary")]),
       ...(edit ? [frame({ name: "danger zone", dir: "row", gap: 8, w: "fill" }, [button("Suspend", "secondary"), button("Delete user", "danger")])] : []),
+    ]);
+  },
+
+  SettingsSection: () => {
+    const input = (label: string, value: string) =>
+      frame({ name: "field", dir: "col", gap: 6, w: "fill" }, [
+        text(label, 14, "color.text.default", "Medium"),
+        frame({ name: "input", dir: "row", w: "fill", h: 40, pad: 12, cross: "center", stroke: "color.border.default", radius: "radius.control" }, [text(value, 14, "color.text.default")]),
+      ]);
+    return frame({ name: "settings section", dir: "row", gap: 32, w: 880 }, [
+      frame({ name: "header", dir: "col", gap: 4, w: 260 }, [text("Profile", 16, "color.text.default", "Semi Bold"), text("Your name and the email we write to.", 14, "color.text.muted")]),
+      frame({ name: "card", dir: "col", w: "fill", fill: "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, [
+        frame({ name: "content", dir: "col", gap: 16, pad: 20, w: "fill" }, [input("Name", "Lena Fischer"), input("Email", "lena.fischer@example.com")]),
+        frame({ name: "footer", dir: "row", gap: 8, pad: [12, 20], w: "fill", align: "end", cross: "center", fill: "color.surface.subtle" }, [text("Unsaved changes", 14, "color.text.muted", "Regular", "fill"), button("Cancel", "secondary"), button("Save changes", "primary")]),
+      ]),
+    ]);
+  },
+
+  PlanCard: () => {
+    const feature = (t: string) => frame({ name: "feature", dir: "row", gap: 8, cross: "center" }, [text("✓", 14, "color.feedback.success", "Semi Bold"), text(t, 14, "color.text.default")]);
+    return frame({ name: "plan card", dir: "col", gap: 16, pad: 20, w: 420, fill: "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, [
+      frame({ name: "header", dir: "row", w: "fill", align: "between", cross: "center" }, [
+        text("Team plan", 18, "color.text.default", "Semi Bold"),
+        frame({ name: "badge", dir: "row", gap: 6, pad: [2, 8], cross: "center", fill: "color.feedback.success-subtle", radius: 999 }, [box(6, 6, { fill: "color.feedback.success", radius: 999 }), text("Active", 12, "color.text.default", "Medium")]),
+      ]),
+      frame({ name: "price", dir: "col", gap: 4 }, [
+        frame({ name: "amount", dir: "row", gap: 4, cross: "end" }, [text("$49", 24, "color.text.default", "Semi Bold"), text("per month", 14, "color.text.muted")]),
+        text("Renews on 3 March 2027", 14, "color.text.muted"),
+      ]),
+      frame({ name: "features", dir: "col", gap: 6 }, [feature("Up to 10 seats"), feature("5 GB of storage"), feature("Email support")]),
+      text("8 of 10 seats used", 14, "color.text.muted"),
+      frame({ name: "actions", dir: "row", gap: 8, w: "fill" }, [button("Change plan", "primary"), button("Cancel subscription", "danger")]),
+    ]);
+  },
+
+  UsageMeter: () => {
+    const meter = (label: string, amounts: string, fill: number, tone: string, note?: string) =>
+      frame({ name: "usage meter", dir: "col", gap: 8, w: "fill" }, [
+        frame({ name: "header", dir: "row", w: "fill", align: "between" }, [text(label, 14, "color.text.default", "Medium"), text(amounts, 14, "color.text.muted")]),
+        frame({ name: "track", dir: "row", w: "fill", h: 10, fill: "color.border.default", radius: 999 }, [box(fill, 10, { fill: tone, radius: 999, name: "bar" })]),
+        ...(note ? [text(note, 14, "color.text.default", "Medium")] : []),
+      ]);
+    return frame({ name: "usage meters", dir: "col", gap: 20, w: 360 }, [
+      meter("Seats", "6 of 10", 216, "color.action.primary"),
+      meter("Storage", "4.2 of 5 GB", 302, "color.feedback.warning", "Near the limit"),
+      meter("API calls", "10,000 of 10,000", 360, "color.feedback.danger", "Limit reached"),
+    ]);
+  },
+
+  PaymentMethodCard: () =>
+    frame({ name: "payment method card", dir: "col", gap: 16, pad: 20, w: 420, fill: "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, [
+      frame({ name: "method", dir: "row", gap: 12, w: "fill", cross: "center" }, [
+        frame({ name: "brand", dir: "row", gap: 6, pad: [6, 8], cross: "center", fill: "color.surface.subtle", stroke: "color.border.default", radius: "radius.control" }, [text("CARD", 12, "color.text.default", "Semi Bold")]),
+        frame({ name: "details", dir: "col", w: "fill" }, [text("•••• 4242", 16, "color.text.default", "Medium"), text("Expires 08/2027", 14, "color.text.muted")]),
+        frame({ name: "badge", dir: "row", gap: 6, pad: [2, 8], cross: "center", fill: "color.feedback.info-subtle", radius: 999 }, [box(6, 6, { fill: "color.feedback.info", radius: 999 }), text("Default", 12, "color.text.default", "Medium")]),
+      ]),
+      frame({ name: "actions", dir: "row", gap: 8, w: "fill" }, [button("Update", "secondary"), button("Make default", "ghost"), button("Remove", "danger")]),
+    ]),
+
+  ApiKeyList: () => {
+    const row = (name: string, prefix: string, meta: string, scopes: string[]) =>
+      frame({ name: "key", dir: "row", gap: 12, pad: 16, w: "fill", cross: "center", stroke: "color.border.default" }, [
+        frame({ name: "details", dir: "col", gap: 6, w: "fill" }, [
+          text(name, 14, "color.text.default", "Medium"),
+          text(prefix, 12, "color.text.muted"),
+          text(meta, 12, "color.text.muted"),
+          frame({ name: "scopes", dir: "row", gap: 6 }, scopes.map((s) => frame({ name: "scope", dir: "row", pad: [2, 8], fill: "color.surface.subtle", stroke: "color.border.default", radius: 999 }, [text(s, 12, "color.text.default", "Medium")]))),
+        ]),
+        button("Revoke", "danger", "sm"),
+      ]);
+    return frame({ name: "api key list", dir: "col", w: 640, fill: "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, [
+      frame({ name: "header", dir: "row", w: "fill", pad: 16, align: "between", cross: "center", stroke: "color.border.default" }, [text("API keys", 16, "color.text.default", "Semi Bold"), button("Create key", "primary")]),
+      row("Deploy script", "rk_demo_8f2a…", "Created 3 March 2027 · Last used 12 March 2027", ["Read", "Write"]),
+      row("Reporting job", "rk_demo_c41d…", "Created 9 January 2027 · Never used", ["Read"]),
     ]);
   },
 
@@ -1119,6 +1275,60 @@ const blueprints: Record<string, Blueprint> = {
         box("fill", 6, { fill: "color.surface.subtle", radius: PILL, name: "rest" }),
       ]),
     ]),
+
+  HoverCard: (c) => {
+    const body = panel({ name: "hover card", dir: "col", gap: 8, pad: 16, w: 288 }, [
+      frame({ dir: "row", gap: 12, cross: "center" }, [
+        box(40, 40, { fill: "color.surface.subtle", radius: PILL, name: "avatar" }),
+        frame({ dir: "col", gap: 2 }, [text("Ada Lovelace", 14, "color.text.default", "Semi Bold"), text("Staff engineer", 14, "color.text.muted")]),
+      ]),
+      text("Joined March 2021", 14, "color.text.muted", "Regular", "fill"),
+    ]);
+    const link = text("Ada Lovelace", 14, "color.text.default", "Medium");
+    const place = c.placement ?? "bottom";
+    return frame({ name: `hover card (${place})`, dir: place === "start" || place === "end" ? "row" : "col", gap: 8, cross: "center" }, place === "top" || place === "start" ? [body, link] : [link, body]);
+  },
+
+  ContextMenu: (c) => {
+    const disabled = on(c, "isDisabled");
+    const item = (label: string, i: number, danger = false, shortcut?: string) =>
+      frame({ name: "item", dir: "row", gap: 8, pad: [6, 10], w: "fill", radius: "radius.control", fill: i === 0 ? "color.surface.subtle" : undefined }, [
+        text(label, 14, danger ? "color.feedback.danger" : "color.text.default", "Regular", "fill"),
+        ...(shortcut ? [text(shortcut, 12, "color.text.muted")] : []),
+      ]);
+    const area = frame({ name: "area", dir: "row", pad: [10, 12], w: 240, stroke: "color.border.default", radius: "radius.control", opacity: disabled ? 0.5 : undefined }, [text("report.pdf", 14, "color.text.default")]);
+    if (disabled) return area;
+    return frame({ name: "context menu", dir: "col", gap: 4 }, [area, panel({ name: "menu", dir: "col", pad: 4, w: 200 }, [item("Open", 0, false, "Enter"), item("Copy link", 1, false, "⌘C"), box("fill", 1, { fill: "color.border.default", name: "separator" }), item("Delete file", 2, true)])]);
+  },
+
+  ColorPicker: (c) => {
+    const alpha = on(c, "showAlpha");
+    const bar = (name: string) => box("fill", 24, { fill: "color.surface.subtle", stroke: "color.border.strong", radius: PILL, name });
+    return frame({ name: "color picker", dir: "col", gap: 8, w: 256 }, [
+      text("Brand color", 14, on(c, "isDisabled") ? "color.text.muted" : "color.text.default", "Medium"),
+      frame({ name: "trigger", dir: "row", gap: 12, pad: [0, 12], h: 40, w: "fill", cross: "center", fill: "color.surface.default", stroke: "color.border.default", radius: "radius.control", opacity: on(c, "isDisabled") ? 0.5 : undefined }, [
+        box(20, 20, { fill: "color.action.primary", stroke: "color.border.strong", radius: "radius.control", name: "swatch" }),
+        text("#d9480f", 14, "color.text.default", "Regular", "fill"),
+      ]),
+      panel({ name: "panel", dir: "col", gap: 12, pad: 10, w: "fill" }, [
+        box("fill", 120, { fill: "color.surface.subtle", stroke: "color.border.strong", radius: "radius.control", name: "area" }),
+        bar("hue"),
+        ...(alpha ? [bar("opacity")] : []),
+        frame({ name: "hex", dir: "row", pad: [0, 12], h: 32, w: "fill", cross: "center", stroke: "color.border.default", radius: "radius.control" }, [text("#d9480f", 14, "color.text.default")]),
+      ]),
+    ]);
+  },
+
+  Rating: (c) => {
+    const sm = c.size === "sm";
+    const lg = c.size === "lg";
+    const px = sm ? 20 : lg ? 32 : 24;
+    const half = on(c, "allowHalf");
+    const star = (i: number) => text(i < 3 ? "★" : i === 3 && half ? "⯨" : "☆", px, i < 3 || (i === 3 && half) ? "color.action.primary" : "color.border.strong");
+    const stars = frame({ name: "stars", dir: "row", gap: 2 }, [0, 1, 2, 3, 4].map(star));
+    if (on(c, "isReadOnly")) return frame({ name: "rating (read only)", dir: "row", gap: 8, cross: "center" }, [stars, text("1,284 ratings", 14, "color.text.muted")]);
+    return frame({ name: "rating", dir: "col", gap: 6 }, [text("Rating", 14, "color.text.default", "Medium"), stars]);
+  },
 
   Dialog: (c) =>
     panel({ name: "dialog", dir: "col", gap: 16, pad: 24, w: c.size === "sm" ? 384 : c.size === "lg" ? 672 : 512 }, [

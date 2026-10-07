@@ -1,0 +1,183 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "PlanCard",
+  "version": "0.1.0",
+  "category": "block",
+  "status": "experimental",
+  "description": "The current subscription plan: name, price and interval, status with the right text, renewal or end date, feature list, a usage hint, and the actions Change plan and Cancel subscription (confirmed, with the end date). A past due plan shows an alert. PlanPicker, exported beside it, lets people choose another plan. Your callbacks do the work. UI permission is not security: the server must check again.",
+  "props": {
+    "plan": {
+      "type": "custom",
+      "tsType": "{ name: string; price: number; interval: \"month\" | \"year\"; currency?: string; description?: string; features?: string[] }",
+      "description": "The plan: its name, the price per interval (in whole units, e.g. 49 for $49), an ISO currency code (default USD), an optional description and the features it includes."
+    },
+    "status": {
+      "type": "enum",
+      "values": [
+        "active",
+        "trialing",
+        "past_due",
+        "canceled"
+      ],
+      "default": "active",
+      "description": "Where the subscription stands. Each status has its own badge text and date line: active \"Renews on\", trialing \"Trial ends on\", past due \"Payment failed\", canceled \"Ends on\"."
+    },
+    "periodEnd": {
+      "type": "custom",
+      "tsType": "Date | string",
+      "description": "When the current period ends: the renewal date, the trial end or the end of access. An ISO date string or a Date."
+    },
+    "usageHint": {
+      "type": "string",
+      "description": "One line about use, e.g. \"8 of 10 seats used\". For a meter use UsageMeter beside the card."
+    },
+    "locale": {
+      "type": "string",
+      "default": "en-US",
+      "description": "The locale for the price and the dates."
+    },
+    "state": {
+      "type": "custom",
+      "tsType": "import(\"../utils/state\").DataState",
+      "description": "The data state: loading shows a skeleton, empty says there is no plan yet and offers Choose a plan, error shows a message with Try again."
+    },
+    "onRetry": {
+      "type": "callback",
+      "tsType": "() => void",
+      "description": "Adds a Try again button to the error state."
+    },
+    "onChangePlan": {
+      "type": "callback",
+      "tsType": "() => void | Promise<unknown>",
+      "description": "Starts changing the plan; yours, async. Usually opens a PlanPicker."
+    },
+    "onCancel": {
+      "type": "callback",
+      "tsType": "() => void | Promise<unknown>",
+      "description": "Cancels the subscription after the person confirmed in the dialog, which states the end date; yours, async."
+    },
+    "onUpdatePayment": {
+      "type": "callback",
+      "tsType": "() => void | Promise<unknown>",
+      "description": "Adds an Update payment method button to the past due alert."
+    },
+    "permissions": {
+      "type": "custom",
+      "tsType": "import(\"../utils/permissions\").Permissions<\"changePlan\" | \"cancel\">",
+      "description": "What the app allows: changePlan and cancel. Hidden renders nothing; disabled keeps the control reachable (aria-disabled) with the reason shown and read, and nothing runs. This only changes what people see: the server must check again."
+    },
+    "classNames": {
+      "type": "custom",
+      "description": "Extra class names for single parts, so you can restyle one part without editing the file. Keys: root, header, name, status, price, renewal, features, feature, usage, alert, actions, changeButton, cancelButton, updateButton.",
+      "tsType": "Partial<Record<\"root\" | \"header\" | \"name\" | \"status\" | \"price\" | \"renewal\" | \"features\" | \"feature\" | \"usage\" | \"alert\" | \"actions\" | \"changeButton\" | \"cancelButton\" | \"updateButton\", string>>"
+    }
+  },
+  "states": [
+    "default",
+    "disabled",
+    "loading"
+  ],
+  "slots": [
+    "root",
+    "header",
+    "name",
+    "status",
+    "price",
+    "renewal",
+    "features",
+    "feature",
+    "usage",
+    "alert",
+    "actions",
+    "changeButton",
+    "cancelButton",
+    "updateButton"
+  ],
+  "tokens": [
+    "color.surface.default",
+    "color.border.default",
+    "color.text.default",
+    "color.text.muted",
+    "color.action.primary",
+    "color.feedback.success",
+    "color.feedback.warning",
+    "color.feedback.danger",
+    "elevation.raised",
+    "radius.overlay"
+  ],
+  "a11y": {
+    "role": "group",
+    "keyboard": [
+      "Tab: moves through Change plan and Cancel subscription",
+      "Cancel subscription opens a confirmation: Escape cancels, Enter confirms"
+    ],
+    "requirements": [
+      "The card is a group named by the plan name",
+      "The status is a badge with words (Active, Trial, Past due, Canceled), never only a color",
+      "A past due plan shows an alert that says what to do",
+      "The features are a list; each tick is decorative",
+      "The cancel confirmation states the date access ends",
+      "A disabled action stays focusable and the reason is its description"
+    ],
+    "screenReader": [
+      "\"Team plan, group\"",
+      "\"Past due\"",
+      "\"Renews on 3 March 2027\"",
+      "\"Cancel subscription, button\"; the dialog says \"You keep access until 3 March 2027\""
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "Showing the plan a workspace is on with its renewal and the way to change or end it",
+      "A billing page next to UsageMeter and PaymentMethodCard"
+    ],
+    "avoid_when": [
+      "Comparing plans before choosing: use PlanPicker",
+      "Listing invoices: use DataTable"
+    ],
+    "anti_patterns": [
+      "Treating the permissions prop as protection: UI permission is not security, so the server must check again",
+      "Cancelling from inside the component: onCancel is yours, and so is the end date it shows",
+      "Showing the status by color alone: the badge text carries it"
+    ]
+  },
+  "contract": {
+    "data": "The current plan, its status and period end, and async callbacks for changing, cancelling and fixing payment.",
+    "dataStates": [
+      "loading",
+      "empty",
+      "error",
+      "ready"
+    ],
+    "permissions": [
+      "changePlan",
+      "cancel"
+    ],
+    "events": [
+      "onChangePlan",
+      "onCancel",
+      "onUpdatePayment",
+      "onRetry"
+    ],
+    "customization": [
+      "classNames for each part",
+      "status and periodEnd",
+      "usageHint and locale",
+      "PlanPicker for choosing a plan"
+    ]
+  },
+  "examples": [
+    "basic",
+    "statuses",
+    "states",
+    "permissions",
+    "classNames",
+    "plan-picker",
+    "billing-page"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {}
+  }
+}

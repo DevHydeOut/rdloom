@@ -1,0 +1,70 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Rating",
+  "version": "0.1.0",
+  "category": "input",
+  "status": "experimental",
+  "description": "A star rating. As an input it is a radio group of stars; with isReadOnly it is a display like \"4.5 out of 5 stars\" with an optional count.",
+  "props": {
+    "label": { "type": "string", "required": true, "description": "Name of what is rated, e.g. \"Rating\" or \"Service\". Screen readers hear it with the range: \"Rating, 1 to 5 stars\"." },
+    "value": { "type": "number", "description": "Controlled value. 0 means no rating." },
+    "defaultValue": { "type": "number", "default": 0, "description": "Initial value when uncontrolled. 0 means no rating." },
+    "onChange": { "type": "callback", "tsType": "(value: number) => void", "description": "Called with the new value, 1 to max (halves with allowHalf), or 0 when cleared." },
+    "max": { "type": "number", "default": 5, "description": "Number of stars." },
+    "allowHalf": { "type": "boolean", "default": false, "description": "Lets people choose half stars, and shows halves when read-only." },
+    "size": { "type": "enum", "values": ["sm", "md", "lg"], "default": "md", "description": "Size of the stars." },
+    "isReadOnly": { "type": "boolean", "default": false, "description": "Shows the value as an image with a text alternative instead of an input." },
+    "isDisabled": { "type": "boolean", "default": false, "description": "Prevents interaction and dims the stars." },
+    "clearable": { "type": "boolean", "default": false, "description": "Adds a Clear button so a chosen rating can be taken back." },
+    "count": { "type": "number", "description": "Read-only only: how many ratings the value comes from, shown as text next to the stars." },
+    "countLabel": { "type": "string", "default": "ratings", "description": "The word shown after the count." },
+    "isLabelHidden": { "type": "boolean", "default": false, "description": "Hides the visible label. It still names the group for screen readers." },
+    "description": { "type": "string", "description": "Help text under the stars." },
+    "errorMessage": { "type": "string", "description": "Shown under the stars when isInvalid is true." },
+    "isInvalid": { "type": "boolean", "description": "Marks the rating as wrong and shows errorMessage." },
+    "name": { "type": "string", "description": "Submits the value with a form under this name." }
+  },
+  "variants": ["size", "allowHalf", "isReadOnly"],
+  "states": ["default", "hover", "focus", "selected", "disabled", "readonly", "invalid"],
+  "slots": ["label", "stars", "star", "count", "clear", "description", "error"],
+  "tokens": ["color.action.primary", "color.border.strong", "color.text.default", "color.text.muted", "color.feedback.danger", "color.focus.ring"],
+  "a11y": {
+    "role": "radiogroup",
+    "keyboard": [
+      "Tab moves to the stars (the chosen one, or the first)",
+      "Right and Down Arrow choose the next star; Left and Up Arrow choose the previous (in a right-to-left page the horizontal arrows swap)",
+      "With allowHalf each arrow press moves by half a star",
+      "The Clear button is a normal button after the stars"
+    ],
+    "requirements": [
+      "The group is a radio group named \"<label>, 1 to <max> stars\" and each star is a radio named \"3 stars\" (\"3.5 stars\" for halves)",
+      "A chosen star is filled and an unchosen one is an outline, so the value never depends on color",
+      "Hovering previews the value; nothing is chosen until a click or key",
+      "Read-only shows role img named \"4.5 out of 5 stars\"; the count is real text beside it",
+      "Each star's target is at least 24px"
+    ],
+    "screenReader": [
+      "Focusing the group reads \"Rating, 1 to 5 stars, radio group\" and the chosen star, \"4 stars, 4 of 5\"",
+      "Arrow keys read the new star as it is chosen",
+      "A read-only rating reads as an image: \"4.5 out of 5 stars\", then the count text"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "Asking for a quick opinion of a product, service or article",
+      "Showing an average rating on a card or a list"
+    ],
+    "avoid_when": [
+      "A precise number: use NumberField or Slider",
+      "A choice with named levels (poor, good, great): use RadioGroup or SegmentedControl"
+    ],
+    "anti_patterns": [
+      "Showing a read-only rating with no count or context",
+      "Using only color to tell chosen stars from empty ones",
+      "Making a rating required with no way to take it back"
+    ]
+  },
+  "examples": ["basic", "read-only-with-count", "half-stars", "sizes", "in-a-form"],
+  "figma": { "componentKey": null, "variantMap": { "size": "Size", "allowHalf": "Half stars", "isReadOnly": "Read only" } }
+}

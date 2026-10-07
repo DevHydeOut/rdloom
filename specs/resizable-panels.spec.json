@@ -1,0 +1,63 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "ResizablePanels",
+  "version": "0.1.0",
+  "category": "layout",
+  "status": "experimental",
+  "description": "Panels side by side or stacked that the person can resize by dragging or with the keyboard, for a sidebar and content, an editor and a console, or a split view. Build it from ResizablePanelGroup, ResizablePanel (id, defaultSize, minSize, maxSize, collapsible, collapsedSize) and ResizableHandle (withHandle, label).",
+  "props": {
+    "children": { "type": "node", "required": true, "description": "ResizablePanel elements with a ResizableHandle between each pair. Give the group a size: it fills its parent." },
+    "orientation": { "type": "enum", "values": ["horizontal", "vertical"], "default": "horizontal", "description": "Horizontal puts panels side by side; vertical stacks them." },
+    "autoSaveId": { "type": "string", "description": "Remember the sizes in this browser under this name. Storage failures are ignored." },
+    "onLayoutChange": { "type": "callback", "tsType": "(sizes: number[]) => void", "description": "Called with every panel's size in percent (summing to 100) whenever the layout changes. During a drag it is called as the pointer moves." },
+    "classNames": {
+      "type": "custom",
+      "description": "Extra class names for single parts. Keys: root, panel, handle, grip.",
+      "tsType": "Partial<Record<\"root\" | \"panel\" | \"handle\" | \"grip\", string>>"
+    }
+  },
+  "variants": ["orientation"],
+  "states": ["default", "hover", "focus", "pressed", "disabled"],
+  "slots": ["panel", "handle", "grip"],
+  "tokens": [
+    "color.border.default",
+    "color.border.strong",
+    "color.action.primary",
+    "color.surface.raised",
+    "color.text.muted",
+    "color.focus.ring",
+    "radius.control"
+  ],
+  "a11y": {
+    "role": "separator",
+    "keyboard": [
+      "Tab moves to each handle",
+      "Arrow keys along the layout resize by 1 percent; with Shift by 10 percent",
+      "Home and End move the handle to the smallest and largest size of the panel before it",
+      "Enter collapses or restores a collapsible neighbouring panel"
+    ],
+    "requirements": [
+      "Each handle has role=separator, aria-orientation, aria-valuenow, aria-valuemin and aria-valuemax of the panel before it, and aria-controls pointing at that panel",
+      "Each handle has an accessible name",
+      "A collapsed panel with no visible size is inert",
+      "Pointer drag uses pointer capture and works with touch; double click restores the default sizes",
+      "Collapse animation is off under prefers-reduced-motion",
+      "The visible grip has a hit area larger than its line"
+    ],
+    "screenReader": [
+      "The handle is announced as a separator with its name and the size of the panel before it in percent",
+      "Collapsing a panel changes the announced value to its collapsed size"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["Two or three regions where people want to choose the split: navigation and content, code and output", "Layouts that stay on one screen on desktop"],
+    "avoid_when": ["Phone layouts: stack the content instead", "Fixed layouts where the split should never change"],
+    "anti_patterns": [
+      "Panels without a minimum size, so content can be dragged to nothing",
+      "Hiding the only way to a task in a collapsed panel"
+    ]
+  },
+  "examples": ["horizontal", "vertical", "nested", "collapsible", "persisted"],
+  "figma": { "componentKey": null, "variantMap": { "orientation": "Orientation" } }
+}

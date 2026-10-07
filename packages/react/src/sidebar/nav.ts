@@ -108,3 +108,6 @@ export function visibleNav(groups: NavGroup[]): NavGroup[] {
   }
   return result;
 }
+
+/** The same rules for one flat list of items (a top navigation): hidden items go, and a parent whose children are all hidden goes too. */
+export const visibleItems = (items: NavItem[]): NavItem[] => visibleNav([{ items }])[0]?.items ?? [];

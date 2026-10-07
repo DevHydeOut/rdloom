@@ -320,6 +320,22 @@ export function GripIcon({ className = "size-4" }: Pick<IconProps, "className">)
   );
 }
 
+export function PlayIcon({ className = "size-4 shrink-0", strokeWidth }: IconProps) {
+  return (
+    <Icon className={className} strokeWidth={strokeWidth}>
+      <P d="M5 3.5v9l7.25-4.5L5 3.5z" />
+    </Icon>
+  );
+}
+
+export function PauseIcon({ className = "size-4 shrink-0", strokeWidth }: IconProps) {
+  return (
+    <Icon className={className} strokeWidth={strokeWidth}>
+      <P d="M5.5 3.5v9M10.5 3.5v9" />
+    </Icon>
+  );
+}
+
 // --- Status: four shapes, so tone never depends on color alone
 
 export function InfoIcon({ className = "size-5 shrink-0", strokeWidth }: IconProps) {

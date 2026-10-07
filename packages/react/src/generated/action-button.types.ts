@@ -23,7 +23,7 @@ export interface ActionButtonSpecProps {
   /**
    * Ask first. Opens an alert dialog (danger tone when the variant is danger); the confirm button runs onAction. confirmText makes the person type a word before it works.
    */
-  confirm?: { title: string; description?: string; confirmLabel?: string; confirmText?: string };
+  confirm?: { title: string; description?: string; confirmLabel?: string; cancelLabel?: string; confirmText?: string };
   /**
    * Visual emphasis, same as Button.
    * @default "primary"

@@ -15,7 +15,7 @@ import {
 } from "react-aria-components";
 import { menuDefaults, type MenuSpecProps } from "../generated/menu.types";
 import { cx } from "../utils/cx";
-const panel =
+export const menuPanel =
   "[box-shadow:var(--rd-elevation-floating)] bg-[var(--rd-color-surface-raised)] text-[var(--rd-color-text-default)] " +
   "border border-[var(--rd-color-border-default)] rounded-[var(--rd-radius-overlay)]";
 import { CheckIcon } from "../utils/icons";
@@ -36,7 +36,7 @@ export function Menu<T extends object = object>({
   ...rest
 }: MenuProps<T>) {
   return (
-    <Popover placement={placement} offset={6} className={cx(panel, "min-w-48 overflow-auto p-1.5")}>
+    <Popover placement={placement} offset={6} className={cx(menuPanel, "min-w-48 overflow-auto p-1.5")}>
       <AriaMenu<T>
         {...rest}
         selectionMode={selectionMode === "none" ? undefined : selectionMode}
@@ -55,9 +55,11 @@ export interface MenuItemProps extends Omit<AriaMenuItemProps, "className" | "ch
   shortcut?: string;
   /** Destructive actions like Delete: shown in the danger color. Say what it does in the text too. */
   variant?: "default" | "danger";
+  /** A small icon before the text, from the shared icon family. Decorative: the text names the item. */
+  icon?: ReactNode;
 }
 
-export function MenuItem({ className, children, shortcut, variant = "default", ...rest }: MenuItemProps) {
+export function MenuItem({ className, children, shortcut, variant = "default", icon, ...rest }: MenuItemProps) {
   const textValue = rest.textValue ?? (typeof children === "string" ? children : undefined);
   return (
     <AriaMenuItem
@@ -75,6 +77,11 @@ export function MenuItem({ className, children, shortcut, variant = "default", .
           {selectionMode !== "none" && (
             <span className="flex size-4 shrink-0 items-center justify-center" aria-hidden="true">
               {isSelected && <CheckIcon />}
+            </span>
+          )}
+          {icon && (
+            <span className="flex size-4 shrink-0 items-center justify-center" aria-hidden="true">
+              {icon}
             </span>
           )}
           <span className="flex-1 truncate">{children}</span>

@@ -1,0 +1,173 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "PaymentMethodCard",
+  "version": "0.1.0",
+  "category": "block",
+  "status": "experimental",
+  "description": "One payment method: a generic card mark, the last four digits, the expiry with an expires soon notice, a default badge, and the actions Update, Remove (confirmed) and Make default. With no method it offers Add a payment method. It never holds a full card number; your callbacks do the work. UI permission is not security: the server must check again.",
+  "props": {
+    "method": {
+      "type": "custom",
+      "tsType": "{ id: string; brand?: string; last4: string; expMonth: number; expYear: number; holder?: string; isDefault?: boolean }",
+      "description": "The method to show. brand is a short word for the chip (e.g. \"Credit\"); only the last four digits are ever shown. Leave out for the empty state."
+    },
+    "expiresSoonDays": {
+      "type": "number",
+      "default": 60,
+      "description": "How many days before the end of the expiry month the card counts as expiring soon."
+    },
+    "now": {
+      "type": "custom",
+      "tsType": "Date",
+      "description": "The current date for the expiry check. Defaults to today; pass one for a fixed result in tests and server rendering."
+    },
+    "state": {
+      "type": "custom",
+      "tsType": "import(\"../utils/state\").DataState",
+      "description": "The data state: loading shows a skeleton, empty (or no method) offers Add a payment method, error shows a message with Try again."
+    },
+    "onRetry": {
+      "type": "callback",
+      "tsType": "() => void",
+      "description": "Adds a Try again button to the error state."
+    },
+    "onAdd": {
+      "type": "callback",
+      "tsType": "() => void | Promise<unknown>",
+      "description": "Starts adding a method from the empty state; yours, async."
+    },
+    "onUpdate": {
+      "type": "callback",
+      "tsType": "(method: { id: string; brand?: string; last4: string; expMonth: number; expYear: number; holder?: string; isDefault?: boolean }) => void | Promise<unknown>",
+      "description": "Starts updating the method (usually opens your payment form); yours, async."
+    },
+    "onRemove": {
+      "type": "callback",
+      "tsType": "(method: { id: string; brand?: string; last4: string; expMonth: number; expYear: number; holder?: string; isDefault?: boolean }) => void | Promise<unknown>",
+      "description": "Removes the method after the person confirmed; yours, async."
+    },
+    "onMakeDefault": {
+      "type": "callback",
+      "tsType": "(method: { id: string; brand?: string; last4: string; expMonth: number; expYear: number; holder?: string; isDefault?: boolean }) => void | Promise<unknown>",
+      "description": "Makes this the default method; yours, async. The button is not shown on the default method."
+    },
+    "permissions": {
+      "type": "custom",
+      "tsType": "import(\"../utils/permissions\").Permissions<\"add\" | \"update\" | \"remove\" | \"makeDefault\">",
+      "description": "What the app allows: add, update, remove and makeDefault. Hidden renders nothing; disabled keeps the control reachable (aria-disabled) with the reason shown and read, and nothing runs. This only changes what people see: the server must check again."
+    },
+    "classNames": {
+      "type": "custom",
+      "description": "Extra class names for single parts, so you can restyle one part without editing the file. Keys: root, brand, details, number, expiry, badge, notice, actions, updateButton, removeButton, defaultButton, addButton, status.",
+      "tsType": "Partial<Record<\"root\" | \"brand\" | \"details\" | \"number\" | \"expiry\" | \"badge\" | \"notice\" | \"actions\" | \"updateButton\" | \"removeButton\" | \"defaultButton\" | \"addButton\" | \"status\", string>>"
+    }
+  },
+  "states": [
+    "default",
+    "disabled",
+    "loading"
+  ],
+  "slots": [
+    "root",
+    "brand",
+    "details",
+    "number",
+    "expiry",
+    "badge",
+    "notice",
+    "actions",
+    "updateButton",
+    "removeButton",
+    "defaultButton",
+    "addButton",
+    "status"
+  ],
+  "tokens": [
+    "color.surface.default",
+    "color.surface.subtle",
+    "color.border.default",
+    "color.text.default",
+    "color.text.muted",
+    "color.feedback.warning",
+    "color.feedback.danger",
+    "elevation.raised",
+    "radius.overlay",
+    "radius.control"
+  ],
+  "a11y": {
+    "role": "group",
+    "keyboard": [
+      "Tab: moves through Update, Make default and Remove",
+      "Remove opens a confirmation: Escape cancels"
+    ],
+    "requirements": [
+      "The card is a group named \"Payment method\" followed by the last four digits",
+      "The brand mark is decorative; the digits are said as text, e.g. \"ending in 4242\"",
+      "Expires soon and Expired are words with an icon, never only a color",
+      "Default is a badge with text",
+      "Removing needs a confirmation and is announced when done",
+      "After a removal focus moves to the card so it is not lost",
+      "A disabled action stays focusable and the reason is its description"
+    ],
+    "screenReader": [
+      "\"Payment method, ending in 4242, group\"",
+      "\"Default\"",
+      "\"Expires soon, 08/2026\"",
+      "\"Payment method removed\""
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "Showing the card or method a workspace pays with on a billing page",
+      "A list of methods: render one PaymentMethodCard each"
+    ],
+    "avoid_when": [
+      "Collecting card details: use your payment provider's own fields, never your own inputs"
+    ],
+    "anti_patterns": [
+      "Treating the permissions prop as protection: UI permission is not security, so the server must check again",
+      "Passing a full card number: only the last four digits belong in the browser",
+      "Showing a card network logo you do not have the right to: the brand chip is plain text on purpose"
+    ]
+  },
+  "contract": {
+    "data": "One payment method (brand word, last four digits, expiry, default flag) and async callbacks to add, update, remove and make default.",
+    "dataStates": [
+      "loading",
+      "empty",
+      "error",
+      "ready"
+    ],
+    "permissions": [
+      "add",
+      "update",
+      "remove",
+      "makeDefault"
+    ],
+    "events": [
+      "onAdd",
+      "onUpdate",
+      "onRemove",
+      "onMakeDefault",
+      "onRetry"
+    ],
+    "customization": [
+      "classNames for each part",
+      "expiresSoonDays",
+      "brand word per method",
+      "now for a fixed date"
+    ]
+  },
+  "examples": [
+    "basic",
+    "expiring",
+    "empty-and-states",
+    "permissions",
+    "classNames"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {}
+  }
+}

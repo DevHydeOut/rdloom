@@ -50,10 +50,22 @@
       "description": "An inline message about the state of the page or a task: a tip, a success, a warning or an error. For brief confirmations that disappear, use Toast."
     },
     {
+      "name": "api-key-list",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A list of API keys with their name, prefix, creation and last use, and scopes as badges. Create key opens a dialog with a name and scopes, then shows the secret once with a Copy button and a warning; it is never shown again. Revoke needs the key name typed to confirm. Your callbacks do the work. UI permission is not security: the server must check again."
+    },
+    {
       "name": "app-footer",
       "type": "registry:ui",
       "version": "0.1.0",
       "description": "The footer of an application or marketing page: a line of text, link lists and social links. It stacks on a phone and has the same size and spacing on every page."
+    },
+    {
+      "name": "app-header",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "The top bar of an application: a slot for a sidebar toggle, the breadcrumbs, a search button that opens your command palette, your own actions, a notifications bell with an unread count and the account menu. In a narrow space the search folds to an icon."
     },
     {
       "name": "approval-box",
@@ -116,6 +128,12 @@
       "description": "A container that groups related content under an optional heading. Compose it with media, an overlay, header, meta, actions, body, a footer and a coloured band for destination, profile, listing and detail-panel cards."
     },
     {
+      "name": "carousel",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A row (or column) of slides that scrolls and snaps, with previous and next buttons and slide dots, for a small set of related items such as featured cards or screenshots. Use CarouselItem for each slide. Built on native scroll snapping, so touch and trackpad swiping work without extra code."
+    },
+    {
       "name": "chart",
       "type": "registry:ui",
       "version": "0.1.0",
@@ -146,6 +164,12 @@
       "description": "One region that opens and closes under a trigger, for detail most people do not need at first. For a stack of related sections, use Accordion."
     },
     {
+      "name": "color-picker",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "Picks a color. A button shows the current color and opens a panel with a saturation and brightness area, a hue slider, an optional opacity slider, a hex field and preset swatches. ColorPickerPanel is the same panel inline. Values are hex strings."
+    },
+    {
       "name": "combobox",
       "type": "registry:ui",
       "version": "0.1.2",
@@ -156,6 +180,12 @@
       "type": "registry:ui",
       "version": "0.1.0",
       "description": "A search box in a dialog that finds and runs commands, jumps to pages and triggers actions from the keyboard. Opens with Ctrl or Cmd + K. Use CommandGroup and CommandItem for the results."
+    },
+    {
+      "name": "context-menu",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "The menu that opens at the pointer on a right click, a long press or the keyboard (Shift+F10 or the Menu key) over an area such as a file row. It never replaces a visible way to do the same thing."
     },
     {
       "name": "customer-table",
@@ -266,6 +296,12 @@
       "description": "Text filled with a gradient that keeps flowing, for a short headline or a highlighted word. The words stay real text."
     },
     {
+      "name": "hover-card",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A richer preview that opens when a link is hovered or reached with the keyboard, like a profile summary on a user name. It only repeats information that is available elsewhere."
+    },
+    {
       "name": "input-otp",
       "type": "registry:ui",
       "version": "0.1.0",
@@ -314,6 +350,18 @@
       "description": "Page numbers with previous and next buttons, for content split across pages. Long ranges collapse to the first page, the last page, and the pages around the current one."
     },
     {
+      "name": "payment-method-card",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "One payment method: a generic card mark, the last four digits, the expiry with an expires soon notice, a default badge, and the actions Update, Remove (confirmed) and Make default. With no method it offers Add a payment method. It never holds a full card number; your callbacks do the work. UI permission is not security: the server must check again."
+    },
+    {
+      "name": "plan-card",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "The current subscription plan: name, price and interval, status with the right text, renewal or end date, feature list, a usage hint, and the actions Change plan and Cancel subscription (confirmed, with the end date). A past due plan shows an alert. PlanPicker, exported beside it, lets people choose another plan. Your callbacks do the work. UI permission is not security: the server must check again."
+    },
+    {
       "name": "popover",
       "type": "registry:ui",
       "version": "0.1.0",
@@ -342,6 +390,18 @@
       "type": "registry:ui",
       "version": "0.1.1",
       "description": "Lets the user pick exactly one option from a small, visible set. Use with Radio children."
+    },
+    {
+      "name": "rating",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A star rating. As an input it is a radio group of stars; with isReadOnly it is a display like \"4.5 out of 5 stars\" with an optional count."
+    },
+    {
+      "name": "resizable-panels",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "Panels side by side or stacked that the person can resize by dragging or with the keyboard, for a sidebar and content, an editor and a console, or a split view. Build it from ResizablePanelGroup, ResizablePanel (id, defaultSize, minSize, maxSize, collapsible, collapsedSize) and ResizableHandle (withHandle, label)."
     },
     {
       "name": "response",
@@ -390,6 +450,12 @@
       "type": "registry:ui",
       "version": "0.1.0",
       "description": "A thin line that divides content, horizontal or vertical, with an optional label in the middle such as \"or\"."
+    },
+    {
+      "name": "settings-section",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "The repeating unit of a settings page: a title and description on the left, a card with the content on the right, and a Save and Cancel bar that appears only when something has changed. Use SettingsRow inside for toggle lists. Your onSave does the work. UI permission is not security: the server must check again."
     },
     {
       "name": "sheet",
@@ -524,16 +590,34 @@
       "description": "Short text label shown on hover or keyboard focus. Wrap the trigger and tooltip in TooltipTrigger."
     },
     {
+      "name": "top-nav",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "Navigation across the top of an application or marketing site: your brand, links (some opening a short list), and a slot for buttons or the account menu. In a narrow space it becomes a menu button that opens the same links in a sheet. It comes plain, with a line, or as a floating pill."
+    },
+    {
       "name": "tree",
       "type": "registry:ui",
       "version": "0.1.0",
       "description": "An expandable hierarchy such as folders and files or a nested menu, with keyboard navigation and optional selection. Build it from nested TreeItem elements."
     },
     {
+      "name": "usage-meter",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A labeled meter for a limit: seats 8 of 10, storage 4.2 of 5 GB, API calls. It warns at 80 percent and at the limit with words and an icon, not only color, and can offer an upgrade when near the limit. UsageMeterList shows several. Built on role=\"meter\"; the app owns the numbers. UI permission is not security: the server must check again."
+    },
+    {
       "name": "user-form",
       "type": "registry:ui",
       "version": "0.1.0",
       "description": "A form to create or edit a user: name, email, role, status and team, with a danger zone for suspending and deleting. Save stays disabled until something changes, and Cancel asks before throwing changes away. Your onSubmit does the work. UI permission is not security: the server must check again."
+    },
+    {
+      "name": "user-menu",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "The avatar button that opens the account menu: the person's name and email at the top, your own entries (settings, billing, help) in groups, a row for the theme, and a Sign out entry that can ask first, shows that it is working, and tells screen readers how it went."
     }
   ]
 }

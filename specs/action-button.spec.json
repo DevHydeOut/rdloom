@@ -9,7 +9,7 @@
     "children": { "type": "node", "required": true, "description": "Button label. Name the action, such as Delete user." },
     "onAction": { "type": "callback", "required": true, "tsType": "() => void | Promise<unknown>", "description": "The work. May be async; its resolved value goes to onSuccess and a throw or rejection goes to onError." },
     "permission": { "type": "custom", "tsType": "import(\"../utils/permissions\").PermissionValue", "description": "What the person may do: allow (default), disabled (shown, focusable, says why) or hidden (renders nothing). Use { state: \"disabled\", reason } to explain. The server must check again." },
-    "confirm": { "type": "custom", "tsType": "{ title: string; description?: string; confirmLabel?: string; confirmText?: string }", "description": "Ask first. Opens an alert dialog (danger tone when the variant is danger); the confirm button runs onAction. confirmText makes the person type a word before it works." },
+    "confirm": { "type": "custom", "tsType": "{ title: string; description?: string; confirmLabel?: string; cancelLabel?: string; confirmText?: string }", "description": "Ask first. Opens an alert dialog (danger tone when the variant is danger); the confirm button runs onAction. confirmText makes the person type a word before it works." },
     "variant": { "type": "enum", "values": ["primary", "secondary", "ghost", "danger"], "default": "primary", "description": "Visual emphasis, same as Button." },
     "size": { "type": "enum", "values": ["sm", "md", "lg"], "default": "md", "description": "Height, padding and font size." },
     "icon": { "type": "node", "description": "Icon shown before the label. Decorative, so the label must say what the button does." },

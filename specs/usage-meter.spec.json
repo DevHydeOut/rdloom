@@ -1,0 +1,162 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "UsageMeter",
+  "version": "0.1.0",
+  "category": "block",
+  "status": "experimental",
+  "description": "A labeled meter for a limit: seats 8 of 10, storage 4.2 of 5 GB, API calls. It warns at 80 percent and at the limit with words and an icon, not only color, and can offer an upgrade when near the limit. UsageMeterList shows several. Built on role=\"meter\"; the app owns the numbers. UI permission is not security: the server must check again.",
+  "props": {
+    "label": {
+      "type": "string",
+      "required": true,
+      "description": "What is measured, e.g. \"Seats\". It is the accessible name."
+    },
+    "value": {
+      "type": "number",
+      "required": true,
+      "description": "How much is used."
+    },
+    "limit": {
+      "type": "number",
+      "required": true,
+      "description": "The most the plan allows."
+    },
+    "unit": {
+      "type": "string",
+      "description": "A unit shown after the numbers, e.g. \"GB\" or \"seats\"."
+    },
+    "formatValue": {
+      "type": "callback",
+      "tsType": "(value: number) => string",
+      "description": "Formats the numbers. Default: up to one decimal."
+    },
+    "description": {
+      "type": "string",
+      "description": "A line under the meter, e.g. \"Resets on 1 April\"."
+    },
+    "warningAt": {
+      "type": "number",
+      "default": 80,
+      "description": "The percentage from which the meter says it is near the limit."
+    },
+    "dangerAt": {
+      "type": "number",
+      "default": 100,
+      "description": "The percentage from which the meter says the limit is reached."
+    },
+    "onUpgrade": {
+      "type": "callback",
+      "tsType": "() => void | Promise<unknown>",
+      "description": "Shows an upgrade button when the meter is near the limit or over it; yours, async."
+    },
+    "upgradeLabel": {
+      "type": "string",
+      "default": "Upgrade",
+      "description": "The text of the upgrade button."
+    },
+    "state": {
+      "type": "custom",
+      "tsType": "import(\"../utils/state\").DataState",
+      "description": "loading shows a skeleton and marks the meter busy; the other states show the meter."
+    },
+    "permissions": {
+      "type": "custom",
+      "tsType": "import(\"../utils/permissions\").Permissions<\"upgrade\">",
+      "description": "What the app allows: upgrade. Hidden renders nothing; disabled keeps the control reachable (aria-disabled) with the reason shown and read, and nothing runs. This only changes what people see: the server must check again."
+    },
+    "classNames": {
+      "type": "custom",
+      "description": "Extra class names for single parts, so you can restyle one part without editing the file. Keys: root, header, label, value, status, track, bar, description, upgradeButton.",
+      "tsType": "Partial<Record<\"root\" | \"header\" | \"label\" | \"value\" | \"status\" | \"track\" | \"bar\" | \"description\" | \"upgradeButton\", string>>"
+    }
+  },
+  "states": [
+    "default",
+    "disabled",
+    "loading"
+  ],
+  "slots": [
+    "root",
+    "header",
+    "label",
+    "value",
+    "status",
+    "track",
+    "bar",
+    "description",
+    "upgradeButton"
+  ],
+  "tokens": [
+    "color.action.primary",
+    "color.border.default",
+    "color.text.default",
+    "color.text.muted",
+    "color.feedback.warning",
+    "color.feedback.danger"
+  ],
+  "a11y": {
+    "role": "meter",
+    "keyboard": [
+      "Tab: moves to the upgrade button when it is shown"
+    ],
+    "requirements": [
+      "Has role meter with aria-valuemin, aria-valuemax and aria-valuenow, named by the label",
+      "aria-valuetext says the amounts and the status in words, e.g. \"8 of 10 seats, near the limit\"",
+      "Near the limit and at the limit are told by text and an icon as well as the bar color",
+      "The bar color has 3:1 contrast against the track",
+      "A value above the limit is shown as full and said as over the limit"
+    ],
+    "screenReader": [
+      "\"Seats, meter, 8 of 10 seats, near the limit\"",
+      "\"Storage, meter, 5 of 5 GB, limit reached\"",
+      "\"Upgrade, button\""
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "Showing how much of a plan limit is used: seats, storage, API calls",
+      "Nudging an upgrade at the moment people need it"
+    ],
+    "avoid_when": [
+      "Progress of a task that finishes: use Progress",
+      "A trend over time: use Chart or Sparkline"
+    ],
+    "anti_patterns": [
+      "Treating the permissions prop as protection: UI permission is not security, so the server must check again",
+      "Computing usage in the component: the numbers are yours",
+      "Showing the warning by color alone: the text and icon are on purpose"
+    ]
+  },
+  "contract": {
+    "data": "A used amount and a limit with an optional unit.",
+    "dataStates": [
+      "loading",
+      "ready"
+    ],
+    "permissions": [
+      "upgrade"
+    ],
+    "events": [
+      "onUpgrade"
+    ],
+    "customization": [
+      "classNames for each part",
+      "warningAt and dangerAt",
+      "unit and formatValue",
+      "UsageMeterList for several meters"
+    ]
+  },
+  "examples": [
+    "basic",
+    "thresholds",
+    "list",
+    "states",
+    "permissions",
+    "classNames"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {}
+  }
+}

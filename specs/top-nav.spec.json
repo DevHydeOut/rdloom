@@ -1,0 +1,133 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "TopNav",
+  "version": "0.1.0",
+  "category": "block",
+  "status": "experimental",
+  "description": "Navigation across the top of an application or marketing site: your brand, links (some opening a short list), and a slot for buttons or the account menu. In a narrow space it becomes a menu button that opens the same links in a sheet. It comes plain, with a line, or as a floating pill.",
+  "props": {
+    "brand": {
+      "type": "node",
+      "description": "Your logo or product name at the start. Make it a link to the home page yourself."
+    },
+    "items": {
+      "type": "custom",
+      "description": "The links as data: { id, label, href?, icon?, badge?, children?, permission? }. An item with children opens a short list instead of going anywhere. An item may carry a permission (\"allow\", \"disabled\", \"hidden\" or { state, reason }): hidden items, and parents left with nothing, are not drawn; disabled items stay as focusable, non-navigating entries (aria-disabled) with the reason in a tooltip.",
+      "required": true,
+      "tsType": "import(\"../sidebar/nav\").NavItem[]"
+    },
+    "currentId": {
+      "type": "string",
+      "description": "The id of the page you are on. It is marked as the current page (aria-current); the parent of a current sub-item is marked as the current section."
+    },
+    "label": {
+      "type": "string",
+      "description": "Accessible name of the navigation.",
+      "default": "Main navigation"
+    },
+    "onNavigate": {
+      "type": "callback",
+      "description": "Called with the item when one is chosen. Items without an href use this to do their work, and entries in a dropdown use it to go to your router.",
+      "tsType": "(item: import(\"../sidebar/nav\").NavItem) => void"
+    },
+    "renderLink": {
+      "type": "custom",
+      "description": "Draw the top-level links and the links in the narrow menu as your router's link. Return the link with the given className and children; call onClick when chosen. Without it, items with an href are plain links.",
+      "tsType": "(props: { item: import(\"../sidebar/nav\").NavItem; className: string; children: import(\"react\").ReactNode; isCurrent: boolean; onClick: () => void }) => import(\"react\").ReactNode"
+    },
+    "actions": {
+      "type": "node",
+      "description": "Buttons or the account menu at the end. They stay visible when the links fold into the menu."
+    },
+    "variant": {
+      "type": "enum",
+      "values": ["plain", "bordered", "floating"],
+      "default": "plain",
+      "description": "plain: no line. bordered: a line under the bar. floating: a rounded pill with a shadow and a margin around it."
+    },
+    "sticky": {
+      "type": "boolean",
+      "default": false,
+      "description": "Keep the bar at the top while the page scrolls."
+    },
+    "menuLabel": {
+      "type": "string",
+      "description": "Accessible name of the button that opens the links in a narrow space, and the title of its sheet.",
+      "default": "Menu"
+    },
+    "classNames": {
+      "type": "custom",
+      "description": "Class names for the parts, by slot name, added after the built-in ones. Slots: root, brand, nav, list, item, dropdown, actions, menu-button, menu-sheet.",
+      "tsType": "Partial<Record<\"root\" | \"brand\" | \"nav\" | \"list\" | \"item\" | \"dropdown\" | \"actions\" | \"menu-button\" | \"menu-sheet\", string>>"
+    }
+  },
+  "variants": ["variant"],
+  "states": ["default", "hover", "focus", "disabled"],
+  "slots": ["root", "brand", "nav", "list", "item", "dropdown", "actions", "menu-button", "menu-sheet"],
+  "tokens": [
+    "color.surface.default",
+    "color.surface.raised",
+    "color.surface.subtle",
+    "color.surface.selected",
+    "color.border.default",
+    "color.text.default",
+    "color.text.muted",
+    "color.action.primary",
+    "color.focus.ring",
+    "radius.control",
+    "elevation.raised",
+    "size.control-sm"
+  ],
+  "a11y": {
+    "role": "navigation",
+    "keyboard": [
+      "Tab: moves through the links and dropdown buttons, then the actions",
+      "Enter or Space: follows a link; on a dropdown button, opens its list",
+      "In a dropdown: arrow keys move, Enter chooses, Escape closes and returns focus to the button",
+      "In a narrow space: Tab to the menu button, Enter opens the sheet, Escape closes it and returns focus to the button"
+    ],
+    "requirements": [
+      "The links are inside one named navigation landmark; only one of the wide bar and the narrow menu is in the page at a time",
+      "The current page is marked with aria-current=\"page\" and also drawn with a bar under it and a heavier label, never by color alone",
+      "A parent of the current page is drawn the same way and read as \"current section\" but is not marked as the page itself",
+      "A dropdown button announces that it opens a menu and whether it is expanded; the list is a real menu of links",
+      "The menu button has a name (\"Menu\") and states whether the sheet is open; choosing a link closes the sheet",
+      "A disabled link stays focusable (aria-disabled), goes nowhere and says why",
+      "The wide and narrow layouts follow the space the bar is in, not only the screen"
+    ],
+    "screenReader": [
+      "\"Main navigation, navigation\", then each link; the current one reads \"Pricing, current page\"",
+      "\"Products, menu button, collapsed\"",
+      "\"Menu, button\" in a narrow space, then the sheet as a dialog titled \"Menu\""
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "A marketing site, documentation or an app with only a few sections",
+      "A top bar of links with a sign-in or account button at the end"
+    ],
+    "avoid_when": [
+      "An admin tool with many sections and sub-pages: use Sidebar or DashboardShell",
+      "Switching between a few views of one page: use Tabs"
+    ],
+    "anti_patterns": [
+      "More than about 6 top-level links: group the rest in a dropdown",
+      "A dropdown inside a dropdown: the list is one level",
+      "Two navigation landmarks with the same name on the page: give each its own label",
+      "UI permission is not security: hiding or disabling a link only changes what people see, so the server must check access again for every request"
+    ]
+  },
+  "contract": {
+    "data": "The links as plain data: items with an id, label, optional href, icon, badge and children.",
+    "dataStates": [],
+    "permissions": ["per navigation item"],
+    "events": ["onNavigate"],
+    "customization": ["variant (plain, bordered, floating)", "renderLink (your router's link)", "brand and actions slots", "classNames for each part"]
+  },
+  "examples": ["basic", "with-dropdowns", "with-your-router", "mobile-menu", "permissions", "classNames"],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {}
+  }
+}

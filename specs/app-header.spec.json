@@ -1,0 +1,153 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "AppHeader",
+  "version": "0.1.0",
+  "category": "block",
+  "status": "experimental",
+  "description": "The top bar of an application: a slot for a sidebar toggle, the breadcrumbs, a search button that opens your command palette, your own actions, a notifications bell with an unread count and the account menu. In a narrow space the search folds to an icon.",
+  "props": {
+    "leading": {
+      "type": "node",
+      "description": "Content at the very start, such as the button that opens or folds the sidebar. Give it an accessible name."
+    },
+    "breadcrumbs": {
+      "type": "node",
+      "description": "Where the person is, usually Breadcrumbs. It takes the free space and shortens before anything else."
+    },
+    "onSearch": {
+      "type": "callback",
+      "description": "Shows the search button and calls this when it is pressed, e.g. to open a CommandPalette. The shortcut shown on it is a hint only: wire the key yourself.",
+      "tsType": "() => void"
+    },
+    "searchLabel": {
+      "type": "string",
+      "description": "Text and accessible name of the search button.",
+      "default": "Search"
+    },
+    "searchShortcut": {
+      "type": "string",
+      "description": "The shortcut hint on the search button, keys separated by a space. Shown only where there is room. Pass an empty string to hide it.",
+      "default": "Ctrl K"
+    },
+    "onNotifications": {
+      "type": "callback",
+      "description": "Shows the notifications bell and calls this when it is pressed, e.g. to open a panel.",
+      "tsType": "() => void"
+    },
+    "notificationCount": {
+      "type": "number",
+      "description": "How many notifications are unread. Drawn as a badge (99+ above 99) and read with the button's name. Zero or none draws no badge.",
+      "default": 0
+    },
+    "notificationsLabel": {
+      "type": "string",
+      "description": "Accessible name of the bell. The count is added: \"Notifications, 3 unread\".",
+      "default": "Notifications"
+    },
+    "actions": {
+      "type": "node",
+      "description": "Your own buttons, before the bell and the account menu."
+    },
+    "userMenu": {
+      "type": "node",
+      "description": "The account menu at the end, normally a UserMenu."
+    },
+    "permissions": {
+      "type": "custom",
+      "description": "What the person may do: { search, notifications } as \"allow\" (default), \"disabled\" or \"hidden\", or { state, reason }. A disabled button stays focusable (aria-disabled) and says why. The server must check again.",
+      "tsType": "import(\"../utils/permissions\").Permissions<\"search\" | \"notifications\">"
+    },
+    "label": {
+      "type": "string",
+      "description": "Accessible name of the header landmark.",
+      "default": "Application header"
+    },
+    "size": {
+      "type": "enum",
+      "values": ["default", "compact"],
+      "default": "default",
+      "description": "default is 56 px high; compact is 44 px with smaller controls."
+    },
+    "border": {
+      "type": "boolean",
+      "default": true,
+      "description": "Draw a line under the header."
+    },
+    "sticky": {
+      "type": "boolean",
+      "default": false,
+      "description": "Keep the header at the top while the page scrolls."
+    },
+    "classNames": {
+      "type": "custom",
+      "description": "Class names for the parts, by slot name, added after the built-in ones. Slots: root, leading, breadcrumbs, search, shortcut, actions, notifications, badge, user-menu.",
+      "tsType": "Partial<Record<\"root\" | \"leading\" | \"breadcrumbs\" | \"search\" | \"shortcut\" | \"actions\" | \"notifications\" | \"badge\" | \"user-menu\", string>>"
+    }
+  },
+  "variants": ["size"],
+  "states": ["default", "hover", "focus", "disabled"],
+  "slots": ["root", "leading", "breadcrumbs", "search", "shortcut", "actions", "notifications", "badge", "user-menu"],
+  "tokens": [
+    "color.surface.default",
+    "color.surface.subtle",
+    "color.border.default",
+    "color.border.strong",
+    "color.text.default",
+    "color.text.muted",
+    "color.action.primary",
+    "color.action.on-primary",
+    "color.focus.ring",
+    "radius.control",
+    "size.control-sm"
+  ],
+  "a11y": {
+    "role": "banner",
+    "keyboard": [
+      "Tab: moves through the leading control, the breadcrumbs, search, your actions, the bell and the account menu, in that order",
+      "Enter or Space: presses a button"
+    ],
+    "requirements": [
+      "The bar is a header landmark with its own name; use one per page and keep the page's main landmark outside it",
+      "The search button has a visible name, or an accessible name when it folds to an icon; the shortcut hint is for sighted keyboard users and is hidden from screen readers so the name is not read twice",
+      "The bell is named with the unread count (\"Notifications, 3 unread\"); the badge is drawn as a number, not as color alone",
+      "A disabled button stays focusable (aria-disabled) and its reason is read with it",
+      "The breadcrumbs keep their own navigation landmark"
+    ],
+    "screenReader": [
+      "\"Application header, banner\"",
+      "\"Search, button\"",
+      "\"Notifications, 3 unread, button\"",
+      "\"Account menu, Ada Lovelace, menu button\""
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "The bar across the top of an application page, inside or beside a sidebar",
+      "You want search, notifications and the account menu in one consistent place on every page"
+    ],
+    "avoid_when": [
+      "You need the whole frame with the sidebar and the phone menu: use DashboardShell",
+      "Navigation across the top of a marketing site: use TopNav",
+      "A title and the actions for one page: use PageHeader below the bar"
+    ],
+    "anti_patterns": [
+      "A second search field in the page next to the search button: one search entry point",
+      "A count badge with no number for screen readers: set notificationCount instead of drawing your own dot",
+      "More than two or three buttons in the actions slot: move the rest into a menu",
+      "UI permission is not security: hiding or disabling a button only changes what people see, so the server must check again for every request"
+    ]
+  },
+  "contract": {
+    "data": "A notification count and the slots you fill: breadcrumbs, actions and the account menu.",
+    "dataStates": [],
+    "permissions": ["search", "notifications"],
+    "events": ["onSearch", "onNotifications"],
+    "customization": ["leading, breadcrumbs, actions and userMenu slots", "size, border and sticky", "classNames for each part"]
+  },
+  "examples": ["basic", "with-breadcrumbs", "with-notifications", "compact", "permissions", "classNames"],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {}
+  }
+}

@@ -1,0 +1,85 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "ColorPicker",
+  "version": "0.1.0",
+  "category": "input",
+  "status": "experimental",
+  "description": "Picks a color. A button shows the current color and opens a panel with a saturation and brightness area, a hue slider, an optional opacity slider, a hex field and preset swatches. ColorPickerPanel is the same panel inline. Values are hex strings.",
+  "props": {
+    "label": { "type": "string", "required": true, "description": "Visible label, also the accessible name of the button." },
+    "value": { "type": "string", "description": "Controlled color as a hex string: #rrggbb, or #rrggbbaa when showAlpha is on." },
+    "defaultValue": { "type": "string", "default": "#000000", "description": "Initial color when uncontrolled, in the same format." },
+    "onChange": { "type": "callback", "tsType": "(value: string) => void", "description": "Called with the new color as lowercase hex: #rrggbb, or #rrggbbaa when showAlpha is on." },
+    "presets": { "type": "custom", "tsType": "string[]", "description": "Hex colors shown as a row of swatches to pick from." },
+    "showAlpha": { "type": "boolean", "default": false, "description": "Adds an opacity slider and makes the value #rrggbbaa." },
+    "format": {
+      "type": "enum",
+      "values": ["hex", "rgb", "hsl"],
+      "default": "hex",
+      "description": "How the color is written on the button. The value is always hex."
+    },
+    "description": { "type": "string", "description": "Help text under the button." },
+    "errorMessage": { "type": "string", "description": "Shown under the button when isInvalid is true." },
+    "isInvalid": { "type": "boolean", "description": "Marks the color as wrong and shows errorMessage." },
+    "isDisabled": { "type": "boolean", "default": false, "description": "Prevents opening the panel and dims the field." },
+    "name": { "type": "string", "description": "Submits the value with a form under this name." }
+  },
+  "variants": ["showAlpha", "isDisabled"],
+  "states": ["default", "hover", "focus", "open", "disabled", "invalid"],
+  "slots": ["label", "trigger", "swatch", "panel", "area", "hue", "alpha", "hex", "presets", "description", "error"],
+  "tokens": [
+    "color.surface.default",
+    "color.surface.raised",
+    "color.border.default",
+    "color.border.strong",
+    "color.text.default",
+    "color.text.muted",
+    "color.action.primary",
+    "color.feedback.danger",
+    "color.focus.ring",
+    "radius.control",
+    "radius.overlay"
+  ],
+  "a11y": {
+    "role": "dialog",
+    "keyboard": [
+      "Enter or Space on the button opens the panel; Esc closes it and returns focus to the button",
+      "Tab moves through the area, hue slider, opacity slider, hex field and presets",
+      "In the color area (one 2D slider), Left and Right Arrow change saturation and Up and Down Arrow change brightness; Page Up and Page Down change by a larger step",
+      "In a slider, arrow keys change the value by one step; Home and End jump to the ends",
+      "Arrow keys move between preset swatches; Enter or Space picks one",
+      "Typing in the hex field changes the color on Enter or when leaving the field"
+    ],
+    "requirements": [
+      "Every part of the color can be set without a pointer, by arrows or by typing the hex",
+      "The button and the swatches carry the color's name (for example \"vibrant orange\"), not only the hex",
+      "The swatch has a visible outline, so a white or very light color is not lost on a white page",
+      "Color is never the only signal: the hex or rgb or hsl text is shown with the swatch",
+      "The area and sliders announce their value in words as they move"
+    ],
+    "screenReader": [
+      "The button reads the label, the color name and its value, as a collapsed or expanded button",
+      "The area reads as a 2D slider with its saturation and brightness values in words; the hue slider reads the hue name",
+      "Presets read as a list of colors by name, with the picked one selected"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "Choosing a brand, label or chart color",
+      "Theme settings where a person needs a precise color",
+      "Pass presets when a small palette is enough"
+    ],
+    "avoid_when": [
+      "A fixed set of a few options: use RadioGroup or SegmentedControl",
+      "Choosing a text or background pair: show the contrast result next to the picker"
+    ],
+    "anti_patterns": [
+      "Showing only a swatch with no text",
+      "Using the picker for a tiny choice that presets alone would answer",
+      "Accepting a low-contrast color for text without telling the person"
+    ]
+  },
+  "examples": ["basic", "with-presets", "with-alpha", "inline", "in-a-form"],
+  "figma": { "componentKey": null, "variantMap": { "showAlpha": "Opacity", "isDisabled": "Disabled" } }
+}

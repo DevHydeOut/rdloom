@@ -1,0 +1,81 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Carousel",
+  "version": "0.1.0",
+  "category": "display",
+  "status": "experimental",
+  "description": "A row (or column) of slides that scrolls and snaps, with previous and next buttons and slide dots, for a small set of related items such as featured cards or screenshots. Use CarouselItem for each slide. Built on native scroll snapping, so touch and trackpad swiping work without extra code.",
+  "props": {
+    "label": { "type": "string", "required": true, "description": "What the carousel shows, e.g. 'Featured plans'. It is the accessible name of the region." },
+    "children": { "type": "node", "required": true, "description": "CarouselItem elements, one per slide." },
+    "orientation": { "type": "enum", "values": ["horizontal", "vertical"], "default": "horizontal", "description": "Direction slides move in. A vertical carousel needs a height (classNames.viewport, default 18rem)." },
+    "slidesPerView": { "type": "custom", "tsType": "1 | 2 | 3", "default": 1, "description": "How many slides are visible at once. Narrow containers show fewer: under 400px one, under 640px at most two." },
+    "loop": { "type": "boolean", "default": false, "description": "Next on the last slide goes back to the first, and Previous on the first goes to the last. Otherwise the buttons stop at the ends." },
+    "showArrows": { "type": "boolean", "default": true, "description": "Show the Previous and Next buttons." },
+    "showDots": { "type": "boolean", "default": true, "description": "Show one 'Go to slide N' button per position." },
+    "autoplay": { "type": "boolean", "default": false, "description": "Move on by itself. A pause and play button is always shown with it. It stops while the pointer is over the carousel or focus is inside it, and never runs when the visitor prefers reduced motion. At the end it returns to the first slide." },
+    "autoplayInterval": { "type": "number", "default": 5000, "description": "Milliseconds each slide stays when autoplay is on." },
+    "index": { "type": "number", "description": "Controlled index of the first visible slide (0 is the first slide)." },
+    "defaultIndex": { "type": "number", "default": 0, "description": "Index of the first visible slide at first, when uncontrolled." },
+    "onIndexChange": { "type": "callback", "tsType": "(index: number) => void", "description": "Called when the first visible slide changes, whether by a button, a key, a dot, a swipe or autoplay." },
+    "gap": { "type": "enum", "values": ["sm", "md", "lg"], "default": "md", "description": "Space between slides: 8, 16 or 24 px." },
+    "messages": {
+      "type": "custom",
+      "tsType": "Partial<Record<\"previous\" | \"next\" | \"goTo\" | \"dots\" | \"pause\" | \"play\" | \"slide\" | \"slides\", string>>",
+      "description": "Your own wording, for translation. goTo, slide and slides use {n}, {from}, {to} and {total} where they apply, e.g. 'Go to slide {n}'."
+    },
+    "classNames": {
+      "type": "custom",
+      "description": "Extra class names for single parts. Keys: root, viewport, controls, arrow, dots, dot, autoplayButton.",
+      "tsType": "Partial<Record<\"root\" | \"viewport\" | \"controls\" | \"arrow\" | \"dots\" | \"dot\" | \"autoplayButton\", string>>"
+    }
+  },
+  "variants": ["orientation", "gap"],
+  "states": ["default", "hover", "focus", "disabled"],
+  "slots": ["viewport", "slide", "arrow", "dots", "dot", "autoplayButton"],
+  "tokens": [
+    "color.surface.default",
+    "color.border.default",
+    "color.action.primary",
+    "color.text.default",
+    "color.text.muted",
+    "color.focus.ring",
+    "radius.control"
+  ],
+  "a11y": {
+    "role": "region",
+    "keyboard": [
+      "Tab moves to the carousel, then through its buttons and the links in the visible slides",
+      "Left and Right arrows (Up and Down when vertical) move one slide while the carousel itself has focus",
+      "Home and End go to the first and last slide",
+      "Enter or Space on Previous, Next, a dot or the pause button does what its name says"
+    ],
+    "requirements": [
+      "The region has role=region, aria-roledescription=carousel and an accessible name",
+      "Each slide has role=group, aria-roledescription=slide and a name like '2 of 5'",
+      "Slides that are fully out of view are inert, so Tab and screen readers skip them",
+      "Previous and Next are named buttons; at an end they use aria-disabled so focus is not lost",
+      "A change the person made is announced politely as 'Slide 2 of 5'; a change made by autoplay is not",
+      "Autoplay is off by default; when on it has a pause and play button, stops on hover and focus, and does not run under prefers-reduced-motion",
+      "Scrolling between slides is instant under prefers-reduced-motion",
+      "Dots are buttons of at least 24 px with aria-current on the current one"
+    ],
+    "screenReader": [
+      "The region is announced as 'Featured plans, carousel'",
+      "Each slide is announced as 'slide, 2 of 5'",
+      "After Next, 'Slide 3 of 5' is announced once; while autoplay runs nothing is announced"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["A handful of equal items that do not all fit: featured products, screenshots, testimonials", "Touch-first layouts where swiping is natural"],
+    "avoid_when": ["Content everyone must see: lay it out in a grid", "Important announcements: rotating content is easy to miss", "Long lists: use a list or table with paging"],
+    "anti_patterns": [
+      "Turning on autoplay for content people need to read",
+      "Putting the only way to complete a task in a slide that is not shown at first",
+      "Slides with very different heights"
+    ]
+  },
+  "examples": ["basic", "multiple-per-view", "with-autoplay", "controlled", "vertical"],
+  "figma": { "componentKey": null, "variantMap": { "orientation": "Orientation", "gap": "Gap" } }
+}

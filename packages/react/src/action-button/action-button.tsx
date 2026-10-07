@@ -103,6 +103,7 @@ export const ActionButton = forwardRef<HTMLButtonElement, ActionButtonProps>(fun
             title={confirm.title}
             description={confirm.description}
             confirmLabel={confirm.confirmLabel}
+            cancelLabel={confirm.cancelLabel}
             confirmText={confirm.confirmText}
             onConfirm={run}
           />

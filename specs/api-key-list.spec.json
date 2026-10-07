@@ -1,0 +1,181 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "ApiKeyList",
+  "version": "0.1.0",
+  "category": "block",
+  "status": "experimental",
+  "description": "A list of API keys with their name, prefix, creation and last use, and scopes as badges. Create key opens a dialog with a name and scopes, then shows the secret once with a Copy button and a warning; it is never shown again. Revoke needs the key name typed to confirm. Your callbacks do the work. UI permission is not security: the server must check again.",
+  "props": {
+    "keys": {
+      "type": "custom",
+      "required": true,
+      "tsType": "Array<{ id: string; name: string; prefix: string; scopes: string[]; createdAt: Date | string; lastUsedAt?: Date | string | null }>",
+      "description": "The keys to list. prefix is the visible start of the key (never the secret). scopes are scope ids."
+    },
+    "scopes": {
+      "type": "custom",
+      "required": true,
+      "tsType": "Array<{ id: string; label: string; description?: string }>",
+      "description": "The scopes a key can have, shown as checkboxes in the create dialog and as badges (by label) in the list."
+    },
+    "title": {
+      "type": "string",
+      "default": "API keys",
+      "description": "The heading of the list."
+    },
+    "headingLevel": {
+      "type": "number",
+      "default": 2,
+      "description": "Heading level of the title, 2 to 6."
+    },
+    "locale": {
+      "type": "string",
+      "default": "en-US",
+      "description": "The locale for dates."
+    },
+    "state": {
+      "type": "custom",
+      "tsType": "import(\"../utils/state\").DataState",
+      "description": "The data state: loading, empty (no keys, with Create key), error (with Try again) or ready. Without it an empty keys list shows the empty state."
+    },
+    "onRetry": {
+      "type": "callback",
+      "tsType": "() => void",
+      "description": "Adds a Try again button to the error state."
+    },
+    "onCreate": {
+      "type": "callback",
+      "required": true,
+      "tsType": "(name: string, scopes: string[]) => Promise<{ secret: string }>",
+      "description": "Creates the key on your server and resolves with its secret, which is shown once. A throw keeps the dialog open with an error."
+    },
+    "onRevoke": {
+      "type": "callback",
+      "required": true,
+      "tsType": "(key: { id: string; name: string; prefix: string; scopes: string[]; createdAt: Date | string; lastUsedAt?: Date | string | null }) => void | Promise<unknown>",
+      "description": "Revokes the key after the person typed its name; yours, async."
+    },
+    "permissions": {
+      "type": "custom",
+      "tsType": "import(\"../utils/permissions\").Permissions<\"create\" | \"revoke\">",
+      "description": "What the app allows: create and revoke. Hidden renders nothing; disabled keeps the control reachable (aria-disabled) with the reason shown and read, and nothing runs. This only changes what people see: the server must check again."
+    },
+    "classNames": {
+      "type": "custom",
+      "description": "Extra class names for single parts, so you can restyle one part without editing the file. Keys: root, header, title, createButton, list, item, name, prefix, meta, scopes, scope, revokeButton, dialog, form, secret, copyButton, warning, reason, status.",
+      "tsType": "Partial<Record<\"root\" | \"header\" | \"title\" | \"createButton\" | \"list\" | \"item\" | \"name\" | \"prefix\" | \"meta\" | \"scopes\" | \"scope\" | \"revokeButton\" | \"dialog\" | \"form\" | \"secret\" | \"copyButton\" | \"warning\" | \"reason\" | \"status\", string>>"
+    }
+  },
+  "states": [
+    "default",
+    "disabled",
+    "loading"
+  ],
+  "slots": [
+    "root",
+    "header",
+    "title",
+    "createButton",
+    "list",
+    "item",
+    "name",
+    "prefix",
+    "meta",
+    "scopes",
+    "scope",
+    "revokeButton",
+    "dialog",
+    "form",
+    "secret",
+    "copyButton",
+    "warning",
+    "reason",
+    "status"
+  ],
+  "tokens": [
+    "color.surface.default",
+    "color.surface.subtle",
+    "color.surface.raised",
+    "color.border.default",
+    "color.text.default",
+    "color.text.muted",
+    "color.feedback.warning",
+    "color.feedback.warning-subtle",
+    "color.feedback.danger",
+    "elevation.raised",
+    "elevation.overlay",
+    "radius.overlay"
+  ],
+  "a11y": {
+    "role": "list",
+    "keyboard": [
+      "Tab: moves through Create key and each Revoke button",
+      "In the create dialog: Tab moves through the name, the scopes, Cancel and Create key; Escape cancels",
+      "Revoke opens a confirmation where the key name is typed; Enter confirms once it matches"
+    ],
+    "requirements": [
+      "Keys are a list; each item names the key, its prefix, when it was created and last used, and its scopes",
+      "The create dialog asks for a name and at least one scope; problems go in an error summary linked to the fields",
+      "The secret is shown once, with a warning in words, and a Copy button that announces \"Copied\"",
+      "Closing the dialog removes the secret from the page; it cannot be shown again",
+      "Revoking needs the key name typed and is announced when done; focus then moves to the heading",
+      "A disabled action stays focusable and the reason is its description"
+    ],
+    "screenReader": [
+      "\"API keys, heading level 2\"",
+      "\"Create key, button\"; \"Create API key, dialog\"",
+      "\"Copy this key now. You will not see it again.\"",
+      "\"Key Deploy script revoked\""
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "Letting people create and revoke the keys they use to call your API",
+      "A developer or integrations settings page"
+    ],
+    "avoid_when": [
+      "Sessions or devices: use a list of sessions with a sign out action",
+      "Storing the secret: show it once and keep only a hash on your server"
+    ],
+    "anti_patterns": [
+      "Treating the permissions prop as protection: UI permission is not security, so the server must check again",
+      "Keeping the secret in app state after the dialog closed: it is shown once on purpose",
+      "Putting the secret in the keys list: only the prefix belongs there"
+    ]
+  },
+  "contract": {
+    "data": "The existing keys (without secrets), the available scopes, an async onCreate that returns the secret and an async onRevoke.",
+    "dataStates": [
+      "loading",
+      "empty",
+      "error",
+      "ready"
+    ],
+    "permissions": [
+      "create",
+      "revoke"
+    ],
+    "events": [
+      "onCreate",
+      "onRevoke",
+      "onRetry"
+    ],
+    "customization": [
+      "classNames for each part",
+      "scopes with descriptions",
+      "title and headingLevel",
+      "locale"
+    ]
+  },
+  "examples": [
+    "basic",
+    "states",
+    "permissions",
+    "classNames"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {}
+  }
+}

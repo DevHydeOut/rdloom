@@ -30,7 +30,7 @@ describe("tools", () => {
   it("finds components by name or id, in any case", () => {
     expect(findComponent(ctx, "date-range-picker").spec.name).toBe("DateRangePicker");
     expect(findComponent(ctx, "daterangepicker").spec.name).toBe("DateRangePicker");
-    expect(() => findComponent(ctx, "carousel")).toThrow(/Available: .*Button/);
+    expect(() => findComponent(ctx, "hologram")).toThrow(/Available: .*Button/);
   });
 
   it("ranks components by a search", () => {
@@ -105,7 +105,7 @@ describe("server over MCP", () => {
   });
 
   it("reports unknown components as a tool error, not a protocol error", async () => {
-    const res = await client.callTool({ name: "get_component", arguments: { name: "Carousel" } });
+    const res = await client.callTool({ name: "get_component", arguments: { name: "Hologram" } });
     expect(res.isError).toBe(true);
     expect((res.content as Array<{ text: string }>)[0].text).toContain("Available:");
   });

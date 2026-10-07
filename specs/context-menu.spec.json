@@ -1,0 +1,86 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "ContextMenu",
+  "version": "0.1.0",
+  "category": "overlay",
+  "status": "experimental",
+  "description": "The menu that opens at the pointer on a right click, a long press or the keyboard (Shift+F10 or the Menu key) over an area such as a file row. It never replaces a visible way to do the same thing.",
+  "props": {
+    "label": { "type": "string", "required": true, "description": "Accessible name of the menu, e.g. \"Actions for report.pdf\"." },
+    "children": { "type": "node", "required": true, "description": "The area the menu belongs to, such as a row or a card. It becomes focusable." },
+    "items": { "type": "node", "required": true, "description": "ContextMenuItem, ContextMenuSection and ContextMenuSeparator elements." },
+    "hint": { "type": "string", "default": "Press Shift+F10 for actions", "description": "Text read by screen readers when the area is focused. It is not shown on screen." },
+    "onAction": { "type": "callback", "tsType": "(key: import(\"react-aria-components\").Key) => void", "description": "Called with the id of the item chosen." },
+    "selectionMode": {
+      "type": "enum",
+      "values": ["none", "single", "multiple"],
+      "default": "none",
+      "description": "none for actions; single or multiple makes every item checkable."
+    },
+    "selectedKeys": { "type": "custom", "tsType": "import(\"react-aria-components\").Selection", "description": "Controlled selected items when selectionMode is not none." },
+    "defaultSelectedKeys": { "type": "custom", "tsType": "import(\"react-aria-components\").Selection", "description": "Initially selected items when uncontrolled." },
+    "onSelectionChange": { "type": "callback", "tsType": "(keys: import(\"react-aria-components\").Selection) => void", "description": "Called when the checked items change." },
+    "isDisabled": { "type": "boolean", "default": false, "description": "Turns the menu off. The area stays as it is and the browser's own menu returns." },
+    "elementType": {
+      "type": "enum",
+      "values": ["div", "li", "tr", "article", "section"],
+      "default": "div",
+      "description": "The element the area renders as, so a table row stays a row."
+    }
+  },
+  "variants": ["isDisabled"],
+  "states": ["default", "focus", "open", "disabled"],
+  "slots": ["area", "popover", "item", "section", "separator", "shortcut"],
+  "tokens": [
+    "color.surface.raised",
+    "color.surface.subtle",
+    "color.border.default",
+    "color.text.default",
+    "color.text.muted",
+    "color.feedback.danger",
+    "color.focus.ring",
+    "radius.overlay",
+    "radius.control"
+  ],
+  "a11y": {
+    "role": "menu",
+    "keyboard": [
+      "Shift+F10 or the Menu key on the focused area opens the menu next to it",
+      "Up and Down Arrow move between items, wrapping at the ends; Home and End jump to the first and last",
+      "Typing a letter moves to the next item starting with it",
+      "Enter or Space chooses the item and closes the menu (in a checkable menu, toggles it)",
+      "Esc closes the menu and returns focus to the area"
+    ],
+    "requirements": [
+      "A context menu is never the only way to do something: every action must also exist as a visible control",
+      "The area is focusable (tabIndex 0) and described by a hint, so keyboard and screen reader users learn the menu is there",
+      "Opens on right click, on a touch long press, and from the keyboard",
+      "Focus returns to the area when the menu closes",
+      "Destructive items say what they do in their text, not only in red"
+    ],
+    "screenReader": [
+      "Focusing the area reads its content followed by \"Press Shift+F10 for actions\"",
+      "Opening announces a menu named by its label and its first item, with its position",
+      "Closing returns to the area"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "Shortcuts to actions that already have a visible button or menu, on rows, cards or files",
+      "Dense lists where every row cannot carry a row of buttons"
+    ],
+    "avoid_when": [
+      "The action has no other way to be reached: add a button or a Menu",
+      "An action list on a button: use Menu",
+      "Text fields: leave the browser's own menu (copy, paste)"
+    ],
+    "anti_patterns": [
+      "A context menu as the only place for an action",
+      "Disabling the browser menu over a whole page",
+      "Nesting a context menu inside another"
+    ]
+  },
+  "examples": ["basic", "with-sections-and-shortcuts", "on-a-table-row", "disabled"],
+  "figma": { "componentKey": null, "variantMap": { "isDisabled": "Disabled" } }
+}
