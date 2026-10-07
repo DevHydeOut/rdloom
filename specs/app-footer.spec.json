@@ -1,0 +1,122 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "AppFooter",
+  "version": "0.1.0",
+  "category": "block",
+  "status": "experimental",
+  "description": "The footer of an application or marketing page: a line of text, link lists and social links. It stacks on a phone and has the same size and spacing on every page.",
+  "props": {
+    "text": {
+      "type": "node",
+      "description": "The text on the left, usually the copyright line."
+    },
+    "links": {
+      "type": "custom",
+      "description": "Footer links: a flat list of { label, href }, or groups of { title, links } for the columns layout.",
+      "tsType": "import(\"../app-footer/links\").FooterLink[] | import(\"../app-footer/links\").FooterLinkGroup[]"
+    },
+    "social": {
+      "type": "node",
+      "description": "Social links, such as icon buttons. Give each one an accessible name."
+    },
+    "layout": {
+      "type": "enum",
+      "values": [
+        "simple",
+        "columns"
+      ],
+      "default": "simple",
+      "description": "simple is one row; columns lists each group under its heading."
+    },
+    "navLabel": {
+      "type": "string",
+      "default": "Footer",
+      "description": "Name of the footer navigation landmark."
+    },
+    "renderLink": {
+      "type": "custom",
+      "description": "Draw links as your router's link. Return the link with the given className and children.",
+      "tsType": "(props: { link: import(\"../app-footer/links\").FooterLink; className: string; children: import(\"react\").ReactNode }) => import(\"react\").ReactNode"
+    },
+    "classNames": {
+      "type": "custom",
+      "description": "Extra class names for single parts, so you can restyle one part without editing the file. Keys: root, inner, text, nav, group, groupTitle, list, link, social.",
+      "tsType": "Partial<Record<\"root\" | \"inner\" | \"text\" | \"nav\" | \"group\" | \"groupTitle\" | \"list\" | \"link\" | \"social\", string>>"
+    }
+  },
+  "variants": [
+    "layout"
+  ],
+  "states": [
+    "default"
+  ],
+  "slots": [
+    "root",
+    "inner",
+    "text",
+    "nav",
+    "group",
+    "groupTitle",
+    "list",
+    "link",
+    "social"
+  ],
+  "tokens": [
+    "color.text.default",
+    "color.text.muted",
+    "color.border.default",
+    "color.surface.default",
+    "color.focus.ring"
+  ],
+  "a11y": {
+    "role": "contentinfo",
+    "keyboard": [
+      "Tab: moves through the links, then the social slot"
+    ],
+    "requirements": [
+      "The footer is the page's contentinfo landmark; use one per page",
+      "The links sit in a navigation landmark with its own name (\"Footer\" by default)",
+      "In the columns layout each group has a real heading, so people can jump between groups",
+      "Links to other sites that open in a new tab say so to screen readers"
+    ],
+    "screenReader": [
+      "\"Footer, navigation\"",
+      "\"Product, heading level 2\", then its links as a list"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "The bottom of an application shell, a marketing page or an auth screen"
+    ],
+    "avoid_when": [
+      "Page-level actions or pagination: those belong in the page"
+    ],
+    "anti_patterns": [
+      "Different padding or width on each page: use the footer as it is and restyle it once through classNames",
+      "More than one footer on a page"
+    ]
+  },
+  "contract": {
+    "data": "Link groups as plain { label, href } objects, and a text line.",
+    "dataStates": [
+      "ready"
+    ],
+    "permissions": [],
+    "events": [],
+    "customization": [
+      "renderLink (your router's link)",
+      "classNames for each part",
+      "text and social slots"
+    ]
+  },
+  "examples": [
+    "simple",
+    "columns",
+    "with-router-link"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {}
+  }
+}

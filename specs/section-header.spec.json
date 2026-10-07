@@ -1,0 +1,110 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "SectionHeader",
+  "version": "0.1.0",
+  "category": "block",
+  "status": "experimental",
+  "description": "The heading of a section inside a page, for a card or a table: a title, a description and actions on the right.",
+  "props": {
+    "title": {
+      "type": "node",
+      "required": true,
+      "description": "The section's title, shown as an h2 by default."
+    },
+    "headingLevel": {
+      "type": "number",
+      "default": 2,
+      "description": "Heading level of the title, 2 to 6."
+    },
+    "description": {
+      "type": "node",
+      "description": "One sentence under the title."
+    },
+    "actions": {
+      "type": "node",
+      "description": "Buttons or a menu for the right of the title."
+    },
+    "size": {
+      "type": "enum",
+      "values": [
+        "default",
+        "compact"
+      ],
+      "default": "default",
+      "description": "compact for pages with little room, such as a side panel or a dense admin screen."
+    },
+    "divider": {
+      "type": "boolean",
+      "default": false,
+      "description": "Draw a line under the header."
+    },
+    "classNames": {
+      "type": "custom",
+      "description": "Extra class names for single parts, so you can restyle one part without editing the file. Keys: root, title, description, actions.",
+      "tsType": "Partial<Record<\"root\" | \"title\" | \"description\" | \"actions\", string>>"
+    }
+  },
+  "variants": [
+    "size",
+    "divider"
+  ],
+  "states": [
+    "default"
+  ],
+  "slots": [
+    "root",
+    "title",
+    "description",
+    "actions"
+  ],
+  "tokens": [
+    "color.text.default",
+    "color.text.muted",
+    "color.border.default"
+  ],
+  "a11y": {
+    "role": "none",
+    "keyboard": [
+      "Tab: moves through the actions"
+    ],
+    "requirements": [
+      "The title is a real heading below the page's h1, so the page has a clear outline",
+      "Actions wrap under the title on a narrow screen"
+    ],
+    "screenReader": [
+      "\"Recent invoices, heading level 2\""
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "Above a card, a table or a form section inside a page"
+    ],
+    "avoid_when": [
+      "The top of a page: use PageHeader"
+    ],
+    "anti_patterns": [
+      "Skipping heading levels (an h4 straight under the h1)"
+    ]
+  },
+  "contract": {
+    "data": "A title, and an optional description and actions.",
+    "dataStates": [
+      "ready"
+    ],
+    "permissions": [],
+    "events": [],
+    "customization": [
+      "classNames for each part",
+      "actions slot"
+    ]
+  },
+  "examples": [
+    "basic",
+    "with-divider"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {}
+  }
+}

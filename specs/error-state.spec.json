@@ -1,0 +1,128 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "ErrorState",
+  "version": "0.1.0",
+  "category": "feedback",
+  "status": "experimental",
+  "description": "What to show when a page or a panel could not be shown: a failed load, or a 404, 403 or 500 screen, with what happened and how to go on.",
+  "props": {
+    "title": {
+      "type": "string",
+      "required": true,
+      "description": "Say what happened, e.g. \"We could not load your invoices\"."
+    },
+    "description": {
+      "type": "string",
+      "description": "Why it happened and what the person can do."
+    },
+    "icon": {
+      "type": "node",
+      "description": "An icon above the title. Decorative. Without an icon or a code a warning icon is shown."
+    },
+    "code": {
+      "type": "string",
+      "description": "A status code such as 404, shown large above the title."
+    },
+    "actions": {
+      "type": "node",
+      "description": "What to do next: a Retry button, a link back."
+    },
+    "variant": {
+      "type": "enum",
+      "values": [
+        "inline",
+        "page"
+      ],
+      "default": "inline",
+      "description": "inline for inside a card or table; page for a whole screen."
+    },
+    "headingLevel": {
+      "type": "number",
+      "default": 2,
+      "description": "Heading level of the title, 1 to 6. Use 1 when the error is the whole page."
+    },
+    "announce": {
+      "type": "boolean",
+      "default": false,
+      "description": "Announce it to screen readers (role alert). Turn it on only when the error appears after the page has loaded."
+    },
+    "classNames": {
+      "type": "custom",
+      "description": "Extra class names for single parts, so you can restyle one part without editing the file. Keys: root, icon, code, title, description, actions.",
+      "tsType": "Partial<Record<\"root\" | \"icon\" | \"code\" | \"title\" | \"description\" | \"actions\", string>>"
+    }
+  },
+  "variants": [
+    "variant"
+  ],
+  "states": [
+    "default"
+  ],
+  "slots": [
+    "root",
+    "icon",
+    "code",
+    "title",
+    "description",
+    "actions"
+  ],
+  "tokens": [
+    "color.text.default",
+    "color.text.muted",
+    "color.border.default",
+    "color.surface.subtle",
+    "color.feedback.danger"
+  ],
+  "a11y": {
+    "role": "none",
+    "keyboard": [
+      "Tab: moves to the actions"
+    ],
+    "requirements": [
+      "The title is a real heading",
+      "With announce the region has role alert and is read when it appears; without it nothing is announced, so a page that loaded with an error does not shout",
+      "The icon is decorative; the words carry the message, never the color"
+    ],
+    "screenReader": [
+      "With announce: \"Alert. We could not load your invoices.\"",
+      "Without: read in order as a heading, text and buttons"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "A request failed and you want to offer a retry",
+      "A 404, 403 or 500 screen"
+    ],
+    "avoid_when": [
+      "A single field is wrong: use the field's error message",
+      "A short message over working content: use Alert"
+    ],
+    "anti_patterns": [
+      "Showing the raw error text from the server",
+      "Setting announce on a page that loaded with the error"
+    ]
+  },
+  "contract": {
+    "data": "A title and description in plain words, and the actions for what to do next.",
+    "dataStates": [
+      "error"
+    ],
+    "permissions": [],
+    "events": [],
+    "customization": [
+      "classNames for each part",
+      "icon, code and actions slots",
+      "variant"
+    ]
+  },
+  "examples": [
+    "basic",
+    "not-found",
+    "with-state-boundary"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {}
+  }
+}

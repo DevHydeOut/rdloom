@@ -8,7 +8,7 @@ export const dashboardShellSidebarAppearanceValues = ["bordered", "subtle", "flo
 /** The frame of a dashboard or admin app: a sidebar of navigation that folds down to icons, a top bar with search and actions, an account menu, and the page. On a phone, or in any narrow space, the sidebar becomes a menu that slides in. */
 export interface DashboardShellSpecProps {
   /**
-   * The navigation as groups of items. An item may hold one level of sub-items.
+   * The navigation as groups of items. An item may hold one level of sub-items. An item may carry a permission ("allow", "disabled", "hidden" or { state, reason }): hidden items, and groups or parents left with nothing, are not drawn or counted; disabled items stay as focusable, non-navigating entries (aria-disabled) with the reason in a tooltip.
    */
   navigation: import("../sidebar/nav").NavGroup[];
   /**
@@ -92,6 +92,10 @@ export interface DashboardShellSpecProps {
    * Called when the person folds or opens the sidebar. Save it if you want it remembered.
    */
   onCollapsedChange?: (collapsed: boolean) => void;
+  /**
+   * Class names for the parts of the shell, by slot name, added after the built-in ones so you can restyle one part without editing the file. Slots: root, skip-link, sidebar, collapse, nav, group, item, sub-list, account, header, search, actions, main, menu-sheet, team-switcher.
+   */
+  classNames?: Partial<Record<"root" | "skip-link" | "sidebar" | "collapse" | "nav" | "group" | "item" | "sub-list" | "account" | "header" | "search" | "actions" | "main" | "menu-sheet" | "team-switcher", string>>;
   /**
    * The page.
    */

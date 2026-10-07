@@ -77,8 +77,33 @@
     },
     "onOpenCustomer": {
       "type": "callback",
-      "description": "Makes each name a button and calls this with the customer, e.g. to open a details panel.",
+      "description": "The older name of onSelect: makes each name a button and calls this with the customer, e.g. to open a details panel. Both are called when both are given.",
       "tsType": "(customer: import(\"../customer-table/query\").Customer) => void"
+    },
+    "onSelect": {
+      "type": "callback",
+      "description": "Makes each name a button and calls this with the customer, e.g. to open a details panel. The conventional name; fires together with onOpenCustomer.",
+      "tsType": "(customer: import(\"../customer-table/query\").Customer) => void"
+    },
+    "onSearch": {
+      "type": "callback",
+      "description": "Called with the search text whenever the search changes (after the short pause with serverSide). It fires in addition to onQueryChange.",
+      "tsType": "(query: string) => void"
+    },
+    "onFilter": {
+      "type": "callback",
+      "description": "Called with the chosen statuses and plans whenever a filter changes or the filters are cleared. It fires in addition to onQueryChange.",
+      "tsType": "(filters: { status: string[]; plan: string[] }) => void"
+    },
+    "permissions": {
+      "type": "custom",
+      "description": "What the app allows, by action: export (the Export CSV button) and open (opening a customer from a name). Each answer is \"allow\", \"disabled\", \"hidden\", true, false or { state, reason }. Hidden removes Export; disabled keeps it focusable with aria-disabled and the reason in a tooltip and read after the button. A disabled open makes the names plain text. Search and filters are always allowed. This only changes what people see: the server must check again.",
+      "tsType": "import(\"../utils/permissions\").Permissions<\"export\" | \"open\">"
+    },
+    "classNames": {
+      "type": "custom",
+      "description": "Class names for the parts of the block, by slot name, added after the built-in ones so you can restyle one part without editing the file. Slots: root, insights, stat, chart, toolbar, search, filters, export, table, cards, empty, error, footer, pagination.",
+      "tsType": "Partial<Record<\"root\" | \"insights\" | \"stat\" | \"chart\" | \"toolbar\" | \"search\" | \"filters\" | \"export\" | \"table\" | \"cards\" | \"empty\" | \"error\" | \"footer\" | \"pagination\", string>>"
     },
     "statusTones": {
       "type": "custom",
@@ -166,14 +191,15 @@
     ],
     "anti_patterns": [
       "Loading every customer into the browser when there are many thousands: use serverSide",
-      "Showing the totals of one page of a server's list as if they were the totals of all customers"
+      "Showing the totals of one page of a server's list as if they were the totals of all customers",
+      "UI permission is not security: hiding or disabling Export or opening a customer only changes what people see, so the server must check access again for every request"
     ]
   },
   "contract": {
     "data": "A list of customers, or one page of them when serverSide is on, with a plain status tone map.",
     "dataStates": ["loading", "empty", "error", "ready"],
-    "permissions": [],
-    "events": ["onQueryChange", "onExport", "onOpenCustomer", "onRetry"],
+    "permissions": ["export", "open"],
+    "events": ["onQueryChange", "onSearch", "onFilter", "onSelect", "onOpenCustomer", "onExport", "onRetry"],
     "customization": ["statusTones", "insights", "density", "currency and locale", "the parts it is built from (Table, Pagination, Chart, Select)"]
   },
   "examples": [
@@ -182,7 +208,9 @@
     "loading-and-empty",
     "custom-insights",
     "without-insights",
-    "row-action"
+    "row-action",
+    "permissions",
+    "classNames"
   ],
   "figma": {
     "componentKey": null,

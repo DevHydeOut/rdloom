@@ -30,6 +30,10 @@ export interface DashboardPageSpecProps {
    * The rest of the page: charts, tables, forms.
    */
   children?: ReactNode;
+  /**
+   * Extra class names for single parts, so you can restyle one part without editing the file. Keys: root, header, title, description, actions, stats, stat, content.
+   */
+  classNames?: Partial<Record<"root" | "header" | "title" | "description" | "actions" | "stats" | "stat" | "content", string>>;
 }
 
 export const dashboardPageDefaults = {

@@ -26,6 +26,12 @@
       "description": "A stack of sections whose content expands and collapses under a heading, like an FAQ. Use with AccordionItem."
     },
     {
+      "name": "action-button",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "One button that handles the permission check, an optional confirmation, the pending state and a result message for an action. It does not fetch data, show toasts, cache or route: you pass the function that does the work."
+    },
+    {
       "name": "agent-activity",
       "type": "registry:ui",
       "version": "0.1.0",
@@ -44,10 +50,22 @@
       "description": "An inline message about the state of the page or a task: a tip, a success, a warning or an error. For brief confirmations that disappear, use Toast."
     },
     {
+      "name": "app-footer",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "The footer of an application or marketing page: a line of text, link lists and social links. It stacks on a phone and has the same size and spacing on every page."
+    },
+    {
       "name": "approval-box",
       "type": "registry:ui",
       "version": "0.1.0",
       "description": "Asks someone to approve or decline something the assistant wants to do. It says what will happen, how risky it is and whether it can be undone, in words as well as color."
+    },
+    {
+      "name": "auth-card",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "The centered card for sign in, sign up, forgot password and verify code screens: a logo, a title, your form, other ways to sign in and links underneath."
     },
     {
       "name": "avatar-group",
@@ -188,6 +206,12 @@
       "description": "What to show when a list, table or page has nothing in it yet: a short explanation and the next step."
     },
     {
+      "name": "error-state",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "What to show when a page or a panel could not be shown: a failed load, or a 404, 403 or 500 screen, with what happened and how to go on."
+    },
+    {
       "name": "error-summary",
       "type": "registry:ui",
       "version": "0.1.0",
@@ -266,6 +290,12 @@
       "description": "A text field for numbers, with increment and decrement buttons, keyboard stepping, and locale-aware formatting for decimals, currency, units and percentages."
     },
     {
+      "name": "page-header",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "The top of a page: breadcrumbs, a title with badges, a description, actions on the right and tabs underneath. Every part is optional except the title."
+    },
+    {
       "name": "pagination",
       "type": "registry:ui",
       "version": "0.1.0",
@@ -324,6 +354,12 @@
       "type": "registry:ui",
       "version": "0.1.0",
       "description": "Concentric rings that swell outward from the centre, as a calm backdrop behind a heading or a call to action. Content goes in front of the rings."
+    },
+    {
+      "name": "section-header",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "The heading of a section inside a page, for a card or a table: a title, a description and actions on the right."
     },
     {
       "name": "segmented-control",

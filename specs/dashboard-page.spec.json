@@ -32,6 +32,11 @@
     "children": {
       "type": "node",
       "description": "The rest of the page: charts, tables, forms."
+    },
+    "classNames": {
+      "type": "custom",
+      "description": "Extra class names for single parts, so you can restyle one part without editing the file. Keys: root, header, title, description, actions, stats, stat, content.",
+      "tsType": "Partial<Record<\"root\" | \"header\" | \"title\" | \"description\" | \"actions\" | \"stats\" | \"stat\" | \"content\", string>>"
     }
   },
   "states": [
@@ -85,10 +90,19 @@
   },
   "contract": {
     "data": "A title, an optional description, and stats as plain objects.",
-    "dataStates": ["loading", "ready"],
+    "dataStates": [
+      "loading",
+      "ready"
+    ],
     "permissions": [],
     "events": [],
-    "customization": ["actions slot", "children", "the Stat cards it draws"]
+    "customization": [
+      "classNames for each part",
+      "actions slot",
+      "children",
+      "the Stat cards it draws",
+      "the PageHeader it is built on"
+    ]
   },
   "examples": [
     "basic",

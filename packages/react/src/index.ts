@@ -50,6 +50,8 @@ export {
 } from "./date-range-picker/date-range-picker";
 export { Dialog, DialogTrigger, type DialogProps } from "./dialog/dialog";
 export { AlertDialog, type AlertDialogProps } from "./alert-dialog/alert-dialog";
+export { ActionButton, type ActionButtonProps } from "./action-button/action-button";
+export { useAction, type UseActionOptions, type UseActionResult } from "./action-button/use-action";
 export {
   Menu,
   MenuItem,
@@ -189,6 +191,12 @@ export { currentTopLevel, findNavItem, flattenNav, trailOf, type NavGroup, type 
 export { Sidebar, type SidebarProps } from "./sidebar/sidebar";
 export { DashboardPage, type DashboardPageProps } from "./dashboard-page/dashboard-page";
 export type { DashboardStat } from "./dashboard-page/stats";
+export { PageHeader, type PageHeaderProps } from "./page-header/page-header";
+export { SectionHeader, type SectionHeaderProps } from "./section-header/section-header";
+export { AppFooter, type AppFooterProps } from "./app-footer/app-footer";
+export type { FooterLink, FooterLinkGroup } from "./app-footer/links";
+export { ErrorState, type ErrorStateProps } from "./error-state/error-state";
+export { AuthCard, type AuthCardProps } from "./auth-card/auth-card";
 // The icon family the components use, for your own buttons and menu entries.
 export * from "./utils/icons";
 // Forms: the Form, its fields, the error summary and repeating rows. The engine behind them is one adapter file.
@@ -224,6 +232,8 @@ export { FieldArray, type FieldArrayMessages, type FieldArrayProps, type FieldAr
 // The two kinds of state (what a screen shows, what an action did) and the boundary that renders by DataState.
 export { toActionState, toDataState, type ActionState, type DataState } from "./utils/state";
 export { StateBoundary, type StateBoundaryProps } from "./utils/state-boundary";
+// Keep table, filter, tab and page state in the address (framework-agnostic).
+export { parseQueryState, serializeQueryState, useQueryState, useWindowQueryState, type QueryField, type QuerySchema, type QueryState, type QueryStateUpdate, type SerializeOptions, type UseQueryStateOptions, type UseWindowQueryStateOptions } from "./utils/url-state";
 export { can, permissionFor, permissionsFrom, resolvePermission, type PermissionState, type PermissionValue, type Permissions, type ResolvedPermission } from "./utils/permissions";
 export { Collapsible, type CollapsibleProps } from "./collapsible/collapsible";
 export { Separator, type SeparatorProps } from "./separator/separator";

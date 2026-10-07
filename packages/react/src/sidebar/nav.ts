@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { resolvePermission, type PermissionValue } from "../utils/permissions";
 
 // The navigation of a dashboard, as data: groups of items, each of which may open a short list of
 // sub-items. The shell draws it; the functions here answer questions about it.
@@ -15,6 +16,11 @@ export interface NavItem {
   badge?: string | number;
   /** One level of sub-items. The item itself then opens and closes the list instead of going anywhere. */
   children?: NavItem[];
+  /**
+   * What the app allows for this item: "allow" (default), "disabled" (shown, not followed, with the reason in a tooltip) or
+   * "hidden" (not drawn). This only changes what people see; the server must check access again.
+   */
+  permission?: PermissionValue;
 }
 
 export interface NavGroup {
@@ -78,3 +84,27 @@ export const initialOf = (label: string) => (label.trim()[0] ?? "?").toUpperCase
 
 /** A badge as the text a screen reader should hear after the label. */
 export const badgeText = (badge: string | number | undefined) => (badge === undefined || badge === "" ? "" : typeof badge === "number" ? `${badge}` : badge);
+
+/** What a navigation item shows: its answer for the current person. */
+export const navPermission = (item: NavItem) => resolvePermission(item.permission);
+
+/**
+ * The navigation as people may see it: hidden items are removed, a parent whose children are all hidden goes too,
+ * and a group left with nothing is dropped. Disabled items stay.
+ */
+export function visibleNav(groups: NavGroup[]): NavGroup[] {
+  const result: NavGroup[] = [];
+  for (const group of groups) {
+    const items: NavItem[] = [];
+    for (const item of group.items) {
+      if (!navPermission(item).isVisible) continue;
+      if (item.children?.length) {
+        const children = item.children.filter((c) => navPermission(c).isVisible);
+        if (children.length === 0) continue;
+        items.push({ ...item, children });
+      } else items.push(item);
+    }
+    if (items.length) result.push({ ...group, items });
+  }
+  return result;
+}

@@ -27,6 +27,8 @@ async function open(page: Page, id: string, name: string, theme: string) {
   await page.evaluate(() => document.fonts.ready);
   // An image that fails (the avatar fallback example) swaps to its initials once the browser reports the failure.
   await page.waitForFunction(() => [...document.images].every((img) => img.complete));
+  // The streaming example types its text out on a timer: wait until the whole reply is there.
+  if (id === "response" && name === "streaming") await expect(page.getByText("GROUP BY month")).toBeVisible({ timeout: 10_000 });
   // Examples that fetch (combobox/async) show a spinner first; wait it out.
   await expect(page.getByRole("status", { name: "Loading" })).toHaveCount(0);
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef, useEffect, useMemo, useRef, useState } from "react";
+import { forwardRef, useEffect, useId, useMemo, useRef, useState } from "react";
 import { Button as AriaButton, Input, Label, SearchField } from "react-aria-components";
 import { customerTableDefaults, type CustomerTableSpecProps } from "../generated/customer-table.types";
 import { Alert } from "../alert/alert";
@@ -11,10 +11,12 @@ import { Chart } from "../chart/chart";
 import { EmptyState } from "../empty-state/empty-state";
 import { Pagination } from "../pagination/pagination";
 import { Select, SelectItem } from "../select/select";
+import { Tooltip, TooltipTrigger } from "../tooltip/tooltip";
 import { Skeleton } from "../skeleton/skeleton";
 import { Stat } from "../stat/stat";
 import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "../table/table";
 import { cx } from "../utils/cx";
+import { permissionFor } from "../utils/permissions";
 import { CloseIcon, SearchIcon } from "../utils/icons";
 import {
   applyQuery,
@@ -35,6 +37,10 @@ import {
 export interface CustomerTableProps extends CustomerTableSpecProps {
   className?: string;
 }
+
+/** The parts of the block that take a class name of their own. */
+export type CustomerTableSlot = "root" | "insights" | "stat" | "chart" | "toolbar" | "search" | "filters" | "export" | "table" | "cards" | "empty" | "error" | "footer" | "pagination";
+export type CustomerTableClassNames = Partial<Record<CustomerTableSlot, string>>;
 
 type Tone = "neutral" | "info" | "success" | "warning" | "danger";
 const defaultTones: Record<string, Tone> = { active: "success", trial: "info", overdue: "warning", churned: "danger" };
@@ -79,6 +85,11 @@ export const CustomerTable = forwardRef<HTMLElement, CustomerTableProps>(functio
     defaultQuery,
     onExport,
     onOpenCustomer,
+    onSelect,
+    onSearch,
+    onFilter,
+    permissions,
+    classNames,
     statusTones,
     density = customerTableDefaults.density,
     className,
@@ -88,6 +99,7 @@ export const CustomerTable = forwardRef<HTMLElement, CustomerTableProps>(functio
   const [query, setQuery] = useState<CustomerQuery>(() => ({ ...emptyQuery(pageSize), ...defaultQuery, pageSize }));
   const [searchText, setSearchText] = useState(query.search);
   const [notice, setNotice] = useState("");
+  const exportReasonId = useId();
   const debounce = useRef<ReturnType<typeof setTimeout>>(undefined);
   useEffect(() => () => clearTimeout(debounce.current), []);
 
@@ -95,12 +107,15 @@ export const CustomerTable = forwardRef<HTMLElement, CustomerTableProps>(functio
   const latest = useRef(query);
   latest.current = query;
   const update = (patch: Partial<CustomerQuery>) => {
-    const next = { ...latest.current, ...patch, page: patch.page ?? 1 };
+    const before = latest.current;
+    const next = { ...before, ...patch, page: patch.page ?? 1 };
     latest.current = next;
     setQuery(next);
     if (serverSide) onQueryChange?.(next);
+    if (next.search !== before.search) onSearch?.(next.search);
+    if (next.status !== before.status || next.plan !== before.plan) onFilter?.({ status: next.status, plan: next.plan });
   };
-  const onSearch = (text: string) => {
+  const changeSearch = (text: string) => {
     setSearchText(text);
     clearTimeout(debounce.current);
     // A server is asked once typing pauses; a list in memory is filtered at every key.
@@ -143,8 +158,10 @@ export const CustomerTable = forwardRef<HTMLElement, CustomerTableProps>(functio
   }, [insights, serverSide, client, currency, locale]);
 
   // --- Export
-  const canExport = !!onExport || !serverSide;
+  const exportPermission = permissionFor(permissions, "export");
+  const canExport = (!!onExport || !serverSide) && exportPermission.isVisible;
   const exportRows = () => {
+    if (!exportPermission.isAllowed) return;
     const all = serverSide ? customers : client!.filtered;
     if (onExport) {
       onExport(all, query);
@@ -174,7 +191,7 @@ export const CustomerTable = forwardRef<HTMLElement, CustomerTableProps>(functio
       label={name === "status" ? "Status" : "Plan"}
       placeholder={all}
       size="md"
-      className="min-w-0 sm:w-40 [&>span:first-of-type]:sr-only"
+      className={cx("min-w-0 sm:w-40 [&>span:first-of-type]:sr-only", classNames?.filters)}
       selectedKey={query[name][0]?.toLowerCase() ?? "all"}
       onSelectionChange={(key) => update({ [name]: key === "all" || key === null ? [] : [values.find((v) => v.toLowerCase() === String(key)) ?? String(key)] })}
       isDisabled={isLoading}
@@ -188,13 +205,19 @@ export const CustomerTable = forwardRef<HTMLElement, CustomerTableProps>(functio
     </Select>
   );
 
+  const openPermission = permissionFor(permissions, "open");
+  const openCustomer = (c: Customer) => {
+    onOpenCustomer?.(c);
+    onSelect?.(c);
+  };
+  const canOpen = (!!onOpenCustomer || !!onSelect) && openPermission.isAllowed;
   const customerCell = (c: Customer) => (
     <span className="flex min-w-0 items-center gap-3">
       <Avatar name={c.name} src={c.avatarUrl} size="sm" decorative />
       <span className="flex min-w-0 flex-col">
-        {onOpenCustomer ? (
+        {canOpen ? (
           <AriaButton
-            onPress={() => onOpenCustomer(c)}
+            onPress={() => openCustomer(c)}
             className="w-fit max-w-full truncate rounded text-start font-medium text-[var(--rd-color-text-default)] underline-offset-2 outline-none data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)] data-[hovered]:underline"
           >
             {c.name}
@@ -211,16 +234,16 @@ export const CustomerTable = forwardRef<HTMLElement, CustomerTableProps>(functio
   const empty = !error && !isLoading && rows.length === 0;
 
   return (
-    <section ref={ref} aria-label={label} aria-busy={isLoading || undefined} className={cx("flex flex-col gap-6", className)}>
+    <section ref={ref} aria-label={label} aria-busy={isLoading || undefined} className={cx("flex flex-col gap-6", className, classNames?.root)}>
       {shownInsights && (
-        <div className="flex min-w-0 flex-col gap-4">
+        <div className={cx("flex min-w-0 flex-col gap-4", classNames?.insights)}>
           <div className="grid grid-cols-[repeat(auto-fit,minmax(min(10rem,100%),1fr))] gap-4">
             {shownInsights.stats.map((s) => (
-              <Stat key={s.label} variant="card" label={s.label} value={s.value} trend={s.trend} data={s.data} description={s.description} summary={s.summary} isLoading={isLoading} />
+              <Stat key={s.label} variant="card" label={s.label} value={s.value} trend={s.trend} data={s.data} description={s.description} summary={s.summary} isLoading={isLoading} className={classNames?.stat} />
             ))}
           </div>
           {shownInsights.chart && (
-            <div className="rounded-2xl border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-default)] p-5 [box-shadow:var(--rd-elevation-raised)]">
+            <div className={cx("rounded-2xl border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-default)] p-5 [box-shadow:var(--rd-elevation-raised)]", classNames?.chart)}>
               <Chart
                 title={shownInsights.chart.title}
                 summary={shownInsights.chart.summary}
@@ -237,12 +260,12 @@ export const CustomerTable = forwardRef<HTMLElement, CustomerTableProps>(functio
 
       <div className="flex flex-col gap-3">
         {/* Search, filters and export */}
-        <div className="flex flex-wrap items-center gap-2">
+        <div className={cx("flex flex-wrap items-center gap-2", classNames?.toolbar)}>
           <SearchField
             value={searchText}
-            onChange={onSearch}
-            onClear={() => onSearch("")}
-            className="group relative min-w-0 flex-1 basis-56"
+            onChange={changeSearch}
+            onClear={() => changeSearch("")}
+            className={cx("group relative min-w-0 flex-1 basis-56", classNames?.search)}
             isDisabled={isLoading && customers.length === 0}
           >
             <Label className="sr-only">Search customers</Label>
@@ -279,16 +302,31 @@ export const CustomerTable = forwardRef<HTMLElement, CustomerTableProps>(functio
             <p role="status" className="text-sm whitespace-nowrap text-[var(--rd-color-text-muted)]">
               {isLoading ? "Loading customers" : `${total.toLocaleString(locale)} customer${total === 1 ? "" : "s"}`}
             </p>
-            {canExport && (
-              <Button variant="secondary" onPress={exportRows} isDisabled={isLoading || total === 0}>
-                Export CSV
-              </Button>
-            )}
+            {canExport &&
+              (exportPermission.isDisabled ? (
+                <>
+                  <TooltipTrigger delay={300}>
+                    <Button variant="secondary" aria-disabled="true" aria-describedby={exportPermission.reason ? exportReasonId : undefined} onPress={() => {}} className={cx("cursor-not-allowed opacity-50", classNames?.export)}>
+                      Export CSV
+                    </Button>
+                    {exportPermission.reason && <Tooltip>{exportPermission.reason}</Tooltip>}
+                  </TooltipTrigger>
+                  {exportPermission.reason && (
+                    <span id={exportReasonId} className="sr-only">
+                      {exportPermission.reason}
+                    </span>
+                  )}
+                </>
+              ) : (
+                <Button variant="secondary" onPress={exportRows} isDisabled={isLoading || total === 0} className={classNames?.export}>
+                  Export CSV
+                </Button>
+              ))}
           </div>
         </div>
 
         {error && (
-          <Alert variant="danger" title="Couldn't load customers">
+          <Alert variant="danger" title="Couldn't load customers" className={classNames?.error}>
             <span className="flex flex-wrap items-center gap-3">
               {error}
               {onRetry && (
@@ -307,6 +345,7 @@ export const CustomerTable = forwardRef<HTMLElement, CustomerTableProps>(functio
               <Table
                 label={label}
                 density={density}
+                className={classNames?.table}
                 sortDescriptor={query.sort ?? undefined}
                 onSortChange={(d) => update({ sort: { column: d.column as CustomerSortColumn, direction: d.direction } })}
               >
@@ -368,7 +407,7 @@ export const CustomerTable = forwardRef<HTMLElement, CustomerTableProps>(functio
             </div>
 
             {/* Cards where there is not */}
-            <ul aria-label={`${label}, as a list`} className="flex flex-col gap-3 md:hidden">
+            <ul aria-label={`${label}, as a list`} className={cx("flex flex-col gap-3 md:hidden", classNames?.cards)}>
               {isLoading
                 ? Array.from({ length: 3 }, (_, i) => (
                     <li key={i} className="rounded-[var(--rd-radius-overlay)] border border-[var(--rd-color-border-default)] p-4">
@@ -409,6 +448,7 @@ export const CustomerTable = forwardRef<HTMLElement, CustomerTableProps>(functio
         {empty && (
           <EmptyState
             size="md"
+            className={classNames?.empty}
             title={filtered ? "No customers match" : "No customers yet"}
             description={filtered ? "Try a different search, or clear the filters to see everyone." : "People appear here once they sign up."}
           >
@@ -422,11 +462,11 @@ export const CustomerTable = forwardRef<HTMLElement, CustomerTableProps>(functio
 
         {/* Where you are, and the pages */}
         {!error && !isLoading && total > 0 && (
-          <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className={cx("flex flex-wrap items-center justify-between gap-3", classNames?.footer)}>
             <p className="text-sm text-[var(--rd-color-text-muted)]">
               Showing {first.toLocaleString(locale)} to {last.toLocaleString(locale)} of {total.toLocaleString(locale)}
             </p>
-            {pageCount > 1 && <Pagination pageCount={pageCount} page={page} onChange={(p) => update({ page: p })} size="sm" label={`${label} pages`} />}
+            {pageCount > 1 && <Pagination pageCount={pageCount} page={page} onChange={(p) => update({ page: p })} size="sm" label={`${label} pages`} className={classNames?.pagination} />}
           </div>
         )}
       </div>

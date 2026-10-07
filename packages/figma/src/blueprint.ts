@@ -304,6 +304,8 @@ const blueprints: Record<string, Blueprint> = {
     return frame({ name: "avatar group", dir: "row", gap: -Math.round(size / 4), cross: "center" }, [chip("AL", "avatar"), chip("GH", "avatar"), chip("KJ", "avatar"), chip("+3", "overflow")]);
   },
 
+  ActionButton: (c) => buttonBlueprint(c, "Delete user"),
+
   AlertDialog: (c) => {
     const danger = c.tone === "danger";
     return panel({ name: "alert dialog", dir: "col", gap: 16, pad: 24, w: 448 }, [
@@ -840,6 +842,60 @@ const blueprints: Record<string, Blueprint> = {
       ]),
       frame({ name: "stats", dir: "row", gap: 12, w: "fill" }, [0, 1, 2, 3].map(() => frame({ name: "stat card", dir: "col", gap: 4, pad: 14, w: "fill", fill: "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, [text("Customers", 12, "color.text.muted"), text("1,284", 22, "color.text.default", "Semi Bold")]))),
     ]),
+
+  PageHeader: (c) => {
+    const compact = c.size === "compact";
+    return frame({ name: "page header", dir: "col", gap: compact ? 8 : 12, w: 720, stroke: c.border ? "color.border.default" : undefined }, [
+      text("Home / Customers / Brightwater", 13, "color.text.muted"),
+      frame({ name: "title row", dir: "row", w: "fill", align: "between", cross: "start" }, [
+        frame({ name: "text", dir: "col", gap: 4 }, [text("Brightwater Supplies", compact ? 18 : 24, "color.text.default", "Semi Bold"), text("Customer since 2022.", 14, "color.text.muted")]),
+        frame({ name: "actions", dir: "row", gap: 8 }, [button("Edit customer", "primary")]),
+      ]),
+    ]);
+  },
+
+  SectionHeader: (c) => {
+    const compact = c.size === "compact";
+    return frame({ name: "section header", dir: "row", w: 560, align: "between", cross: "start", stroke: c.divider ? "color.border.default" : undefined }, [
+      frame({ name: "text", dir: "col", gap: 2 }, [text("Recent invoices", compact ? 16 : 18, "color.text.default", "Semi Bold"), text("The last ten, newest first.", 14, "color.text.muted")]),
+      button("View all", "secondary", "sm"),
+    ]);
+  },
+
+  AppFooter: (c) => {
+    const col = (title: string) => frame({ name: "group", dir: "col", gap: 8 }, [text(title, 14, "color.text.default", "Semi Bold"), text("Features", 14, "color.text.muted"), text("Pricing", 14, "color.text.muted")]);
+    const columns = c.layout === "columns";
+    return frame({ name: "app footer", dir: "col", gap: 24, pad: 32, w: 800, fill: "color.surface.default", stroke: "color.border.default" }, [
+      ...(columns ? [frame({ name: "groups", dir: "row", gap: 48 }, [col("Product"), col("Company"), col("Legal")])] : []),
+      frame({ name: "bottom", dir: "row", w: "fill", align: "between", cross: "center" }, [
+        text("© 2026 rdloom. All rights reserved.", 14, "color.text.muted"),
+        ...(columns ? [] : [frame({ name: "links", dir: "row", gap: 24 }, [text("Privacy", 14, "color.text.muted"), text("Terms", 14, "color.text.muted")])]),
+      ]),
+    ]);
+  },
+
+  ErrorState: (c) => {
+    const page = c.variant === "page";
+    return frame({ name: "error state", dir: "col", gap: 12, pad: page ? [64, 24] : [40, 24], w: page ? 480 : 400, align: "center", cross: "center", stroke: page ? undefined : "color.border.default", radius: page ? undefined : "radius.overlay" }, [
+      box(48, 48, { fill: "color.surface.subtle", stroke: "color.border.default", radius: 999, name: "icon" }),
+      text("We could not load your invoices", page ? 24 : 16, "color.text.default", "Semi Bold"),
+      text("Check your connection and try again.", 14, "color.text.muted"),
+      button("Try again", "primary"),
+    ]);
+  },
+
+  AuthCard: (c) => {
+    const w = c.size === "lg" ? 512 : c.size === "sm" ? 352 : 416;
+    const field = (label: string) => frame({ name: "field", dir: "col", gap: 6, w: "fill" }, [text(label, 14, "color.text.default", "Medium"), frame({ name: "input", dir: "row", w: "fill", h: 40, stroke: "color.border.default", radius: "radius.control" }, [])]);
+    return frame({ name: "auth card", dir: "col", gap: 20, pad: 32, w, fill: "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, [
+      text("rdloom", 18, "color.text.default", "Semi Bold"),
+      frame({ name: "header", dir: "col", gap: 6 }, [text("Sign in to your account", 24, "color.text.default", "Semi Bold"), text("Welcome back. Enter your details to continue.", 14, "color.text.muted")]),
+      field("Email"),
+      field("Password"),
+      button("Sign in", "primary"),
+      text("Create an account", 14, "color.text.muted"),
+    ]);
+  },
 
   Steps: (c) => {
     const vertical = c.orientation === "vertical";

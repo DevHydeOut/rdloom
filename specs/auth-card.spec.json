@@ -1,0 +1,142 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "AuthCard",
+  "version": "0.1.0",
+  "category": "block",
+  "status": "experimental",
+  "description": "The centered card for sign in, sign up, forgot password and verify code screens: a logo, a title, your form, other ways to sign in and links underneath.",
+  "props": {
+    "title": {
+      "type": "node",
+      "required": true,
+      "description": "The screen's title, shown as an h1, e.g. \"Sign in to your account\"."
+    },
+    "headingLevel": {
+      "type": "number",
+      "default": 1,
+      "description": "Heading level of the title, 1 to 6."
+    },
+    "description": {
+      "type": "node",
+      "description": "One sentence under the title."
+    },
+    "brand": {
+      "type": "node",
+      "description": "Your logo or name, shown above the title."
+    },
+    "children": {
+      "type": "node",
+      "description": "The form: Form, fields and a submit button."
+    },
+    "socialProviders": {
+      "type": "node",
+      "description": "Buttons for signing in another way. They are set under an \"or continue with\" line."
+    },
+    "socialLabel": {
+      "type": "string",
+      "default": "or continue with",
+      "description": "The text of the line above the social providers."
+    },
+    "footer": {
+      "type": "node",
+      "description": "Links under the card content, such as \"Forgot your password?\" or \"Create an account\"."
+    },
+    "illustration": {
+      "type": "node",
+      "description": "An image or panel for the side of the card. Shown from large screens up; hidden on a phone."
+    },
+    "size": {
+      "type": "enum",
+      "values": [
+        "sm",
+        "md",
+        "lg"
+      ],
+      "default": "md",
+      "description": "Width of the form column: 22rem, 26rem or 32rem."
+    },
+    "classNames": {
+      "type": "custom",
+      "description": "Extra class names for single parts, so you can restyle one part without editing the file. Keys: root, card, brand, header, title, description, body, socialProviders, footer, illustration.",
+      "tsType": "Partial<Record<\"root\" | \"card\" | \"brand\" | \"header\" | \"title\" | \"description\" | \"body\" | \"socialProviders\" | \"footer\" | \"illustration\", string>>"
+    }
+  },
+  "variants": [
+    "size"
+  ],
+  "states": [
+    "default"
+  ],
+  "slots": [
+    "root",
+    "card",
+    "brand",
+    "header",
+    "title",
+    "description",
+    "body",
+    "socialProviders",
+    "footer",
+    "illustration"
+  ],
+  "tokens": [
+    "color.surface.default",
+    "color.surface.subtle",
+    "color.border.default",
+    "color.text.default",
+    "color.text.muted",
+    "radius.overlay"
+  ],
+  "a11y": {
+    "role": "none",
+    "keyboard": [
+      "Tab: moves through the form fields, the submit button, the providers, then the footer links"
+    ],
+    "requirements": [
+      "The title is the page's h1",
+      "The \"or continue with\" line is a separator with a text label, read once",
+      "The illustration is decorative and hidden from screen readers",
+      "The card holds the form only; error summary, labels and messages come from the Form components you put inside"
+    ],
+    "screenReader": [
+      "\"Sign in to your account, heading level 1\"",
+      "\"or continue with, separator\""
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "Sign in, sign up, forgot password, reset password, verify code"
+    ],
+    "avoid_when": [
+      "A settings form inside the app: use a normal page"
+    ],
+    "anti_patterns": [
+      "Putting the account's real credentials in examples or tests",
+      "Hiding the error summary: a failed submit must be explained"
+    ]
+  },
+  "contract": {
+    "data": "Text for the title and description, and the form as children.",
+    "dataStates": [
+      "ready"
+    ],
+    "permissions": [],
+    "events": [],
+    "customization": [
+      "classNames for each part",
+      "brand, footer, socialProviders and illustration slots",
+      "the form you pass as children"
+    ]
+  },
+  "examples": [
+    "sign-in",
+    "sign-up",
+    "forgot-password",
+    "verify-code"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {}
+  }
+}

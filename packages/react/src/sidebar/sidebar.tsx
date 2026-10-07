@@ -8,11 +8,15 @@ import { Menu, MenuItem, MenuTrigger } from "../menu/menu";
 import { Tooltip, TooltipTrigger } from "../tooltip/tooltip";
 import { cx } from "../utils/cx";
 import { ChevronRightIcon, ChevronsUpDownIcon, SearchIcon, SidebarIcon } from "../utils/icons";
-import { badgeText, currentTopLevel, initialOf, type NavGroup, type NavItem, type ShellTeam, type ShellUser } from "./nav";
+import { badgeText, currentTopLevel, initialOf, navPermission, visibleNav, type NavGroup, type NavItem, type ShellTeam, type ShellUser } from "./nav";
 
 export interface SidebarProps extends SidebarSpecProps {
   className?: string;
 }
+
+/** The parts of the sidebar that take a class name of their own. */
+export type SidebarSlot = "root" | "header" | "team-switcher" | "search" | "nav" | "group" | "item" | "sub-list" | "footer" | "collapse" | "account";
+export type SidebarClassNames = Partial<Record<SidebarSlot, string>>;
 
 const linkBase =
   "relative flex w-full items-center gap-3 rounded-[var(--rd-radius-control)] px-3 py-1.5 text-start text-sm outline-none transition-colors " +
@@ -35,6 +39,8 @@ export interface NavProps {
   onPick?: () => void;
   /** Ask the sidebar to open (a collapsed parent has nowhere to show its sub-items). */
   onExpand?: () => void;
+  /** Class names for the parts: nav, group, item and sub-list are drawn here. */
+  classNames?: SidebarClassNames;
 }
 
 function Badge({ value, collapsed }: { value: string | number | undefined; collapsed: boolean }) {
@@ -74,15 +80,43 @@ function ItemBody({ item, collapsed, nested }: { item: NavItem; collapsed: boole
 }
 
 function Entry({ item, nested, current, parentOf, ...nav }: { item: NavItem; nested?: boolean; current: boolean; parentOf: boolean } & NavProps) {
-  const { collapsed, onNavigate, renderLink, onPick, onExpand } = nav;
+  const { collapsed, onNavigate, renderLink, onPick, onExpand, classNames } = nav;
   const listId = useId();
   const [open, setOpen] = useState(parentOf);
   useEffect(() => {
     if (parentOf) setOpen(true);
   }, [parentOf]);
   const iconOnly = collapsed && !nested;
-  const className = cx(linkBase, "group/nav", current && linkCurrent, parentOf && !current && "font-medium !text-[var(--rd-color-text-default)]", iconOnly && "justify-center px-0", nested && "min-h-8 py-1");
+  const className = cx(linkBase, "group/nav", current && linkCurrent, parentOf && !current && "font-medium !text-[var(--rd-color-text-default)]", iconOnly && "justify-center px-0", nested && "min-h-8 py-1", classNames?.item);
   const body = <ItemBody item={item} collapsed={iconOnly} nested={nested} />;
+
+  const permission = navPermission(item);
+  if (permission.isDisabled) {
+    // Shown, focusable and explained, but it goes nowhere.
+    const reason = permission.reason;
+    const button = (
+      <AriaButton aria-disabled="true" aria-describedby={reason ? listId : undefined} onPress={() => {}} className={cx(className, "cursor-not-allowed opacity-50")}>
+        {body}
+      </AriaButton>
+    );
+    return (
+      <li>
+        {reason || iconOnly ? (
+          <TooltipTrigger delay={300}>
+            {button}
+            <Tooltip placement="end">{reason ? (iconOnly ? `${item.label}: ${reason}` : reason) : item.label}</Tooltip>
+          </TooltipTrigger>
+        ) : (
+          button
+        )}
+        {reason && (
+          <span id={listId} className="sr-only">
+            {reason}
+          </span>
+        )}
+      </li>
+    );
+  }
 
   if (item.children?.length) {
     return (
@@ -102,7 +136,7 @@ function Entry({ item, nested, current, parentOf, ...nav }: { item: NavItem; nes
           {!collapsed && <ChevronRightIcon className={cx("size-4 shrink-0 text-[var(--rd-color-text-muted)] transition-transform motion-reduce:transition-none", open ? "rotate-90" : "")} />}
         </AriaButton>
         {/* Closed lists stay in the page, hidden, so their links are still there for search and for the current page's own parent. */}
-        <ul id={listId} hidden={!open || collapsed} className="mt-0.5 ms-5 flex flex-col gap-0.5 border-s border-[var(--rd-color-border-default)] ps-2">
+        <ul id={listId} hidden={!open || collapsed} className={cx("mt-0.5 ms-5 flex flex-col gap-0.5 border-s border-[var(--rd-color-border-default)] ps-2", classNames?.["sub-list"])}>
           {item.children.map((child) => (
             <Entry key={child.id} item={child} nested current={nav.currentId === child.id} parentOf={false} {...nav} />
           ))}
@@ -145,12 +179,14 @@ function Entry({ item, nested, current, parentOf, ...nav }: { item: NavItem; nes
 }
 
 export function NavList(props: NavProps) {
-  const { groups, currentId, collapsed, label } = props;
+  const { currentId, collapsed, label, classNames } = props;
+  // What the app hides is not drawn, and nothing that is empty is left behind.
+  const groups = visibleNav(props.groups);
   const top = currentTopLevel(groups, currentId);
   return (
-    <nav aria-label={label} className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto px-3 py-2">
+    <nav aria-label={label} className={cx("flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto px-3 py-2", classNames?.nav)}>
       {groups.map((group, g) => (
-        <div key={g} className="flex flex-col gap-1">
+        <div key={g} className={cx("flex flex-col gap-1", classNames?.group)}>
           {group.label &&
             (collapsed ? (
               <div role="separator" className="mx-2 my-1 border-t border-[var(--rd-color-border-default)]" />
@@ -159,7 +195,7 @@ export function NavList(props: NavProps) {
             ))}
           <ul className="flex flex-col gap-0.5">
             {group.items.map((item) => (
-              <Entry key={item.id} item={item} current={currentId === item.id} parentOf={top?.id === item.id && top.id !== currentId} {...props} />
+              <Entry key={item.id} item={item} current={currentId === item.id} parentOf={top?.id === item.id && top.id !== currentId} {...props} groups={groups} />
             ))}
           </ul>
         </div>
@@ -177,7 +213,7 @@ function TeamLogo({ team }: { team: ShellTeam }) {
 }
 
 /** The name of the organisation or workspace at the top of the sidebar. With several to choose from it is a menu. */
-export function TeamSwitcher({ team, teams, onSelect, collapsed }: { team: ShellTeam; teams?: ShellTeam[]; onSelect?: (team: ShellTeam) => void; collapsed: boolean }) {
+export function TeamSwitcher({ team, teams, onSelect, collapsed, className: extra }: { team: ShellTeam; teams?: ShellTeam[]; onSelect?: (team: ShellTeam) => void; collapsed: boolean; className?: string }) {
   const body = (
     <>
       <TeamLogo team={team} />
@@ -193,6 +229,7 @@ export function TeamSwitcher({ team, teams, onSelect, collapsed }: { team: Shell
   const classes = cx(
     "flex w-full items-center gap-2.5 rounded-[var(--rd-radius-control)] p-1.5 outline-none data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)]",
     collapsed && "justify-center",
+    extra,
   );
   if (!teams || teams.length < 2) return <div className={classes}>{body}</div>;
   return (
@@ -211,7 +248,7 @@ export function TeamSwitcher({ team, teams, onSelect, collapsed }: { team: Shell
   );
 }
 
-export function AccountMenu({ user, collapsed }: { user: ShellUser; collapsed: boolean }) {
+export function AccountMenu({ user, collapsed, className: extra }: { user: ShellUser; collapsed: boolean; className?: string }) {
   const trigger = (
     <AriaButton
       aria-label={`Account menu, ${user.name}`}
@@ -230,9 +267,9 @@ export function AccountMenu({ user, collapsed }: { user: ShellUser; collapsed: b
       {!collapsed && <ChevronsUpDownIcon className="size-4 shrink-0 text-[var(--rd-color-text-muted)]" />}
     </AriaButton>
   );
-  if (!user.menu?.length) return <div className="p-1">{trigger}</div>;
+  if (!user.menu?.length) return <div className={cx("p-1", extra)}>{trigger}</div>;
   return (
-    <div className="border-t border-[var(--rd-color-border-default)] p-2">
+    <div className={cx("border-t border-[var(--rd-color-border-default)] p-2", extra)}>
       <MenuTrigger>
         {trigger}
         <Menu placement="top start">
@@ -282,6 +319,7 @@ export const Sidebar = forwardRef<HTMLDivElement, SidebarProps>(function Sidebar
     onCollapsedChange,
     collapsible = sidebarDefaults.collapsible,
     appearance = sidebarDefaults.appearance,
+    classNames,
     className,
   },
   ref,
@@ -301,6 +339,7 @@ export const Sidebar = forwardRef<HTMLDivElement, SidebarProps>(function Sidebar
       className={cx(
         "flex min-h-[var(--rd-size-control-sm)] w-full items-center gap-3 rounded-[var(--rd-radius-control)] px-3 text-start text-sm text-[var(--rd-color-text-muted)] outline-none data-[hovered]:bg-[var(--rd-color-surface-subtle)] data-[hovered]:text-[var(--rd-color-text-default)] data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)]",
         collapsed && "justify-center px-0",
+        classNames?.collapse,
       )}
     >
       <SidebarIcon className="size-4 shrink-0" />
@@ -318,17 +357,18 @@ export const Sidebar = forwardRef<HTMLDivElement, SidebarProps>(function Sidebar
         collapsed ? "w-[var(--rd-sidebar-rail,4.5rem)]" : "w-[var(--rd-sidebar-width,16rem)]",
         appearances[appearance],
         className,
+        classNames?.root,
       )}
     >
-      <div className={cx("flex h-14 shrink-0 items-center px-3", collapsed && "justify-center")}>
+      <div className={cx("flex h-14 shrink-0 items-center px-3", collapsed && "justify-center", classNames?.header)}>
         {team ? (
-          <TeamSwitcher team={team} teams={teams} onSelect={onTeamChange} collapsed={collapsed} />
+          <TeamSwitcher team={team} teams={teams} onSelect={onTeamChange} collapsed={collapsed} className={classNames?.["team-switcher"]} />
         ) : (
           !collapsed && <div className="min-w-0 flex-1 truncate px-1 text-[15px] font-semibold">{brand}</div>
         )}
       </div>
       {onSearch && (
-        <div className="px-3 pb-1">
+        <div className={cx("px-3 pb-1", classNames?.search)}>
           {collapsed ? (
             <TooltipTrigger delay={300}>
               <AriaButton
@@ -351,8 +391,8 @@ export const Sidebar = forwardRef<HTMLDivElement, SidebarProps>(function Sidebar
           )}
         </div>
       )}
-      <NavList groups={navigation} currentId={currentId} label={label} collapsed={collapsed} onNavigate={onNavigate} renderLink={renderLink} onPick={onPick} onExpand={() => setCollapsed(false)} />
-      {footer && !collapsed && <div className="shrink-0 px-3 pb-2">{footer as ReactNode}</div>}
+      <NavList groups={navigation} currentId={currentId} label={label} collapsed={collapsed} onNavigate={onNavigate} renderLink={renderLink} onPick={onPick} onExpand={() => setCollapsed(false)} classNames={classNames} />
+      {footer && !collapsed && <div className={cx("shrink-0 px-3 pb-2", classNames?.footer)}>{footer as ReactNode}</div>}
       {collapsible && (
         <div className="shrink-0 px-3 pb-2">
           {collapsed ? (
@@ -365,7 +405,7 @@ export const Sidebar = forwardRef<HTMLDivElement, SidebarProps>(function Sidebar
           )}
         </div>
       )}
-      {user && <AccountMenu user={user} collapsed={collapsed} />}
+      {user && <AccountMenu user={user} collapsed={collapsed} className={classNames?.account} />}
     </div>
   );
 });

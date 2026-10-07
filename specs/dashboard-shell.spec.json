@@ -8,7 +8,7 @@
   "props": {
     "navigation": {
       "type": "custom",
-      "description": "The navigation as groups of items. An item may hold one level of sub-items.",
+      "description": "The navigation as groups of items. An item may hold one level of sub-items. An item may carry a permission (\"allow\", \"disabled\", \"hidden\" or { state, reason }): hidden items, and groups or parents left with nothing, are not drawn or counted; disabled items stay as focusable, non-navigating entries (aria-disabled) with the reason in a tooltip.",
       "required": true,
       "tsType": "import(\"../sidebar/nav\").NavGroup[]"
     },
@@ -102,6 +102,11 @@
       "description": "Called when the person folds or opens the sidebar. Save it if you want it remembered.",
       "tsType": "(collapsed: boolean) => void"
     },
+    "classNames": {
+      "type": "custom",
+      "description": "Class names for the parts of the shell, by slot name, added after the built-in ones so you can restyle one part without editing the file. Slots: root, skip-link, sidebar, collapse, nav, group, item, sub-list, account, header, search, actions, main, menu-sheet, team-switcher.",
+      "tsType": "Partial<Record<\"root\" | \"skip-link\" | \"sidebar\" | \"collapse\" | \"nav\" | \"group\" | \"item\" | \"sub-list\" | \"account\" | \"header\" | \"search\" | \"actions\" | \"main\" | \"menu-sheet\" | \"team-switcher\", string>>"
+    },
     "children": {
       "type": "node",
       "description": "The page.",
@@ -183,13 +188,14 @@
     "anti_patterns": [
       "Putting the shell inside another shell",
       "Hiding the only way to a section behind the folded sidebar's tooltip: give every item an icon people can tell apart",
-      "More than about 7 top-level items in one group without headings"
+      "More than about 7 top-level items in one group without headings",
+      "UI permission is not security: hiding or disabling an item only changes what people see, so the server must check access again for every request"
     ]
   },
   "contract": {
     "data": "The navigation as plain data: groups of items, each with an id, label, optional href, icon, badge and sub-items.",
     "dataStates": [],
-    "permissions": [],
+    "permissions": ["per navigation item"],
     "events": ["onNavigate", "onTeamChange", "onSearch", "onCollapsedChange"],
     "customization": ["renderLink (your router's link)", "brand or team", "header and actions slots", "the Sidebar it is built on"]
   },
@@ -197,7 +203,9 @@
     "basic",
     "with-sub-items",
     "collapsed",
-    "with-your-router"
+    "with-your-router",
+    "permissions",
+    "classNames"
   ],
   "figma": {
     "componentKey": null,

@@ -91,7 +91,7 @@ export const EagerExamples = createContext<Record<string, ComponentType> | null>
  * "More", and a test fails so it gets a home.
  */
 export const componentGroupDefs: Array<{ id: string; label: string; ids: string[] }> = [
-  { id: "buttons", label: "Buttons", ids: ["button", "shimmer-button", "ripple-button", "pulse-button", "gradient-button", "reveal-button"] },
+  { id: "buttons", label: "Buttons", ids: ["button", "action-button", "shimmer-button", "ripple-button", "pulse-button", "gradient-button", "reveal-button"] },
   { id: "search", label: "Search and commands", ids: ["command-palette", "combobox"] },
   { id: "text-inputs", label: "Text and number inputs", ids: ["text-field", "input-otp", "number-field", "tag-input", "file-upload"] },
   { id: "choice", label: "Choices and toggles", ids: ["select", "checkbox", "radio-group", "switch", "slider", "segmented-control", "toggle-button"] },
@@ -101,11 +101,11 @@ export const componentGroupDefs: Array<{ id: string; label: string; ids: string[
   { id: "charts", label: "Charts and stats", ids: ["chart", "sparkline", "stat"] },
   { id: "navigation", label: "Navigation", ids: ["tabs", "breadcrumbs", "steps", "menu"] },
   { id: "overlays", label: "Dialogs and popovers", ids: ["dialog", "alert-dialog", "sheet", "popover", "tooltip"] },
-  { id: "feedback", label: "Feedback and status", ids: ["alert", "toast", "progress", "skeleton", "empty-state", "badge"] },
+  { id: "feedback", label: "Feedback and status", ids: ["alert", "toast", "progress", "skeleton", "empty-state", "error-state", "badge"] },
   { id: "display", label: "Content and layout", ids: ["card", "accordion", "avatar", "kbd", "collapsible", "separator", "avatar-group"] },
   { id: "ai", label: "AI chat and agents", ids: ["chat", "message", "prompt-input", "response", "tool-call", "agent-activity", "approval-box", "citation", "sources", "generated-table", "generated-chart"] },
   { id: "motion", label: "Motion and effects", ids: ["text-shimmer", "gradient-text", "blur-fade", "shine-border", "shuttle-border", "ripple"] },
-  { id: "blocks", label: "Blocks", ids: ["dashboard-shell", "dashboard-page", "sidebar", "customer-table"] },
+  { id: "blocks", label: "Blocks", ids: ["dashboard-shell", "dashboard-page", "page-header", "section-header", "app-footer", "auth-card", "sidebar", "customer-table"] },
 ];
 
 export interface ComponentGroup {

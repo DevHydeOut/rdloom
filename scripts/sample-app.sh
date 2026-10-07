@@ -82,6 +82,15 @@ for part in alert-dialog input-otp collapsible separator toggle-button avatar-gr
 done
 echo "✓ small components installed"
 
+step "Page structure and actions: page header, section header, footer, error state, auth card, action button"
+npx rdloom add page-header section-header app-footer error-state auth-card action-button --install
+for part in page-header section-header app-footer error-state auth-card action-button alert-dialog separator tooltip; do
+  test -e "src/components/rdloom/$part/$part.tsx" || { echo "✗ rdloom add did not bring $part"; exit 1; }
+done
+test -e src/components/rdloom/utils/url-state.ts || { echo "✗ the address-state helpers (utils/url-state.ts) were not installed"; exit 1; }
+test -e src/components/rdloom/utils/permissions.ts || { echo "✗ the permission helpers (utils/permissions.ts) were not installed"; exit 1; }
+echo "✓ page structure and actions installed"
+
 step "Typecheck and production build"
 npm run build --silent
 # The keyframes must be in the CSS the browser actually loads, with no <style> tag in the markup.

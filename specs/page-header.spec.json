@@ -1,0 +1,139 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "PageHeader",
+  "version": "0.1.0",
+  "category": "block",
+  "status": "experimental",
+  "description": "The top of a page: breadcrumbs, a title with badges, a description, actions on the right and tabs underneath. Every part is optional except the title.",
+  "props": {
+    "title": {
+      "type": "node",
+      "required": true,
+      "description": "The page's title, shown as an h1 by default."
+    },
+    "headingLevel": {
+      "type": "number",
+      "default": 1,
+      "description": "Heading level of the title, 1 to 6. Keep 1 unless the header sits inside another page."
+    },
+    "description": {
+      "type": "node",
+      "description": "One or two sentences under the title."
+    },
+    "breadcrumbs": {
+      "type": "node",
+      "description": "A Breadcrumbs component, shown above the title."
+    },
+    "meta": {
+      "type": "node",
+      "description": "Badges or a status shown next to the title."
+    },
+    "actions": {
+      "type": "node",
+      "description": "Buttons for the right of the title. They wrap under the title on a narrow screen."
+    },
+    "tabs": {
+      "type": "node",
+      "description": "A Tabs list (or any navigation) shown under the title."
+    },
+    "isLoading": {
+      "type": "boolean",
+      "default": false,
+      "description": "Show the title and description as skeletons and mark the header busy."
+    },
+    "size": {
+      "type": "enum",
+      "values": [
+        "default",
+        "compact"
+      ],
+      "default": "default",
+      "description": "compact for pages with little room, such as a side panel or a dense admin screen."
+    },
+    "border": {
+      "type": "boolean",
+      "default": false,
+      "description": "Draw a line under the header."
+    },
+    "classNames": {
+      "type": "custom",
+      "description": "Extra class names for single parts, so you can restyle one part without editing the file. Keys: root, breadcrumbs, title, meta, description, actions, tabs.",
+      "tsType": "Partial<Record<\"root\" | \"breadcrumbs\" | \"title\" | \"meta\" | \"description\" | \"actions\" | \"tabs\", string>>"
+    }
+  },
+  "variants": [
+    "size",
+    "border"
+  ],
+  "states": [
+    "default",
+    "loading"
+  ],
+  "slots": [
+    "root",
+    "breadcrumbs",
+    "title",
+    "meta",
+    "description",
+    "actions",
+    "tabs"
+  ],
+  "tokens": [
+    "color.text.default",
+    "color.text.muted",
+    "color.border.default",
+    "color.surface.subtle"
+  ],
+  "a11y": {
+    "role": "none",
+    "keyboard": [
+      "Tab: moves through the breadcrumbs, the actions, then the tabs"
+    ],
+    "requirements": [
+      "The title is a real heading (h1 unless you change headingLevel), so there is one clear heading to jump to",
+      "Breadcrumbs keep their own navigation landmark; the header adds none",
+      "While loading the header is marked busy and the title keeps a hidden \"Loading\" text, never a made-up title",
+      "On a narrow screen the actions move under the title instead of squeezing it"
+    ],
+    "screenReader": [
+      "\"Customers, heading level 1\"",
+      "While loading: \"Loading, heading level 1\""
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "The top of any page or detail screen",
+      "Inside DashboardPage, which uses it for its heading"
+    ],
+    "avoid_when": [
+      "Headings for a section inside a page: use SectionHeader"
+    ],
+    "anti_patterns": [
+      "More than one h1 on a page",
+      "Putting the main action in tabs instead of actions"
+    ]
+  },
+  "contract": {
+    "data": "A title, and optional description, breadcrumbs, badges, actions and tabs.",
+    "dataStates": [
+      "loading",
+      "ready"
+    ],
+    "permissions": [],
+    "events": [],
+    "customization": [
+      "classNames for each part",
+      "breadcrumbs, meta, actions and tabs slots"
+    ]
+  },
+  "examples": [
+    "basic",
+    "with-breadcrumbs-and-tabs",
+    "loading"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {}
+  }
+}

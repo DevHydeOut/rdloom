@@ -8,7 +8,7 @@ export const sidebarAppearanceValues = ["bordered", "subtle", "floating", "inset
 /** A sidebar of navigation: the team or product name at the top, grouped links with sub-items and badges, an optional footer, and the signed-in person at the bottom. It can fold down to icons, and comes in four looks. It is only the panel; DashboardShell adds the top bar and the phone menu. */
 export interface SidebarSpecProps {
   /**
-   * The navigation as groups of items. An item may hold one level of sub-items.
+   * The navigation as groups of items. An item may hold one level of sub-items. An item may carry a permission ("allow", "disabled", "hidden" or { state, reason }): hidden items, and groups or parents left with nothing, are not drawn or counted; disabled items stay as focusable, non-navigating entries (aria-disabled) with the reason in a tooltip.
    */
   navigation: import("../sidebar/nav").NavGroup[];
   /**
@@ -83,6 +83,10 @@ export interface SidebarSpecProps {
    * @default true
    */
   collapsible?: boolean;
+  /**
+   * Class names for the parts of the sidebar, by slot name, added after the built-in ones so you can restyle one part without editing the file. Slots: root, header, team-switcher, search, nav, group, item, sub-list, footer, collapse, account.
+   */
+  classNames?: Partial<Record<"root" | "header" | "team-switcher" | "search" | "nav" | "group" | "item" | "sub-list" | "footer" | "collapse" | "account", string>>;
   /**
    * bordered: a line on the inner edge. subtle: a tinted panel with no line. floating: a rounded raised card with a margin around it. inset: no line and no fill, for a sidebar that sits on a tinted page beside an inset page card (DashboardShell draws that page card).
    * @default "bordered"

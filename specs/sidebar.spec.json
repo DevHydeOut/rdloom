@@ -8,7 +8,7 @@
   "props": {
     "navigation": {
       "type": "custom",
-      "description": "The navigation as groups of items. An item may hold one level of sub-items.",
+      "description": "The navigation as groups of items. An item may hold one level of sub-items. An item may carry a permission (\"allow\", \"disabled\", \"hidden\" or { state, reason }): hidden items, and groups or parents left with nothing, are not drawn or counted; disabled items stay as focusable, non-navigating entries (aria-disabled) with the reason in a tooltip.",
       "required": true,
       "tsType": "import(\"../sidebar/nav\").NavGroup[]"
     },
@@ -93,6 +93,11 @@
       "description": "Show the Collapse button at the bottom. Turn it off when you fold the sidebar from somewhere else, such as a top bar.",
       "default": true
     },
+    "classNames": {
+      "type": "custom",
+      "description": "Class names for the parts of the sidebar, by slot name, added after the built-in ones so you can restyle one part without editing the file. Slots: root, header, team-switcher, search, nav, group, item, sub-list, footer, collapse, account.",
+      "tsType": "Partial<Record<\"root\" | \"header\" | \"team-switcher\" | \"search\" | \"nav\" | \"group\" | \"item\" | \"sub-list\" | \"footer\" | \"collapse\" | \"account\", string>>"
+    },
     "appearance": {
       "type": "enum",
       "values": ["bordered", "subtle", "floating", "inset"],
@@ -169,13 +174,14 @@
     "anti_patterns": [
       "Putting a second navigation landmark with the same name on the page: give each one its own label",
       "Hiding the only way to a section behind the folded sidebar's tooltip: give every item an icon people can tell apart",
-      "More than about 7 top-level items in one group without headings"
+      "More than about 7 top-level items in one group without headings",
+      "UI permission is not security: hiding or disabling an item only changes what people see, so the server must check access again for every request"
     ]
   },
   "contract": {
     "data": "The navigation as plain data: groups of items, each with an id, label, optional href, icon, badge and sub-items.",
     "dataStates": [],
-    "permissions": [],
+    "permissions": ["per navigation item"],
     "events": ["onNavigate", "onPick", "onTeamChange", "onSearch", "onCollapsedChange"],
     "customization": ["appearance (bordered, subtle, floating)", "renderLink (your router's link)", "footer slot", "--rd-sidebar-width and --rd-sidebar-rail"]
   },
@@ -185,7 +191,9 @@
     "floating",
     "collapsed",
     "standalone",
-    "in-a-sheet"
+    "in-a-sheet",
+    "permissions",
+    "classNames"
   ],
   "figma": {
     "componentKey": null,

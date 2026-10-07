@@ -68,9 +68,29 @@ export interface CustomerTableSpecProps {
    */
   onExport?: (customers: import("../customer-table/query").Customer[], query: import("../customer-table/query").CustomerQuery) => void;
   /**
-   * Makes each name a button and calls this with the customer, e.g. to open a details panel.
+   * The older name of onSelect: makes each name a button and calls this with the customer, e.g. to open a details panel. Both are called when both are given.
    */
   onOpenCustomer?: (customer: import("../customer-table/query").Customer) => void;
+  /**
+   * Makes each name a button and calls this with the customer, e.g. to open a details panel. The conventional name; fires together with onOpenCustomer.
+   */
+  onSelect?: (customer: import("../customer-table/query").Customer) => void;
+  /**
+   * Called with the search text whenever the search changes (after the short pause with serverSide). It fires in addition to onQueryChange.
+   */
+  onSearch?: (query: string) => void;
+  /**
+   * Called with the chosen statuses and plans whenever a filter changes or the filters are cleared. It fires in addition to onQueryChange.
+   */
+  onFilter?: (filters: { status: string[]; plan: string[] }) => void;
+  /**
+   * What the app allows, by action: export (the Export CSV button) and open (opening a customer from a name). Each answer is "allow", "disabled", "hidden", true, false or { state, reason }. Hidden removes Export; disabled keeps it focusable with aria-disabled and the reason in a tooltip and read after the button. A disabled open makes the names plain text. Search and filters are always allowed. This only changes what people see: the server must check again.
+   */
+  permissions?: import("../utils/permissions").Permissions<"export" | "open">;
+  /**
+   * Class names for the parts of the block, by slot name, added after the built-in ones so you can restyle one part without editing the file. Slots: root, insights, stat, chart, toolbar, search, filters, export, table, cards, empty, error, footer, pagination.
+   */
+  classNames?: Partial<Record<"root" | "insights" | "stat" | "chart" | "toolbar" | "search" | "filters" | "export" | "table" | "cards" | "empty" | "error" | "footer" | "pagination", string>>;
   /**
    * Which badge color a status gets. The defaults are active green, trial blue, overdue amber, churned red; anything else is neutral.
    */

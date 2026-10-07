@@ -419,7 +419,7 @@ function BlockExample({ component, example }: { component: DocComponent; example
   const [view, setView] = useState<"preview" | "code">("preview");
   const widths = { desktop: "max-w-full", tablet: "max-w-[768px]", phone: "max-w-[390px]" } as const;
   // Blocks that are a whole application screen fill a frame; the rest take the height of their content.
-  const tall = component.id === "dashboard-shell" || component.id === "sidebar";
+  const tall = component.id === "dashboard-shell" || component.id === "sidebar" || component.id === "auth-card";
   const seg = (active: boolean) =>
     `h-7 rounded-md px-2.5 text-xs font-medium outline-none transition-colors focus-visible:ring-2 focus-visible:ring-[var(--rd-color-focus-ring)] ${active ? "bg-[var(--site-bg)] text-[var(--site-fg)] shadow-sm" : "text-[var(--site-muted)] hover:text-[var(--site-fg)]"}`;
   return (
@@ -459,7 +459,7 @@ function BlockExample({ component, example }: { component: DocComponent; example
           </a>
         </div>
         {view === "preview" ? (
-          <div data-block-preview className={`bg-[var(--site-subtle)] ${tall ? "min-h-0 flex-1" : ""} ${tall && size === "desktop" ? "p-0" : "p-3 sm:p-6"}`}>
+          <div data-block-preview className={`${tall ? "min-h-0 flex-1 bg-[var(--site-subtle)]" : "bg-[var(--rd-color-surface-default)]"} ${tall && size === "desktop" ? "p-0" : "p-3 sm:p-6"}`}>
             <div
               className={`mx-auto w-full overflow-hidden transition-[max-width] duration-300 motion-reduce:transition-none ${widths[size]} ${
                 tall ? `h-full bg-[var(--rd-color-surface-default)] ${size === "desktop" ? "" : "rounded-xl border border-[var(--site-border)]"}` : ""

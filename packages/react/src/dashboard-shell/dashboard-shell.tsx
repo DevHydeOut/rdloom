@@ -12,6 +12,10 @@ export interface DashboardShellProps extends DashboardShellSpecProps {
   className?: string;
 }
 
+/** The parts of the shell that take a class name of their own. */
+export type DashboardShellSlot = "root" | "skip-link" | "sidebar" | "collapse" | "nav" | "group" | "item" | "sub-list" | "account" | "header" | "search" | "actions" | "main" | "menu-sheet" | "team-switcher";
+export type DashboardShellClassNames = Partial<Record<DashboardShellSlot, string>>;
+
 const NARROW = 768;
 
 /**
@@ -44,6 +48,7 @@ export const DashboardShell = forwardRef<HTMLDivElement, DashboardShellProps>(fu
     defaultCollapsed = dashboardShellDefaults.defaultCollapsed,
     onCollapsedChange,
     children,
+    classNames,
     className,
   },
   forwardedRef,
@@ -68,7 +73,9 @@ export const DashboardShell = forwardRef<HTMLDivElement, DashboardShellProps>(fu
   }, []);
 
   const inset = sidebarAppearance === "inset";
-  const nav = { groups: navigation, currentId, label, onNavigate, renderLink } satisfies Partial<NavProps>;
+  // The parts the sidebar draws; the others belong to the shell itself.
+  const navClasses = { nav: classNames?.nav, group: classNames?.group, item: classNames?.item, "sub-list": classNames?.["sub-list"], account: classNames?.account, "team-switcher": classNames?.["team-switcher"] };
+  const nav = { groups: navigation, currentId, label, onNavigate, renderLink, classNames: navClasses } satisfies Partial<NavProps>;
 
   return (
     <div
@@ -78,7 +85,7 @@ export const DashboardShell = forwardRef<HTMLDivElement, DashboardShellProps>(fu
         else if (forwardedRef) forwardedRef.current = node;
       }}
       data-compact={compact || undefined}
-      className={cx("group/shell relative flex h-full min-h-0 w-full overflow-hidden text-[var(--rd-color-text-default)]", inset ? "bg-[var(--rd-color-surface-subtle)]" : "bg-[var(--rd-color-surface-default)]", className)}
+      className={cx("group/shell relative flex h-full min-h-0 w-full overflow-hidden text-[var(--rd-color-text-default)]", inset ? "bg-[var(--rd-color-surface-subtle)]" : "bg-[var(--rd-color-surface-default)]", className, classNames?.root)}
     >
       <a
         href={`#${mainId}`}
@@ -89,7 +96,7 @@ export const DashboardShell = forwardRef<HTMLDivElement, DashboardShellProps>(fu
           event.preventDefault();
           target.focus();
         }}
-        className="sr-only z-50 rounded-[var(--rd-radius-control)] bg-[var(--rd-color-surface-raised)] px-3 py-2 text-sm font-medium [box-shadow:var(--rd-elevation-floating)] focus:not-sr-only focus:absolute focus:start-3 focus:top-3"
+        className={cx("sr-only z-50 rounded-[var(--rd-radius-control)] bg-[var(--rd-color-surface-raised)] px-3 py-2 text-sm font-medium [box-shadow:var(--rd-elevation-floating)] focus:not-sr-only focus:absolute focus:start-3 focus:top-3", classNames?.["skip-link"])}
       >
         {skipLabel}
       </a>
@@ -99,6 +106,7 @@ export const DashboardShell = forwardRef<HTMLDivElement, DashboardShellProps>(fu
         className={cx(
           "hidden shrink-0 transition-[width] duration-200 motion-reduce:transition-none md:flex group-data-[compact]/shell:!hidden",
           collapsed ? "w-[4.5rem]" : "w-64",
+          classNames?.sidebar,
         )}
       >
         <Sidebar
@@ -117,13 +125,14 @@ export const DashboardShell = forwardRef<HTMLDivElement, DashboardShellProps>(fu
           appearance={sidebarAppearance}
           footer={sidebarFooter}
           collapsible={false}
+          classNames={navClasses}
           className={sidebarAppearance === "floating" ? "[--rd-sidebar-rail:calc(100%-1rem)] [--rd-sidebar-width:calc(100%-1rem)]" : "[--rd-sidebar-rail:100%] [--rd-sidebar-width:100%]"}
         />
       </div>
 
       <div className={cx("flex min-w-0 flex-1 flex-col", inset && "p-2 ps-0 group-data-[compact]/shell:p-0")}>
         <div className={cx("flex min-h-0 flex-1 flex-col", inset && "overflow-hidden rounded-xl border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-default)] [box-shadow:var(--rd-elevation-raised)] group-data-[compact]/shell:rounded-none group-data-[compact]/shell:border-0")}>
-        <header className="flex h-14 shrink-0 items-center gap-3 border-b border-[var(--rd-color-border-default)] px-4">
+        <header className={cx("flex h-14 shrink-0 items-center gap-3 border-b border-[var(--rd-color-border-default)] px-4", classNames?.header)}>
           {/* The same navigation as a slide-in menu, where the sidebar is hidden */}
           <div className="block md:hidden group-data-[compact]/shell:!block">
             <DialogTrigger>
@@ -133,11 +142,11 @@ export const DashboardShell = forwardRef<HTMLDivElement, DashboardShellProps>(fu
               >
                 <MenuIcon className="size-5" />
               </AriaButton>
-              <Sheet title={typeof brand === "string" ? brand : "Menu"} side="start" size="sm">
+              <Sheet title={typeof brand === "string" ? brand : "Menu"} side="start" size="sm" className={classNames?.["menu-sheet"]}>
                 {({ close }) => (
                   <div className="-m-6 flex h-[calc(100%+3rem)] min-h-0 flex-col">
                     <NavList {...nav} collapsed={false} onPick={close} />
-                    {user && <AccountMenu user={user} collapsed={false} />}
+                    {user && <AccountMenu user={user} collapsed={false} className={classNames?.account} />}
                   </div>
                 )}
               </Sheet>
@@ -149,7 +158,7 @@ export const DashboardShell = forwardRef<HTMLDivElement, DashboardShellProps>(fu
               aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
               aria-expanded={!collapsed}
               onPress={() => setCollapsed(!collapsed)}
-              className="flex size-8 shrink-0 items-center justify-center rounded-[var(--rd-radius-control)] text-[var(--rd-color-text-muted)] outline-none data-[hovered]:bg-[var(--rd-color-surface-subtle)] data-[hovered]:text-[var(--rd-color-text-default)] data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)]"
+              className={cx("flex size-8 shrink-0 items-center justify-center rounded-[var(--rd-radius-control)] text-[var(--rd-color-text-muted)] outline-none data-[hovered]:bg-[var(--rd-color-surface-subtle)] data-[hovered]:text-[var(--rd-color-text-default)] data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)]", classNames?.collapse)}
             >
               <SidebarIcon className="size-[18px]" />
             </AriaButton>
@@ -160,15 +169,15 @@ export const DashboardShell = forwardRef<HTMLDivElement, DashboardShellProps>(fu
             <AriaButton
               onPress={onSearch}
               aria-label={searchLabel}
-              className="flex h-9 items-center gap-2 rounded-[var(--rd-radius-control)] border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-default)] px-3 text-sm text-[var(--rd-color-text-muted)] outline-none data-[hovered]:border-[var(--rd-color-border-strong)] data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)] sm:w-56"
+              className={cx("flex h-9 items-center gap-2 rounded-[var(--rd-radius-control)] border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-default)] px-3 text-sm text-[var(--rd-color-text-muted)] outline-none data-[hovered]:border-[var(--rd-color-border-strong)] data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)] sm:w-56", classNames?.search)}
             >
               <SearchIcon className="size-4" />
               <span className="hidden flex-1 text-start sm:inline">{searchLabel}</span>
             </AriaButton>
           )}
-          {actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}
+          {actions && <div className={cx("flex shrink-0 items-center gap-2", classNames?.actions)}>{actions}</div>}
         </header>
-        <main id={mainId} tabIndex={-1} className="min-h-0 flex-1 overflow-y-auto outline-none">
+        <main id={mainId} tabIndex={-1} className={cx("min-h-0 flex-1 overflow-y-auto outline-none", classNames?.main)}>
           {children as ReactNode}
         </main>
         </div>

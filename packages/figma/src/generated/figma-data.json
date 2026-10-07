@@ -325,6 +325,35 @@
       ]
     },
     {
+      "name": "ActionButton",
+      "id": "action-button",
+      "version": "0.1.0",
+      "description": "One button that handles the permission check, an optional confirmation, the pending state and a result message for an action. It does not fetch data, show toasts, cache or route: you pass the function that does the work.",
+      "properties": [
+        {
+          "prop": "variant",
+          "name": "Variant",
+          "values": [
+            "primary",
+            "secondary",
+            "ghost",
+            "danger"
+          ],
+          "default": "primary"
+        },
+        {
+          "prop": "size",
+          "name": "Size",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "default": "md"
+        }
+      ]
+    },
+    {
       "name": "AgentActivity",
       "id": "agent-activity",
       "version": "0.1.0",
@@ -368,6 +397,23 @@
       ]
     },
     {
+      "name": "AppFooter",
+      "id": "app-footer",
+      "version": "0.1.0",
+      "description": "The footer of an application or marketing page: a line of text, link lists and social links. It stacks on a phone and has the same size and spacing on every page.",
+      "properties": [
+        {
+          "prop": "layout",
+          "name": "layout",
+          "values": [
+            "simple",
+            "columns"
+          ],
+          "default": "simple"
+        }
+      ]
+    },
+    {
       "name": "ApprovalBox",
       "id": "approval-box",
       "version": "0.1.0",
@@ -382,6 +428,24 @@
             "high"
           ],
           "default": "medium"
+        }
+      ]
+    },
+    {
+      "name": "AuthCard",
+      "id": "auth-card",
+      "version": "0.1.0",
+      "description": "The centered card for sign in, sign up, forgot password and verify code screens: a logo, a title, your form, other ways to sign in and links underneath.",
+      "properties": [
+        {
+          "prop": "size",
+          "name": "size",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "default": "md"
         }
       ]
     },
@@ -881,6 +945,23 @@
       ]
     },
     {
+      "name": "ErrorState",
+      "id": "error-state",
+      "version": "0.1.0",
+      "description": "What to show when a page or a panel could not be shown: a failed load, or a 404, 403 or 500 screen, with what happened and how to go on.",
+      "properties": [
+        {
+          "prop": "variant",
+          "name": "variant",
+          "values": [
+            "inline",
+            "page"
+          ],
+          "default": "inline"
+        }
+      ]
+    },
+    {
       "name": "ErrorSummary",
       "id": "error-summary",
       "version": "0.1.0",
@@ -1130,6 +1211,32 @@
       ]
     },
     {
+      "name": "PageHeader",
+      "id": "page-header",
+      "version": "0.1.0",
+      "description": "The top of a page: breadcrumbs, a title with badges, a description, actions on the right and tabs underneath. Every part is optional except the title.",
+      "properties": [
+        {
+          "prop": "size",
+          "name": "size",
+          "values": [
+            "default",
+            "compact"
+          ],
+          "default": "default"
+        },
+        {
+          "prop": "border",
+          "name": "border",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
       "name": "Pagination",
       "id": "pagination",
       "version": "0.1.0",
@@ -1365,6 +1472,32 @@
         {
           "prop": "isPaused",
           "name": "Paused",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
+      "name": "SectionHeader",
+      "id": "section-header",
+      "version": "0.1.0",
+      "description": "The heading of a section inside a page, for a card or a table: a title, a description and actions on the right.",
+      "properties": [
+        {
+          "prop": "size",
+          "name": "size",
+          "values": [
+            "default",
+            "compact"
+          ],
+          "default": "default"
+        },
+        {
+          "prop": "divider",
+          "name": "divider",
           "values": [
             "false",
             "true"
