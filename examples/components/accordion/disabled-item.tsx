@@ -2,7 +2,7 @@ import { Accordion, AccordionItem } from "@rdloom/react";
 
 export default function AccordionDisabledItemExample() {
   return (
-    <div className="w-full max-w-lg">
+    <div className="w-[32rem] max-w-full">
       <Accordion>
         <AccordionItem id="general" title="General">
           Workspace name and URL.

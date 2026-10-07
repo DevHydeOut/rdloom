@@ -29,6 +29,18 @@ const navigation: NavGroup[] = [
 
 const user = { name: "Ada Lovelace", email: "ada@example.com", menu: [{ id: "profile", label: "Your profile", onSelect: vi.fn() }, { id: "out", label: "Sign out", onSelect: vi.fn(), variant: "danger" as const }] };
 
+describe("sidebar looks", () => {
+  it("passes the look and the footer to the sidebar", () => {
+    const { container } = render(
+      <DashboardShell navigation={navigation} brand="Acme" sidebarAppearance="inset" sidebarFooter={<p>Free plan</p>}>
+        <DashboardPage title="Home" />
+      </DashboardShell>,
+    );
+    expect(container.querySelector("[data-appearance='inset']")).not.toBeNull();
+    expect(screen.getAllByText("Free plan").length).toBeGreaterThan(0);
+  });
+});
+
 describe("navigation as data", () => {
   it("lists every item, sub-items included, and finds one by id", () => {
     expect(flattenNav(navigation).map((i) => i.id)).toEqual(["home", "customers", "reports", "revenue", "retention", "settings"]);

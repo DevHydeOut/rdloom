@@ -118,7 +118,7 @@ function Overview() {
 }
 
 // The sidebar is the left column of the shell. Items without an href call onNavigate; with an href they are real links.
-export default function SidebarBasicExample() {
+export default function SidebarInsetExample() {
   const [current, setCurrent] = useState("overview");
   const [team, setTeam] = useState(teams[0]);
   const page = findNavItem(navigation, current)!;
@@ -135,7 +135,7 @@ export default function SidebarBasicExample() {
         onTeamChange={(t) => setTeam(teams.find((x) => x.id === t.id) ?? teams[0])}
         user={{ name: "Ada Lovelace", email: "ada@example.com", menu: [{ id: "profile", label: "Your profile", onSelect: () => {} }, { id: "out", label: "Sign out", onSelect: () => {}, variant: "danger" }] }}
         onSearch={() => {}}
-        sidebarAppearance="bordered"
+        sidebarAppearance="inset"
         header={
           <Breadcrumbs label="You are here">
             <BreadcrumbItem>{navigation.find((g) => g.items.some((i) => i.id === current || i.children?.some((c) => c.id === current)))?.label ?? "Platform"}</BreadcrumbItem>

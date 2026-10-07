@@ -78,6 +78,16 @@
       "description": "Draw items as your router's link. Return the link with the given className and children; call onClick when chosen. Without it, items with an href are plain links.",
       "tsType": "(props: { item: import(\"../sidebar/nav\").NavItem; className: string; children: import(\"react\").ReactNode; isCurrent: boolean; onClick: () => void }) => import(\"react\").ReactNode"
     },
+    "sidebarAppearance": {
+      "type": "enum",
+      "values": ["bordered", "subtle", "floating", "inset"],
+      "default": "bordered",
+      "description": "The look of the sidebar and the page: bordered (a line between them), subtle (a tinted sidebar), floating (the sidebar is a raised card) or inset (a tinted background with the page as a rounded card)."
+    },
+    "sidebarFooter": {
+      "type": "node",
+      "description": "Content above the account area in the sidebar, such as an upgrade card. It is hidden while the sidebar is folded."
+    },
     "isCollapsed": {
       "type": "boolean",
       "description": "Controlled: whether the sidebar is folded down to icons."

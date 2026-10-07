@@ -11,8 +11,8 @@ export interface AvatarGroupProps
 
 const sizes: Record<NonNullable<AvatarGroupSpecProps["size"]>, { overlap: string; chip: string }> = {
   xs: { overlap: "-ms-1.5", chip: "size-6 text-[10px]" },
-  sm: { overlap: "-ms-2", chip: "size-8 text-xs" },
-  md: { overlap: "-ms-2.5", chip: "size-10 text-sm" },
+  sm: { overlap: "-ms-1.5", chip: "size-8 text-xs" },
+  md: { overlap: "-ms-2", chip: "size-10 text-sm" },
   lg: { overlap: "-ms-3.5", chip: "size-14 text-base" },
 };
 

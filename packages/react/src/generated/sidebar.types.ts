@@ -3,9 +3,9 @@
 
 import type { ReactNode } from "react";
 
-export const sidebarAppearanceValues = ["bordered", "subtle", "floating"] as const;
+export const sidebarAppearanceValues = ["bordered", "subtle", "floating", "inset"] as const;
 
-/** A sidebar of navigation: the team or product name at the top, grouped links with sub-items and badges, an optional footer, and the signed-in person at the bottom. It can fold down to icons, and comes in three looks. It is only the panel; DashboardShell adds the top bar and the phone menu. */
+/** A sidebar of navigation: the team or product name at the top, grouped links with sub-items and badges, an optional footer, and the signed-in person at the bottom. It can fold down to icons, and comes in four looks. It is only the panel; DashboardShell adds the top bar and the phone menu. */
 export interface SidebarSpecProps {
   /**
    * The navigation as groups of items. An item may hold one level of sub-items.
@@ -84,10 +84,10 @@ export interface SidebarSpecProps {
    */
   collapsible?: boolean;
   /**
-   * bordered: a line on the inner edge. subtle: a tinted panel with no line. floating: a rounded raised card with a margin around it.
+   * bordered: a line on the inner edge. subtle: a tinted panel with no line. floating: a rounded raised card with a margin around it. inset: no line and no fill, for a sidebar that sits on a tinted page beside an inset page card (DashboardShell draws that page card).
    * @default "bordered"
    */
-  appearance?: "bordered" | "subtle" | "floating";
+  appearance?: "bordered" | "subtle" | "floating" | "inset";
 }
 
 export const sidebarDefaults = {

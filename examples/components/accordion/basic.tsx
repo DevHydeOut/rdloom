@@ -2,7 +2,7 @@ import { Accordion, AccordionItem } from "@rdloom/react";
 
 export default function AccordionBasicExample() {
   return (
-    <div className="w-full max-w-lg">
+    <div className="w-[32rem] max-w-full">
       <Accordion defaultExpandedKeys={["own"]}>
         <AccordionItem id="own" title="Do I own the code?">
           Yes. rdloom add copies the source into your project. Change anything; upgrades merge into your edits.

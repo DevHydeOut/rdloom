@@ -431,3 +431,74 @@ export function Spinner({ className = "size-4" }: Pick<IconProps, "className">) 
     </svg>
   );
 }
+
+// --- Cards and profiles
+
+export function HeartIcon({ className = "size-4 shrink-0", strokeWidth, filled }: IconProps & { filled?: boolean }) {
+  return (
+    <Icon className={className} strokeWidth={strokeWidth}>
+      <P d="M8 13.25S2.5 10 2.5 6.1a2.9 2.9 0 0 1 5.5-1.3 2.9 2.9 0 0 1 5.5 1.3C13.5 10 8 13.25 8 13.25z" fill={filled ? "currentColor" : undefined} />
+    </Icon>
+  );
+}
+
+export function StarIcon({ className = "size-4 shrink-0", strokeWidth, filled }: IconProps & { filled?: boolean }) {
+  return (
+    <Icon className={className} strokeWidth={strokeWidth}>
+      <P d="M8 2.25l1.7 3.5 3.8.5-2.8 2.7.7 3.8L8 10.9l-3.4 1.85.7-3.8-2.8-2.7 3.8-.5L8 2.25z" fill={filled ? "currentColor" : undefined} />
+    </Icon>
+  );
+}
+
+export function TagIcon({ className = "size-4 shrink-0", strokeWidth }: IconProps) {
+  return (
+    <Icon className={className} strokeWidth={strokeWidth}>
+      <P d="M2.5 8.2V3.5a1 1 0 0 1 1-1h4.7l5.3 5.3a1 1 0 0 1 0 1.4l-4.3 4.3a1 1 0 0 1-1.4 0L2.5 8.2z" />
+      <C cx={5.5} cy={5.5} r={0.75} />
+    </Icon>
+  );
+}
+
+export function PlaneIcon({ className = "size-4 shrink-0", strokeWidth }: IconProps) {
+  return (
+    <Icon className={className} strokeWidth={strokeWidth}>
+      <P d="M13.75 2.25L2.25 6.9l4.3 1.8 1.8 4.3 5.4-10.75z" />
+      <P d="M6.55 8.7l3.2-3.2" />
+    </Icon>
+  );
+}
+
+export function PinIcon({ className = "size-4 shrink-0", strokeWidth }: IconProps) {
+  return (
+    <Icon className={className} strokeWidth={strokeWidth}>
+      <P d="M8 14s4.25-3.75 4.25-7.1a4.25 4.25 0 0 0-8.5 0C3.75 10.25 8 14 8 14z" />
+      <C cx={8} cy={6.9} r={1.5} />
+    </Icon>
+  );
+}
+
+export function VerifiedIcon({ className = "size-4 shrink-0", strokeWidth }: IconProps) {
+  return (
+    <Icon className={className} strokeWidth={strokeWidth}>
+      <C cx={8} cy={8} r={5.75} />
+      <P d="M5.5 8.2l1.8 1.8 3.2-3.8" />
+    </Icon>
+  );
+}
+
+export function UserIcon({ className = "size-4 shrink-0", strokeWidth }: IconProps) {
+  return (
+    <Icon className={className} strokeWidth={strokeWidth}>
+      <C cx={8} cy={5.5} r={2.5} />
+      <P d="M3 13.5c.5-2.5 2.5-4 5-4s4.5 1.5 5 4" />
+    </Icon>
+  );
+}
+
+export function CommentIcon({ className = "size-4 shrink-0", strokeWidth }: IconProps) {
+  return (
+    <Icon className={className} strokeWidth={strokeWidth}>
+      <P d="M2.75 3.75a1 1 0 0 1 1-1h8.5a1 1 0 0 1 1 1v6.5a1 1 0 0 1-1 1H7l-3 2.5v-2.5a1 1 0 0 1-1.25-1v-6.5z" />
+    </Icon>
+  );
+}

@@ -32,7 +32,7 @@ export function Accordion({
       {...rest}
       allowsMultipleExpanded={allowsMultipleExpanded}
       isDisabled={isDisabled}
-      className={cx("flex w-full flex-col divide-y divide-[var(--rd-color-border-default)] overflow-hidden rounded-[var(--rd-radius-overlay)] border border-[var(--rd-color-border-default)] [box-shadow:var(--rd-elevation-raised)]", className)}
+      className={cx("flex w-full min-w-0 flex-col divide-y divide-[var(--rd-color-border-default)] overflow-hidden rounded-[var(--rd-radius-overlay)] border border-[var(--rd-color-border-default)] [box-shadow:var(--rd-elevation-raised)]", className)}
     >
       {children}
     </DisclosureGroup>
@@ -50,12 +50,12 @@ export interface AccordionItemProps extends Omit<DisclosureProps, "className" | 
 
 export function AccordionItem({ title, children, headingLevel = 3, className, ...rest }: AccordionItemProps) {
   return (
-    <Disclosure {...rest} className={cx("group", className)}>
+    <Disclosure {...rest} className={cx("group first:rounded-t-[var(--rd-radius-overlay)] last:rounded-b-[var(--rd-radius-overlay)]", className)}>
       <Heading level={headingLevel} className="m-0">
         <Button
           slot="trigger"
           className={cx(
-            "flex w-full items-center justify-between gap-4 px-4 py-3.5 text-start text-sm font-medium outline-none",
+            "flex w-full items-center justify-between gap-4 px-4 py-3.5 text-start text-sm font-medium outline-none rounded-[inherit] group-data-[expanded]:rounded-b-none",
             "text-[var(--rd-color-text-default)] data-[hovered]:bg-[var(--rd-color-surface-subtle)]",
             "data-[focus-visible]:ring-2 data-[focus-visible]:ring-inset data-[focus-visible]:ring-[var(--rd-color-focus-ring)]",
             "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50 data-[disabled]:bg-transparent",
@@ -70,7 +70,9 @@ export function AccordionItem({ title, children, headingLevel = 3, className, ..
           </span>
         </Button>
       </Heading>
-      <DisclosurePanel className="px-4 pb-4 text-sm text-[var(--rd-color-text-default)]">{children}</DisclosurePanel>
+      <DisclosurePanel className="h-[var(--disclosure-panel-height)] overflow-clip text-sm text-[var(--rd-color-text-default)] transition-[height] duration-200 ease-out motion-reduce:transition-none">
+        <div className="px-4 pb-4 opacity-0 transition-opacity duration-200 group-data-[expanded]:opacity-100 motion-reduce:transition-none">{children}</div>
+      </DisclosurePanel>
     </Disclosure>
   );
 }

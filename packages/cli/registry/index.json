@@ -95,7 +95,7 @@
       "name": "card",
       "type": "registry:ui",
       "version": "0.1.0",
-      "description": "A bordered container that groups related content under an optional heading, with an optional footer for actions."
+      "description": "A container that groups related content under an optional heading. Compose it with media, an overlay, header, meta, actions, body, a footer and a coloured band for destination, profile, listing and detail-panel cards."
     },
     {
       "name": "chart",
@@ -371,7 +371,7 @@
       "name": "sidebar",
       "type": "registry:ui",
       "version": "0.1.0",
-      "description": "A sidebar of navigation: the team or product name at the top, grouped links with sub-items and badges, an optional footer, and the signed-in person at the bottom. It can fold down to icons, and comes in three looks. It is only the panel; DashboardShell adds the top bar and the phone menu."
+      "description": "A sidebar of navigation: the team or product name at the top, grouped links with sub-items and badges, an optional footer, and the signed-in person at the bottom. It can fold down to icons, and comes in four looks. It is only the panel; DashboardShell adds the top bar and the phone menu."
     },
     {
       "name": "skeleton",

@@ -3,6 +3,8 @@
 
 import type { ReactNode } from "react";
 
+export const dashboardShellSidebarAppearanceValues = ["bordered", "subtle", "floating", "inset"] as const;
+
 /** The frame of a dashboard or admin app: a sidebar of navigation that folds down to icons, a top bar with search and actions, an account menu, and the page. On a phone, or in any narrow space, the sidebar becomes a menu that slides in. */
 export interface DashboardShellSpecProps {
   /**
@@ -69,6 +71,15 @@ export interface DashboardShellSpecProps {
    */
   renderLink?: (props: { item: import("../sidebar/nav").NavItem; className: string; children: import("react").ReactNode; isCurrent: boolean; onClick: () => void }) => import("react").ReactNode;
   /**
+   * The look of the sidebar and the page: bordered (a line between them), subtle (a tinted sidebar), floating (the sidebar is a raised card) or inset (a tinted background with the page as a rounded card).
+   * @default "bordered"
+   */
+  sidebarAppearance?: "bordered" | "subtle" | "floating" | "inset";
+  /**
+   * Content above the account area in the sidebar, such as an upgrade card. It is hidden while the sidebar is folded.
+   */
+  sidebarFooter?: ReactNode;
+  /**
    * Controlled: whether the sidebar is folded down to icons.
    */
   isCollapsed?: boolean;
@@ -91,6 +102,7 @@ export const dashboardShellDefaults = {
   searchLabel: "Search",
   label: "Main navigation",
   skipLabel: "Skip to main content",
+  sidebarAppearance: "bordered",
   defaultCollapsed: false,
 } as const;
 

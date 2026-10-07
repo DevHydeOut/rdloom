@@ -254,6 +254,18 @@ describe("Accordion", () => {
     expect(locked).toHaveAttribute("aria-expanded", "false");
   });
 
+  it("keeps padding off the panel so a closed item is only as tall as its trigger", () => {
+    render(<Faq />);
+    const closedPanel = document.querySelector('[aria-labelledby]:not([aria-expanded])[hidden], div[hidden]') as HTMLElement;
+    expect(closedPanel).not.toBeNull();
+    expect(closedPanel).toHaveAttribute("hidden");
+    expect(closedPanel.className).not.toMatch(/(^|\s)(p|px|py|pb|pt)-/);
+    expect(closedPanel.className).toContain("overflow-clip");
+    expect(closedPanel.className).toContain("motion-reduce:transition-none");
+    expect(closedPanel.firstElementChild!.className).toContain("pb-4");
+    expect(screen.queryByText("Second answer")).not.toBeVisible();
+  });
+
   it("has no axe violations", async () => {
     render(<Faq />);
     expect(await axeViolations()).toEqual([]);

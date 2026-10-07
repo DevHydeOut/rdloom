@@ -118,11 +118,12 @@ function Overview() {
 }
 
 // The sidebar is the left column of the shell. Items without an href call onNavigate; with an href they are real links.
-export default function SidebarBasicExample() {
+export default function SidebarCollapsedExample() {
   const [current, setCurrent] = useState("overview");
   const [team, setTeam] = useState(teams[0]);
   const page = findNavItem(navigation, current)!;
   const trail = trailOf(navigation, current);
+  const [collapsed, setCollapsed] = useState(true);
 
   return (
     <div className="h-full w-full">
@@ -136,6 +137,8 @@ export default function SidebarBasicExample() {
         user={{ name: "Ada Lovelace", email: "ada@example.com", menu: [{ id: "profile", label: "Your profile", onSelect: () => {} }, { id: "out", label: "Sign out", onSelect: () => {}, variant: "danger" }] }}
         onSearch={() => {}}
         sidebarAppearance="bordered"
+        isCollapsed={collapsed}
+        onCollapsedChange={setCollapsed}
         header={
           <Breadcrumbs label="You are here">
             <BreadcrumbItem>{navigation.find((g) => g.items.some((i) => i.id === current || i.children?.some((c) => c.id === current)))?.label ?? "Platform"}</BreadcrumbItem>

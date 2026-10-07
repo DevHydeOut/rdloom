@@ -3,10 +3,12 @@
 
 import type { ReactNode } from "react";
 
-export const cardVariantValues = ["outlined", "raised", "subtle"] as const;
-export const cardPaddingValues = ["sm", "md", "lg"] as const;
+export const cardVariantValues = ["outlined", "raised", "subtle", "floating"] as const;
+export const cardPaddingValues = ["none", "sm", "md", "lg"] as const;
+export const cardRoundedValues = ["default", "large"] as const;
+export const cardLayoutValues = ["stack", "overlay"] as const;
 
-/** A bordered container that groups related content under an optional heading, with an optional footer for actions. */
+/** A container that groups related content under an optional heading. Compose it with media, an overlay, header, meta, actions, body, a footer and a coloured band for destination, profile, listing and detail-panel cards. */
 export interface CardSpecProps {
   /**
    * The card's content.
@@ -30,21 +32,33 @@ export interface CardSpecProps {
    */
   headingLevel?: number;
   /**
-   * outlined has a border, raised adds a shadow, subtle is a tinted block with no border.
+   * outlined has a border, raised adds a small shadow, subtle is a tinted block with no border, floating is a borderless card with a large soft shadow.
    * @default "outlined"
    */
-  variant?: "outlined" | "raised" | "subtle";
+  variant?: "outlined" | "raised" | "subtle" | "floating";
   /**
-   * Inner spacing.
+   * Inner spacing. none leaves the edges to the parts inside (full-bleed media, a band).
    * @default "md"
    */
-  padding?: "sm" | "md" | "lg";
+  padding?: "none" | "sm" | "md" | "lg";
+  /**
+   * Corner radius. large is the 24 px media-card radius; parts inside follow it.
+   * @default "default"
+   */
+  rounded?: "default" | "large";
+  /**
+   * stack lays the parts out in a column. overlay makes a CardMedia fill the whole card, inside a thin frame, with CardOverlay content laid over its bottom.
+   * @default "stack"
+   */
+  layout?: "stack" | "overlay";
 }
 
 export const cardDefaults = {
   headingLevel: 3,
   variant: "outlined",
   padding: "md",
+  rounded: "default",
+  layout: "stack",
 } as const;
 
 export const cardMeta = {

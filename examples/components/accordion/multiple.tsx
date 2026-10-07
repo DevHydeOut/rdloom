@@ -2,7 +2,7 @@ import { Accordion, AccordionItem } from "@rdloom/react";
 
 export default function AccordionMultipleExample() {
   return (
-    <div className="w-full max-w-lg">
+    <div className="w-[32rem] max-w-full">
       {/* Several sections open at once, e.g. for settings people compare. */}
       <Accordion allowsMultipleExpanded defaultExpandedKeys={["profile", "billing"]}>
         <AccordionItem id="profile" title="Profile">

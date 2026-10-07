@@ -4,26 +4,107 @@
   "version": "0.1.0",
   "category": "layout",
   "status": "experimental",
-  "description": "A bordered container that groups related content under an optional heading, with an optional footer for actions.",
+  "description": "A container that groups related content under an optional heading. Compose it with media, an overlay, header, meta, actions, body, a footer and a coloured band for destination, profile, listing and detail-panel cards.",
   "props": {
-    "children": { "type": "node", "required": true, "description": "The card's content." },
-    "title": { "type": "string", "description": "Heading shown at the top. Also names the card for screen readers." },
-    "description": { "type": "string", "description": "Supporting text under the title." },
-    "footer": { "type": "node", "description": "Actions or meta information along the bottom, e.g. buttons." },
-    "headingLevel": { "type": "number", "default": 3, "description": "Heading level for the title, 2 to 6. Pick the level that fits where the card sits in the page's outline." },
-    "variant": { "type": "enum", "values": ["outlined", "raised", "subtle"], "default": "outlined", "description": "outlined has a border, raised adds a shadow, subtle is a tinted block with no border." },
-    "padding": { "type": "enum", "values": ["sm", "md", "lg"], "default": "md", "description": "Inner spacing." }
+    "children": {
+      "type": "node",
+      "required": true,
+      "description": "The card's content."
+    },
+    "title": {
+      "type": "string",
+      "description": "Heading shown at the top. Also names the card for screen readers."
+    },
+    "description": {
+      "type": "string",
+      "description": "Supporting text under the title."
+    },
+    "footer": {
+      "type": "node",
+      "description": "Actions or meta information along the bottom, e.g. buttons."
+    },
+    "headingLevel": {
+      "type": "number",
+      "default": 3,
+      "description": "Heading level for the title, 2 to 6. Pick the level that fits where the card sits in the page's outline."
+    },
+    "variant": {
+      "type": "enum",
+      "values": [
+        "outlined",
+        "raised",
+        "subtle",
+        "floating"
+      ],
+      "default": "outlined",
+      "description": "outlined has a border, raised adds a small shadow, subtle is a tinted block with no border, floating is a borderless card with a large soft shadow."
+    },
+    "padding": {
+      "type": "enum",
+      "values": [
+        "none",
+        "sm",
+        "md",
+        "lg"
+      ],
+      "default": "md",
+      "description": "Inner spacing. none leaves the edges to the parts inside (full-bleed media, a band)."
+    },
+    "rounded": {
+      "type": "enum",
+      "values": [
+        "default",
+        "large"
+      ],
+      "default": "default",
+      "description": "Corner radius. large is the 24 px media-card radius; parts inside follow it."
+    },
+    "layout": {
+      "type": "enum",
+      "values": [
+        "stack",
+        "overlay"
+      ],
+      "default": "stack",
+      "description": "stack lays the parts out in a column. overlay makes a CardMedia fill the whole card, inside a thin frame, with CardOverlay content laid over its bottom."
+    }
   },
-  "variants": ["variant", "padding"],
-  "states": ["default"],
-  "slots": ["root", "header", "title", "description", "body", "footer"],
+  "variants": [
+    "variant",
+    "padding",
+    "rounded",
+    "layout"
+  ],
+  "states": [
+    "default"
+  ],
+  "slots": [
+    "root",
+    "media",
+    "overlay",
+    "header",
+    "title",
+    "description",
+    "meta",
+    "body",
+    "actions",
+    "footer",
+    "band"
+  ],
   "tokens": [
-    "color.surface.default",
-    "color.surface.subtle",
-    "color.surface.raised",
+    "color.action.primary",
     "color.border.default",
+    "color.chart.4",
+    "color.chart.6",
+    "color.feedback.success",
+    "color.overlay.backdrop",
+    "color.surface.default",
+    "color.surface.raised",
+    "color.surface.subtle",
     "color.text.default",
     "color.text.muted",
+    "elevation.floating",
+    "radius.media",
     "radius.overlay"
   ],
   "a11y": {
@@ -31,23 +112,65 @@
     "keyboard": [],
     "requirements": [
       "With a title, the card is a group labelled by it; without one it is a plain container",
-      "The title is a real heading at the level you choose, so the page outline stays correct",
-      "A card is not a landmark and not focusable: put links and buttons inside it"
+      "The title (title prop or CardTitle) is a real heading at the level you choose, so the page outline stays correct",
+      "A card is not a landmark and not focusable: put links and buttons inside it",
+      "CardMedia needs alt text describing the picture, or decorative for a picture that adds nothing; an empty alt is only allowed with decorative, never by accident",
+      "Art drawn with children (no src) is exposed as an image named by alt, or hidden when decorative",
+      "Text over an overlay card sits on a scrim: the dark scrim is at least 75 percent of the overlay backdrop colour behind the text zone, so white text keeps 4.5:1 over any picture; the light scrim fades to the solid card surface so default text keeps its normal contrast",
+      "CardIconButton requires an accessible name (label) because the icon is decorative; it shows a focus ring in every tone, including over a picture",
+      "Meta items are a list; their icons are decorative, so the text must carry the meaning (\"from $120\", not just a tag icon)",
+      "Colour is never the only carrier: the band says what it means in words (POSTED 2 DAYS AGO)"
     ],
     "screenReader": [
       "Entering a titled card announces its name and that it is a group",
-      "The title is reachable as a heading when navigating by headings"
+      "The title is reachable as a heading when navigating by headings",
+      "A picture is announced by its alt text; decorative pictures are skipped",
+      "Meta is announced as a list with the number of items",
+      "Icon buttons are announced by their label, e.g. \"Save New York\""
     ],
     "wcag": "2.2 AA"
   },
   "usage": {
-    "use_when": ["Grouping a small set of related facts or controls, like a plan, a project or a setting", "A dashboard of independent blocks"],
-    "avoid_when": ["Rows of the same record type: use a table or data grid", "Wrapping a whole page"],
-    "anti_patterns": ["Cards inside cards", "A heading level that skips (h1 then h4)", "Making the whole card clickable and also putting buttons in it"]
+    "use_when": [
+      "Grouping a small set of related facts or controls, like a plan, a project or a setting",
+      "A dashboard of independent blocks",
+      "Destination, product or profile tiles with a picture",
+      "A listing with a short summary and one action",
+      "A detail panel with a header, rows and actions"
+    ],
+    "avoid_when": [
+      "Rows of the same record type: use a table or data grid",
+      "Wrapping a whole page"
+    ],
+    "anti_patterns": [
+      "Cards inside cards",
+      "A heading level that skips (h1 then h4)",
+      "Making the whole card clickable and also putting buttons in it",
+      "Putting long paragraphs over a picture",
+      "An icon button without a label",
+      "Using alt text like \"image\" or repeating the title word for word",
+      "Dark text over a dark scrim, or white text over the light overlay"
+    ]
   },
-  "examples": ["basic", "with-footer", "variants"],
+  "examples": [
+    "basic",
+    "with-footer",
+    "variants",
+    "image-top",
+    "full-image",
+    "with-actions",
+    "profile",
+    "profile-full-image",
+    "job-listing",
+    "detail-panel"
+  ],
   "figma": {
     "componentKey": null,
-    "variantMap": { "variant": "Variant", "padding": "Padding" }
+    "variantMap": {
+      "variant": "Variant",
+      "padding": "Padding",
+      "rounded": "Rounded",
+      "layout": "Layout"
+    }
   }
 }

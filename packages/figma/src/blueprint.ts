@@ -211,7 +211,20 @@ const blueprints: Record<string, Blueprint> = {
 
   Card: (c) => {
     const variant = c.variant ?? "outlined";
-    const pad = c.padding === "sm" ? 12 : c.padding === "lg" ? 24 : 16;
+    if (c.layout === "overlay") {
+      // Full-image card: picture fills the frame, a scrim and the text sit over its bottom.
+      return frame(
+        { name: "card overlay", dir: "col", pad: 6, w: 320, h: 420, fill: "color.surface.raised", radius: c.rounded === "large" ? "radius.media" : "radius.overlay" },
+        [
+          frame({ name: "media", dir: "col", w: "fill", h: 408, align: "end", pad: 16, gap: 12, fill: "color.overlay.backdrop", radius: "radius.media" }, [
+            text("Destination", 24, "color.action.on-primary", "Semi Bold"),
+            text("Economy", 14, "color.action.on-primary"),
+            frame({ name: "button", dir: "row", w: "fill", h: 40, align: "center", cross: "center", fill: "color.surface.default", radius: PILL }, [text("Search flight", 14, "color.text.default", "Semi Bold")]),
+          ]),
+        ],
+      );
+    }
+    const pad = c.padding === "none" ? 0 : c.padding === "sm" ? 12 : c.padding === "lg" ? 24 : 16;
     return frame(
       {
         name: "card",
@@ -219,9 +232,9 @@ const blueprints: Record<string, Blueprint> = {
         gap: pad > 16 ? 16 : 12,
         pad,
         w: 320,
-        fill: variant === "subtle" ? "color.surface.subtle" : variant === "raised" ? "color.surface.raised" : "color.surface.default",
-        stroke: variant === "subtle" ? undefined : "color.border.default",
-        radius: "radius.overlay",
+        fill: variant === "subtle" ? "color.surface.subtle" : variant === "raised" || variant === "floating" ? "color.surface.raised" : "color.surface.default",
+        stroke: variant === "subtle" || variant === "floating" ? undefined : "color.border.default",
+        radius: c.rounded === "large" ? "radius.media" : "radius.overlay",
       },
       [
         frame({ name: "header", dir: "col", gap: 2, w: "fill" }, [
@@ -725,8 +738,8 @@ const blueprints: Record<string, Blueprint> = {
         pad: 12,
         w: 256,
         h: 520,
-        fill: appearance === "subtle" ? "color.surface.subtle" : appearance === "floating" ? "color.surface.raised" : "color.surface.default",
-        stroke: appearance === "subtle" ? undefined : "color.border.default",
+        fill: appearance === "subtle" ? "color.surface.subtle" : appearance === "floating" ? "color.surface.raised" : appearance === "inset" ? undefined : "color.surface.default",
+        stroke: appearance === "subtle" || appearance === "inset" ? undefined : "color.border.default",
         radius: appearance === "floating" ? "radius.overlay" : undefined,
       },
       [

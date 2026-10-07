@@ -118,7 +118,7 @@ function Overview() {
 }
 
 // The sidebar is the left column of the shell. Items without an href call onNavigate; with an href they are real links.
-export default function SidebarBasicExample() {
+export default function SidebarFloatingExample() {
   const [current, setCurrent] = useState("overview");
   const [team, setTeam] = useState(teams[0]);
   const page = findNavItem(navigation, current)!;
@@ -135,7 +135,14 @@ export default function SidebarBasicExample() {
         onTeamChange={(t) => setTeam(teams.find((x) => x.id === t.id) ?? teams[0])}
         user={{ name: "Ada Lovelace", email: "ada@example.com", menu: [{ id: "profile", label: "Your profile", onSelect: () => {} }, { id: "out", label: "Sign out", onSelect: () => {}, variant: "danger" }] }}
         onSearch={() => {}}
-        sidebarAppearance="bordered"
+        sidebarAppearance="floating"
+        sidebarFooter={
+          <div className="flex flex-col gap-2 rounded-[var(--rd-radius-control)] border border-[var(--rd-color-border-default)] p-3 text-sm">
+            <p className="font-medium">Free plan</p>
+            <p className="text-xs text-[var(--rd-color-text-muted)]">8 of 10 seats used.</p>
+            <Button size="sm">Upgrade</Button>
+          </div>
+        }
         header={
           <Breadcrumbs label="You are here">
             <BreadcrumbItem>{navigation.find((g) => g.items.some((i) => i.id === current || i.children?.some((c) => c.id === current)))?.label ?? "Platform"}</BreadcrumbItem>

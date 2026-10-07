@@ -419,7 +419,7 @@ function BlockExample({ component, example }: { component: DocComponent; example
   const [view, setView] = useState<"preview" | "code">("preview");
   const widths = { desktop: "max-w-full", tablet: "max-w-[768px]", phone: "max-w-[390px]" } as const;
   // Blocks that are a whole application screen fill a frame; the rest take the height of their content.
-  const tall = component.id === "dashboard-shell";
+  const tall = component.id === "dashboard-shell" || component.id === "sidebar";
   const seg = (active: boolean) =>
     `h-7 rounded-md px-2.5 text-xs font-medium outline-none transition-colors focus-visible:ring-2 focus-visible:ring-[var(--rd-color-focus-ring)] ${active ? "bg-[var(--site-bg)] text-[var(--site-fg)] shadow-sm" : "text-[var(--site-muted)] hover:text-[var(--site-fg)]"}`;
   return (
@@ -427,8 +427,9 @@ function BlockExample({ component, example }: { component: DocComponent; example
       <H2 id={`example-${example.name}`} label={title(example.name)}>
         {title(example.name)}
       </H2>
-      <div className="overflow-hidden rounded-xl border border-[var(--site-border)]">
-        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--site-border)] bg-[var(--site-bg)] px-3 py-2">
+      {/* A whole screen gets a fixed, tall frame (1040px with the toolbar), so you see the real layout and scroll inside it. */}
+      <div className={`overflow-hidden rounded-xl border border-[var(--site-border)] ${tall && view === "preview" ? "flex h-[1040px] flex-col" : ""}`}>
+        <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-[var(--site-border)] bg-[var(--site-bg)] px-3 py-2">
           <div role="group" aria-label="Preview or code" className="flex gap-0.5 rounded-lg bg-[var(--site-subtle)] p-0.5">
             <button type="button" aria-pressed={view === "preview"} onClick={() => setView("preview")} className={seg(view === "preview")}>
               Preview
@@ -458,11 +459,10 @@ function BlockExample({ component, example }: { component: DocComponent; example
           </a>
         </div>
         {view === "preview" ? (
-          <div data-block-preview className={`bg-[var(--site-subtle)] ${tall && size === "desktop" ? "p-0" : "p-3 sm:p-6"}`}>
-            {/* A whole screen gets a tall frame (nearly the height of a laptop screen), so you see the real layout and scroll inside it. */}
+          <div data-block-preview className={`bg-[var(--site-subtle)] ${tall ? "min-h-0 flex-1" : ""} ${tall && size === "desktop" ? "p-0" : "p-3 sm:p-6"}`}>
             <div
               className={`mx-auto w-full overflow-hidden transition-[max-width] duration-300 motion-reduce:transition-none ${widths[size]} ${
-                tall ? `h-[min(52rem,calc(100dvh-8rem))] min-h-[32rem] bg-[var(--rd-color-surface-default)] ${size === "desktop" ? "" : "rounded-xl border border-[var(--site-border)]"}` : ""
+                tall ? `h-full bg-[var(--rd-color-surface-default)] ${size === "desktop" ? "" : "rounded-xl border border-[var(--site-border)]"}` : ""
               }`}
             >
               <Live component={component} example={example} />

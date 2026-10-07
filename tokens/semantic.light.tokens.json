@@ -50,7 +50,8 @@
   "radius": {
     "$type": "dimension",
     "control": { "$value": "{radius.md}" },
-    "overlay": { "$value": "{radius.lg}" }
+    "overlay": { "$value": "{radius.lg}" },
+    "media": { "$value": "{radius.xl}" }
   },
   "space": {
     "$type": "dimension",

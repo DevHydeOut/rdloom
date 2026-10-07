@@ -55,7 +55,8 @@
     "$type": "dimension",
     "sm": { "$value": "6px" },
     "md": { "$value": "10px" },
-    "lg": { "$value": "14px" }
+    "lg": { "$value": "14px" },
+    "xl": { "$value": "24px" }
   },
   "space": {
     "$type": "dimension",

@@ -5,7 +5,28 @@ export { Accordion, AccordionItem, type AccordionItemProps, type AccordionProps 
 export { BreadcrumbItem, Breadcrumbs, type BreadcrumbItemProps, type BreadcrumbsProps } from "./breadcrumbs/breadcrumbs";
 export { Button, type ButtonProps } from "./button/button";
 export { Calendar, RangeCalendar, type CalendarProps, type RangeCalendarProps } from "./calendar/calendar";
-export { Card, type CardProps } from "./card/card";
+export {
+  Card,
+  CardActions,
+  CardBand,
+  CardBody,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardIconButton,
+  CardMedia,
+  CardMeta,
+  CardMetaItem,
+  CardOverlay,
+  CardTitle,
+  type CardBandProps,
+  type CardIconButtonProps,
+  type CardMediaProps,
+  type CardMetaItemProps,
+  type CardOverlayProps,
+  type CardProps,
+  type CardTitleProps,
+} from "./card/card";
 export { Checkbox, type CheckboxProps } from "./checkbox/checkbox";
 export { Combobox, ComboboxItem, type ComboboxItemProps, type ComboboxProps } from "./combobox/combobox";
 export {

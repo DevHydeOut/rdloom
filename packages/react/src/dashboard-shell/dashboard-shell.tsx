@@ -38,6 +38,8 @@ export const DashboardShell = forwardRef<HTMLDivElement, DashboardShellProps>(fu
     skipLabel = dashboardShellDefaults.skipLabel,
     onNavigate,
     renderLink,
+    sidebarAppearance = dashboardShellDefaults.sidebarAppearance,
+    sidebarFooter,
     isCollapsed,
     defaultCollapsed = dashboardShellDefaults.defaultCollapsed,
     onCollapsedChange,
@@ -65,6 +67,7 @@ export const DashboardShell = forwardRef<HTMLDivElement, DashboardShellProps>(fu
     return () => observer.disconnect();
   }, []);
 
+  const inset = sidebarAppearance === "inset";
   const nav = { groups: navigation, currentId, label, onNavigate, renderLink } satisfies Partial<NavProps>;
 
   return (
@@ -75,7 +78,7 @@ export const DashboardShell = forwardRef<HTMLDivElement, DashboardShellProps>(fu
         else if (forwardedRef) forwardedRef.current = node;
       }}
       data-compact={compact || undefined}
-      className={cx("group/shell relative flex h-full min-h-0 w-full overflow-hidden bg-[var(--rd-color-surface-default)] text-[var(--rd-color-text-default)]", className)}
+      className={cx("group/shell relative flex h-full min-h-0 w-full overflow-hidden text-[var(--rd-color-text-default)]", inset ? "bg-[var(--rd-color-surface-subtle)]" : "bg-[var(--rd-color-surface-default)]", className)}
     >
       <a
         href={`#${mainId}`}
@@ -111,12 +114,15 @@ export const DashboardShell = forwardRef<HTMLDivElement, DashboardShellProps>(fu
           user={user}
           isCollapsed={collapsed}
           onCollapsedChange={setCollapsed}
+          appearance={sidebarAppearance}
+          footer={sidebarFooter}
           collapsible={false}
-          className="!w-full"
+          className={sidebarAppearance === "floating" ? "[--rd-sidebar-rail:calc(100%-1rem)] [--rd-sidebar-width:calc(100%-1rem)]" : "[--rd-sidebar-rail:100%] [--rd-sidebar-width:100%]"}
         />
       </div>
 
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className={cx("flex min-w-0 flex-1 flex-col", inset && "p-2 ps-0 group-data-[compact]/shell:p-0")}>
+        <div className={cx("flex min-h-0 flex-1 flex-col", inset && "overflow-hidden rounded-xl border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-default)] [box-shadow:var(--rd-elevation-raised)] group-data-[compact]/shell:rounded-none group-data-[compact]/shell:border-0")}>
         <header className="flex h-14 shrink-0 items-center gap-3 border-b border-[var(--rd-color-border-default)] px-4">
           {/* The same navigation as a slide-in menu, where the sidebar is hidden */}
           <div className="block md:hidden group-data-[compact]/shell:!block">
@@ -165,6 +171,7 @@ export const DashboardShell = forwardRef<HTMLDivElement, DashboardShellProps>(fu
         <main id={mainId} tabIndex={-1} className="min-h-0 flex-1 overflow-y-auto outline-none">
           {children as ReactNode}
         </main>
+        </div>
       </div>
     </div>
   );

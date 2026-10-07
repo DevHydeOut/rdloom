@@ -117,6 +117,8 @@ describe("Sidebar", () => {
     expect(container.firstElementChild).toHaveAttribute("data-appearance", "floating");
     rerender(<Sidebar navigation={navigation} brand="Acme" appearance="subtle" />);
     expect(container.firstElementChild).toHaveAttribute("data-appearance", "subtle");
+    rerender(<Sidebar navigation={navigation} brand="Acme" appearance="inset" />);
+    expect(container.firstElementChild).toHaveAttribute("data-appearance", "inset");
   });
 
   it("draws items through renderLink", () => {

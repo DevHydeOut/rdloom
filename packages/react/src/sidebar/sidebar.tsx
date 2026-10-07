@@ -7,7 +7,7 @@ import { Avatar } from "../avatar/avatar";
 import { Menu, MenuItem, MenuTrigger } from "../menu/menu";
 import { Tooltip, TooltipTrigger } from "../tooltip/tooltip";
 import { cx } from "../utils/cx";
-import { ChevronDownIcon, ChevronsUpDownIcon, SearchIcon, SidebarIcon } from "../utils/icons";
+import { ChevronRightIcon, ChevronsUpDownIcon, SearchIcon, SidebarIcon } from "../utils/icons";
 import { badgeText, currentTopLevel, initialOf, type NavGroup, type NavItem, type ShellTeam, type ShellUser } from "./nav";
 
 export interface SidebarProps extends SidebarSpecProps {
@@ -99,7 +99,7 @@ function Entry({ item, nested, current, parentOf, ...nav }: { item: NavItem; nes
           className={cx(className)}
         >
           {body}
-          {!collapsed && <ChevronDownIcon className={cx("size-4 shrink-0 text-[var(--rd-color-text-muted)] transition-transform motion-reduce:transition-none", open ? "rotate-180" : "")} />}
+          {!collapsed && <ChevronRightIcon className={cx("size-4 shrink-0 text-[var(--rd-color-text-muted)] transition-transform motion-reduce:transition-none", open ? "rotate-90" : "")} />}
         </AriaButton>
         {/* Closed lists stay in the page, hidden, so their links are still there for search and for the current page's own parent. */}
         <ul id={listId} hidden={!open || collapsed} className="mt-0.5 ms-5 flex flex-col gap-0.5 border-s border-[var(--rd-color-border-default)] ps-2">
@@ -155,7 +155,7 @@ export function NavList(props: NavProps) {
             (collapsed ? (
               <div role="separator" className="mx-2 my-1 border-t border-[var(--rd-color-border-default)]" />
             ) : (
-              <p className="px-3 pb-1 text-xs font-semibold tracking-wide text-[var(--rd-color-text-muted)] uppercase">{group.label}</p>
+              <p className="px-3 pb-1 text-xs font-medium text-[var(--rd-color-text-muted)]">{group.label}</p>
             ))}
           <ul className="flex flex-col gap-0.5">
             {group.items.map((item) => (
@@ -227,7 +227,7 @@ export function AccountMenu({ user, collapsed }: { user: ShellUser; collapsed: b
           {user.email && <span className="truncate text-xs text-[var(--rd-color-text-muted)]">{user.email}</span>}
         </span>
       )}
-      {!collapsed && <ChevronDownIcon className="size-4 shrink-0 text-[var(--rd-color-text-muted)]" />}
+      {!collapsed && <ChevronsUpDownIcon className="size-4 shrink-0 text-[var(--rd-color-text-muted)]" />}
     </AriaButton>
   );
   if (!user.menu?.length) return <div className="p-1">{trigger}</div>;
@@ -250,6 +250,7 @@ export function AccountMenu({ user, collapsed }: { user: ShellUser; collapsed: b
 const appearances = {
   bordered: "border-e border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-default)]",
   subtle: "bg-[var(--rd-color-surface-subtle)]",
+  inset: "bg-transparent",
   floating: "m-2 h-[calc(100%-1rem)] rounded-2xl border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-raised)] [box-shadow:var(--rd-elevation-raised)]",
 } as const;
 

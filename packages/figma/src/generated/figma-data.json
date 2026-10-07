@@ -250,6 +250,14 @@
       "dark": "14px"
     },
     {
+      "name": "radius/media",
+      "token": "radius.media",
+      "cssVar": "--rd-radius-media",
+      "type": "FLOAT",
+      "light": "24px",
+      "dark": "24px"
+    },
+    {
       "name": "space/control-x",
       "token": "space.control-x",
       "cssVar": "--rd-space-control-x",
@@ -526,7 +534,7 @@
       "name": "Card",
       "id": "card",
       "version": "0.1.0",
-      "description": "A bordered container that groups related content under an optional heading, with an optional footer for actions.",
+      "description": "A container that groups related content under an optional heading. Compose it with media, an overlay, header, meta, actions, body, a footer and a coloured band for destination, profile, listing and detail-panel cards.",
       "properties": [
         {
           "prop": "variant",
@@ -534,7 +542,8 @@
           "values": [
             "outlined",
             "raised",
-            "subtle"
+            "subtle",
+            "floating"
           ],
           "default": "outlined"
         },
@@ -542,11 +551,30 @@
           "prop": "padding",
           "name": "Padding",
           "values": [
+            "none",
             "sm",
             "md",
             "lg"
           ],
           "default": "md"
+        },
+        {
+          "prop": "rounded",
+          "name": "Rounded",
+          "values": [
+            "default",
+            "large"
+          ],
+          "default": "default"
+        },
+        {
+          "prop": "layout",
+          "name": "Layout",
+          "values": [
+            "stack",
+            "overlay"
+          ],
+          "default": "stack"
         }
       ]
     },
@@ -1528,7 +1556,7 @@
       "name": "Sidebar",
       "id": "sidebar",
       "version": "0.1.0",
-      "description": "A sidebar of navigation: the team or product name at the top, grouped links with sub-items and badges, an optional footer, and the signed-in person at the bottom. It can fold down to icons, and comes in three looks. It is only the panel; DashboardShell adds the top bar and the phone menu.",
+      "description": "A sidebar of navigation: the team or product name at the top, grouped links with sub-items and badges, an optional footer, and the signed-in person at the bottom. It can fold down to icons, and comes in four looks. It is only the panel; DashboardShell adds the top bar and the phone menu.",
       "properties": [
         {
           "prop": "appearance",
@@ -1536,7 +1564,8 @@
           "values": [
             "bordered",
             "subtle",
-            "floating"
+            "floating",
+            "inset"
           ],
           "default": "bordered"
         }
