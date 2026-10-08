@@ -204,7 +204,7 @@ pre {
     background: linear-gradient(var(--site-border-strong), var(--site-border) 12%, var(--site-border) 92%, transparent);
   }
 
-  .thread h2[id]::before {
+  .thread h2.site-h2[id]::before {
     content: "";
     position: absolute;
     top: 4.2rem;
@@ -218,7 +218,7 @@ pre {
   }
 }
 
-.thread h2[id] {
+.thread h2.site-h2[id] {
   position: relative;
 }
 

@@ -1,6 +1,6 @@
 import { AuthCard, ErrorSummary, Form, FormSubmitButton, FormTextField } from "@rdloom/react";
 
-const link = "rounded-[var(--rd-radius-control)] font-medium text-[var(--rd-color-text-default)] underline underline-offset-4 outline-none focus-visible:ring-2 focus-visible:ring-[var(--rd-color-focus-ring)]";
+const link = "inline-block min-h-6 rounded-[var(--rd-radius-control)] font-medium text-[var(--rd-color-text-default)] underline underline-offset-4 outline-none focus-visible:ring-2 focus-visible:ring-[var(--rd-color-focus-ring)]";
 
 // The card sits on a muted page that fills the whole height. On a real page pass min-h-dvh in className.
 export default function AuthCardMutedBackgroundExample() {

@@ -66,7 +66,7 @@ export function MenuItem({ className, children, shortcut, variant = "default", i
       {...rest}
       textValue={textValue}
       className={cx(
-        "group flex cursor-default items-center gap-2 rounded-[var(--rd-radius-control)] px-2.5 py-2 text-sm outline-none",
+        "group flex cursor-default items-center gap-2 rounded-[var(--rd-radius-control)] px-2.5 py-2 text-sm [@media(pointer:coarse)]:min-h-10 outline-none",
         "data-[focused]:bg-[var(--rd-color-surface-subtle)] data-[hovered]:bg-[var(--rd-color-surface-subtle)] data-[disabled]:opacity-50",
         variant === "danger" ? "text-[var(--rd-color-feedback-danger)]" : "text-[var(--rd-color-text-default)]",
         className,

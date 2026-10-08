@@ -30,7 +30,7 @@ const columns: ColumnDef<Person, any>[] = [
 export default function DataGridSelectionExample() {
   const [selected, setSelected] = useState<string[]>([]);
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex min-w-0 max-w-full flex-col gap-2">
       <p className="text-sm" aria-live="polite">
         {selected.length} selected
       </p>

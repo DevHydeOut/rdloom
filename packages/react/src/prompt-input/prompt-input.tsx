@@ -66,6 +66,10 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
   const fileInput = useRef<HTMLInputElement>(null);
   const hintId = useId();
   const [expanded, setExpanded] = useState(false);
+  const [narrow, setNarrow] = useState(false);
+  const bar = useRef<HTMLDivElement>(null);
+  const lead = useRef<HTMLDivElement>(null);
+  const trail = useRef<HTMLDivElement>(null);
   useImperativeHandle(ref, () => ({ focus: () => field.current?.focus() }), []);
 
   const set = (next: string) => {
@@ -84,6 +88,25 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
     if (value === "") setExpanded(false);
     else if (value.includes("\n") || el.scrollHeight > ONE_LINE) setExpanded(true);
   }, [value]);
+
+  // When the buttons on both sides would leave the text box less than about 8rem, move them to a second row.
+  useLayoutEffect(() => {
+    const el = bar.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    const measure = () => {
+      const rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+      const sides = (lead.current?.offsetWidth ?? 0) + (trail.current?.offsetWidth ?? 0);
+      setNarrow((was) => {
+        const next = el.clientWidth < sides + 8 * rem;
+        // Keep the two-row layout until there is clear room again, so the bar does not flip on the boundary.
+        return was ? el.clientWidth < sides + 8 * rem + 16 || next : next;
+      });
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [endContent, onVoice, isStreaming, onAttach, actions.length]);
 
   const trimmed = value.trim();
   const hasContent = trimmed !== "" || attachments.length > 0;
@@ -160,12 +183,13 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
 
       {/* The three parts keep their place in the page when the bar goes to two rows: only the grid areas change, so typing is never interrupted. */}
       <div
+        ref={bar}
         className={cx(
           "grid items-center gap-x-1.5 gap-y-0.5 p-2",
-          expanded ? "grid-cols-[1fr_auto] [grid-template-areas:'field_field''lead_trail']" : "grid-cols-[auto_1fr_auto] [grid-template-areas:'lead_field_trail']",
+          expanded || narrow ? "grid-cols-[1fr_auto] [grid-template-areas:'field_field''lead_trail']" : "grid-cols-[auto_1fr_auto] [grid-template-areas:'lead_field_trail']",
         )}
       >
-        <div className="flex [grid-area:lead] items-center">
+        <div ref={lead} className="flex [grid-area:lead] items-center justify-self-start">
           {hasMenu && (
             <>
               <MenuTrigger>
@@ -237,7 +261,7 @@ export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(funct
           className="max-h-[200px] min-h-10 min-w-0 resize-none bg-transparent px-2 py-2 text-base leading-6 text-[var(--rd-color-text-default)] outline-none [grid-area:field] placeholder:text-[var(--rd-color-text-muted)] sm:text-[15px]"
         />
 
-        <div className="flex [grid-area:trail] items-center gap-1">
+        <div ref={trail} className="flex [grid-area:trail] items-center gap-1 justify-self-end">
           {endContent}
           {onVoice && (
             <AriaButton aria-label={isListening ? "Stop dictation" : "Dictate"} aria-pressed={isListening} isDisabled={isDisabled} onPress={onVoice} className={cx(quietButton, isListening && "bg-[var(--rd-color-surface-selected)] text-[var(--rd-color-action-primary)]")}>

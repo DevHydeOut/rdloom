@@ -196,7 +196,7 @@ export const CustomerTable = forwardRef<HTMLElement, CustomerTableProps>(functio
       label={name === "status" ? "Status" : "Plan"}
       placeholder={all}
       size="md"
-      className={cx("min-w-0 sm:w-40 [&>span:first-of-type]:sr-only", classNames?.filters)}
+      className={cx("min-w-0 flex-1 sm:w-40 sm:flex-none [&>span:first-of-type]:sr-only", classNames?.filters)}
       selectedKey={query[name][0]?.toLowerCase() ?? "all"}
       onSelectionChange={(key) => update({ [name]: key === "all" || key === null ? [] : [values.find((v) => v.toLowerCase() === String(key)) ?? String(key)] })}
       isDisabled={isLoading}
@@ -373,8 +373,8 @@ export const CustomerTable = forwardRef<HTMLElement, CustomerTableProps>(functio
                 label={label}
                 density={density}
                 className={classNames?.table}
-                sortDescriptor={query.sort ?? undefined}
-                onSortChange={(d) => update({ sort: { column: d.column as CustomerSortColumn, direction: d.direction } })}
+                sortDescriptor={query.sort ?? null}
+                onSortChange={(d) => update({ sort: d ? { column: d.column as CustomerSortColumn, direction: d.direction } : null })}
               >
                 <TableHeader>
                   <TableColumn id="name" isRowHeader allowsSorting>

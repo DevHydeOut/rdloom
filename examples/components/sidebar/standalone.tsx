@@ -18,7 +18,7 @@ const navigation: NavGroup[] = [
 export default function SidebarStandaloneExample() {
   const [current, setCurrent] = useState("customers");
   return (
-    <div className="flex h-[34rem] overflow-hidden rounded-xl border border-[var(--rd-color-border-default)]">
+    <div className="mx-auto flex h-[34rem] w-fit max-w-full overflow-hidden sm:w-full rounded-xl border border-[var(--rd-color-border-default)]">
       <Sidebar
         navigation={navigation}
         currentId={current}
@@ -33,7 +33,7 @@ export default function SidebarStandaloneExample() {
         }
         user={{ name: "Ada Lovelace", email: "ada@example.com", menu: [{ id: "out", label: "Sign out", onSelect: () => {} }] }}
       />
-      <div className="flex-1 bg-[var(--rd-color-surface-subtle)] p-6 text-sm text-[var(--rd-color-text-muted)]">Your page goes here.</div>
+      <div className="hidden flex-1 bg-[var(--rd-color-surface-subtle)] p-6 sm:block text-sm text-[var(--rd-color-text-muted)]">Your page goes here.</div>
     </div>
   );
 }

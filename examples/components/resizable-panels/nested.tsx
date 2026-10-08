@@ -14,7 +14,7 @@ export default function ResizablePanelsNestedExample() {
   return (
     <div className="mx-auto h-72 w-[40rem] max-w-full overflow-hidden rounded-[var(--rd-radius-overlay)] border border-[var(--rd-color-border-default)]">
       <ResizablePanelGroup>
-        <ResizablePanel defaultSize={25} minSize={15}>
+        <ResizablePanel defaultSize={30} minSize={20}>
           <Pane title="Files" />
         </ResizablePanel>
         <ResizableHandle withHandle label="Resize files" />

@@ -8,6 +8,7 @@
   "props": {
     "label": { "type": "string", "default": "Main", "description": "The accessible name of the navigation landmark, e.g. 'Main'. Give each nav on a page a different name." },
     "delay": { "type": "number", "default": 150, "description": "Milliseconds the pointer rests on a trigger before its panel opens, and before it closes after the pointer leaves. Keyboard and click open at once." },
+    "align": { "type": "enum", "values": ["start", "center", "end"], "default": "start", "description": "Where an open panel sits under the bar: start aligns it with the bar start, center puts it in the middle of the bar, end aligns it with the bar end. Use center or end for a wide panel near the edge of the page." },
     "children": { "type": "node", "required": true, "description": "NavigationMenuItem elements. Each holds either a NavigationMenuLink, or a NavigationMenuTrigger with a NavigationMenuContent." }
   },
   "variants": [],

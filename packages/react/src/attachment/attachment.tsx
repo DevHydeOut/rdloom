@@ -47,7 +47,7 @@ export const Attachment = forwardRef<HTMLElement, AttachmentProps>(function Atta
   const failed = status === "error";
   const Root = (inList ? "li" : "div") as "div";
 
-  const nameClass = cx("truncate text-sm font-medium text-[var(--rd-color-text-default)]", (href || onPress) && "rounded underline-offset-2 data-[hovered]:underline", focusRing);
+  const nameClass = cx("truncate text-sm font-medium text-[var(--rd-color-text-default)]", (href || onPress) && "inline-block min-h-6 rounded underline-offset-2 data-[hovered]:underline", focusRing);
   const nameNode = href ? (
     <AriaLink href={href} className={nameClass}>
       {name}

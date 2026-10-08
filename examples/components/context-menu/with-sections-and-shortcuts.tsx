@@ -2,10 +2,10 @@ import { ContextMenu, ContextMenuItem, ContextMenuSection, ContextMenuSeparator,
 
 export default function ContextMenuWithSectionsAndShortcutsExample() {
   return (
-    <div className="flex justify-center p-6">
+    <div className="flex min-w-0 max-w-full justify-center p-6">
       <ContextMenu
         label="Actions for Q3 plan"
-        className="flex w-80 flex-col gap-1 rounded-[var(--rd-radius-overlay)] border border-[var(--rd-color-border-default)] p-4 text-sm"
+        className="flex w-80 max-w-full flex-col gap-1 rounded-[var(--rd-radius-overlay)] border border-[var(--rd-color-border-default)] p-4 text-sm"
         items={
           <>
             <ContextMenuSection title="Open">

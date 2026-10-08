@@ -30,7 +30,7 @@ const columns: ColumnDef<Person, any>[] = [
 export default function DataGridFilterExample() {
   const [query, setQuery] = useState("");
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex min-w-0 max-w-full flex-col gap-3">
       <TextField className="w-64" label="Search" value={query} onChange={setQuery} />
       <DataGrid label="People" data={people} columns={columns} getRowId={(p) => p.id} height={320} globalFilter={query} emptyMessage="Nobody matches." />
     </div>

@@ -22,6 +22,7 @@ import { useEffect, useMemo, useRef, useState, type ClipboardEvent, type CSSProp
 import { Button } from "../button/button";
 import { dataGridDefaults, type DataGridSpecProps } from "../generated/data-grid.types";
 import { cx } from "../utils/cx";
+import { scrollHintClass, useScrollHint } from "../utils/scroll-hint";
 import { ArrowDownIcon, ArrowUpIcon, ChevronRightIcon, SpinnerIcon } from "../utils/icons";
 import { columnFilter, filteredRowModel, searchFilter, sortedRowModel } from "./hierarchy";
 import { ColumnMenu, RowHandle, SetFilter, type ColumnMenuAction } from "./column-ui";
@@ -107,7 +108,7 @@ function SelectBox(props: { label: string; checked: boolean; indeterminate?: boo
       onChange={props.onToggle}
       // Keep focus on the grid cell rather than the checkbox, or Space would toggle twice.
       onMouseDown={(e) => e.preventDefault()}
-      className="size-4 cursor-pointer accent-[var(--rd-color-action-primary)]"
+      className="size-5 cursor-pointer sm:size-4 accent-[var(--rd-color-action-primary)]"
     />
   );
 }
@@ -133,7 +134,7 @@ function ExpandToggle({ expanded, onToggle }: { expanded: boolean; onToggle: () 
         onToggle();
       }}
       onMouseDown={(e) => e.preventDefault()}
-      className="me-1 inline-flex size-5 flex-none items-center justify-center rounded text-[var(--rd-color-text-muted)] hover:bg-[var(--rd-color-surface-subtle)]"
+      className="me-1 inline-flex size-6 flex-none items-center justify-center rounded text-[var(--rd-color-text-muted)] hover:bg-[var(--rd-color-surface-subtle)]"
     >
       <ChevronRightIcon className={cx("size-3.5 transition-transform motion-reduce:transition-none", expanded && "rotate-90")} />
     </button>
@@ -456,6 +457,7 @@ export function DataGrid<T>({
 
   // --- Virtualization ------------------------------------------------------
   const scrollRef = useRef<HTMLDivElement>(null);
+  const scrollHint = useScrollHint(scrollRef);
   const virtualizer = useVirtualizer({
     count: items.length,
     getScrollElement: () => scrollRef.current,
@@ -1160,7 +1162,7 @@ export function DataGrid<T>({
           if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setGridFocused(false);
         }}
       >
-        <div ref={scrollRef} className="relative overflow-auto" style={{ height }}>
+        <div ref={scrollRef} data-hint={scrollHint} className={cx("relative overflow-auto", scrollHintClass)} style={{ height }}>
           <div role="rowgroup" className="sticky top-0 z-[2]" style={{ width: totalWidth, minWidth: "100%" }}>
             {/* Header row */}
             <div

@@ -362,7 +362,7 @@ export function EventCalendar({
                       onDateSelect?.(key);
                     }}
                     className={cx(
-                      "group relative flex min-h-24 min-w-0 flex-col gap-1 bg-[var(--rd-color-surface-default)] p-1.5 outline-none",
+                      "group relative flex min-h-11 min-w-0 flex-col gap-1 sm:min-h-24 bg-[var(--rd-color-surface-default)] p-1.5 outline-none",
                       "hover:bg-[var(--rd-color-surface-subtle)] focus-visible:z-10 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--rd-color-focus-ring)]",
                       outside && "bg-[var(--rd-color-surface-subtle)] text-[var(--rd-color-text-muted)]",
                       isSelected && "bg-[var(--rd-color-surface-selected)]",
@@ -388,8 +388,9 @@ export function EventCalendar({
                             if (create.isAllowed) onCreate?.(key);
                           }}
                           className={cx(
-                            "flex size-6 items-center justify-center rounded-[var(--rd-radius-control)] text-[var(--rd-color-text-muted)] outline-none",
-                            "opacity-0 group-focus-within:opacity-100 group-hover:opacity-100 data-[focus-visible]:opacity-100 data-[hovered]:bg-[var(--rd-color-surface-subtle)] data-[hovered]:text-[var(--rd-color-text-default)]",
+                            "relative z-10 flex size-6 shrink-0 items-center justify-center rounded-[var(--rd-radius-control)] text-[var(--rd-color-text-muted)] outline-none",
+                            // Hidden until the day is hovered or focused, except on a touch screen, where there is no hover.
+                            "opacity-0 group-focus-within:opacity-100 group-hover:opacity-100 data-[focus-visible]:opacity-100 data-[hovered]:bg-[var(--rd-color-surface-subtle)] data-[hovered]:text-[var(--rd-color-text-default)] [@media(hover:none)]:opacity-70",
                             "data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)]",
                             create.isDisabled && "cursor-not-allowed opacity-0 group-hover:opacity-50 group-focus-within:opacity-50",
                             classNames?.addButton,
@@ -399,7 +400,46 @@ export function EventCalendar({
                         </AriaButton>
                       )}
                     </div>
-                    <ul className="flex min-w-0 flex-col gap-0.5">
+                    {chips.length > 0 && (
+                      <DialogTrigger isOpen={moreFor === `d:${key}`} onOpenChange={(open) => setMoreFor(open ? `d:${key}` : null)}>
+                        <AriaButton
+                          aria-label={`Show ${eventsWord(chips.length)} on ${fmt.day.format(utc(date))}`}
+                          excludeFromTabOrder={!isStop}
+                          className={cx(
+                            "absolute inset-0 flex items-end gap-1 p-1.5 outline-none sm:hidden",
+                            "data-[focus-visible]:ring-2 data-[focus-visible]:ring-inset data-[focus-visible]:ring-[var(--rd-color-focus-ring)]",
+                          )}
+                        >
+                          <span aria-hidden="true" className="flex items-center gap-0.5">
+                            {chips.slice(0, 3).map(({ event }) => (
+                              <span key={event.id} className={cx("size-1.5 rounded-full", tones[event.tone ?? "neutral"].dot)} />
+                            ))}
+                            {chips.length > 3 && (
+                              <span className="ms-0.5 text-[10px] font-medium leading-none text-[var(--rd-color-text-muted)]">+{chips.length - 3}</span>
+                            )}
+                          </span>
+                        </AriaButton>
+                        <Popover label={`Events on ${fmt.day.format(utc(date))}`} showArrow={false} placement="bottom" className={cx("w-[min(20rem,calc(100vw-2rem))]", classNames?.popover)}>
+                          <ul className="flex flex-col gap-1 p-1">
+                            {chips.map(({ event, time }) => (
+                              <li key={event.id}>
+                                <EventButton
+                                  large
+                                  event={event}
+                                  time={time}
+                                  onPress={() => {
+                                    setMoreFor(null);
+                                    onEventSelect?.(event);
+                                  }}
+                                  className={classNames?.event}
+                                />
+                              </li>
+                            ))}
+                          </ul>
+                        </Popover>
+                      </DialogTrigger>
+                    )}
+                    <ul className="hidden min-w-0 flex-col gap-0.5 sm:flex">
                       {shown.map(({ event, time }) => (
                         <li key={event.id} className="min-w-0">
                           <EventButton event={event} time={time} tabIndex={inner} onPress={() => onEventSelect?.(event)} className={classNames?.event} />
@@ -412,7 +452,7 @@ export function EventCalendar({
                           aria-label={`${rest} more ${plural.select(rest) === "one" ? "event" : "events"} on ${fmt.day.format(utc(date))}`}
                           excludeFromTabOrder={!isStop}
                           className={cx(
-                            "w-full truncate rounded-[var(--rd-radius-control)] px-1.5 py-0.5 text-start text-xs font-medium text-[var(--rd-color-text-muted)] outline-none",
+                            "hidden w-full truncate rounded-[var(--rd-radius-control)] px-1.5 py-0.5 text-start text-xs font-medium sm:block text-[var(--rd-color-text-muted)] outline-none",
                             "data-[hovered]:bg-[var(--rd-color-surface-subtle)] data-[hovered]:text-[var(--rd-color-text-default)] data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)]",
                             rtlFlip,
                             classNames?.more,
@@ -456,12 +496,14 @@ function EventButton({
   tabIndex,
   onPress,
   className,
+  large,
 }: {
   event: EventCalendarEvent;
   time: string | null;
   tabIndex?: number;
   onPress: () => void;
   className?: string;
+  large?: boolean;
 }) {
   const tone = tones[event.tone ?? "neutral"];
   return (
@@ -469,7 +511,8 @@ function EventButton({
       onPress={onPress}
       excludeFromTabOrder={tabIndex === -1}
       className={cx(
-        "flex w-full min-w-0 items-center gap-1.5 rounded-[var(--rd-radius-control)] px-1.5 py-0.5 text-start text-xs text-[var(--rd-color-text-default)] outline-none",
+        "flex w-full min-w-0 items-center gap-1.5 rounded-[var(--rd-radius-control)] text-start text-[var(--rd-color-text-default)] outline-none",
+        large ? "min-h-11 px-3 text-sm" : "min-h-6 min-w-6 px-1.5 py-0.5 text-xs",
         "data-[hovered]:brightness-95 data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)]",
         tone.box,
         className,

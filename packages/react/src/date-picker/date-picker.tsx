@@ -76,7 +76,7 @@ export function DatePicker<T extends DateValue = DateValue>({
         </Text>
       )}
       <FieldError className={fieldError}>{errorMessage}</FieldError>
-      <Popover className={cx(overlayPanel, "overflow-auto")}>
+      <Popover className={cx(overlayPanel, "max-w-[calc(100vw-1.5rem)] overflow-auto")}>
         <Dialog className="p-3 outline-none">
           <Calendar />
         </Dialog>

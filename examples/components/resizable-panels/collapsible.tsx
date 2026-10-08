@@ -14,7 +14,7 @@ export default function ResizablePanelsCollapsibleExample() {
   return (
     <div className="mx-auto h-72 w-[40rem] max-w-full overflow-hidden rounded-[var(--rd-radius-overlay)] border border-[var(--rd-color-border-default)]">
       <ResizablePanelGroup>
-        <ResizablePanel defaultSize={30} minSize={20} maxSize={45} collapsible>
+        <ResizablePanel defaultSize={40} minSize={25} maxSize={55} collapsible>
           <Pane title="Navigation">Press Enter on the handle to collapse or restore this panel.</Pane>
         </ResizablePanel>
         <ResizableHandle withHandle label="Resize navigation" />

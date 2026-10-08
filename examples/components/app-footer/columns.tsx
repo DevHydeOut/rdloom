@@ -12,7 +12,7 @@ export default function AppFooterColumnsExample() {
           { title: "Legal", links: [{ label: "Privacy", href: "/privacy" }, { label: "Terms", href: "/terms" }] },
         ]}
         social={
-          <a href="/feed" className="rounded-[var(--rd-radius-control)] text-sm text-[var(--rd-color-text-muted)] hover:text-[var(--rd-color-text-default)] hover:underline">
+          <a href="/feed" className="inline-flex min-h-6 items-center rounded-[var(--rd-radius-control)] text-sm text-[var(--rd-color-text-muted)] hover:text-[var(--rd-color-text-default)] hover:underline">
             Blog feed
           </a>
         }

@@ -24,6 +24,7 @@ export const Sparkline = forwardRef<SVGSVGElement, SparklineProps>(function Spar
     label,
     width = sparklineDefaults.width,
     height = sparklineDefaults.height,
+    responsive = sparklineDefaults.responsive,
     color = sparklineDefaults.color,
     showLast = sparklineDefaults.showLast,
     showExtremes = sparklineDefaults.showExtremes,
@@ -109,10 +110,12 @@ export const Sparkline = forwardRef<SVGSVGElement, SparklineProps>(function Spar
       {...rest}
       {...a11y}
       ref={ref}
-      width={width}
-      height={height}
+      width={responsive ? "100%" : width}
+      height={responsive ? undefined : height}
+      style={responsive ? { height: "auto", ...rest.style } : rest.style}
       viewBox={`0 0 ${width} ${height}`}
       data-type={type}
+      preserveAspectRatio="xMidYMid meet"
     >
       {shapes}
     </svg>

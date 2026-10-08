@@ -417,7 +417,7 @@ export const ResizableHandle = forwardRef<HTMLDivElement, ResizableHandleProps>(
       className={cx(
         "relative flex shrink-0 touch-none items-center justify-center bg-[var(--rd-color-border-default)] outline-none",
         "after:absolute after:content-['']",
-        vertical ? "h-px w-full cursor-row-resize after:inset-x-0 after:-inset-y-1.5" : "h-full w-px cursor-col-resize after:inset-y-0 after:-inset-x-1.5",
+        vertical ? "h-px w-full cursor-row-resize after:inset-x-0 after:-inset-y-1.5 [@media(pointer:coarse)]:after:-inset-y-4" : "h-full w-px cursor-col-resize after:inset-y-0 after:-inset-x-1.5 [@media(pointer:coarse)]:after:-inset-x-4",
         "hover:bg-[var(--rd-color-action-primary)] data-[active]:bg-[var(--rd-color-action-primary)]",
         "focus-visible:bg-[var(--rd-color-action-primary)] focus-visible:ring-2 focus-visible:ring-[var(--rd-color-focus-ring)]",
         "aria-disabled:cursor-not-allowed aria-disabled:opacity-50",

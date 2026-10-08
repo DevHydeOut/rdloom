@@ -65,16 +65,16 @@ export const Bubble = forwardRef<HTMLElement, BubbleProps>(function Bubble(
       data-from={from}
       data-position={position}
       data-status={status}
-      className={cx("flex w-full gap-2", mine ? "flex-row-reverse" : "flex-row", className)}
+      className={cx("flex w-full flex-col gap-1", mine ? "items-end" : "items-start", className)}
     >
-      {hasAvatarColumn && (
-        <div className="flex w-8 shrink-0 items-end">{showAvatar ? avatar : null}</div>
+      {showName && (
+        <span className={cx("px-1 text-xs font-medium text-[var(--rd-color-text-muted)]", hasAvatarColumn && !mine && "ms-10")}>{name}</span>
       )}
-      <div className={cx("flex min-w-0 max-w-[85%] flex-col gap-1", mine ? "items-end" : "items-start")}>
-        {showName && <span className="px-1 text-xs font-medium text-[var(--rd-color-text-muted)]">{name}</span>}
+      <div className={cx("flex max-w-[85%] min-w-0 gap-2", mine ? "flex-row-reverse" : "flex-row", "items-end")}>
+        {hasAvatarColumn && <div className="flex w-8 shrink-0 items-end">{showAvatar ? avatar : null}</div>}
         <div
           className={cx(
-            "flex flex-col gap-2 rounded-[var(--rd-radius-overlay)] px-3.5 py-2 text-sm break-words",
+            "flex min-w-0 flex-col gap-2 rounded-[var(--rd-radius-overlay)] px-3.5 py-2 text-sm break-words",
             mine
               ? "bg-[var(--rd-color-action-primary)] text-[var(--rd-color-action-on-primary)]"
               : "bg-[var(--rd-color-surface-subtle)] text-[var(--rd-color-text-default)] ring-1 ring-[var(--rd-color-border-default)]",
@@ -86,31 +86,39 @@ export const Bubble = forwardRef<HTMLElement, BubbleProps>(function Bubble(
           {children}
           {attachments}
         </div>
-        {hasFooter && (
-          <div className={cx("flex flex-wrap items-center gap-x-2 gap-y-1 px-1 text-xs text-[var(--rd-color-text-muted)]", mine && "justify-end")}>
-            {timestamp !== undefined && (
-              <time dateTime={timestamp instanceof Date ? timestamp.toISOString() : timestamp}>{visibleTime}</time>
-            )}
-            {status === "sending" && <span role="status">Sending</span>}
-            {failed && (
-              <span role="alert" className="inline-flex items-center gap-1.5 text-[var(--rd-color-feedback-danger)]">
-                <ErrorIcon className="size-3.5 shrink-0" />
-                Not sent
-                {onRetry && (
-                  <AriaButton
-                    onPress={onRetry}
-                    className={cx("inline-flex items-center gap-1 rounded px-1 font-medium underline underline-offset-2", focusRing)}
-                  >
-                    <RetryIcon className="size-3.5 shrink-0" />
-                    Retry
-                  </AriaButton>
-                )}
-              </span>
-            )}
-            {actions && <div className="flex items-center gap-1">{actions}</div>}
-          </div>
-        )}
       </div>
+      {hasFooter && (
+        <div
+          className={cx(
+            "flex min-h-6 max-w-[85%] flex-wrap items-center gap-x-2 gap-y-1 px-1 text-xs leading-none text-[var(--rd-color-text-muted)]",
+            hasAvatarColumn && !mine && "ms-10",
+            mine && "justify-end",
+          )}
+        >
+          {timestamp !== undefined && (
+            <time dateTime={timestamp instanceof Date ? timestamp.toISOString() : timestamp}>{visibleTime}</time>
+          )}
+          {status === "sending" && <span role="status">Sending</span>}
+          {failed && (
+            <span role="alert" className="inline-flex items-center gap-1.5 text-[var(--rd-color-feedback-danger)]">
+              <ErrorIcon className="size-3.5 shrink-0" />
+              Not sent
+              {onRetry && (
+                <AriaButton
+                  onPress={onRetry}
+                  className={cx("inline-flex min-h-6 items-center gap-1 rounded px-1 font-medium underline underline-offset-2", focusRing)}
+                >
+                  <RetryIcon className="size-3.5 shrink-0" />
+                  Retry
+                </AriaButton>
+              )}
+            </span>
+          )}
+          {actions && (
+            <div className="flex items-center gap-1 [&_button]:!h-6 [&_button]:!min-h-0 [&_button]:!px-2 [&_button]:!text-xs">{actions}</div>
+          )}
+        </div>
+      )}
     </article>
   );
 });

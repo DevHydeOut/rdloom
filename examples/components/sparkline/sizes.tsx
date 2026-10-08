@@ -1,24 +1,28 @@
 import { Sparkline } from "@rdloom/react";
 
-const data = [14, 18, 15, 22, 20, 27, 25, 33, 30, 38];
+// Fixed, repeatable series so the preview never changes between renders.
+const noise = (i: number, k: number) => Math.sin(i * 12.9898 + k * 78.233) * 0.5 + Math.sin(i * 4.1 + k) * 0.5;
 
-// You choose the size in pixels. Small ones sit in text, large ones stand on their own.
+const data = Array.from({ length: 40 }, (_, i) => Math.round((60 + i * 0.9 + noise(i, 5) * 6) * 10) / 10);
+
+// You choose the size in pixels, or pass responsive to fill the parent. Small ones sit in text, large ones stand on their own.
 export default function SparklineSizesExample() {
   return (
-    <div className="flex items-end gap-8">
-      {[
-        { w: 56, h: 20 },
-        { w: 96, h: 32 },
-        { w: 160, h: 56 },
-        { w: 240, h: 88 },
-      ].map(({ w, h }) => (
-        <figure key={w} className="flex flex-col items-center gap-2">
-          <Sparkline type="area" width={w} height={h} data={data} />
-          <figcaption className="text-xs text-[var(--rd-color-text-muted)]">
-            {w} × {h}
-          </figcaption>
-        </figure>
-      ))}
+    <div className="flex w-full justify-center">
+      <div className="flex w-[36rem] max-w-full flex-col gap-5">
+        {[
+          { w: 96, h: 28 },
+          { w: 240, h: 48 },
+          { w: 576, h: 80 },
+        ].map(({ w, h }) => (
+          <figure key={w} className="flex items-center gap-4">
+            <figcaption className="w-24 shrink-0 text-xs tabular-nums text-[var(--rd-color-text-muted)]">
+              {w} × {h}
+            </figcaption>
+            <Sparkline type="area" width={w} height={h} data={data} className="max-w-full" />
+          </figure>
+        ))}
+      </div>
     </div>
   );
 }

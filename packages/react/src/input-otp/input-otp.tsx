@@ -19,7 +19,7 @@ export interface InputOTPProps
 }
 
 const cell =
-  "relative flex h-[var(--rd-size-control-lg)] w-[var(--rd-size-control-md)] items-center justify-center text-base font-medium " +
+  "relative flex h-[var(--rd-size-control-lg)] w-[var(--rd-size-control-md)] min-w-0 shrink items-center justify-center text-base font-medium " +
   "bg-[var(--rd-color-surface-default)] text-[var(--rd-color-text-default)] border border-[var(--rd-color-border-default)] " +
   "rounded-[var(--rd-radius-control)] [box-shadow:var(--rd-elevation-raised)] transition-colors " +
   "data-[active]:border-[var(--rd-color-focus-ring)] data-[active]:ring-2 data-[active]:ring-[var(--rd-color-focus-ring)] " +
@@ -82,7 +82,7 @@ export const InputOTP = forwardRef<HTMLDivElement, InputOTPProps>(function Input
       className={cx("flex flex-col gap-2", className)}
     >
       <Label className="text-sm font-medium text-[var(--rd-color-text-default)]">{label}</Label>
-      <div role="group" aria-label={label} className="relative inline-flex w-fit items-center gap-2">
+      <div role="group" aria-label={label} className="relative inline-flex w-fit max-w-full items-center gap-2">
         {Array.from({ length }, (_, index) => {
           const char = current[index];
           const isActive = focused && index === active;

@@ -26,7 +26,7 @@ function Reasoning({ part }: { part: ReasoningPart }) {
       <AriaButton
         aria-expanded={open}
         onPress={() => setOpen((v) => !v)}
-        className="inline-flex w-fit items-center gap-1.5 rounded px-1 text-xs text-[var(--rd-color-text-muted)] outline-none data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)] data-[hovered]:text-[var(--rd-color-text-default)]"
+        className="inline-flex min-h-6 w-fit items-center gap-1.5 rounded px-1 text-xs text-[var(--rd-color-text-muted)] outline-none data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)] data-[hovered]:text-[var(--rd-color-text-default)]"
       >
         <ChevronRightIcon className={cx("size-3.5 transition-transform motion-reduce:transition-none", open && "rotate-90")} />
         {part.streaming ? "Thinking…" : "Reasoning"}
@@ -162,7 +162,7 @@ export const Message = forwardRef<HTMLElement, MessageProps>(function Message(
             <ErrorIcon className="size-4 shrink-0" />
             Something went wrong.
             {onRetry && (
-              <AriaButton onPress={onRetry} className="rounded px-1 font-medium underline underline-offset-2 outline-none data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)]">
+              <AriaButton onPress={onRetry} className="min-h-6 rounded px-1 font-medium underline underline-offset-2 outline-none data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)]">
                 Try again
               </AriaButton>
             )}

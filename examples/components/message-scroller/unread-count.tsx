@@ -22,8 +22,8 @@ export default function MessageScrollerUnreadCountExample() {
   }, []);
 
   return (
-    <div className="flex w-full justify-center">
-      <div className="h-72 w-full max-w-lg rounded-[var(--rd-radius-overlay)] border border-[var(--rd-color-border-default)]">
+    <div className="flex w-full justify-center py-4">
+      <div className="h-72 w-[36rem] max-w-full rounded-[var(--rd-radius-overlay)] border border-[var(--rd-color-border-default)]">
         <MessageScroller label="Team thread" unreadCount={unread}
           onAtBottomChange={(v) => {
             atBottom.current = v;

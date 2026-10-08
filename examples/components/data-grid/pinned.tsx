@@ -28,7 +28,7 @@ const columns: ColumnDef<Person, any>[] = [
 
 export default function DataGridPinnedExample() {
   return (
-    <div className="max-w-md">
+    <div className="min-w-0 max-w-md">
       <DataGrid label="People" data={people} columns={columns} getRowId={(p) => p.id} height={320} pinnedColumns={["name"]} />
     </div>
   );

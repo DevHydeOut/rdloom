@@ -25,7 +25,7 @@ export default function SparklineInATableExample() {
                 <TableCell>{r.name}</TableCell>
                 <TableCell>{r.plan}</TableCell>
                 <TableCell>
-                  <Sparkline type="area" data={r.usage} width={96} height={28} color={change > 5 ? "success" : change < -5 ? "danger" : "muted"} />
+                  <Sparkline type="area" data={r.usage} width={64} height={28} color={change > 5 ? "success" : change < -5 ? "danger" : "muted"} />
                 </TableCell>
                 <TableCell className="tabular-nums">{change > 0 ? `Up ${change}%` : change < 0 ? `Down ${Math.abs(change)}%` : "No change"}</TableCell>
               </TableRow>

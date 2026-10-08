@@ -167,7 +167,7 @@ export const HoverCardTrigger = forwardRef<HTMLAnchorElement, HoverCardTriggerPr
         }
       }}
       className={cx(
-        "cursor-pointer rounded-sm font-medium text-[var(--rd-color-text-default)] underline decoration-[var(--rd-color-border-strong)] decoration-1 underline-offset-4 outline-none transition-colors " +
+        "inline-flex min-h-6 cursor-pointer items-center rounded-sm font-medium text-[var(--rd-color-text-default)] underline decoration-[var(--rd-color-border-strong)] decoration-1 underline-offset-4 outline-none transition-colors " +
           "data-[hovered]:decoration-[var(--rd-color-text-default)] " +
           "data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)] data-[focus-visible]:ring-offset-2",
         className,

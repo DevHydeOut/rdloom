@@ -38,7 +38,7 @@ export function Sources({ sources, label = sourcesDefaults.label, className }: S
               </span>
               <span className="flex min-w-0 flex-col">
                 {source.url && isWeb(source.url) ? (
-                  <a href={source.url} target="_blank" rel="noopener noreferrer" className="font-medium underline underline-offset-2 hover:text-[var(--rd-color-action-primary)]">
+                  <a href={source.url} target="_blank" rel="noopener noreferrer" className="inline-block min-h-6 py-0.5 font-medium underline underline-offset-2 hover:text-[var(--rd-color-action-primary)]">
                     {source.title}
                     <span className="sr-only"> (opens in a new tab)</span>
                   </a>

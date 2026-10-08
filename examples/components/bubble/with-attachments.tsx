@@ -3,7 +3,7 @@ import { Attachment, AttachmentList, Bubble } from "@rdloom/react";
 export default function BubbleWithAttachmentsExample() {
   return (
     <div className="flex w-full justify-center">
-      <div className="flex w-full max-w-md flex-col gap-4">
+      <div className="flex w-[28rem] max-w-full flex-col gap-4">
         <Bubble
           from="user"
           name="You"

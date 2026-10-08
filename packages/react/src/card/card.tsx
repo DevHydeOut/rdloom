@@ -197,10 +197,11 @@ export function CardMedia({ src, alt, decorative, aspectRatio = "photo", classNa
 
 // --- Overlay
 
-// Two stacked layers of the backdrop colour give a solid dark zone behind the text and a soft fade above it.
+// One smooth ramp with several stops, so there is no visible band where the scrim ends.
 const darkScrim =
-  "[background:linear-gradient(to_top,var(--rd-color-overlay-backdrop)_55%,transparent),linear-gradient(to_top,var(--rd-color-overlay-backdrop)_55%,transparent)]";
-const lightScrim = "[background:linear-gradient(to_top,var(--rd-color-surface-raised)_60%,transparent)]";
+  "[background:linear-gradient(to_top,color-mix(in_srgb,var(--rd-color-overlay-backdrop)_92%,transparent),color-mix(in_srgb,var(--rd-color-overlay-backdrop)_75%,transparent)_35%,color-mix(in_srgb,var(--rd-color-overlay-backdrop)_40%,transparent)_65%,color-mix(in_srgb,var(--rd-color-overlay-backdrop)_12%,transparent)_85%,transparent)]";
+const lightScrim =
+  "[background:linear-gradient(to_top,var(--rd-color-surface-raised),color-mix(in_srgb,var(--rd-color-surface-raised)_85%,transparent)_40%,color-mix(in_srgb,var(--rd-color-surface-raised)_40%,transparent)_70%,transparent)]";
 
 export interface CardOverlayProps extends Omit<HTMLAttributes<HTMLDivElement>, "className"> {
   /** dark: white text over a dark scrim. light: default text over a fade to the card surface. */
@@ -217,16 +218,12 @@ export function CardOverlay({ tone = "dark", className, children, ...rest }: Car
       <div
         {...rest}
         className={cx(
-          "relative z-10 mt-auto flex flex-col gap-3 px-4 pb-4 pt-28",
+          "relative z-10 mt-auto flex flex-col gap-3 p-5 pt-28",
           tone === "dark" ? "text-white" : "text-[var(--rd-color-text-default)]",
           className,
         )}
       >
         <span aria-hidden="true" className={cx("pointer-events-none absolute inset-0 -z-10", tone === "dark" ? darkScrim : lightScrim)} />
-        <span
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 -z-10 backdrop-blur-sm [mask-image:linear-gradient(to_top,#000_40%,transparent)] motion-reduce:backdrop-blur-none"
-        />
         {children}
       </div>
     </CardContext.Provider>

@@ -39,15 +39,15 @@ export default function CardDetailPanelExample() {
     <div className="w-[28rem] max-w-full">
       <Card variant="floating" rounded="large" padding="sm">
         <CardHeader className="gap-3 rounded-[calc(var(--rd-radius-media)-0.5rem)] bg-[var(--rd-color-surface-subtle)] p-4">
-          <div className="flex items-start gap-3">
+          <div className="flex flex-wrap items-start gap-3">
             <span aria-hidden="true" className="grid size-11 shrink-0 place-items-center rounded-xl bg-[var(--rd-color-action-primary)] text-[var(--rd-color-action-on-primary)]">
               <CalendarIcon className="size-5" />
             </span>
-            <div className="flex min-w-0 flex-1 flex-col">
+            <div className="flex min-w-40 flex-1 flex-col">
               <CardTitle>Brand identity review</CardTitle>
               <CardDescription>Thu, Mar 14 · 10:00 to 11:00</CardDescription>
             </div>
-            <CardActions className="gap-1">
+            <CardActions className="ms-auto gap-1">
               <CardIconButton label="Turn on reminders" tone="ghost" className="size-8">
                 <BellIcon />
               </CardIconButton>

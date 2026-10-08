@@ -40,9 +40,9 @@ export default function ChartAreaExample() {
         height={260}
         actions={
           <SegmentedControl label="Time range" selectedKey={range} onChange={(key) => setRange(key as keyof typeof ranges)}>
-            <SegmentedControlItem id="90">Last 3 months</SegmentedControlItem>
-            <SegmentedControlItem id="30">Last 30 days</SegmentedControlItem>
-            <SegmentedControlItem id="7">Last 7 days</SegmentedControlItem>
+            <SegmentedControlItem id="90">3 months</SegmentedControlItem>
+            <SegmentedControlItem id="30">30 days</SegmentedControlItem>
+            <SegmentedControlItem id="7">7 days</SegmentedControlItem>
           </SegmentedControl>
         }
         data={{

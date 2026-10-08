@@ -8,10 +8,12 @@ const invoices = [
   { id: "inv-1045", customer: "Hooli", amount: 15 },
 ];
 
-// The table reports the sort; you sort your data and pass it back.
+// The table reports the sort (ascending, descending, then none); you sort your data and pass it back.
 export default function TableSortableExample() {
-  const [sort, setSort] = useState<SortDescriptor>({ column: "amount", direction: "descending" });
+  const [sort, setSort] = useState<SortDescriptor | null>({ column: "amount", direction: "descending" });
+  // A third press on a column clears the sort (null): the rows go back to their own order.
   const rows = useMemo(() => {
+    if (!sort) return invoices;
     const key = sort.column as "customer" | "amount";
     const sorted = [...invoices].sort((a, b) => (a[key] < b[key] ? -1 : a[key] > b[key] ? 1 : 0));
     return sort.direction === "descending" ? sorted.reverse() : sorted;

@@ -79,7 +79,7 @@ export interface BreadcrumbItemProps {
 export function BreadcrumbItem({ href, children, icon, separator, className }: BreadcrumbItemProps) {
   return (
     <Breadcrumb className={cx("group flex min-w-0 items-center gap-2", className)}>
-      <Link href={href} className={cx(linkClass, icon ? "inline-flex min-w-0 items-center gap-1.5" : "block min-w-0 truncate")}>
+      <Link href={href} className={cx(linkClass, icon ? "inline-flex min-h-6 min-w-0 items-center gap-1.5" : "block min-h-6 min-w-0 truncate py-0.5")}>
         {icon ? (
           <>
             <span aria-hidden="true" className="inline-flex shrink-0 [&>svg]:size-4">

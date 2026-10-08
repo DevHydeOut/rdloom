@@ -2,7 +2,7 @@ import { Button, Card, CardDescription, CardIconButton, CardMedia, CardMeta, Car
 
 // Placeholder art drawn with gradients. Swap CardMedia's style for src="..." to use a photo.
 const skyline =
-  "linear-gradient(to top, #1e293b 0 18%, transparent 18%), linear-gradient(90deg, transparent 0 12%, #334155 12% 22%, transparent 22% 30%, #475569 30% 44%, transparent 44% 52%, #334155 52% 60%, transparent 60%), linear-gradient(to bottom, #38bdf8 0%, #bae6fd 55%, #fde68a 100%)";
+  "linear-gradient(to top, #1e293b, transparent 40%), linear-gradient(90deg, transparent 0 12%, #334155 12% 22%, transparent 22% 30%, #475569 30% 44%, transparent 44% 52%, #334155 52% 60%, transparent 60%), linear-gradient(to bottom, #38bdf8 0%, #bae6fd 55%, #fde68a 100%)";
 
 export default function CardFullImageExample() {
   return (
@@ -22,7 +22,7 @@ export default function CardFullImageExample() {
             Search flight
           </Button>
         </CardOverlay>
-        <CardIconButton label="Save New York" tone="frosted" className="absolute end-4 top-4 z-20">
+        <CardIconButton label="Save New York" tone="frosted" className="absolute end-5 top-5 z-20">
           <HeartIcon className="size-5" />
         </CardIconButton>
       </Card>

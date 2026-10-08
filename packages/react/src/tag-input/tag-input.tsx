@@ -123,7 +123,7 @@ export const TagInput = forwardRef<HTMLDivElement, TagInputProps>(function TagIn
                 <Button
                   slot="remove"
                   className={
-                    "flex size-5 items-center justify-center rounded-full text-[var(--rd-color-text-muted)] outline-none " +
+                    "-my-0.5 flex size-6 items-center justify-center rounded-full text-[var(--rd-color-text-muted)] outline-none " +
                     "data-[hovered]:bg-[var(--rd-color-border-default)] data-[hovered]:text-[var(--rd-color-text-default)] " +
                     "data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)]"
                   }

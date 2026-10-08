@@ -104,6 +104,8 @@ export const AppHeader = forwardRef<HTMLElement, AppHeaderProps>(function AppHea
   const shortcutKeys = searchShortcut.split(" ").filter(Boolean);
   const unread = Math.max(0, Math.floor(notificationCount));
 
+  // Narrow with actions beside the breadcrumbs: the trail moves to its own row so neither is squeezed out.
+  const stacked = narrow && !!breadcrumbs && !!actions;
   return (
     <header
       ref={(node) => {
@@ -116,7 +118,7 @@ export const AppHeader = forwardRef<HTMLElement, AppHeaderProps>(function AppHea
       data-narrow={narrow || undefined}
       className={cx(
         "flex w-full items-center gap-3 bg-[var(--rd-color-surface-default)] px-4 text-[var(--rd-color-text-default)]",
-        compact ? "h-11" : "h-14",
+        stacked ? "h-auto flex-wrap py-2" : compact ? "h-11" : "h-14",
         border && "border-b border-[var(--rd-color-border-default)]",
         sticky && "sticky top-0 z-30",
         className,
@@ -124,7 +126,8 @@ export const AppHeader = forwardRef<HTMLElement, AppHeaderProps>(function AppHea
       )}
     >
       {leading && <div className={cx("flex shrink-0 items-center gap-2", classNames?.leading)}>{leading}</div>}
-      <div className={cx("flex min-w-0 flex-1 items-center", classNames?.breadcrumbs)}>{breadcrumbs}</div>
+      <div className={cx("flex min-w-0 items-center", stacked ? "order-last basis-full" : "flex-1", classNames?.breadcrumbs)}>{breadcrumbs}</div>
+      {stacked && <div aria-hidden="true" className="flex-1" />}
       {onSearch && (
         <BarButton
           permission={permissions?.search}

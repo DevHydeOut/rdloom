@@ -7,11 +7,13 @@
   "description": "Month grid for picking a date. RangeCalendar picks a start and end. Used inside DatePicker and DateRangePicker.",
   "props": {
     "visibleMonths": { "type": "number", "default": 1, "description": "How many months to show side by side." },
+    "captionLayout": { "type": "enum", "values": ["label", "dropdowns"], "default": "label", "description": "label shows the month and year as a heading. dropdowns shows a Month and a Year select, so a far date is two choices away." },
+    "bordered": { "type": "boolean", "default": false, "description": "Draws the calendar inside a rounded border with padding." },
     "minValue": { "type": "custom", "tsType": "import(\"react-aria-components\").DateValue", "description": "Earliest selectable date." },
     "maxValue": { "type": "custom", "tsType": "import(\"react-aria-components\").DateValue", "description": "Latest selectable date." },
     "isDisabled": { "type": "boolean", "default": false, "description": "Disables every date." }
   },
-  "variants": ["isDisabled"],
+  "variants": ["captionLayout", "bordered", "isDisabled"],
   "states": ["default", "hover", "focus", "selected", "disabled"],
   "slots": ["header", "previous", "heading", "next", "grid", "cell"],
   "tokens": [
@@ -44,9 +46,9 @@
     "avoid_when": ["A compact form field: use DatePicker"],
     "anti_patterns": ["Hiding which dates are unavailable until they're clicked"]
   },
-  "examples": ["single", "range", "two-months", "min-max"],
+  "examples": ["single", "range", "two-months", "min-max", "with-month-year-selectors", "bordered", "bordered-with-selectors"],
   "figma": {
     "componentKey": null,
-    "variantMap": { "isDisabled": "Disabled" }
+    "variantMap": { "captionLayout": "Caption", "bordered": "Bordered", "isDisabled": "Disabled" }
   }
 }

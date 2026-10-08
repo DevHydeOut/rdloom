@@ -28,6 +28,13 @@ interface RootContext {
 const RootCtx = createContext<RootContext | null>(null);
 const ItemCtx = createContext<{ id: string; triggerId: string; contentId: string } | null>(null);
 const InPanelCtx = createContext(false);
+const AlignCtx = createContext<"start" | "center" | "end">("start");
+
+const panelAlign = {
+  start: "start-0",
+  center: "start-1/2 -translate-x-1/2 rtl:translate-x-1/2",
+  end: "end-0",
+} as const;
 
 function useRoot(part: string): RootContext {
   const ctx = useContext(RootCtx);
@@ -54,7 +61,7 @@ export interface NavigationMenuProps extends NavigationMenuSpecProps {
  * grouped links below it. Hover opens a panel after a short delay; click and keyboard open it at once.
  */
 export const NavigationMenu = forwardRef<HTMLElement, NavigationMenuProps>(function NavigationMenu(
-  { label = navigationMenuDefaults.label, delay = navigationMenuDefaults.delay, children, className },
+  { label = navigationMenuDefaults.label, delay = navigationMenuDefaults.delay, align = navigationMenuDefaults.align, children, className },
   forwardedRef,
 ) {
   const root = useRef<HTMLElement | null>(null);
@@ -176,7 +183,7 @@ export const NavigationMenu = forwardRef<HTMLElement, NavigationMenuProps>(funct
           else if (forwardedRef) forwardedRef.current = node;
         }}
         aria-label={label}
-        className={cx("relative text-[var(--rd-color-text-default)]", className)}
+        className={cx("relative w-fit max-w-full self-start text-[var(--rd-color-text-default)]", className)}
         onKeyDown={onKeyDown}
         onPointerDown={() => {
           pointerInside.current = true;
@@ -191,7 +198,9 @@ export const NavigationMenu = forwardRef<HTMLElement, NavigationMenuProps>(funct
           if (!to || !event.currentTarget.contains(to)) close(false);
         }}
       >
-        <ul className="flex items-center gap-1">{children}</ul>
+        <AlignCtx.Provider value={align}>
+          <ul className="flex items-center gap-1">{children}</ul>
+        </AlignCtx.Provider>
       </nav>
     </RootCtx.Provider>
   );
@@ -272,9 +281,10 @@ export const NavigationMenuContent = forwardRef<HTMLDivElement, NavigationMenuCo
   const item = useContext(ItemCtx);
   if (!item) throw new Error("NavigationMenuContent must be used inside NavigationMenuItem.");
   const isOpen = root.openId === item.id;
+  const align = useContext(AlignCtx);
   return (
     // The outer box starts right under the bar and carries a little padding, so the pointer can cross the gap without closing the panel.
-    <div ref={ref} id={item.contentId} data-rd-nav-panel={item.id} hidden={!isOpen} className="absolute start-0 top-full z-40 pt-2">
+    <div ref={ref} id={item.contentId} data-rd-nav-panel={item.id} hidden={!isOpen} className={cx("absolute top-full z-40 pt-2", panelAlign[align])}>
       <div
         className={cx(
           "w-max max-w-[calc(100vw-2rem)] rounded-[var(--rd-radius-overlay)] border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-raised)] p-2 text-[var(--rd-color-text-default)] [box-shadow:var(--rd-elevation-floating)]",

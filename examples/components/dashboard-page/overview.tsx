@@ -57,7 +57,7 @@ export default function DashboardPageOverviewExample() {
             { label: "New customers", value: 312, trend: { change: 8, label: "vs last month" }, data: [22, 25, 24, 29, 31, 30, 34, 39] },
           ]}
         >
-          <div className="grid gap-6 lg:grid-cols-3">
+          <div className="grid gap-6 lg:grid-cols-3 [&>*]:min-w-0">
             <Card title="Revenue" description="Monthly totals for the year" className="lg:col-span-2">
               <Chart
                 type="area"
@@ -81,7 +81,7 @@ export default function DashboardPageOverviewExample() {
             </Card>
           </div>
 
-          <div className="grid gap-6 lg:grid-cols-3">
+          <div className="grid gap-6 lg:grid-cols-3 [&>*]:min-w-0">
             <Card title="Recent orders" description="The latest five" className="lg:col-span-2">
               <Table label="Recent orders">
                 <TableHeader>

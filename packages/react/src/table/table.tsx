@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef, type ReactNode } from "react";
+import { forwardRef, useRef, type ReactNode } from "react";
 import {
   Cell,
   Checkbox,
@@ -19,9 +19,11 @@ import {
 } from "react-aria-components";
 import { tableDefaults, type TableSpecProps } from "../generated/table.types";
 import { cx } from "../utils/cx";
+import { scrollHintClass, useScrollHint } from "../utils/scroll-hint";
 import { CheckIcon, SortIcon } from "../utils/icons";
 
 export type { SortDescriptor } from "react-aria-components";
+import type { SortDescriptor } from "react-aria-components";
 
 export interface TableProps
   extends TableSpecProps,
@@ -30,14 +32,24 @@ export interface TableProps
 }
 
 export const Table = forwardRef<HTMLTableElement, TableProps>(function Table(
-  { label, children, density = tableDefaults.density, selectionMode = tableDefaults.selectionMode, className, ...rest },
+  { label, children, density = tableDefaults.density, selectionMode = tableDefaults.selectionMode, sortDescriptor, onSortChange, className, ...rest },
   ref,
 ) {
+  // A sortable header has three states: ascending, descending, and back to the default order. React Aria only toggles the
+  // first two, so a press on the descending column is turned into "no sort" (null) here.
+  const changeSort = onSortChange
+    ? (next: SortDescriptor) => onSortChange(sortDescriptor && sortDescriptor.column === next.column && sortDescriptor.direction === "descending" ? null : next)
+    : undefined;
+  const boxRef = useRef<HTMLDivElement>(null);
+  const hint = useScrollHint(boxRef);
   return (
     // The wrapper scrolls sideways on a narrow screen instead of squashing the columns.
     <div
+      ref={boxRef}
       data-density={density}
+      data-hint={hint}
       className={cx(
+        scrollHintClass,
         "group/table overflow-x-auto rounded-[var(--rd-radius-overlay)] border border-[var(--rd-color-border-default)]",
         "bg-[var(--rd-color-surface-default)] [box-shadow:var(--rd-elevation-raised)]",
         className,
@@ -45,6 +57,8 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(function Table(
     >
       <AriaTable
         {...rest}
+        sortDescriptor={sortDescriptor ?? undefined}
+        onSortChange={changeSort}
         ref={ref}
         aria-label={label}
         selectionMode={selectionMode === "none" ? undefined : selectionMode}
@@ -60,7 +74,7 @@ function SelectBox() {
   return (
     <Checkbox
       slot="selection"
-      className="group/box flex size-4 items-center justify-center rounded-[var(--rd-radius-sm,4px)] border border-[var(--rd-color-border-strong)] outline-none data-[selected]:border-transparent data-[selected]:bg-[var(--rd-color-action-primary)] data-[indeterminate]:border-transparent data-[indeterminate]:bg-[var(--rd-color-action-primary)] data-[focus-visible]:ring-2 data-[focus-visible]:ring-offset-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)]"
+      className="group/box relative flex size-4 items-center before:absolute before:-inset-3 before:content-['']  justify-center rounded-[var(--rd-radius-sm,4px)] border border-[var(--rd-color-border-strong)] outline-none data-[selected]:border-transparent data-[selected]:bg-[var(--rd-color-action-primary)] data-[indeterminate]:border-transparent data-[indeterminate]:bg-[var(--rd-color-action-primary)] data-[focus-visible]:ring-2 data-[focus-visible]:ring-offset-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)]"
     >
       {({ isSelected, isIndeterminate }) =>
         isIndeterminate ? (

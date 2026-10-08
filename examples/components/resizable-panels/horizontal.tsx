@@ -14,7 +14,7 @@ export default function ResizablePanelsHorizontalExample() {
   return (
     <div className="mx-auto h-72 w-[40rem] max-w-full overflow-hidden rounded-[var(--rd-radius-overlay)] border border-[var(--rd-color-border-default)]">
       <ResizablePanelGroup>
-        <ResizablePanel defaultSize={30} minSize={15} maxSize={50}>
+        <ResizablePanel defaultSize={40} minSize={20} maxSize={55}>
           <Pane title="Sidebar">Drag the line, or focus it and use the arrow keys.</Pane>
         </ResizablePanel>
         <ResizableHandle withHandle label="Resize sidebar" />

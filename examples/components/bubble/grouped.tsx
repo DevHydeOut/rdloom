@@ -3,7 +3,7 @@ import { Avatar, Bubble, BubbleGroup, Button } from "@rdloom/react";
 export default function BubbleGroupedExample() {
   return (
     <div className="flex w-full justify-center">
-      <div className="flex w-full max-w-md flex-col gap-4">
+      <div className="flex w-[28rem] max-w-full flex-col gap-4">
         <BubbleGroup aria-label="Messages from Alex">
           <Bubble name="Alex" avatar={<Avatar name="Alex Rivera" size="sm" decorative />}>
             Did you see the new design?

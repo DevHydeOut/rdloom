@@ -19,7 +19,7 @@ export interface SliderProps
 }
 
 const thumb =
-  "top-1/2 size-5 rounded-full border-2 border-[var(--rd-color-action-primary)] bg-[var(--rd-color-surface-raised)] [box-shadow:var(--rd-elevation-raised)] outline-none " +
+  "top-1/2 size-5 [@media(pointer:coarse)]:size-7 rounded-full border-2 border-[var(--rd-color-action-primary)] bg-[var(--rd-color-surface-raised)] [box-shadow:var(--rd-elevation-raised)] outline-none " +
   "transition-[box-shadow,transform] data-[dragging]:scale-110 data-[dragging]:[box-shadow:var(--rd-elevation-floating)] data-[focus-visible]:ring-4 data-[focus-visible]:ring-[var(--rd-color-focus-ring)] " +
   "data-[disabled]:border-[var(--rd-color-border-strong)]";
 

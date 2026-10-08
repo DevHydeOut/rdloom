@@ -179,6 +179,12 @@ export function neighbours(id: string) {
   return { previous: i > 0 ? parts[i - 1] : undefined, next: i >= 0 && i < parts.length - 1 ? parts[i + 1] : undefined };
 }
 
+/** The block before and after this one in the Blocks list. */
+export function blockNeighbours(id: string) {
+  const i = blocks.findIndex((c) => c.id === id);
+  return { previous: i > 0 ? blocks[i - 1] : undefined, next: i >= 0 && i < blocks.length - 1 ? blocks[i + 1] : undefined };
+}
+
 /** "DataGrid" -> "Data Grid": the name people read, while code keeps the real one. */
 export const displayName = (name: string) => name.replace(/([a-z0-9])([A-Z])/g, "$1 $2");
 

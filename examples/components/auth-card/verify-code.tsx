@@ -1,6 +1,6 @@
 import { AuthCard, Button, ErrorSummary, Field, Form, FormSubmitButton, InputOTP } from "@rdloom/react";
 
-const link = "rounded-[var(--rd-radius-control)] font-medium text-[var(--rd-color-text-default)] underline underline-offset-4 outline-none focus-visible:ring-2 focus-visible:ring-[var(--rd-color-focus-ring)]";
+const link = "inline-block min-h-6 rounded-[var(--rd-radius-control)] font-medium text-[var(--rd-color-text-default)] underline underline-offset-4 outline-none focus-visible:ring-2 focus-visible:ring-[var(--rd-color-focus-ring)]";
 
 // InputOTP is bound to the form with Field, so a missing or wrong code shows its message and appears in the ErrorSummary.
 export default function AuthCardVerifyCodeExample() {

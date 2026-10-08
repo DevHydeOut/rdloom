@@ -1,9 +1,79 @@
 import { ToastRegion } from "@rdloom/react";
-import { blocks, components, displayName, hrefOf } from "../data";
+import { useLayoutEffect, useRef, useState } from "react";
+import { blocks, components, displayName, hrefOf, type DocComponent, type Example } from "../data";
 import { Link } from "../router";
 import { PageHeader } from "../ui";
 import { ArrowRightIcon } from "../icons";
 import { Live } from "./component-page";
+
+/**
+ * A small live picture of a block's first example, shrunk to fit the box and centered in it. The block is drawn at its
+ * natural size first, measured, and then scaled so that the whole of it shows; nothing in it can be pressed or read twice.
+ */
+function Thumb({ component, example }: { component: DocComponent; example?: Example }) {
+  const box = useRef<HTMLDivElement>(null);
+  const inner = useRef<HTMLDivElement>(null);
+  const applied = useRef(0.34);
+  const [view, setView] = useState({ scale: 0.34, x: 0, y: 0 });
+  useLayoutEffect(() => {
+    const b = box.current;
+    const i = inner.current;
+    if (!b || !i) return;
+    const fit = () => {
+      // The drawn parts of the block, in the block's own pixels (undo the scale it is shown at).
+      const base = i.getBoundingClientRect();
+      const k = applied.current;
+      let l = Infinity;
+      let t = Infinity;
+      let r = -Infinity;
+      let bt = -Infinity;
+      for (const el of i.querySelectorAll("*")) {
+        const rc = el.getBoundingClientRect();
+        if (rc.width < 2 || rc.height < 2) continue;
+        l = Math.min(l, (rc.left - base.left) / k);
+        t = Math.min(t, (rc.top - base.top) / k);
+        r = Math.max(r, (rc.right - base.left) / k);
+        bt = Math.max(bt, (rc.bottom - base.top) / k);
+      }
+      if (!isFinite(l) || r <= l || bt <= t) return;
+      const scale = Math.min(0.7, (b.clientWidth - 32) / (r - l), (b.clientHeight - 32) / (bt - t));
+      applied.current = scale;
+      setView({ scale, x: -((l + r) / 2) * scale, y: -((t + bt) / 2) * scale });
+    };
+    fit();
+    // Examples load lazily and some draw late (charts, fonts): measure again whenever the block's markup changes.
+    let frame = 0;
+    const later = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(fit);
+    };
+    const mo = new MutationObserver(later);
+    mo.observe(i, { childList: true, subtree: true });
+    const ro = new ResizeObserver(later);
+    ro.observe(b);
+    const settle = window.setTimeout(fit, 800);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.clearTimeout(settle);
+      mo.disconnect();
+      ro.disconnect();
+    };
+  }, []);
+  return (
+    <div ref={box} aria-hidden="true" className="relative h-56 overflow-hidden border-b border-[var(--site-border)] bg-[var(--site-subtle)]">
+      {example && (
+        <div
+          ref={inner}
+          inert
+          style={{ transform: `translate(${view.x}px, ${view.y}px) scale(${view.scale})` }}
+          className={`pointer-events-none absolute start-1/2 top-1/2 w-[1100px] origin-top-left select-none ${component.id === "dashboard-shell" ? "h-[760px]" : ""}`}
+        >
+          <Live component={component} example={example} />
+        </div>
+      )}
+    </div>
+  );
+}
 
 /** Every block, each with a small live picture of its first example. */
 export function BlocksIndex() {
@@ -19,13 +89,7 @@ export function BlocksIndex() {
           return (
             <li key={c.id} className="group relative flex flex-col overflow-hidden rounded-xl border border-[var(--site-border)] transition-colors focus-within:ring-2 focus-within:ring-[var(--rd-color-focus-ring)] hover:border-[var(--site-border-strong)]">
               {/* A small picture of the real block: it is shrunk, and nothing in it can be pressed or read twice. */}
-              <div aria-hidden="true" className="relative h-56 overflow-hidden border-b border-[var(--site-border)] bg-[var(--site-subtle)]">
-                {first && (
-                  <div inert className={`pointer-events-none absolute start-4 top-4 w-[1100px] origin-top-left scale-[0.34] select-none ${c.id === "dashboard-shell" ? "h-[760px]" : ""}`}>
-                    <Live component={c} example={first} />
-                  </div>
-                )}
-              </div>
+              <Thumb component={c} example={first} />
               <div className="flex flex-col gap-1.5 p-4">
                 <span className="flex items-center justify-between gap-2 font-medium">
                   {/* The one link of the card; it stretches over the whole card, so the card is one target (and the picture, which has links of its own, is not inside a link). */}

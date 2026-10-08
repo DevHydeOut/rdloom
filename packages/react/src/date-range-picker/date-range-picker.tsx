@@ -152,7 +152,7 @@ export function DateRangePicker<T extends DateValue = DateValue>({
         </Text>
       )}
       <FieldError className={fieldError}>{errorMessage}</FieldError>
-      <Popover className={cx(overlayPanel, "overflow-auto")}>
+      <Popover className={cx(overlayPanel, "max-w-[calc(100vw-1.5rem)] overflow-auto")}>
         <Dialog className="flex flex-col gap-3 p-3 outline-none sm:flex-row">
           {presets && presets.length > 0 && (
             <PresetList presets={presets} timeZone={timeZone} minValue={rest.minValue} maxValue={rest.maxValue} />

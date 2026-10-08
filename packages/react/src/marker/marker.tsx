@@ -45,7 +45,7 @@ export const Marker = forwardRef<HTMLDivElement, MarkerProps>(function Marker(
           aria-label={jumpLabel}
           className={cx(
             textClass,
-            "rounded-[var(--rd-radius-control)] px-2 py-0.5 outline-none data-[hovered]:underline data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)]",
+            "min-h-6 rounded-[var(--rd-radius-control)] px-2 py-0.5 outline-none data-[hovered]:underline data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)]",
           )}
         >
           {text}

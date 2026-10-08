@@ -127,7 +127,7 @@ describe("CardMedia", () => {
     expect(screen.getByRole("img", { name: "Skyline" })).toHaveClass("absolute", "inset-0");
     expect(screen.getByText("New York").closest("div")).toHaveClass("text-white");
     expect(screen.getByText("Economy")).toHaveClass("text-white/80");
-    expect(container.querySelectorAll("[aria-hidden='true']").length).toBeGreaterThanOrEqual(2);
+    expect(container.querySelectorAll("[aria-hidden='true']").length).toBeGreaterThanOrEqual(1);
     expect(container.innerHTML).toContain("--rd-color-overlay-backdrop");
   });
 

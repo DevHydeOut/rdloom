@@ -107,7 +107,7 @@ function Field({ fieldRef, size, isMultiple, isLoading, placeholder }: FieldProp
             aria-label={`Remove ${item.textValue}`}
             onClick={() => remove(item.key)}
             className={
-              "flex size-4 items-center justify-center rounded-sm outline-none text-[var(--rd-color-text-muted)] " +
+              "-my-1 flex size-6 items-center justify-center rounded-sm outline-none text-[var(--rd-color-text-muted)] " +
               "hover:text-[var(--rd-color-text-default)] focus-visible:ring-2 focus-visible:ring-[var(--rd-color-focus-ring)]"
             }
           >

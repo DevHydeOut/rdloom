@@ -205,7 +205,8 @@ export const Chart = forwardRef<HTMLElement, ChartProps>(function Chart(
   const count = series.length || 1;
   const groupW = stackedMode || type !== "bar" ? Math.min(band * 0.62, 56) : Math.min(band * 0.62, 44 * count);
   const barW = stackedMode ? groupW : groupW / count;
-  const direct = type === "bar" && (stackedMode ? n <= 12 : n * count <= 12);
+  const valueW = vals.length ? Math.max(...vals.flat().map((v) => textWidth(axisFormat(v)))) : 0;
+  const direct = type === "bar" && (stackedMode ? n <= 12 : n * count <= 12) && valueW + 4 <= (stackedMode ? band : band / count);
   const widest = Math.min(Math.max(0, ...labels.map((l) => textWidth(l.length > 14 ? `${l.slice(0, 13)}…` : l))), plotW);
   const labelStep = Math.max(1, Math.ceil((widest + 16) / band));
   const maxChars = Math.max(3, Math.floor((band * labelStep - 8) / 6.5));

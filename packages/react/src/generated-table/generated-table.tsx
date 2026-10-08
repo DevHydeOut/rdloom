@@ -43,7 +43,7 @@ export const GeneratedTable = forwardRef<HTMLDivElement, GeneratedTableProps>(fu
   { data, title, summary, maxRows = generatedTableDefaults.maxRows, isSortable = generatedTableDefaults.isSortable, fileName = generatedTableDefaults.fileName, onExport, className },
   ref,
 ) {
-  const [sort, setSort] = useState<SortDescriptor | undefined>();
+  const [sort, setSort] = useState<SortDescriptor | null>(null);
   const [all, setAll] = useState(false);
   const [notice, setNotice] = useState("");
   const titleId = useId();

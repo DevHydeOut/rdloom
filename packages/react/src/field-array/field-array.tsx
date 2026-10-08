@@ -63,7 +63,7 @@ export interface FieldArrayProps
 }
 
 const rowButton =
-  "flex size-8 shrink-0 items-center justify-center rounded-[var(--rd-radius-control)] outline-none " +
+  "flex size-10 shrink-0 items-center sm:size-8 justify-center rounded-[var(--rd-radius-control)] outline-none " +
   "text-[var(--rd-color-text-muted)] data-[hovered]:bg-[var(--rd-color-surface-subtle)] data-[hovered]:text-[var(--rd-color-text-default)] " +
   "data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed " +
   "data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)]";
@@ -234,14 +234,14 @@ export function FieldArray({
                   aria-label={m.rowLabel(itemLabel, n)}
                   data-rd-row-id={id}
                   className={
-                    "flex items-start gap-3 rounded-[var(--rd-radius-overlay)] border border-[var(--rd-color-border-default)] " +
+                    "flex flex-col-reverse gap-3 sm:flex-row sm:items-start rounded-[var(--rd-radius-overlay)] border border-[var(--rd-color-border-default)] " +
                     "bg-[var(--rd-color-surface-default)] p-3 [box-shadow:var(--rd-elevation-raised)]"
                   }
                 >
                   <div data-rd-row-content className="grid min-w-0 flex-1 gap-3">
                     {children(row)}
                   </div>
-                  <div className="flex shrink-0 items-center gap-0.5">
+                  <div className="flex shrink-0 items-center justify-end gap-0.5">
                     {allowReorder && (
                       <>
                         <AriaButton

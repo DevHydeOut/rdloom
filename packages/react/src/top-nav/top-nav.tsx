@@ -191,7 +191,7 @@ export const TopNav = forwardRef<HTMLDivElement, TopNavProps>(function TopNav(
       data-variant={variant}
       data-narrow={narrow || undefined}
       className={cx(
-        "flex h-14 w-auto items-center gap-4 px-4 text-[var(--rd-color-text-default)]",
+        "flex h-14 w-auto items-center gap-4 px-4 text-[var(--rd-color-text-default)] data-[narrow]:gap-2 data-[narrow]:px-2",
         variants[variant],
         sticky && (variant === "floating" ? "sticky top-3 z-30" : "sticky top-0 z-30"),
         className,
@@ -215,7 +215,7 @@ export const TopNav = forwardRef<HTMLDivElement, TopNavProps>(function TopNav(
           </Sheet>
         </DialogTrigger>
       )}
-      {brand && <div className={cx("flex shrink-0 items-center text-[15px] font-semibold", classNames?.brand)}>{brand as ReactNode}</div>}
+      {brand && <div className={cx("flex min-w-0 shrink items-center truncate text-[15px] font-semibold", classNames?.brand)}>{brand as ReactNode}</div>}
       {!narrow && (
         <nav aria-label={label} className={cx("flex min-w-0 flex-1 items-center", classNames?.nav)}>
           <ul className={cx("flex items-center gap-1", classNames?.list)}>
@@ -226,7 +226,7 @@ export const TopNav = forwardRef<HTMLDivElement, TopNavProps>(function TopNav(
         </nav>
       )}
       {narrow && <div className="flex-1" />}
-      {actions && <div className={cx("flex shrink-0 items-center gap-2", classNames?.actions)}>{actions}</div>}
+      {actions && <div className={cx("flex shrink-0 items-center", narrow ? "gap-1" : "gap-2", classNames?.actions)}>{actions}</div>}
     </div>
   );
 });

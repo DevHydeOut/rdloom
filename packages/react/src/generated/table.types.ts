@@ -39,13 +39,13 @@ export interface TableSpecProps {
    */
   onSelectionChange?: (keys: "all" | Set<import("react-aria-components").Key>) => void;
   /**
-   * Controlled sort: the column id and direction. You sort the rows yourself.
+   * Controlled sort: the column id and direction, or null for the default order. You sort the rows yourself.
    */
-  sortDescriptor?: import("react-aria-components").SortDescriptor;
+  sortDescriptor?: import("react-aria-components").SortDescriptor | null;
   /**
-   * Called when the user sorts by a column with allowsSorting. Sort your data and pass it back.
+   * Called when the user presses a column with allowsSorting. A column goes ascending, then descending, then back to the default order: null on that third press. Sort your data and pass it back.
    */
-  onSortChange?: (descriptor: import("react-aria-components").SortDescriptor) => void;
+  onSortChange?: (descriptor: import("react-aria-components").SortDescriptor | null) => void;
 }
 
 export const tableDefaults = {

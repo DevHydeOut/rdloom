@@ -12,7 +12,7 @@ export interface AppFooterProps
 }
 
 const linkClass =
-  "rounded-[var(--rd-radius-control)] text-sm text-[var(--rd-color-text-muted)] outline-none transition-colors hover:text-[var(--rd-color-text-default)] hover:underline " +
+  "inline-flex min-h-6 items-center rounded-[var(--rd-radius-control)] text-sm text-[var(--rd-color-text-muted)] outline-none transition-colors hover:text-[var(--rd-color-text-default)] hover:underline " +
   "focus-visible:ring-2 focus-visible:ring-[var(--rd-color-focus-ring)]";
 
 /**

@@ -31,6 +31,11 @@
       "default": 96,
       "description": "Width in pixels."
     },
+    "responsive": {
+      "type": "boolean",
+      "default": false,
+      "description": "Fills the width of its parent and keeps the aspect ratio of width and height. Use it for a wide chart in a KPI row."
+    },
     "height": {
       "type": "number",
       "default": 32,

@@ -3,6 +3,8 @@
 
 import type { ReactNode } from "react";
 
+export const navigationMenuAlignValues = ["start", "center", "end"] as const;
+
 /** Site navigation along the top of a page: plain links, and triggers that open a shared panel of grouped links (a mega-menu). Built from NavigationMenuItem, NavigationMenuTrigger, NavigationMenuContent and NavigationMenuLink. It is a set of links, not a menu of actions. */
 export interface NavigationMenuSpecProps {
   /**
@@ -16,6 +18,11 @@ export interface NavigationMenuSpecProps {
    */
   delay?: number;
   /**
+   * Where an open panel sits under the bar: start aligns it with the bar start, center puts it in the middle of the bar, end aligns it with the bar end. Use center or end for a wide panel near the edge of the page.
+   * @default "start"
+   */
+  align?: "start" | "center" | "end";
+  /**
    * NavigationMenuItem elements. Each holds either a NavigationMenuLink, or a NavigationMenuTrigger with a NavigationMenuContent.
    */
   children: ReactNode;
@@ -24,6 +31,7 @@ export interface NavigationMenuSpecProps {
 export const navigationMenuDefaults = {
   label: "Main",
   delay: 150,
+  align: "start",
 } as const;
 
 export const navigationMenuMeta = {

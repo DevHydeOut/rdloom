@@ -4,6 +4,7 @@ import { forwardRef, useState } from "react";
 import { Button } from "react-aria-components";
 import { paginationDefaults, type PaginationSpecProps } from "../generated/pagination.types";
 import { cx } from "../utils/cx";
+import { useMediaQuery } from "../utils/use-media-query";
 import { ChevronRightIcon } from "../utils/icons";
 
 export interface PaginationProps extends PaginationSpecProps {
@@ -74,6 +75,7 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(function Pagi
   },
   ref,
 ) {
+  const narrow = useMediaQuery("(max-width: 479px)");
   const [inner, setInner] = useState(defaultPage);
   const count = Math.max(1, Math.floor(pageCount));
   const active = Math.min(Math.max(1, Math.floor(page ?? inner)), count);
@@ -93,7 +95,7 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(function Pagi
             <Chevron direction="left" />
           </Button>
         </li>
-        {paginationRange(active, count, siblingCount).map((item) =>
+        {paginationRange(active, count, narrow ? 0 : siblingCount).map((item) =>
           typeof item === "string" ? (
             <li key={item} aria-hidden="true" className="px-1 text-[var(--rd-color-text-muted)] select-none">
               …

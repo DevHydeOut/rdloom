@@ -1,6 +1,6 @@
 import { AuthCard, ChartIcon, ErrorSummary, Form, FormCheckbox, FormSubmitButton, FormTextField, SparkleIcon, UsersIcon } from "@rdloom/react";
 
-const link = "rounded-[var(--rd-radius-control)] font-medium text-[var(--rd-color-text-default)] underline underline-offset-4 outline-none focus-visible:ring-2 focus-visible:ring-[var(--rd-color-focus-ring)]";
+const link = "inline-block min-h-6 rounded-[var(--rd-radius-control)] font-medium text-[var(--rd-color-text-default)] underline underline-offset-4 outline-none focus-visible:ring-2 focus-visible:ring-[var(--rd-color-focus-ring)]";
 
 const points = [
   { icon: <ChartIcon />, text: "Reports that stay in step with your data" },

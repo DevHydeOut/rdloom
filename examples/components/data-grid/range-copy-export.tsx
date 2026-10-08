@@ -35,7 +35,7 @@ export default function DataGridRangeCopyExportExample() {
   const [rows, setRows] = useState(lines);
   const api = useRef<DataGridApi>(null);
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex min-w-0 max-w-full flex-col gap-3">
       <div className="flex gap-2">
         <Button variant="secondary" size="sm" onPress={() => api.current?.downloadCsv()}>
           Download CSV

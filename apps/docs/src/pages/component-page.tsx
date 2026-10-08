@@ -1,5 +1,7 @@
-import { Suspense, useContext, useEffect, useState, type ReactNode } from "react";
+import { Suspense, useContext, useEffect, useId, useState, type ReactNode } from "react";
 import {
+  blockNeighbours,
+  blocks,
   categoryLabel,
   components,
   defaultComponentsDir,
@@ -17,7 +19,7 @@ import {
   type RegistryFile,
 } from "../data";
 import { ArrowLeftIcon, ArrowRightIcon } from "../icons";
-import { Link } from "../router";
+import { Link, navigate } from "../router";
 import { registryBase } from "../routes";
 import { addCommand, Badge, CodeBlock, CommandBlock, CopyPill, DocTabs, H2, H3, List, Muted, PageHeader, Preview, runCommand } from "../ui";
 
@@ -476,6 +478,50 @@ function BlockExample({ component, example }: { component: DocComponent; example
   );
 }
 
+/** On a block page: the way back to all blocks, a picker to jump to any other block, and the blocks before and after. */
+function BlockNav({ id }: { id: string }) {
+  const { previous, next } = blockNeighbours(id);
+  const arrow = "flex size-8 items-center justify-center rounded-lg border border-[var(--site-border)] bg-[var(--site-subtle)] text-[var(--site-muted)] outline-none hover:text-[var(--site-fg)] focus-visible:ring-2 focus-visible:ring-[var(--rd-color-focus-ring)]";
+  const selectId = useId();
+  return (
+    <nav aria-label="Blocks" className="relative z-10 mb-10 flex flex-wrap items-center gap-3 bg-[var(--site-bg)] py-1">
+      <Link href="/blocks" className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-[var(--site-border)] bg-[var(--site-subtle)] px-3 text-sm outline-none hover:text-[var(--site-fg)] focus-visible:ring-2 focus-visible:ring-[var(--rd-color-focus-ring)]">
+        <ArrowLeftIcon size={14} />
+        All blocks
+      </Link>
+      <div className="flex items-center gap-2">
+        <label htmlFor={selectId} className="text-sm text-[var(--site-muted)]">
+          Go to
+        </label>
+        <select
+          id={selectId}
+          value={id}
+          onChange={(e) => navigate(`/blocks/${e.target.value}`)}
+          className="h-8 rounded-lg border border-[var(--site-border)] bg-[var(--site-bg)] px-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-[var(--rd-color-focus-ring)]"
+        >
+          {blocks.map((b) => (
+            <option key={b.id} value={b.id}>
+              {displayName(b.spec.name)}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className="ms-auto flex items-center gap-2">
+        {previous ? (
+          <Link href={`/blocks/${previous.id}`} aria-label={`Previous block: ${displayName(previous.spec.name)}`} className={arrow}>
+            <ArrowLeftIcon size={15} />
+          </Link>
+        ) : null}
+        {next ? (
+          <Link href={`/blocks/${next.id}`} aria-label={`Next block: ${displayName(next.spec.name)}`} className={arrow}>
+            <ArrowRightIcon size={15} />
+          </Link>
+        ) : null}
+      </div>
+    </nav>
+  );
+}
+
 export function ComponentPage({ component, layout = "page" }: { component: DocComponent; /** "block": examples shown at full width, the rest in a reading column. */ layout?: "page" | "block" }) {
   const asBlock = layout === "block";
   const { spec, id } = component;
@@ -485,6 +531,7 @@ export function ComponentPage({ component, layout = "page" }: { component: DocCo
 
   return (
     <article>
+      {asBlock && <BlockNav id={id} />}
       <PageHeader
         title={displayName(spec.name)}
         lead={spec.description}

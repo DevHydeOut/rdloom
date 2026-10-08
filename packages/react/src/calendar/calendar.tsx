@@ -1,7 +1,11 @@
 "use client";
 
+import { useContext } from "react";
 import {
   Button,
+  CalendarStateContext,
+  RangeCalendarStateContext,
+  useLocale,
   Calendar as AriaCalendar,
   CalendarCell,
   CalendarGrid,
@@ -16,6 +20,7 @@ import {
 } from "react-aria-components";
 import { calendarDefaults, type CalendarSpecProps } from "../generated/calendar.types";
 import { cx } from "../utils/cx";
+import { NativeSelect } from "../native-select/native-select";
 import { ChevronLeftIcon, ChevronRightIcon } from "../utils/icons";
 
 type Omitted = keyof CalendarSpecProps | "className" | "children" | "visibleDuration";
@@ -82,21 +87,83 @@ function Grids({ visibleMonths, range }: { visibleMonths: number; range: boolean
   );
 }
 
-function Header() {
+const selectClass = "w-auto min-w-0 [&>label]:sr-only [&_select]:ps-2 [&_select]:pe-7 [&_svg]:size-3.5";
+
+// Month and year as two native selects. They read and move the focused date of the surrounding calendar.
+function CaptionSelects() {
+  const single = useContext(CalendarStateContext);
+  const range = useContext(RangeCalendarStateContext);
+  const state = single ?? range;
+  const { locale } = useLocale();
+  if (!state) return null;
+  const focused = state.focusedDate;
+  const months = focused.calendar.getMonthsInYear(focused);
+  const monthName = (m: number) =>
+    new Intl.DateTimeFormat(locale, { month: "long", timeZone: "UTC" }).format(focused.set({ month: m }).toDate("UTC"));
+  const yearName = (y: number) =>
+    new Intl.DateTimeFormat(locale, { year: "numeric", timeZone: "UTC" }).format(focused.set({ year: y }).toDate("UTC"));
+  const minYear = state.minValue ? state.minValue.year : focused.year - 50;
+  const maxYear = state.maxValue ? state.maxValue.year : focused.year + 50;
+  const lo = Math.min(minYear, focused.year);
+  const hi = Math.max(maxYear, focused.year);
+  const years = Array.from({ length: hi - lo + 1 }, (_, i) => lo + i);
+  const monthDisabled = (m: number) => {
+    const d = focused.set({ month: m });
+    return (!!state.minValue && d.compare(state.minValue) < 0 && d.month !== state.minValue.month) ||
+      (!!state.maxValue && d.compare(state.maxValue) > 0 && d.month !== state.maxValue.month);
+  };
+  return (
+    <div className="flex items-center gap-1">
+      <NativeSelect
+        label="Month"
+        size="sm"
+        className={selectClass}
+        isDisabled={state.isDisabled}
+        value={String(focused.month)}
+        onChange={(e) => state.setFocusedDate(focused.set({ month: Number(e.target.value) }))}
+        options={Array.from({ length: months }, (_, i) => ({ value: String(i + 1), label: monthName(i + 1), disabled: monthDisabled(i + 1) }))}
+      />
+      <NativeSelect
+        label="Year"
+        size="sm"
+        className={selectClass}
+        isDisabled={state.isDisabled}
+        value={String(focused.year)}
+        onChange={(e) => state.setFocusedDate(focused.set({ year: Number(e.target.value) }))}
+        options={years.map((y) => ({ value: String(y), label: yearName(y) }))}
+      />
+    </div>
+  );
+}
+
+function Header({ captionLayout }: { captionLayout: "label" | "dropdowns" }) {
   return (
     // A div, not <header>: outside sectioning content a header is a page-level
     // "banner" landmark, so every calendar would add one.
     <div className="flex items-center justify-between gap-2 pb-2">
       <NavButton slot="previous" />
-      <Heading className="text-sm font-semibold text-[var(--rd-color-text-default)]" />
+      {captionLayout === "dropdowns" ? (
+        <>
+          {/* Keeps the month announcement for screen readers while the selects do the visible work. */}
+          <Heading className="sr-only" />
+          <CaptionSelects />
+        </>
+      ) : (
+        <Heading className="text-sm font-semibold text-[var(--rd-color-text-default)]" />
+      )}
       <NavButton slot="next" />
     </div>
   );
 }
 
+const borderedClass =
+  "rounded-[var(--rd-radius-overlay)] border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-default)] p-4";
+
 export function Calendar({
   visibleMonths = calendarDefaults.visibleMonths,
   isDisabled = calendarDefaults.isDisabled,
+  captionLayout = calendarDefaults.captionLayout,
+  bordered = calendarDefaults.bordered,
   className,
   ...rest
 }: CalendarProps) {
@@ -105,9 +172,9 @@ export function Calendar({
       {...rest}
       isDisabled={isDisabled}
       visibleDuration={{ months: visibleMonths }}
-      className={cx("w-fit", className)}
+      className={cx("w-fit", bordered && borderedClass, className)}
     >
-      <Header />
+      <Header captionLayout={captionLayout} />
       <Grids visibleMonths={visibleMonths} range={false} />
     </AriaCalendar>
   );
@@ -116,6 +183,8 @@ export function Calendar({
 export function RangeCalendar({
   visibleMonths = calendarDefaults.visibleMonths,
   isDisabled = calendarDefaults.isDisabled,
+  captionLayout = calendarDefaults.captionLayout,
+  bordered = calendarDefaults.bordered,
   className,
   ...rest
 }: RangeCalendarProps) {
@@ -124,9 +193,9 @@ export function RangeCalendar({
       {...rest}
       isDisabled={isDisabled}
       visibleDuration={{ months: visibleMonths }}
-      className={cx("w-fit", className)}
+      className={cx("w-fit", bordered && borderedClass, className)}
     >
-      <Header />
+      <Header captionLayout={captionLayout} />
       <Grids visibleMonths={visibleMonths} range />
     </AriaRangeCalendar>
   );

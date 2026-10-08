@@ -282,7 +282,7 @@ export function H2({ id, label, children }: { id: string; /** Text for "On this 
     <h2
       id={id}
       data-label={label ?? (typeof children === "string" ? children : undefined)}
-      className="font-display group scroll-mt-20 pt-14 pb-4 text-[24px] leading-8 tracking-[-0.03em]"
+      className="site-h2 font-display group scroll-mt-20 pt-14 pb-4 text-[24px] leading-8 tracking-[-0.03em]"
     >
       {children}
       {/* A permalink: copies the address of this section, so it can be shared or bookmarked. Shown on hover and on keyboard focus. */}

@@ -13,8 +13,8 @@ export default function ContextMenuOnATableRowExample() {
   const [last, setLast] = useState<string>();
 
   return (
-    <div className="flex flex-col items-center gap-3 p-6">
-      <table className="w-96 border-collapse text-sm">
+    <div className="flex flex-col items-center min-w-0 max-w-full gap-3 p-6">
+      <table className="w-96 max-w-full border-collapse text-sm">
         <caption className="pb-2 text-start text-[var(--rd-color-text-muted)]">Invoices</caption>
         <thead>
           <tr className="border-b border-[var(--rd-color-border-default)]">

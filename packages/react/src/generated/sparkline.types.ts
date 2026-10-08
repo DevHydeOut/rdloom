@@ -25,6 +25,11 @@ export interface SparklineSpecProps {
    */
   width?: number;
   /**
+   * Fills the width of its parent and keeps the aspect ratio of width and height. Use it for a wide chart in a KPI row.
+   * @default false
+   */
+  responsive?: boolean;
+  /**
    * Height in pixels.
    * @default 32
    */
@@ -54,6 +59,7 @@ export interface SparklineSpecProps {
 export const sparklineDefaults = {
   type: "line",
   width: 96,
+  responsive: false,
   height: 32,
   color: "primary",
   showLast: true,

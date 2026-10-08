@@ -2,8 +2,8 @@ import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMe
 
 export default function NavigationMenuFeaturedAndGridExample() {
   return (
-    <div className="flex min-h-[24rem] w-full justify-center">
-      <NavigationMenu label="Main">
+    <div className="flex min-h-[24rem] w-full items-start justify-center">
+      <NavigationMenu label="Main" align="center">
         <NavigationMenuItem>
           <NavigationMenuTrigger>Solutions</NavigationMenuTrigger>
           <NavigationMenuContent>

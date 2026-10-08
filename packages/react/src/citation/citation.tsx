@@ -29,7 +29,7 @@ export function Citation({ index, source, href, className }: CitationProps) {
         onClick={jump}
         aria-label={`Source ${index}: ${source.title}`}
         className={cx(
-          "inline-flex min-w-5 items-center justify-center rounded-full border border-[var(--rd-color-border-strong)] bg-[var(--rd-color-surface-subtle)] px-1 text-[0.7rem] font-medium leading-5 no-underline tabular-nums",
+          "-my-1 inline-flex min-h-6 min-w-6 items-center justify-center rounded-full border border-[var(--rd-color-border-strong)] bg-[var(--rd-color-surface-subtle)] px-1 text-[0.7rem] font-medium leading-5 no-underline tabular-nums",
           "text-[var(--rd-color-text-default)] outline-none hover:bg-[var(--rd-color-surface-selected)] focus-visible:ring-2 focus-visible:ring-[var(--rd-color-focus-ring)]",
         )}
       >

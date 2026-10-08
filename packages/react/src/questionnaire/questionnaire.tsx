@@ -260,7 +260,7 @@ export const Questionnaire = forwardRef<HTMLDivElement, QuestionnaireProps>(func
             <div className="flex flex-col gap-1">
               <h2 id={headingId} ref={heading} tabIndex={-1} className="text-lg font-semibold text-[var(--rd-color-text-default)] outline-none">
                 {question.title}
-                {question.required && <span aria-hidden="true" className="text-[var(--rd-color-feedback-danger)]"> *</span>}
+                {question.required && <span aria-hidden="true" className="text-[var(--rd-color-feedback-danger)]">{" *"}</span>}
               </h2>
               {question.description && <p className="text-sm text-[var(--rd-color-text-muted)]">{question.description}</p>}
             </div>

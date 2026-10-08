@@ -23,7 +23,7 @@ export default function CardWithActionsExample() {
     <div className="w-80 max-w-full">
       <Card variant="floating" rounded="large" padding="sm">
         <CardMedia alt="A bridge at sunset over the bay" style={{ background: bridge }} />
-        <CardHeader className="px-2 pt-1">
+        <CardHeader>
           <CardTitle size="lg">San Francisco</CardTitle>
           <CardDescription>Premium economy</CardDescription>
           <CardMeta className="mt-2">
@@ -31,7 +31,7 @@ export default function CardWithActionsExample() {
             <CardMetaItem icon={<PlaneIcon />}>SFO</CardMetaItem>
           </CardMeta>
         </CardHeader>
-        <CardActions className="px-2 pb-2 pt-1">
+        <CardActions>
           <Button className="flex-1 !rounded-full">Search flight</Button>
           <CardIconButton label="Save San Francisco" tone="outlined">
             <HeartIcon filled className="size-5 text-[var(--rd-color-feedback-danger)]" />

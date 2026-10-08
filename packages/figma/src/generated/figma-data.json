@@ -717,6 +717,24 @@
       "description": "Month grid for picking a date. RangeCalendar picks a start and end. Used inside DatePicker and DateRangePicker.",
       "properties": [
         {
+          "prop": "captionLayout",
+          "name": "Caption",
+          "values": [
+            "label",
+            "dropdowns"
+          ],
+          "default": "label"
+        },
+        {
+          "prop": "bordered",
+          "name": "Bordered",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        },
+        {
           "prop": "isDisabled",
           "name": "Disabled",
           "values": [

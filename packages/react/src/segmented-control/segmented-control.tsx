@@ -49,7 +49,7 @@ export const SegmentedControl = forwardRef<HTMLDivElement, SegmentedControlProps
         // The size reaches the items through this attribute, so each item stays a plain ToggleButton.
         data-size={size}
         className={cx(
-          "group inline-flex gap-0.5 rounded-[var(--rd-radius-control)] border border-[var(--rd-color-border-default)] " +
+          "group inline-flex max-w-full gap-0.5 overflow-x-auto rounded-[var(--rd-radius-control)] border border-[var(--rd-color-border-default)] " +
             "bg-[var(--rd-color-surface-subtle)] p-0.5 data-[disabled]:opacity-50",
           className,
         )}

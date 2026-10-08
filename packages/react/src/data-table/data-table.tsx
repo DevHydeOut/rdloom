@@ -65,7 +65,7 @@ const control =
   "data-[focused]:border-[var(--rd-color-focus-ring)] data-[focused]:ring-2 data-[focused]:ring-[var(--rd-color-focus-ring)] [&::-webkit-search-cancel-button]:hidden";
 
 const checkbox =
-  "flex size-4 shrink-0 items-center justify-center rounded-[var(--rd-radius-sm,4px)] border border-[var(--rd-color-border-strong)] outline-none " +
+  "relative flex size-4 shrink-0 items-center before:absolute before:-inset-3 before:content-['']  justify-center rounded-[var(--rd-radius-sm,4px)] border border-[var(--rd-color-border-strong)] outline-none " +
   "data-[selected]:border-transparent data-[selected]:bg-[var(--rd-color-action-primary)] data-[indeterminate]:border-transparent data-[indeterminate]:bg-[var(--rd-color-action-primary)] " +
   "data-[focus-visible]:ring-2 data-[focus-visible]:ring-offset-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)]";
 
@@ -534,8 +534,8 @@ export function DataTable<Row>({
             selectionMode={selectable ? "multiple" : "none"}
             selectedKeys={selected}
             onSelectionChange={racSelection}
-            sortDescriptor={query.sort ? { column: query.sort.column, direction: query.sort.direction } : undefined}
-            onSortChange={(d) => update({ sort: { column: String(d.column), direction: d.direction } })}
+            sortDescriptor={query.sort ? { column: query.sort.column, direction: query.sort.direction } : null}
+            onSortChange={(d) => update({ sort: d ? { column: String(d.column), direction: d.direction } : null })}
           >
             <TableHeader className={classNames?.header}>
               {columns.map((c, i) => (

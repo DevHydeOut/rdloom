@@ -133,7 +133,8 @@ export const FileUpload = forwardRef<HTMLDivElement, FileUploadProps>(function F
         </span>
         <div className="flex flex-col items-center gap-1">
           <Text slot="label" className="text-sm text-[var(--rd-color-text-default)]">
-            <span className="group-data-[drop-target]:hidden">Drag files here, or</span>
+            <span className="group-data-[drop-target]:hidden [@media(pointer:coarse)]:hidden">Drag files here, or</span>
+            <span className="hidden [@media(pointer:coarse)]:inline group-data-[drop-target]:hidden">Add files from your device</span>
             <span className="hidden group-data-[drop-target]:inline">Drop to add</span>
           </Text>
           <FileTrigger

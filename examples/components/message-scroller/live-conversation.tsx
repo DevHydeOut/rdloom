@@ -23,8 +23,8 @@ export default function MessageScrollerLiveConversationExample() {
       return [...prev, { id: `m${n + 1}`, role: mine ? "user" : "assistant", parts: [{ type: "text", text }] }];
     });
   return (
-    <div className="flex w-full justify-center">
-      <div className="flex w-full max-w-lg flex-col gap-3">
+    <div className="flex w-full justify-center py-4">
+      <div className="flex w-[36rem] max-w-full flex-col gap-4">
         <div className="h-72 rounded-[var(--rd-radius-overlay)] border border-[var(--rd-color-border-default)]">
           <MessageScroller label="Order support">
             {messages.map((m) => (

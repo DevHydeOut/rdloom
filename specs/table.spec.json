@@ -13,8 +13,8 @@
     "selectedKeys": { "type": "custom", "tsType": "\"all\" | Iterable<import(\"react-aria-components\").Key>", "description": "Controlled selection, by row id." },
     "defaultSelectedKeys": { "type": "custom", "tsType": "\"all\" | Iterable<import(\"react-aria-components\").Key>", "description": "Initial selection when uncontrolled." },
     "onSelectionChange": { "type": "callback", "tsType": "(keys: \"all\" | Set<import(\"react-aria-components\").Key>) => void", "description": "Called with the selected row ids." },
-    "sortDescriptor": { "type": "custom", "tsType": "import(\"react-aria-components\").SortDescriptor", "description": "Controlled sort: the column id and direction. You sort the rows yourself." },
-    "onSortChange": { "type": "callback", "tsType": "(descriptor: import(\"react-aria-components\").SortDescriptor) => void", "description": "Called when the user sorts by a column with allowsSorting. Sort your data and pass it back." }
+    "sortDescriptor": { "type": "custom", "tsType": "import(\"react-aria-components\").SortDescriptor | null", "description": "Controlled sort: the column id and direction, or null for the default order. You sort the rows yourself." },
+    "onSortChange": { "type": "callback", "tsType": "(descriptor: import(\"react-aria-components\").SortDescriptor | null) => void", "description": "Called when the user presses a column with allowsSorting. A column goes ascending, then descending, then back to the default order: null on that third press. Sort your data and pass it back." }
   },
   "variants": ["density", "selectionMode"],
   "states": ["default", "hover", "focus", "selected"],

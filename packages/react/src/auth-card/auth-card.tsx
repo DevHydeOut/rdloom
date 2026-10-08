@@ -42,7 +42,7 @@ export const AuthCard = forwardRef<HTMLDivElement, AuthCardProps>(function AuthC
     <div {...rest} ref={ref} className={cx("flex min-h-full w-full items-center justify-center bg-[var(--rd-color-surface-subtle)] p-4 sm:p-8", classNames?.root, className)}>
       <div
         className={cx(
-          "grid w-full overflow-hidden rounded-[var(--rd-radius-overlay)] border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-default)] [box-shadow:var(--rd-elevation-floating)]",
+          "grid w-full grid-cols-1 overflow-hidden rounded-[var(--rd-radius-overlay)] border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-default)] [box-shadow:var(--rd-elevation-floating)]",
           illustration ? "max-w-4xl lg:grid-cols-2" : widths[size],
           classNames?.card,
         )}

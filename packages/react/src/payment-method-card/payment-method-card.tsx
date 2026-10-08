@@ -123,8 +123,8 @@ export function PaymentMethodCard({
                   <CreditCardIcon className="size-4 shrink-0" />
                   {brand}
                 </span>
-                <div className={cx("flex min-w-0 flex-1 flex-col", classNames?.details)}>
-                  <p className={cx("text-base font-medium tabular-nums text-[var(--rd-color-text-default)]", classNames?.number)}>
+                <div className={cx("flex min-w-36 flex-1 flex-col", classNames?.details)}>
+                  <p className={cx("whitespace-nowrap text-base font-medium tabular-nums text-[var(--rd-color-text-default)]", classNames?.number)}>
                     <span aria-hidden="true">•••• {method.last4}</span>
                     <span className="sr-only">
                       {brand} {last4}
