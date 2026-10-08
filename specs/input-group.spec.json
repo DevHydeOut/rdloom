@@ -1,0 +1,66 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "InputGroup",
+  "version": "0.1.0",
+  "category": "input",
+  "status": "experimental",
+  "description": "One bordered text field that wraps an input with addons before or after it: a currency sign, a URL prefix, a search icon, a clear, show or copy button. Built from InputGroup, InputGroupAddon and InputGroupInput.",
+  "props": {
+    "label": { "type": "string", "required": true, "description": "Visible label. Required so the field is always named." },
+    "description": { "type": "string", "description": "Help text shown under the group." },
+    "errorMessage": { "type": "string", "description": "Shown when the field is invalid." },
+    "size": { "type": "enum", "values": ["sm", "md", "lg"], "default": "md", "description": "Height and font size of the whole group." },
+    "isDisabled": { "type": "boolean", "default": false, "description": "Prevents editing and dims the group. Buttons inside addons need their own isDisabled." },
+    "isInvalid": { "type": "boolean", "default": false, "description": "Marks the value as invalid and shows errorMessage." },
+    "isRequired": { "type": "boolean", "default": false, "description": "Marks the field as required for form submission." },
+    "isReadOnly": { "type": "boolean", "default": false, "description": "The value can be selected and copied but not edited." },
+    "value": { "type": "string", "description": "Controlled value." },
+    "defaultValue": { "type": "string", "description": "Initial value when uncontrolled." },
+    "onChange": { "type": "callback", "tsType": "(value: string) => void", "description": "Called with the new value on every edit." },
+    "children": { "type": "node", "description": "One InputGroupInput and any number of InputGroupAddon, in the order they should appear." }
+  },
+  "variants": ["size", "isDisabled", "isInvalid", "isReadOnly"],
+  "states": ["default", "hover", "focus", "disabled", "invalid", "readonly"],
+  "slots": ["label", "group", "addon", "input", "description", "error"],
+  "tokens": [
+    "color.surface.default",
+    "color.surface.subtle",
+    "color.border.default",
+    "color.border.strong",
+    "color.text.default",
+    "color.text.muted",
+    "color.feedback.danger",
+    "color.focus.ring",
+    "radius.control"
+  ],
+  "a11y": {
+    "role": "textbox",
+    "keyboard": [
+      "Tab moves to the input, then to any button in an addon, in visual order",
+      "Typing, selecting and clipboard keys work as in a normal text field",
+      "Enter or Space activates a focused addon button"
+    ],
+    "requirements": [
+      "The input is named by the visible label; the addons are not part of the name",
+      "Text addons (a currency, a URL prefix) are linked to the input with aria-describedby, so they are read after the label, with the help text, and not lost",
+      "Icon addons are decorative and hidden from assistive technology",
+      "A button in an addon has its own accessible name; an icon-only one needs an aria-label",
+      "The focus ring is drawn around the whole group when the input has focus; a focused addon button has its own ring",
+      "Invalid is shown by the border color and by the error message, which is linked with aria-describedby",
+      "Disabled and read-only are exposed on the input itself"
+    ],
+    "screenReader": [
+      "Announced as an edit text with its label, for example \"Amount, edit text, USD\"",
+      "Help text, error messages and addon text are all read as the description of the input",
+      "A required field is announced as required"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["A value needs a fixed unit or prefix, like $ or https://", "A search box with a leading icon and a clear button", "A password with a show button, or a read-only value with a copy button"],
+    "avoid_when": ["A plain text field: use TextField", "Several separate inputs in a row, like a date or a code: use their own components", "More than one or two addons on each side: the input gets too narrow"],
+    "anti_patterns": ["Using an addon as the only label of the field", "An icon-only addon button without an aria-label", "Putting long text in an addon"]
+  },
+  "examples": ["currency", "url", "search", "password", "copy"],
+  "figma": { "componentKey": null, "variantMap": { "size": "Size", "isDisabled": "Disabled", "isInvalid": "Invalid" } }
+}

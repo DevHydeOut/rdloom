@@ -4,7 +4,7 @@ import { forwardRef } from "react";
 import { Button as AriaButton, type ButtonProps as AriaButtonProps } from "react-aria-components";
 import { buttonDefaults, type ButtonSpecProps } from "../generated/button.types";
 import { cx } from "../utils/cx";
-import { Spinner } from "../utils/icons";
+import { SpinnerIcon } from "../utils/icons";
 
 // This file is the styled layer: the CLI copies it into user projects and
 // they own it. Behavior and accessibility come from react-aria-components.
@@ -63,7 +63,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       isPending={isLoading}
       className={cx(base, variants[variant], sizes[size], className)}
     >
-      {isLoading && <Spinner className="size-4" />}
+      {isLoading && <SpinnerIcon className="size-4" />}
       {children}
     </AriaButton>
   );

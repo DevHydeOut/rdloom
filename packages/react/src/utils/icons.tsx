@@ -439,7 +439,7 @@ export function StopIcon({ className = "size-4 shrink-0" }: Pick<IconProps, "cla
 
 // --- Progress
 
-export function Spinner({ className = "size-4" }: Pick<IconProps, "className">) {
+export function SpinnerIcon({ className = "size-4" }: Pick<IconProps, "className">) {
   return (
     <svg aria-hidden="true" focusable="false" viewBox="0 0 16 16" className={`${className} animate-spin`} fill="none">
       <circle cx="8" cy="8" r="6.25" stroke="currentColor" strokeWidth="1.75" opacity="0.25" vectorEffect="non-scaling-stroke" />

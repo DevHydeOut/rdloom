@@ -45,9 +45,17 @@ const variants: Record<NonNullable<CardSpecProps["variant"]>, string> = {
 
 const paddings: Record<NonNullable<CardSpecProps["padding"]>, string> = {
   none: "p-0",
-  sm: "p-3 gap-2",
-  md: "p-4 gap-3",
-  lg: "p-6 gap-4",
+  sm: "p-4 gap-3",
+  md: "p-5 gap-4",
+  lg: "p-6 gap-5",
+};
+
+// The same gap between the card's own parts: heading block, content and footer.
+const gaps: Record<NonNullable<CardSpecProps["padding"]>, string> = {
+  none: "gap-0",
+  sm: "gap-3",
+  md: "gap-4",
+  lg: "gap-5",
 };
 
 const radii: Record<Rounded, string> = {
@@ -112,7 +120,7 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(function Card(
         ) : (
           <>
             {(title || description) && (
-              <div className="flex flex-col gap-0.5">
+              <div className="flex flex-col gap-1">
                 {title && (
                   <Heading id={titleId} className="text-base font-semibold">
                     {title}
@@ -121,7 +129,7 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(function Card(
                 {description && <p className="text-[var(--rd-color-text-muted)]">{description}</p>}
               </div>
             )}
-            <div>{children}</div>
+            <div className={cx("flex flex-col", gaps[padding])}>{children}</div>
             {footer && <CardFooter>{footer}</CardFooter>}
           </>
         )}
@@ -228,7 +236,7 @@ export function CardOverlay({ tone = "dark", className, children, ...rest }: Car
 // --- Text parts
 
 export function CardHeader({ className, ...rest }: HTMLAttributes<HTMLDivElement>) {
-  return <div {...rest} className={cx("flex flex-col gap-0.5", className)} />;
+  return <div {...rest} className={cx("flex flex-col gap-1", className)} />;
 }
 
 export interface CardTitleProps extends Omit<HTMLAttributes<HTMLHeadingElement>, "className"> {
@@ -308,7 +316,7 @@ export function CardBody({ className, ...rest }: HTMLAttributes<HTMLDivElement>)
     <div
       {...rest}
       className={cx(
-        "relative z-10 flex flex-col gap-3 bg-[var(--rd-color-surface-raised)] p-5",
+        "relative z-10 flex flex-col gap-4 bg-[var(--rd-color-surface-raised)] p-5",
         card?.rounded === "large" ? "rounded-[var(--rd-radius-media)]" : "rounded-[var(--rd-radius-overlay)]",
         className,
       )}
@@ -349,7 +357,7 @@ export function CardFooter({ className, ...rest }: HTMLAttributes<HTMLDivElement
   return (
     <div
       {...rest}
-      className={cx("mt-1 flex flex-wrap items-center gap-2 border-t border-[var(--rd-color-border-default)] pt-3", className)}
+      className={cx("flex flex-wrap items-center gap-2 border-t border-[var(--rd-color-border-default)] pt-4", className)}
     />
   );
 }

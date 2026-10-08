@@ -1,0 +1,37 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "ScrollArea",
+  "version": "0.1.0",
+  "category": "display",
+  "status": "experimental",
+  "description": "A scrollable region with a thin themed scrollbar, reachable by keyboard, with optional fades at the edges that still have content.",
+  "props": {
+    "orientation": { "type": "enum", "values": ["vertical", "horizontal", "both"], "default": "vertical", "description": "The directions that scroll." },
+    "label": { "type": "string", "description": "Accessible name of the region. Required unless aria-labelledby points at a heading." },
+    "showFades": { "type": "boolean", "default": true, "description": "Fade the edges that still have content beyond them." },
+    "children": { "type": "node", "required": true, "description": "The scrolling content." }
+  },
+  "variants": ["orientation", "showFades"],
+  "states": ["default", "focus"],
+  "slots": ["viewport"],
+  "tokens": ["color.border.strong", "color.focus.ring", "radius.control"],
+  "a11y": {
+    "role": "region",
+    "keyboard": ["Tab moves focus to the region", "Arrow keys, Page Up, Page Down, Home and End scroll it"],
+    "requirements": [
+      "The region is focusable (tabIndex 0) so keyboard users can scroll it",
+      "The region has an accessible name from label or aria-labelledby",
+      "A visible focus ring shows when it has keyboard focus",
+      "Edge fades are decoration and never hide content permanently"
+    ],
+    "screenReader": ["Announced as a region with its label"],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["A fixed-height list, log or table that scrolls inside the page", "A row of tags or chips wider than its container"],
+    "avoid_when": ["The whole page scrolls: leave it to the browser", "Content that fits: do not add a scroller"],
+    "anti_patterns": ["Nesting scroll areas in the same direction", "Hiding the scrollbar entirely", "A region with no label"]
+  },
+  "examples": ["vertical-list", "horizontal-tags", "both-directions"],
+  "figma": { "componentKey": null, "variantMap": { "orientation": "Orientation", "showFades": "Fades" } }
+}

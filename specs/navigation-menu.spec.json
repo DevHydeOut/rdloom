@@ -1,0 +1,72 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "NavigationMenu",
+  "version": "0.1.0",
+  "category": "navigation",
+  "status": "experimental",
+  "description": "Site navigation along the top of a page: plain links, and triggers that open a shared panel of grouped links (a mega-menu). Built from NavigationMenuItem, NavigationMenuTrigger, NavigationMenuContent and NavigationMenuLink. It is a set of links, not a menu of actions.",
+  "props": {
+    "label": { "type": "string", "default": "Main", "description": "The accessible name of the navigation landmark, e.g. 'Main'. Give each nav on a page a different name." },
+    "delay": { "type": "number", "default": 150, "description": "Milliseconds the pointer rests on a trigger before its panel opens, and before it closes after the pointer leaves. Keyboard and click open at once." },
+    "children": { "type": "node", "required": true, "description": "NavigationMenuItem elements. Each holds either a NavigationMenuLink, or a NavigationMenuTrigger with a NavigationMenuContent." }
+  },
+  "variants": [],
+  "states": ["default", "hover", "focus", "open"],
+  "slots": ["root", "list", "item", "trigger", "chevron", "panel", "link", "link-title", "link-description"],
+  "tokens": [
+    "color.surface.default",
+    "color.surface.raised",
+    "color.surface.subtle",
+    "color.border.default",
+    "color.text.default",
+    "color.text.muted",
+    "color.focus.ring",
+    "radius.control",
+    "radius.overlay"
+  ],
+  "a11y": {
+    "role": "navigation",
+    "keyboard": [
+      "Tab moves through the top-level triggers and links, then into the open panel's links, then on",
+      "Enter or Space on a trigger opens or closes its panel",
+      "Down Arrow on a trigger opens its panel and moves to the first link",
+      "Left and Right Arrow move between the top-level triggers and links (reversed in right-to-left text)",
+      "Home and End move to the first and last top-level item",
+      "Esc closes the open panel and returns focus to its trigger"
+    ],
+    "requirements": [
+      "A nav landmark with an accessible name",
+      "Each trigger is a button with aria-expanded and aria-controls pointing at its panel",
+      "The panel closes on a click outside it and when focus leaves the navigation",
+      "Hover opens a panel after a short delay, and everything hover does is also available by keyboard and click",
+      "The current page is marked with aria-current=\"page\" and a visible mark that is not color alone",
+      "Opening and closing respect reduced motion"
+    ],
+    "screenReader": [
+      "The landmark is announced as navigation with its name",
+      "A trigger is announced as a button, expanded or collapsed",
+      "Links in the panel are read as links with their title and description, and the current one as current page"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "A marketing or documentation site with several sections, some with many links",
+      "A header where a few links need a short description each"
+    ],
+    "avoid_when": [
+      "Actions such as Copy or Delete: use Menu",
+      "A desktop application's File, Edit, View bar: use Menubar",
+      "Navigation inside an app with many levels: use Sidebar",
+      "Five or fewer links with no groups: plain links are enough"
+    ],
+    "anti_patterns": [
+      "Opening a panel only on hover with no click or keyboard route",
+      "A trigger that is also a link to a page: the trigger only opens the panel",
+      "Panels with more than about eight links without grouping",
+      "Putting forms or other controls in the panel"
+    ]
+  },
+  "examples": ["basic", "featured-and-grid", "with-current-page"],
+  "figma": { "componentKey": null, "variantMap": {} }
+}

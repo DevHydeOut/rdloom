@@ -1,0 +1,68 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Menubar",
+  "version": "0.1.0",
+  "category": "navigation",
+  "status": "experimental",
+  "description": "A horizontal bar of menus like File, Edit and View, as in a desktop application. Each MenubarMenu opens a list of actions with shortcuts, checkbox and radio items and submenus. Arrow keys move between the menus.",
+  "props": {
+    "label": { "type": "string", "default": "Application", "description": "The accessible name of the menu bar, e.g. 'Application'." },
+    "children": { "type": "node", "required": true, "description": "MenubarMenu elements, one per top-level menu." }
+  },
+  "variants": [],
+  "states": ["default", "hover", "focus", "open", "disabled"],
+  "slots": ["root", "trigger", "menu", "item", "shortcut", "submenu", "separator"],
+  "tokens": [
+    "color.surface.raised",
+    "color.surface.subtle",
+    "color.border.default",
+    "color.text.default",
+    "color.text.muted",
+    "color.focus.ring",
+    "radius.control",
+    "radius.overlay"
+  ],
+  "a11y": {
+    "role": "menubar",
+    "keyboard": [
+      "Tab moves into the bar (one stop) and out of it",
+      "Left and Right Arrow move between menus; with a menu open they open the neighbouring menu",
+      "Down Arrow, Enter or Space opens the menu and focuses its first item",
+      "Up and Down Arrow move between items; Right Arrow opens a submenu and Left Arrow closes it",
+      "Enter or Space chooses an item, or toggles a checkbox or radio item",
+      "Esc closes the menu and returns focus to its trigger"
+    ],
+    "requirements": [
+      "The bar has role menubar with an accessible name; the triggers are menu items with aria-haspopup and aria-expanded",
+      "Only one trigger is in the tab order at a time",
+      "Focus returns to the trigger when its menu closes",
+      "Checkbox and radio items expose their checked state",
+      "Disabled items stay visible and are skipped by the arrow keys",
+      "Shortcuts shown are only a hint; the app must handle them itself"
+    ],
+    "screenReader": [
+      "The bar is announced as a menu bar, each trigger as a menu item with a submenu, expanded or collapsed",
+      "Items are announced with their position, and checked items as checked",
+      "Shortcuts are read after the item name"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "A web application that works like a desktop editor, with many commands grouped under File, Edit and View",
+      "Commands that already have keyboard shortcuts you want to show"
+    ],
+    "avoid_when": [
+      "Site navigation to pages: use NavigationMenu",
+      "One overflow menu: use Menu",
+      "Few commands: show them as buttons"
+    ],
+    "anti_patterns": [
+      "Top-level triggers that run an action directly instead of opening a menu",
+      "Showing a shortcut that nothing handles",
+      "Nesting submenus more than one level deep"
+    ]
+  },
+  "examples": ["file-edit-view", "checkbox-and-radio", "with-disabled-items"],
+  "figma": { "componentKey": null, "variantMap": {} }
+}

@@ -76,11 +76,22 @@ grep -q '@tanstack/react-form' package.json || { echo "✗ the form engine depen
 echo "✓ forms and their parts installed"
 
 step "Small components: confirm dialog, one-time code, collapsible, separator, toggle button, avatar group"
-npx rdloom add alert-dialog input-otp collapsible separator toggle-button avatar-group --install
-for part in alert-dialog input-otp collapsible separator toggle-button avatar-group text-field; do
+npx rdloom add alert-dialog input-otp collapsible separator toggle-button avatar-group spinner toggle-group --install
+for part in alert-dialog input-otp collapsible separator toggle-button avatar-group spinner toggle-group text-field; do
+  test -e "src/components/rdloom/$part/$part.tsx" || { echo "✗ rdloom add did not bring $part"; exit 1; }
+done
+npx rdloom add drawer scroll-area --install
+for part in drawer scroll-area; do
   test -e "src/components/rdloom/$part/$part.tsx" || { echo "✗ rdloom add did not bring $part"; exit 1; }
 done
 echo "✓ small components installed"
+
+step "Button group and input group"
+npx rdloom add button-group input-group --install
+for part in button-group input-group button text-field; do
+  test -e "src/components/rdloom/$part/$part.tsx" || { echo "✗ rdloom add did not bring $part"; exit 1; }
+done
+echo "✓ button group and input group installed"
 
 step "Page structure and actions: page header, section header, footer, error state, auth card, action button"
 npx rdloom add page-header section-header app-footer error-state auth-card action-button --install
@@ -105,6 +116,13 @@ for part in user-menu app-header top-nav settings-section plan-card usage-meter 
   test -e "src/components/rdloom/$part/$part.tsx" || { echo "✗ rdloom add did not bring $part"; exit 1; }
 done
 echo "✓ navigation, settings, billing and the last core components installed"
+
+step "Navigation menu and menubar"
+npx rdloom add navigation-menu menubar --install
+for part in navigation-menu menubar kbd menu; do
+  test -e "src/components/rdloom/$part/$part.tsx" || { echo "✗ rdloom add did not bring $part"; exit 1; }
+done
+echo "✓ navigation menu and menubar installed"
 
 step "Typecheck and production build"
 npm run build --silent

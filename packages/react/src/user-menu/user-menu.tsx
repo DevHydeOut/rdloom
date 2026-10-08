@@ -8,7 +8,7 @@ import { AlertDialog } from "../alert-dialog/alert-dialog";
 import { Avatar } from "../avatar/avatar";
 import { MenuItem, MenuSection } from "../menu/menu";
 import { cx } from "../utils/cx";
-import { ChevronsUpDownIcon, Spinner } from "../utils/icons";
+import { ChevronsUpDownIcon, SpinnerIcon } from "../utils/icons";
 import { resolvePermission, type PermissionValue } from "../utils/permissions";
 
 /** One entry of the menu. */
@@ -195,7 +195,7 @@ export const UserMenu = forwardRef<HTMLDivElement, UserMenuProps>(function UserM
                 className={classNames?.item}
               >
                 <span className="flex items-center gap-2">
-                  {isPending && <Spinner className="size-4 shrink-0" />}
+                  {isPending && <SpinnerIcon className="size-4 shrink-0" />}
                   <span className="flex min-w-0 flex-col">
                     <span className="truncate">{isPending ? signingOutLabel : signOutLabel}</span>
                     {signOut.isDisabled && signOut.reason && <span className="truncate text-xs text-[var(--rd-color-text-muted)]">{signOut.reason}</span>}

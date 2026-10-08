@@ -1,0 +1,49 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "ToggleGroup",
+  "version": "0.1.0",
+  "category": "input",
+  "status": "experimental",
+  "description": "A row or column of joined toggle buttons with shared borders, for formatting options or a choice between a few modes. Pick single or multiple selection.",
+  "props": {
+    "selectionMode": { "type": "enum", "values": ["single", "multiple"], "default": "single", "description": "One pressed item at most, or any number." },
+    "orientation": { "type": "enum", "values": ["horizontal", "vertical"], "default": "horizontal", "description": "Direction of the group. Arrow keys follow it." },
+    "size": { "type": "enum", "values": ["sm", "md", "lg"], "default": "md", "description": "Item height, from the shared control sizes." },
+    "variant": { "type": "enum", "values": ["outline", "ghost"], "default": "outline", "description": "Outline draws a border around every item; ghost has no border until an item is hovered or pressed." },
+    "isDisabled": { "type": "boolean", "default": false, "description": "Disables every item." },
+    "disallowEmptySelection": { "type": "boolean", "default": false, "description": "Keeps one item pressed at all times." },
+    "children": { "type": "node", "description": "ToggleGroupItem elements, each with an id. Control the pressed ids with selectedKeys, defaultSelectedKeys and onSelectionChange." }
+  },
+  "variants": ["selectionMode", "orientation", "size", "variant"],
+  "states": ["default", "hover", "focus", "pressed", "selected", "disabled"],
+  "slots": ["group", "item"],
+  "tokens": ["color.surface.default", "color.surface.subtle", "color.border.default", "color.border.strong", "color.action.primary", "color.text.default", "color.focus.ring", "radius.control"],
+  "a11y": {
+    "role": "group",
+    "keyboard": [
+      "Tab moves focus into the group and out of it; only one item is in the tab order",
+      "Arrow keys move focus between items, following the orientation",
+      "Space or Enter toggles the focused item",
+      "Home and End move to the first and last item"
+    ],
+    "requirements": [
+      "The group has an accessible name through aria-label or aria-labelledby",
+      "In single mode the group is a radiogroup and items are radios; in multiple mode items expose aria-pressed",
+      "An icon-only item has an aria-label",
+      "The pressed state is shown by fill and weight, not only by color",
+      "Joined borders keep a 3:1 contrast against the background"
+    ],
+    "screenReader": [
+      "Items are announced as pressed or not pressed, or as checked radios in single mode",
+      "A disabled item is announced as dimmed or unavailable"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["A formatting toolbar where several options can be on", "Alignment or view mode where one of a few is on", "A compact choice with icons"],
+    "avoid_when": ["Switching the content of a panel: use Tabs or SegmentedControl", "One on or off setting: use Switch", "More than about six options: use Select"],
+    "anti_patterns": ["Icon-only items with no aria-label", "A group with no accessible name", "Mixing text and icon items in one group"]
+  },
+  "examples": ["formatting", "alignment", "vertical", "disabled"],
+  "figma": { "componentKey": null, "variantMap": { "size": "Size", "variant": "Variant", "orientation": "Orientation" } }
+}

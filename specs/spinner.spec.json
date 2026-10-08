@@ -1,0 +1,40 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Spinner",
+  "version": "0.1.0",
+  "category": "feedback",
+  "status": "experimental",
+  "description": "A small loading indicator for work of unknown length: inline with text, inside a button, or over a whole area.",
+  "props": {
+    "size": { "type": "enum", "values": ["sm", "md", "lg"], "default": "md", "description": "Diameter: 16, 20 or 32 px." },
+    "label": { "type": "string", "default": "Loading", "description": "The accessible name, read by screen readers as visually hidden text. Say what is loading when it is not obvious, e.g. \"Loading invoices\"." },
+    "decorative": { "type": "boolean", "default": false, "description": "Hides the spinner from assistive technology. Use it when the surrounding control already says it is busy, such as a button labelled \"Saving\"." }
+  },
+  "variants": ["size", "decorative"],
+  "states": ["default", "loading"],
+  "slots": ["indicator", "label"],
+  "tokens": ["color.action.primary", "color.text.muted"],
+  "a11y": {
+    "role": "status",
+    "keyboard": [],
+    "requirements": [
+      "Not focusable and not interactive",
+      "Has role status with the label as visually hidden text, so the busy state is announced politely",
+      "With decorative set it is aria-hidden and has no role",
+      "With reduced motion the rotation stops and the static arc remains, so it still reads as a loading mark",
+      "Never the only sign of progress for work that takes long: pair it with text"
+    ],
+    "screenReader": [
+      "The label is announced when the spinner appears",
+      "A decorative spinner is not announced"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["A short wait of unknown length", "A button that is saving or sending", "Covering an area while its content loads"],
+    "avoid_when": ["The wait has a known length: use Progress", "A page or list shape is known: use Skeleton"],
+    "anti_patterns": ["Several spinners on one screen at once", "A spinner with no text for waits over a few seconds", "Leaving the default label when the page has many spinners"]
+  },
+  "examples": ["sizes", "inline", "button", "overlay"],
+  "figma": { "componentKey": null, "variantMap": { "size": "Size" } }
+}

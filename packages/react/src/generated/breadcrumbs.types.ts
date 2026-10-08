@@ -3,6 +3,8 @@
 
 import type { ReactNode } from "react";
 
+export const breadcrumbsSeparatorValues = ["chevron", "slash"] as const;
+
 /** The path from the top of the site to the current page, as links. Use BreadcrumbItem for each step; the last one is the current page. */
 export interface BreadcrumbsSpecProps {
   /**
@@ -15,6 +17,11 @@ export interface BreadcrumbsSpecProps {
    */
   label?: string;
   /**
+   * The mark between steps. Use BreadcrumbItem's own `separator` prop for any other mark.
+   * @default "chevron"
+   */
+  separator?: "chevron" | "slash";
+  /**
    * Disables every link in the trail.
    * @default false
    */
@@ -23,6 +30,7 @@ export interface BreadcrumbsSpecProps {
 
 export const breadcrumbsDefaults = {
   label: "Breadcrumbs",
+  separator: "chevron",
   isDisabled: false,
 } as const;
 

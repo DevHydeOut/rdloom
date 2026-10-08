@@ -30,7 +30,8 @@ async function open(page: Page, id: string, name: string, theme: string) {
   // The streaming example types its text out on a timer: wait until the whole reply is there.
   if (id === "response" && name === "streaming") await expect(page.getByText("GROUP BY month")).toBeVisible({ timeout: 10_000 });
   // Examples that fetch (combobox/async) show a spinner first; wait it out.
-  await expect(page.getByRole("status", { name: "Loading" })).toHaveCount(0);
+  // The Spinner examples are the spinner, so they keep it.
+  if (id !== "spinner") await expect(page.getByRole("status", { name: "Loading" })).toHaveCount(0);
 }
 
 for (const theme of ["light", "dark"]) {

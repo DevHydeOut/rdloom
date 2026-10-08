@@ -110,6 +110,12 @@
       "description": "The path from the top of the site to the current page, as links. Use BreadcrumbItem for each step; the last one is the current page."
     },
     {
+      "name": "button-group",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "Joins related Buttons into one visual unit with shared borders and rounded outer corners only, horizontal or vertical. Also the base for a split button and an icon toolbar."
+    },
+    {
       "name": "button",
       "type": "registry:ui",
       "version": "0.1.0",
@@ -236,6 +242,12 @@
       "description": "Modal window that asks for focus, such as a confirmation or a short form. Open it with DialogTrigger."
     },
     {
+      "name": "drawer",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A modal panel that slides up from the bottom of the screen and can be dragged down to dismiss, for short tasks on phones. Open it with DialogTrigger."
+    },
+    {
       "name": "empty-state",
       "type": "registry:ui",
       "version": "0.1.0",
@@ -302,6 +314,12 @@
       "description": "A richer preview that opens when a link is hovered or reached with the keyboard, like a profile summary on a user name. It only repeats information that is available elsewhere."
     },
     {
+      "name": "input-group",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "One bordered text field that wraps an input with addons before or after it: a currency sign, a URL prefix, a search icon, a clear, show or copy button. Built from InputGroup, InputGroupAddon and InputGroupInput."
+    },
+    {
       "name": "input-otp",
       "type": "registry:ui",
       "version": "0.1.0",
@@ -326,10 +344,22 @@
       "description": "A list of actions or options that opens from a button, like a More (…) or Account menu. Use with MenuTrigger and MenuItem."
     },
     {
+      "name": "menubar",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A horizontal bar of menus like File, Edit and View, as in a desktop application. Each MenubarMenu opens a list of actions with shortcuts, checkbox and radio items and submenus. Arrow keys move between the menus."
+    },
+    {
       "name": "message",
       "type": "registry:ui",
       "version": "0.1.0",
       "description": "One message in a conversation, from you or the assistant. It renders each part in order with the right component: text as formatted markdown, tool calls as activity, tables and charts as real components, sources at the end."
+    },
+    {
+      "name": "navigation-menu",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "Site navigation along the top of a page: plain links, and triggers that open a shared panel of grouped links (a mega-menu). Built from NavigationMenuItem, NavigationMenuTrigger, NavigationMenuContent and NavigationMenuLink. It is a set of links, not a menu of actions."
     },
     {
       "name": "number-field",
@@ -428,6 +458,12 @@
       "description": "Concentric rings that swell outward from the centre, as a calm backdrop behind a heading or a call to action. Content goes in front of the rings."
     },
     {
+      "name": "scroll-area",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A scrollable region with a thin themed scrollbar, reachable by keyboard, with optional fades at the edges that still have content."
+    },
+    {
       "name": "section-header",
       "type": "registry:ui",
       "version": "0.1.0",
@@ -512,6 +548,12 @@
       "description": "A tiny line or bar graphic that shows the shape of a trend, without axes. Decoration unless it has a label."
     },
     {
+      "name": "spinner",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A small loading indicator for work of unknown length: inline with text, inside a button, or over a whole area."
+    },
+    {
       "name": "stat",
       "type": "registry:ui",
       "version": "0.1.0",
@@ -576,6 +618,12 @@
       "type": "registry:ui",
       "version": "0.1.0",
       "description": "A button that stays pressed until pressed again, for turning a mode on or off, like Bold or Mute. Group several with ToggleButtonGroup for single or multiple choice."
+    },
+    {
+      "name": "toggle-group",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A row or column of joined toggle buttons with shared borders, for formatting options or a choice between a few modes. Pick single or multiple selection."
     },
     {
       "name": "tool-call",

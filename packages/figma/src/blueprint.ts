@@ -264,6 +264,18 @@ const blueprints: Record<string, Blueprint> = {
     ]);
   },
 
+  Drawer: () =>
+    frame({ name: "drawer", dir: "col", w: 360, stroke: "color.border.default", radius: "radius.overlay" }, [
+      frame({ dir: "row", pad: [12, 0], w: "fill", align: "center" }, [box(40, 6, { fill: "color.border.strong", radius: PILL, name: "handle" })]),
+      frame({ dir: "col", gap: 4, pad: [0, 24], w: "fill" }, [text("Share", 18, "color.text.default", "Semi Bold"), text("Anyone with the link can view.", 14, "color.text.muted")]),
+      box("fill", 24, { name: "spacer" }),
+    ]),
+
+  ScrollArea: () =>
+    frame({ name: "scroll area", dir: "col", w: 280, h: 160, stroke: "color.border.default", radius: "radius.control" }, [
+      ...[1, 2, 3, 4].map((n) => frame({ dir: "row", pad: [8, 12], w: "fill" }, [text(`Item ${n}`, 14, "color.text.default")])),
+    ]),
+
   Carousel: (c) => {
     const vertical = c.orientation === "vertical";
     const per = c.slidesPerView === "2" ? 2 : c.slidesPerView === "3" ? 3 : 1;
@@ -289,6 +301,50 @@ const blueprints: Record<string, Blueprint> = {
       pane("Panel", vertical ? 60 : 240),
     ]);
   },
+
+  Spinner: (c) => {
+    const d = c.size === "sm" ? 16 : c.size === "lg" ? 32 : 20;
+    return frame({ name: "spinner", dir: "row", cross: "center", align: "center" }, [box(d, d, { stroke: "color.action.primary", radius: "radius.control", name: "indicator" })]);
+  },
+
+  ToggleGroup: (c) => {
+    const h = c.size === "sm" ? 28 : c.size === "lg" ? 44 : 36;
+    const vertical = c.orientation === "vertical";
+    const ghost = c.variant === "ghost";
+    const item = (label: string, pressed: boolean) =>
+      frame(
+        {
+          name: pressed ? "pressed item" : "item",
+          dir: "row",
+          pad: [0, 14],
+          h,
+          w: vertical ? 120 : undefined,
+          align: "center",
+          cross: "center",
+          fill: pressed ? "color.surface.subtle" : ghost ? undefined : "color.surface.default",
+          stroke: ghost && !pressed ? undefined : pressed && !ghost ? "color.action.primary" : "color.border.default",
+        },
+        [text(label, c.size === "lg" ? 16 : 14, "color.text.default", pressed ? "Semi Bold" : "Medium")],
+      );
+    return frame({ name: "toggle group", dir: vertical ? "col" : "row", radius: "radius.control" }, [item("Bold", true), item("Italic", false), item("Underline", false)]);
+  },
+
+  ButtonGroup: (c) => {
+    const vertical = c.orientation === "vertical";
+    const h = HEIGHTS[c.size ?? "md"] ?? 40;
+    const item = (label: string, first: boolean, last: boolean) =>
+      frame({ name: "button", dir: "row", pad: [0, 16], h, w: vertical ? "fill" : undefined, align: "center", cross: "center", fill: "color.surface.default", stroke: "color.border.default", radius: first || last ? "radius.control" : undefined }, [
+        text(label, FONT[c.size ?? "md"] ?? 14, "color.text.default", "Medium"),
+      ]);
+    return frame({ name: "button group", dir: vertical ? "col" : "row", w: vertical ? 120 : undefined }, [item("Day", true, false), item("Week", false, false), item("Month", false, true)]);
+  },
+
+  InputGroup: (c) =>
+    field("Amount", c, [
+      frame({ name: "addon", dir: "row", pad: [0, 4], fill: "color.surface.subtle" }, [text("$", FONT[c.size ?? "md"] ?? 14, "color.text.muted")]),
+      placeholder("0.00", c),
+      text("USD", FONT[c.size ?? "md"] ?? 14, "color.text.muted"),
+    ]),
 
   Separator: (c) => {
     if (c.orientation === "vertical") return frame({ name: "separator", dir: "row", h: 24 }, [box(1, 24, { fill: "color.border.default", name: "line" })]);
@@ -1442,6 +1498,41 @@ const blueprints: Record<string, Blueprint> = {
       ]);
     const data = [["Ada Lovelace", "Paid", "$120.50"], ["Grace Hopper", "Shipped", "$89.00"], ["Alan Turing", "Pending", "$42.10"]];
     return panel({ name: "data grid", dir: "col" }, [rowOf(cols.map((c2) => c2[0]), true), ...data.flatMap((r) => [box("fill", 1, { fill: "color.border.default", name: "divider" }), rowOf(r, false)])]);
+  },
+
+  NavigationMenu: () => {
+    const item = (label: string, open = false, chevron = true) =>
+      frame({ name: "item", dir: "row", gap: 6, pad: [6, 12], cross: "center", fill: open ? "color.surface.subtle" : undefined, radius: "radius.control" }, [
+        text(label, 14, open ? "color.text.default" : "color.text.muted"),
+        ...(chevron ? [text("v", 12, "color.text.muted")] : []),
+      ]);
+    const link = (title: string, desc: string) =>
+      frame({ name: "link", dir: "col", gap: 4, pad: 12, w: "fill" }, [text(title, 14, "color.text.default", "Medium"), text(desc, 14, "color.text.muted")]);
+    return frame({ name: "navigation menu", dir: "col", gap: 8, w: 360 }, [
+      frame({ name: "bar", dir: "row", gap: 4 }, [item("Product", true), item("Resources"), item("Pricing", false, false)]),
+      frame({ name: "panel", dir: "col", pad: 8, w: 320, fill: "color.surface.raised", stroke: "color.border.default", radius: "radius.overlay" }, [
+        link("Analytics", "Track visits and revenue."),
+        link("Automations", "Run routine steps for you."),
+      ]),
+    ]);
+  },
+
+  Menubar: () => {
+    const trigger = (label: string, open = false) =>
+      frame({ name: "trigger", dir: "row", pad: [6, 12], cross: "center", fill: open ? "color.surface.subtle" : undefined, radius: "radius.control" }, [text(label, 14, "color.text.default")]);
+    const row = (label: string, keys: string, disabled = false) =>
+      frame({ name: "item", dir: "row", pad: [8, 10], w: "fill", align: "between", cross: "center", opacity: disabled ? 0.5 : undefined }, [
+        text(label, 14, "color.text.default"),
+        text(keys, 12, "color.text.muted"),
+      ]);
+    return frame({ name: "menubar", dir: "col", gap: 8, w: 300 }, [
+      frame({ name: "bar", dir: "row", gap: 2, pad: 4, stroke: "color.border.default", radius: "radius.control" }, [trigger("File", true), trigger("Edit"), trigger("View")]),
+      frame({ name: "menu", dir: "col", pad: 6, w: 240, fill: "color.surface.raised", stroke: "color.border.default", radius: "radius.overlay" }, [
+        row("New document", "Ctrl N"),
+        row("Open", "Ctrl O"),
+        row("Print", "Ctrl P", true),
+      ]),
+    ]);
   },
 };
 

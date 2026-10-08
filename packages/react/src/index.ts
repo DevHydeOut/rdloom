@@ -2,7 +2,15 @@ export { Alert, type AlertProps } from "./alert/alert";
 export { Avatar, initialsOf, type AvatarProps } from "./avatar/avatar";
 export { Badge, type BadgeProps } from "./badge/badge";
 export { Accordion, AccordionItem, type AccordionItemProps, type AccordionProps } from "./accordion/accordion";
-export { BreadcrumbItem, Breadcrumbs, type BreadcrumbItemProps, type BreadcrumbsProps } from "./breadcrumbs/breadcrumbs";
+export {
+  BreadcrumbEllipsis,
+  BreadcrumbItem,
+  Breadcrumbs,
+  type BreadcrumbCollapsedItem,
+  type BreadcrumbEllipsisProps,
+  type BreadcrumbItemProps,
+  type BreadcrumbsProps,
+} from "./breadcrumbs/breadcrumbs";
 export { Button, type ButtonProps } from "./button/button";
 export { Calendar, RangeCalendar, type CalendarProps, type RangeCalendarProps } from "./calendar/calendar";
 export {
@@ -282,7 +290,22 @@ export { parseQueryState, serializeQueryState, useQueryState, useWindowQueryStat
 export { can, permissionFor, permissionsFrom, resolvePermission, type PermissionState, type PermissionValue, type Permissions, type ResolvedPermission } from "./utils/permissions";
 export { Collapsible, type CollapsibleProps } from "./collapsible/collapsible";
 export { Separator, type SeparatorProps } from "./separator/separator";
+export { ButtonGroup, type ButtonGroupProps } from "./button-group/button-group";
+export {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  type InputGroupAddonProps,
+  type InputGroupInputProps,
+  type InputGroupProps,
+} from "./input-group/input-group";
+export { Spinner, type SpinnerProps } from "./spinner/spinner";
+export { ToggleGroup, ToggleGroupItem, type ToggleGroupItemProps, type ToggleGroupProps } from "./toggle-group/toggle-group";
 export { ToggleButton, ToggleButtonGroup, type ToggleButtonGroupProps, type ToggleButtonProps } from "./toggle-button/toggle-button";
 export { AvatarGroup, avatarGroupName, type AvatarGroupProps } from "./avatar-group/avatar-group";
 export { Carousel, CarouselItem, type CarouselItemProps, type CarouselProps } from "./carousel/carousel";
 export { ResizableHandle, ResizablePanel, ResizablePanelGroup, ResizablePanels, type ResizableHandleProps, type ResizablePanelGroupProps, type ResizablePanelProps } from "./resizable-panels/resizable-panels";
+export { Drawer, type DrawerProps } from "./drawer/drawer";
+export { ScrollArea, type ScrollAreaProps } from "./scroll-area/scroll-area";
+export { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuTrigger, type NavigationMenuContentProps, type NavigationMenuItemProps, type NavigationMenuLinkProps, type NavigationMenuProps, type NavigationMenuTriggerProps } from "./navigation-menu/navigation-menu";
+export { Menubar, MenubarGroup, MenubarItem, MenubarMenu, MenubarSeparator, MenubarSubmenu, type MenubarGroupProps, type MenubarItemProps, type MenubarMenuProps, type MenubarProps, type MenubarSubmenuProps } from "./menubar/menubar";

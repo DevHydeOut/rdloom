@@ -23,7 +23,7 @@ import {
 import { comboboxDefaults, type ComboboxSpecProps } from "../generated/combobox.types";
 import { cx } from "../utils/cx";
 import { fieldError, fieldHelp, fieldLabel, iconButton, listItem, overlayPanel, type FieldSize } from "../utils/field";
-import { CheckIcon, ChevronDownIcon, CloseIcon, Spinner } from "../utils/icons";
+import { CheckIcon, ChevronDownIcon, CloseIcon, SpinnerIcon } from "../utils/icons";
 
 type Mode = "single" | "multiple";
 
@@ -126,7 +126,7 @@ function Field({ fieldRef, size, isMultiple, isLoading, placeholder }: FieldProp
       />
       {isLoading && (
         <span className="text-[var(--rd-color-text-muted)]" role="status" aria-label="Loading">
-          <Spinner />
+          <SpinnerIcon />
         </span>
       )}
       <Button className={cx(iconButton, "ml-0 size-7")}>
@@ -169,7 +169,7 @@ export function Combobox<T extends object, M extends Mode = "single">({
       <ListBoxLoadMoreItem onLoadMore={onLoadMore} isLoading={isLoading} className="flex justify-center py-2 text-[var(--rd-color-text-muted)]">
         {/* While loading, React Aria exposes this row as an option; without
             text, screen readers announce a blank extra item. */}
-        <Spinner />
+        <SpinnerIcon />
         <span className="sr-only">Loading more…</span>
       </ListBoxLoadMoreItem>
     </>

@@ -1,0 +1,67 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Drawer",
+  "version": "0.1.0",
+  "category": "overlay",
+  "status": "experimental",
+  "description": "A modal panel that slides up from the bottom of the screen and can be dragged down to dismiss, for short tasks on phones. Open it with DialogTrigger.",
+  "props": {
+    "title": { "type": "string", "description": "Heading, also used as the drawer accessible name. Without a title, pass aria-label." },
+    "description": { "type": "string", "description": "Short supporting text under the title." },
+    "isDismissable": { "type": "boolean", "default": true, "description": "Closes on backdrop click and on a swipe or drag down. Esc always closes." },
+    "children": {
+      "type": "custom",
+      "tsType": "ReactNode | ((opts: { close: () => void }) => ReactNode)",
+      "description": "Body and actions. A function receives close()."
+    }
+  },
+  "variants": ["isDismissable"],
+  "states": ["open"],
+  "slots": ["backdrop", "panel", "handle", "header", "title", "description", "body"],
+  "tokens": [
+    "color.overlay.backdrop",
+    "color.surface.raised",
+    "color.border.default",
+    "color.border.strong",
+    "color.text.default",
+    "color.text.muted",
+    "color.focus.ring",
+    "radius.overlay"
+  ],
+  "a11y": {
+    "role": "dialog",
+    "keyboard": ["Esc closes", "Tab and Shift+Tab stay inside the drawer"],
+    "requirements": [
+      "Focus moves into the drawer on open and returns to the trigger on close",
+      "Content behind the drawer is hidden from assistive technology",
+      "Page scroll is locked while open",
+      "Dragging is an extra way to close: Esc and any close button in the content always work",
+      "The slide animation and the drag settle are turned off when the user prefers reduced motion",
+      "The drawer is at most 90% of the viewport height and its body scrolls"
+    ],
+    "screenReader": [
+      "Opening announces a dialog with the drawer title",
+      "The description is read after the title",
+      "The drag handle is hidden from assistive technology",
+      "Closing announces the button that opened it (focus is back there)"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "A short task or a few choices on a phone, within thumb reach",
+      "Actions for one item, such as share or move"
+    ],
+    "avoid_when": [
+      "A side panel on large screens: use Sheet",
+      "A short confirmation: use Dialog or AlertDialog"
+    ],
+    "anti_patterns": [
+      "Making dragging the only way to close it: always offer an action button too",
+      "Long multi-step flows inside a drawer",
+      "Drawers opening other drawers"
+    ]
+  },
+  "examples": ["basic", "with-form", "scrollable-list"],
+  "figma": { "componentKey": null, "variantMap": { "isDismissable": "Dismissable" } }
+}

@@ -1,0 +1,44 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "ButtonGroup",
+  "version": "0.1.0",
+  "category": "input",
+  "status": "experimental",
+  "description": "Joins related Buttons into one visual unit with shared borders and rounded outer corners only, horizontal or vertical. Also the base for a split button and an icon toolbar.",
+  "props": {
+    "label": { "type": "string", "required": true, "description": "Accessible name of the group, e.g. \"Text formatting\". Read when focus enters the group." },
+    "orientation": { "type": "enum", "values": ["horizontal", "vertical"], "default": "horizontal", "description": "Direction the buttons are stacked." },
+    "size": { "type": "enum", "values": ["sm", "md", "lg"], "description": "Size passed to every Button that does not set its own. A Button inside a MenuTrigger needs its own size." },
+    "children": { "type": "node", "description": "Two or more Buttons, or a MenuTrigger holding a Button." }
+  },
+  "variants": ["orientation", "size"],
+  "states": ["default", "hover", "focus", "pressed", "disabled"],
+  "slots": ["group", "button"],
+  "tokens": ["color.border.default", "color.border.strong", "color.surface.default", "color.surface.subtle", "color.action.primary", "color.focus.ring", "radius.control"],
+  "a11y": {
+    "role": "group",
+    "keyboard": [
+      "Tab moves through the buttons one by one, in order",
+      "Enter or Space activates the focused button",
+      "A menu button opens its menu with Enter, Space or Arrow Down"
+    ],
+    "requirements": [
+      "The group has role group and an accessible name from label",
+      "Every button keeps its own accessible name; an icon-only button needs an aria-label",
+      "The focused button is raised above its neighbours so its focus ring is never covered by a shared border",
+      "Buttons keep their own disabled and pressed states; the group does not hide them"
+    ],
+    "screenReader": [
+      "Announced as a group with its label, then each button by name",
+      "A menu button is announced as a menu button, collapsed or expanded"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["Closely related actions that belong together, like Bold, Italic, Underline", "A split button: a main action next to a menu of alternatives", "Previous and next style controls"],
+    "avoid_when": ["Choosing one option from several: use SegmentedControl or ToggleButtonGroup", "Unrelated actions: leave space between them", "Many buttons that do not fit in one row: use a Menu"],
+    "anti_patterns": ["Mixing several filled primary buttons in one group", "Icon-only buttons without an aria-label", "A split button whose menu item repeats the main action"]
+  },
+  "examples": ["basic", "split-button", "icon-toolbar"],
+  "figma": { "componentKey": null, "variantMap": { "orientation": "Orientation", "size": "Size" } }
+}

@@ -6,7 +6,7 @@ import { agentActivityDefaults, type AgentActivitySpecProps } from "../generated
 import { ToolCall } from "../tool-call/tool-call";
 import { isToolActive } from "../utils/ai";
 import { cx } from "../utils/cx";
-import { ChevronRightIcon, Spinner, SparkleIcon } from "../utils/icons";
+import { ChevronRightIcon, SpinnerIcon, SparkleIcon } from "../utils/icons";
 
 export interface AgentActivityProps extends AgentActivitySpecProps {
   className?: string;
@@ -57,7 +57,7 @@ export const AgentActivity = forwardRef<HTMLDivElement, AgentActivityProps>(func
         onPress={() => setOpen((v) => !v)}
         className="inline-flex w-fit items-center gap-2 rounded-[var(--rd-radius-control)] px-2 py-1 text-sm text-[var(--rd-color-text-muted)] outline-none data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)] data-[hovered]:bg-[var(--rd-color-surface-subtle)] data-[disabled]:cursor-default"
       >
-        {working && !needsAnswer ? <Spinner className="size-4 text-[var(--rd-color-action-primary)]" /> : <SparkleIcon />}
+        {working && !needsAnswer ? <SpinnerIcon className="size-4 text-[var(--rd-color-action-primary)]" /> : <SparkleIcon />}
         <span>{summary}</span>
         <ChevronRightIcon className={cx("size-4 transition-transform motion-reduce:transition-none", expanded && "rotate-90")} />
       </AriaButton>

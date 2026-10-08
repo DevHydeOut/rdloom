@@ -61,14 +61,14 @@ export const Alert = forwardRef<HTMLDivElement, AlertProps>(function Alert(
       ref={ref}
       role={urgent ? "alert" : "status"}
       className={cx(
-        "flex items-start gap-3 rounded-[var(--rd-radius-overlay)] border p-3.5 " +
+        "flex items-start gap-3 rounded-[var(--rd-radius-overlay)] border p-4 " +
           "text-sm leading-relaxed text-[var(--rd-color-text-default)] [box-shadow:var(--rd-elevation-raised)]",
         tone.box,
         className,
       )}
     >
       <Icon className={cx("mt-0.5 size-5 shrink-0", tone.icon)} />
-      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+      <div className="flex min-w-0 flex-1 flex-col gap-1">
         {/* Said in words, so the tone isn't only a color and an icon. */}
         <span className="sr-only">{tone.say}: </span>
         {title && <p className="font-medium">{title}</p>}

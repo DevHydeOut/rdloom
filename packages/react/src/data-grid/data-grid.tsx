@@ -22,7 +22,7 @@ import { useEffect, useMemo, useRef, useState, type ClipboardEvent, type CSSProp
 import { Button } from "../button/button";
 import { dataGridDefaults, type DataGridSpecProps } from "../generated/data-grid.types";
 import { cx } from "../utils/cx";
-import { ArrowDownIcon, ArrowUpIcon, ChevronRightIcon, Spinner } from "../utils/icons";
+import { ArrowDownIcon, ArrowUpIcon, ChevronRightIcon, SpinnerIcon } from "../utils/icons";
 import { columnFilter, filteredRowModel, searchFilter, sortedRowModel } from "./hierarchy";
 import { ColumnMenu, RowHandle, SetFilter, type ColumnMenuAction } from "./column-ui";
 import { extendValues } from "./fill";
@@ -1620,7 +1620,7 @@ export function DataGrid<T>({
           role="status"
           className="absolute inset-0 flex items-center justify-center gap-2 bg-[var(--rd-color-surface-default)]/70 text-[var(--rd-color-text-muted)]"
         >
-          <Spinner /> Loading…
+          <SpinnerIcon /> Loading…
         </div>
       )}
     </div>

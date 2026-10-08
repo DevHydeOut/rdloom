@@ -564,6 +564,33 @@
       "properties": []
     },
     {
+      "name": "ButtonGroup",
+      "id": "button-group",
+      "version": "0.1.0",
+      "description": "Joins related Buttons into one visual unit with shared borders and rounded outer corners only, horizontal or vertical. Also the base for a split button and an icon toolbar.",
+      "properties": [
+        {
+          "prop": "orientation",
+          "name": "Orientation",
+          "values": [
+            "horizontal",
+            "vertical"
+          ],
+          "default": "horizontal"
+        },
+        {
+          "prop": "size",
+          "name": "Size",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "default": "sm"
+        }
+      ]
+    },
+    {
       "name": "Button",
       "id": "button",
       "version": "0.1.0",
@@ -1029,6 +1056,23 @@
       ]
     },
     {
+      "name": "Drawer",
+      "id": "drawer",
+      "version": "0.1.0",
+      "description": "A modal panel that slides up from the bottom of the screen and can be dragged down to dismiss, for short tasks on phones. Open it with DialogTrigger.",
+      "properties": [
+        {
+          "prop": "isDismissable",
+          "name": "Dismissable",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "true"
+        }
+      ]
+    },
+    {
       "name": "EmptyState",
       "id": "empty-state",
       "version": "0.1.0",
@@ -1209,6 +1253,51 @@
       ]
     },
     {
+      "name": "InputGroup",
+      "id": "input-group",
+      "version": "0.1.0",
+      "description": "One bordered text field that wraps an input with addons before or after it: a currency sign, a URL prefix, a search icon, a clear, show or copy button. Built from InputGroup, InputGroupAddon and InputGroupInput.",
+      "properties": [
+        {
+          "prop": "size",
+          "name": "Size",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "default": "md"
+        },
+        {
+          "prop": "isDisabled",
+          "name": "Disabled",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        },
+        {
+          "prop": "isInvalid",
+          "name": "Invalid",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        },
+        {
+          "prop": "isReadOnly",
+          "name": "isReadOnly",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
       "name": "InputOTP",
       "id": "input-otp",
       "version": "0.1.0",
@@ -1295,10 +1384,24 @@
       ]
     },
     {
+      "name": "Menubar",
+      "id": "menubar",
+      "version": "0.1.0",
+      "description": "A horizontal bar of menus like File, Edit and View, as in a desktop application. Each MenubarMenu opens a list of actions with shortcuts, checkbox and radio items and submenus. Arrow keys move between the menus.",
+      "properties": []
+    },
+    {
       "name": "Message",
       "id": "message",
       "version": "0.1.0",
       "description": "One message in a conversation, from you or the assistant. It renders each part in order with the right component: text as formatted markdown, tool calls as activity, tables and charts as real components, sources at the end.",
+      "properties": []
+    },
+    {
+      "name": "NavigationMenu",
+      "id": "navigation-menu",
+      "version": "0.1.0",
+      "description": "Site navigation along the top of a page: plain links, and triggers that open a shared panel of grouped links (a mega-menu). Built from NavigationMenuItem, NavigationMenuTrigger, NavigationMenuContent and NavigationMenuLink. It is a set of links, not a menu of actions.",
       "properties": []
     },
     {
@@ -1675,6 +1778,33 @@
       ]
     },
     {
+      "name": "ScrollArea",
+      "id": "scroll-area",
+      "version": "0.1.0",
+      "description": "A scrollable region with a thin themed scrollbar, reachable by keyboard, with optional fades at the edges that still have content.",
+      "properties": [
+        {
+          "prop": "orientation",
+          "name": "Orientation",
+          "values": [
+            "vertical",
+            "horizontal",
+            "both"
+          ],
+          "default": "vertical"
+        },
+        {
+          "prop": "showFades",
+          "name": "Fades",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "true"
+        }
+      ]
+    },
+    {
       "name": "SectionHeader",
       "id": "section-header",
       "version": "0.1.0",
@@ -1977,6 +2107,33 @@
       ]
     },
     {
+      "name": "Spinner",
+      "id": "spinner",
+      "version": "0.1.0",
+      "description": "A small loading indicator for work of unknown length: inline with text, inside a button, or over a whole area.",
+      "properties": [
+        {
+          "prop": "size",
+          "name": "Size",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "default": "md"
+        },
+        {
+          "prop": "decorative",
+          "name": "decorative",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
       "name": "Stat",
       "id": "stat",
       "version": "0.1.0",
@@ -2266,6 +2423,51 @@
             "outline"
           ],
           "default": "default"
+        }
+      ]
+    },
+    {
+      "name": "ToggleGroup",
+      "id": "toggle-group",
+      "version": "0.1.0",
+      "description": "A row or column of joined toggle buttons with shared borders, for formatting options or a choice between a few modes. Pick single or multiple selection.",
+      "properties": [
+        {
+          "prop": "selectionMode",
+          "name": "selectionMode",
+          "values": [
+            "single",
+            "multiple"
+          ],
+          "default": "single"
+        },
+        {
+          "prop": "orientation",
+          "name": "Orientation",
+          "values": [
+            "horizontal",
+            "vertical"
+          ],
+          "default": "horizontal"
+        },
+        {
+          "prop": "size",
+          "name": "Size",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "default": "md"
+        },
+        {
+          "prop": "variant",
+          "name": "Variant",
+          "values": [
+            "outline",
+            "ghost"
+          ],
+          "default": "outline"
         }
       ]
     },

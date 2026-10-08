@@ -8,11 +8,12 @@
   "props": {
     "children": { "type": "node", "required": true, "description": "BreadcrumbItem elements, from the top level down to the current page." },
     "label": { "type": "string", "default": "Breadcrumbs", "description": "Accessible name of the navigation landmark. Translate it for other languages." },
+    "separator": { "type": "enum", "values": ["chevron", "slash"], "default": "chevron", "description": "The mark between steps. Use BreadcrumbItem's own `separator` prop for any other mark." },
     "isDisabled": { "type": "boolean", "default": false, "description": "Disables every link in the trail." }
   },
   "variants": [],
   "states": ["default", "hover", "focus", "disabled"],
-  "slots": ["list", "item", "link", "separator"],
+  "slots": ["list", "item", "link", "separator", "ellipsis"],
   "tokens": ["color.text.default", "color.text.muted", "color.focus.ring", "radius.control"],
   "a11y": {
     "role": "navigation",
@@ -21,7 +22,8 @@
       "A navigation landmark with an accessible name, containing an ordered list of links",
       "The last item is the current page: aria-current=\"page\", and it cannot be followed (it has no href and is aria-disabled)",
       "Separators are decorative (aria-hidden), so they are not read out",
-      "Links have a visible focus ring"
+      "Links have a visible focus ring",
+      "A collapsed trail keeps the hidden steps in a menu, reached by a button that is named (for example \"Show hidden pages\") and opens with Enter or Space"
     ],
     "screenReader": [
       "Announced as a navigation landmark named Breadcrumbs, with a list of N items",
@@ -34,7 +36,7 @@
     "avoid_when": ["A flat site with one level: no trail is needed", "Showing the steps someone has taken: use a stepper"],
     "anti_patterns": ["Making the current page a link to itself", "Using breadcrumbs instead of the main navigation", "Hiding the trail from screen readers with aria-hidden"]
   },
-  "examples": ["basic", "long-trail"],
+  "examples": ["basic", "with-icon", "slash-separator", "custom-separator", "collapsed", "long-trail"],
   "figma": {
     "componentKey": null,
     "variantMap": {}

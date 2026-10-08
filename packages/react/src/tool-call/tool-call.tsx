@@ -6,7 +6,7 @@ import { toolCallDefaults, type ToolCallSpecProps } from "../generated/tool-call
 import { ApprovalBox } from "../approval-box/approval-box";
 import { toolDuration, toolStateLabel, type ToolState } from "../utils/ai";
 import { cx } from "../utils/cx";
-import { BanIcon, ChevronRightIcon, ClockIcon, ErrorIcon, Spinner, SuccessIcon, WarningIcon } from "../utils/icons";
+import { BanIcon, ChevronRightIcon, ClockIcon, ErrorIcon, SpinnerIcon, SuccessIcon, WarningIcon } from "../utils/icons";
 
 export interface ToolCallProps extends ToolCallSpecProps {
   className?: string;
@@ -23,7 +23,7 @@ function StateIcon({ state }: { state: ToolState }) {
     case "pending":
       return <ClockIcon className="size-4 text-[var(--rd-color-text-muted)]" />;
     case "running":
-      return <Spinner className="size-4 text-[var(--rd-color-action-primary)]" />;
+      return <SpinnerIcon className="size-4 text-[var(--rd-color-action-primary)]" />;
     case "awaiting-approval":
       return <WarningIcon className="size-4 text-[var(--rd-color-feedback-warning)]" />;
     case "approved":
