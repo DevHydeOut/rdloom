@@ -1,0 +1,45 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Item",
+  "version": "0.1.0",
+  "category": "display",
+  "status": "experimental",
+  "description": "A flexible list row with a leading media slot (icon box, avatar or picture), a title, a description and trailing actions. The whole row can be a link or a button while its actions stay separately clickable.",
+  "props": {
+    "children": { "type": "node", "required": true, "description": "ItemMedia, ItemContent and ItemActions. ItemActions is placed outside the link or button so it never nests one interactive element in another." },
+    "variant": { "type": "enum", "values": ["default", "outline", "muted"], "default": "default", "description": "default has no surface, outline adds a border, muted adds a tinted background." },
+    "size": { "type": "enum", "values": ["sm", "md"], "default": "md", "description": "sm is a compact row, md the standard row." },
+    "href": { "type": "string", "description": "Makes the row a link to this address." },
+    "onPress": { "type": "callback", "tsType": "(event: import(\"react-aria-components\").PressEvent) => void", "description": "Makes the row a button, or runs on a press of the link when href is also set." },
+    "isDisabled": { "type": "boolean", "default": false, "description": "Disables the link or button part of the row. Actions keep their own state." }
+  },
+  "variants": ["variant", "size"],
+  "states": ["default", "hover", "focus", "pressed", "disabled"],
+  "slots": ["root", "media", "content", "title", "description", "actions", "group", "separator"],
+  "tokens": ["color.text.default", "color.text.muted", "color.border.default", "color.surface.subtle", "color.focus.ring", "radius.control"],
+  "a11y": {
+    "role": "listitem",
+    "keyboard": ["Tab moves to the row when it is a link or button, then to each action", "Enter activates a link row; Enter and Space activate a button row"],
+    "requirements": [
+      "ItemGroup is a list (role list) and each Item inside it is a listitem",
+      "A link or button row has a visible focus ring and a hover state",
+      "Actions are siblings of the link or button, never children of it, so no interactive element is nested in another",
+      "The link or button is named by its title and description; icon-only actions need a label",
+      "ItemMedia icons are decorative: the title carries the meaning",
+      "ItemSeparator is decorative inside a list and does not break the list count"
+    ],
+    "screenReader": [
+      "A group is announced as a list with the number of items",
+      "A link row is announced as a link with its title and description",
+      "Each action is announced by its own label"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["Lists of people, files, settings or notifications with an icon, text and an action", "Rows that open a detail page", "A compact stack of related options"],
+    "avoid_when": ["Rows of the same fields to compare: use a table or data grid", "A large selectable collection: use a list box or grid list"],
+    "anti_patterns": ["Putting a button or link inside ItemContent when the row is already a link", "Icon-only actions without a label", "Using the muted variant for every row so none stands out"]
+  },
+  "examples": ["basic", "with-icons-and-actions", "as-links", "grouped", "muted"],
+  "figma": { "componentKey": null, "variantMap": { "variant": "Variant", "size": "Size" } }
+}

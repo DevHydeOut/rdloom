@@ -133,7 +133,12 @@
     "sign-in",
     "sign-up",
     "forgot-password",
-    "verify-code"
+    "verify-code",
+    "split-with-image",
+    "muted-background",
+    "centered-minimal",
+    "with-social-buttons",
+    "reset-password"
   ],
   "figma": {
     "componentKey": null,

@@ -82,6 +82,7 @@ export const CustomerTable = forwardRef<HTMLElement, CustomerTableProps>(functio
     serverSide = customerTableDefaults.serverSide,
     totalCount,
     onQueryChange,
+    query: controlledQuery,
     defaultQuery,
     onExport,
     onOpenCustomer,
@@ -96,8 +97,12 @@ export const CustomerTable = forwardRef<HTMLElement, CustomerTableProps>(functio
   },
   ref,
 ) {
-  const [query, setQuery] = useState<CustomerQuery>(() => ({ ...emptyQuery(pageSize), ...defaultQuery, pageSize }));
+  const [ownQuery, setQuery] = useState<CustomerQuery>(() => ({ ...emptyQuery(pageSize), ...defaultQuery, pageSize }));
+  // A query passed in (for example one read from the address) replaces the table's own.
+  const query = controlledQuery ?? ownQuery;
   const [searchText, setSearchText] = useState(query.search);
+  // Back and forward buttons change the query from outside: keep the search box in step.
+  useEffect(() => setSearchText(query.search), [query.search]);
   const [notice, setNotice] = useState("");
   const exportReasonId = useId();
   const debounce = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -111,7 +116,7 @@ export const CustomerTable = forwardRef<HTMLElement, CustomerTableProps>(functio
     const next = { ...before, ...patch, page: patch.page ?? 1 };
     latest.current = next;
     setQuery(next);
-    if (serverSide) onQueryChange?.(next);
+    if (serverSide || controlledQuery) onQueryChange?.(next);
     if (next.search !== before.search) onSearch?.(next.search);
     if (next.status !== before.status || next.plan !== before.plan) onFilter?.({ status: next.status, plan: next.plan });
   };
@@ -211,6 +216,8 @@ export const CustomerTable = forwardRef<HTMLElement, CustomerTableProps>(functio
     onSelect?.(c);
   };
   const canOpen = (!!onOpenCustomer || !!onSelect) && openPermission.isAllowed;
+  const openDisabled = (!!onOpenCustomer || !!onSelect) && openPermission.isDisabled;
+  const openReasonId = useId();
   const customerCell = (c: Customer) => (
     <span className="flex min-w-0 items-center gap-3">
       <Avatar name={c.name} src={c.avatarUrl} size="sm" decorative />
@@ -222,6 +229,26 @@ export const CustomerTable = forwardRef<HTMLElement, CustomerTableProps>(functio
           >
             {c.name}
           </AriaButton>
+        ) : openDisabled ? (
+          // Stays focusable, says why it does not work, and does nothing when pressed.
+          <>
+          <TooltipTrigger delay={300}>
+            <AriaButton
+              aria-disabled="true"
+              aria-describedby={openPermission.reason ? `${openReasonId}-${c.id}` : undefined}
+              onPress={() => {}}
+              className="w-fit max-w-full cursor-not-allowed truncate rounded text-start font-medium text-[var(--rd-color-text-default)] opacity-70 outline-none data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)]"
+            >
+              {c.name}
+            </AriaButton>
+            {openPermission.reason && <Tooltip>{openPermission.reason}</Tooltip>}
+          </TooltipTrigger>
+          {openPermission.reason && (
+            <span id={`${openReasonId}-${c.id}`} className="sr-only">
+              {openPermission.reason}
+            </span>
+          )}
+          </>
         ) : (
           <span className="truncate font-medium text-[var(--rd-color-text-default)]">{c.name}</span>
         )}

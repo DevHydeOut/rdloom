@@ -56,9 +56,13 @@ export interface CustomerTableSpecProps {
    */
   totalCount?: number;
   /**
-   * With serverSide: called with the new query (search, status, plan, sort, page, pageSize). Typing in the search waits for a short pause first.
+   * With serverSide or a controlled query: called with the new query (search, status, plan, sort, page, pageSize). With serverSide, typing in the search waits for a short pause first.
    */
   onQueryChange?: (query: import("../customer-table/query").CustomerQuery) => void;
+  /**
+   * Controlled query. Pass the search, filters, sort and page you keep somewhere else, such as the address bar (see customerQuerySchema), and update it in onQueryChange. Without it the table keeps its own.
+   */
+  query?: import("../customer-table/query").CustomerQuery;
   /**
    * Start with a search, filters, a sort or a page already set.
    */

@@ -74,6 +74,18 @@
       "description": "Asks someone to approve or decline something the assistant wants to do. It says what will happen, how risky it is and whether it can be undone, in words as well as color."
     },
     {
+      "name": "aspect-ratio",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A box that keeps a fixed width to height ratio for what it holds, such as an image, a video or a map. It reserves the space before the content loads, so the page does not jump."
+    },
+    {
+      "name": "attachment",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A chip or card for a file attached to a message or a prompt: its name, size, a type icon, an upload progress bar or error, and an optional remove button. A preview variant shows a thumbnail for pictures. AttachmentList groups several as a list."
+    },
+    {
       "name": "auth-card",
       "type": "registry:ui",
       "version": "0.1.0",
@@ -108,6 +120,12 @@
       "type": "registry:ui",
       "version": "0.1.0",
       "description": "The path from the top of the site to the current page, as links. Use BreadcrumbItem for each step; the last one is the current page."
+    },
+    {
+      "name": "bubble",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A chat bubble for plain, short messages. Bubble is the chrome around one message: alignment and colour for who sent it, an avatar, a name and a time, a delivery status with Retry, grouped bubbles that merge their corners, and a footer for actions. It does not render structured replies. Message renders an AI turn from typed parts (markdown, tools, charts, sources) and Chat holds the whole conversation; use Bubble for person-to-person or simple text chats, or put a Response inside a Bubble when you want the bubble look around formatted text."
     },
     {
       "name": "button-group",
@@ -242,6 +260,12 @@
       "description": "Modal window that asks for focus, such as a confirmation or a short form. Open it with DialogTrigger."
     },
     {
+      "name": "direction",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "Sets the reading direction for everything inside it. It writes the dir attribute and gives React Aria the matching locale, so arrow keys and logical CSS flip together."
+    },
+    {
       "name": "drawer",
       "type": "registry:ui",
       "version": "0.1.0",
@@ -264,6 +288,12 @@
       "type": "registry:ui",
       "version": "0.1.0",
       "description": "The list of problems at the top of a Form after a failed submit. Focus moves to it and each item takes the person to its field. It shows nothing until a submit has failed and goes away when everything is fixed."
+    },
+    {
+      "name": "event-calendar",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A month grid that shows events on the days they happen. People move between months, step through days with the arrow keys, pick an event, and add one from a day when the app allows it. The app owns the events and the month. Days with more events than fit show a +N more button that opens the full list for that day. UI permission is not security: the server must check again."
     },
     {
       "name": "field-array",
@@ -332,10 +362,22 @@
       "description": "A dialog for inviting one or many people: rows of email and role, Add another, checks for format, duplicates and people who are already members, an error summary, and a submit button that says how many invitations it sends. Your onInvite does the work. UI permission is not security: the server must check again."
     },
     {
+      "name": "item",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A flexible list row with a leading media slot (icon box, avatar or picture), a title, a description and trailing actions. The whole row can be a link or a button while its actions stay separately clickable."
+    },
+    {
       "name": "kbd",
       "type": "registry:ui",
       "version": "0.1.0",
       "description": "Shows a keyboard key or shortcut, like Ctrl or ⌘K, in a keycap style. Not interactive."
+    },
+    {
+      "name": "marker",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A divider that labels a moment inside a conversation or feed: a centered label between two lines. Use date for a new day, unread for where new messages start, and event for something that happened, like someone joining."
     },
     {
       "name": "menu",
@@ -350,10 +392,22 @@
       "description": "A horizontal bar of menus like File, Edit and View, as in a desktop application. Each MenubarMenu opens a list of actions with shortcuts, checkbox and radio items and submenus. Arrow keys move between the menus."
     },
     {
+      "name": "message-scroller",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "The scrolling region of a conversation. It follows new messages while the reader is at the bottom, stays put when the reader has scrolled up (with a Jump to latest button), and keeps the place when older messages are added at the top."
+    },
+    {
       "name": "message",
       "type": "registry:ui",
       "version": "0.1.0",
       "description": "One message in a conversation, from you or the assistant. It renders each part in order with the right component: text as formatted markdown, tool calls as activity, tables and charts as real components, sources at the end."
+    },
+    {
+      "name": "native-select",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "The browser's own select menu, dressed like the other fields. It gives the native picker on phones and works with plain form posts. For custom option rows or search, use Select or Combobox."
     },
     {
       "name": "navigation-menu",
@@ -414,6 +468,12 @@
       "type": "registry:ui",
       "version": "0.1.0",
       "description": "A button with a soft ring that keeps radiating out, to draw the eye to the one action that matters now. Builds on Button."
+    },
+    {
+      "name": "questionnaire",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A short flow of questions asked one at a time, for onboarding or for an assistant that needs a few details. It shows progress, keeps answers when going back, and ends with a review step where each answer can be edited."
     },
     {
       "name": "radio-group",
@@ -608,6 +668,12 @@
       "description": "A field for a time of day, with separate hour, minute and (optional) second segments that follow the visitor's locale and 12 or 24 hour clock."
     },
     {
+      "name": "time-slot-picker",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "Pick a day, then a time on that day. A calendar chooses the date; the times for it come from your getSlots function, sync or async, and show as a group of radio buttons. Times that are taken are disabled and say why. A Confirm button hands back the date and the slot. The app owns which times exist. UI permission is not security: the server must check again before it books anything."
+    },
+    {
       "name": "toast",
       "type": "registry:ui",
       "version": "0.1.0",
@@ -648,6 +714,12 @@
       "type": "registry:ui",
       "version": "0.1.0",
       "description": "An expandable hierarchy such as folders and files or a nested menu, with keyboard navigation and optional selection. Build it from nested TreeItem elements."
+    },
+    {
+      "name": "typography",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "Text components that use the font of the host app: Heading (H1 to H4) with the visual size separate from the semantic level, Text, Lead, Prose for raw HTML, InlineCode, Blockquote and List."
     },
     {
       "name": "usage-meter",

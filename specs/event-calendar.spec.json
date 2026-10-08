@@ -1,0 +1,205 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "EventCalendar",
+  "version": "0.1.0",
+  "category": "block",
+  "status": "experimental",
+  "description": "A month grid that shows events on the days they happen. People move between months, step through days with the arrow keys, pick an event, and add one from a day when the app allows it. The app owns the events and the month. Days with more events than fit show a +N more button that opens the full list for that day. UI permission is not security: the server must check again.",
+  "props": {
+    "events": {
+      "type": "custom",
+      "required": true,
+      "tsType": "Array<{ id: string; title: string; start: string; end?: string; tone?: \"neutral\" | \"info\" | \"success\" | \"warning\" | \"danger\"; allDay?: boolean }>",
+      "description": "The events. start and end are ISO strings (2026-10-12 or 2026-10-12T09:30); the date part places the event, the time part is shown. An event with an end on a later day appears on each day it covers."
+    },
+    "month": {
+      "type": "string",
+      "description": "The month shown, as YYYY-MM. Use it with onMonthChange to control the month."
+    },
+    "defaultMonth": {
+      "type": "string",
+      "description": "The month shown first when the month is not controlled, as YYYY-MM. Default: the current month."
+    },
+    "onMonthChange": {
+      "type": "callback",
+      "tsType": "(month: string) => void",
+      "description": "Called with YYYY-MM when someone moves to another month, so you can load that month's events."
+    },
+    "weekStartsOn": {
+      "type": "number",
+      "default": 0,
+      "description": "The first day of the week, 0 for Sunday to 6 for Saturday."
+    },
+    "locale": {
+      "type": "string",
+      "description": "A BCP 47 locale for month, day and time names, e.g. \"de-DE\". Default: the browser's."
+    },
+    "today": {
+      "type": "string",
+      "description": "The date treated as today, as YYYY-MM-DD. Default: the device's date. Set it for stable screenshots and tests."
+    },
+    "maxEventsPerDay": {
+      "type": "number",
+      "default": 3,
+      "description": "How many events a day shows before the rest go behind \"+N more\"."
+    },
+    "label": {
+      "type": "string",
+      "default": "Calendar",
+      "description": "Names the grid for screen readers, together with the month."
+    },
+    "onEventSelect": {
+      "type": "callback",
+      "tsType": "(event: { id: string; title: string; start: string; end?: string; tone?: \"neutral\" | \"info\" | \"success\" | \"warning\" | \"danger\"; allDay?: boolean }) => void",
+      "description": "Called when someone picks an event."
+    },
+    "onDateSelect": {
+      "type": "callback",
+      "tsType": "(date: string) => void",
+      "description": "Called with YYYY-MM-DD when someone picks a day (click, Enter or Space)."
+    },
+    "onCreate": {
+      "type": "callback",
+      "tsType": "(date: string) => void",
+      "description": "Called with YYYY-MM-DD when someone uses a day's add button. The button shows only when this is set and permissions.create allows it."
+    },
+    "state": {
+      "type": "custom",
+      "tsType": "import(\"../utils/state\").DataState",
+      "description": "loading shows a skeleton grid and marks the calendar busy, empty says there are no events, error says they could not load. ready or no state shows the month."
+    },
+    "onRetry": {
+      "type": "callback",
+      "tsType": "() => void",
+      "description": "Called by the Try again button in the error state."
+    },
+    "permissions": {
+      "type": "custom",
+      "tsType": "import(\"../utils/permissions\").Permissions<\"create\">",
+      "description": "What the app allows: create. Hidden leaves the add buttons out; disabled keeps them reachable (aria-disabled) with the reason read, and nothing runs. This only changes what people see: the server must check again."
+    },
+    "classNames": {
+      "type": "custom",
+      "description": "Extra class names for single parts, so you can restyle one part without editing the file. Keys: root, header, title, nav, grid, weekday, day, dayNumber, event, more, addButton, popover.",
+      "tsType": "Partial<Record<\"root\" | \"header\" | \"title\" | \"nav\" | \"grid\" | \"weekday\" | \"day\" | \"dayNumber\" | \"event\" | \"more\" | \"addButton\" | \"popover\", string>>"
+    }
+  },
+  "states": [
+    "default",
+    "hover",
+    "focus",
+    "selected",
+    "disabled",
+    "loading"
+  ],
+  "slots": [
+    "root",
+    "header",
+    "title",
+    "nav",
+    "grid",
+    "weekday",
+    "day",
+    "dayNumber",
+    "event",
+    "more",
+    "addButton",
+    "popover"
+  ],
+  "tokens": [
+    "color.surface.default",
+    "color.surface.subtle",
+    "color.surface.selected",
+    "color.border.default",
+    "color.text.default",
+    "color.text.muted",
+    "color.action.primary",
+    "color.action.on-primary",
+    "color.focus.ring",
+    "color.feedback.info",
+    "color.feedback.info-subtle",
+    "color.feedback.success",
+    "color.feedback.success-subtle",
+    "color.feedback.warning",
+    "color.feedback.warning-subtle",
+    "color.feedback.danger",
+    "color.feedback.danger-subtle"
+  ],
+  "a11y": {
+    "role": "grid",
+    "keyboard": [
+      "Tab: moves into the grid on one day, then to the controls inside that day",
+      "Arrow keys: move between days, across month edges",
+      "Home and End: first and last day of the week",
+      "Page Up and Page Down: previous and next month",
+      "Enter or Space: picks the day",
+      "Escape: closes the +N more list"
+    ],
+    "requirements": [
+      "A grid with column headers for the weekdays and one row per week",
+      "Only one day is in the tab order; the arrow keys move it (roving tabindex)",
+      "Each day names its full date and how many events it has",
+      "Events are buttons named by time and title",
+      "The month heading is announced when the month changes",
+      "A disabled add button stays focusable and its reason is read",
+      "Event tone is shown by a dot and the color, never the only cue to the title"
+    ],
+    "screenReader": [
+      "\"Thursday 8 October 2026, 2 events, grid cell\"",
+      "\"9:00 AM Design review, button\"",
+      "\"3 more events on 8 October, button\""
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "Showing what is scheduled across a month: bookings, deliveries, releases",
+      "Letting people open an event or start a new one from a day"
+    ],
+    "avoid_when": [
+      "Picking one date for a form: use DatePicker or Calendar",
+      "Choosing a time on a day: use TimeSlotPicker",
+      "Hour by hour scheduling with overlapping events: this shows a month, not a day timeline"
+    ],
+    "anti_patterns": [
+      "Treating the permissions prop as protection: UI permission is not security, so the server must check again",
+      "Loading every event the app has: load the visible month and use onMonthChange",
+      "Telling event types apart by color alone: put the type in the title"
+    ]
+  },
+  "contract": {
+    "data": "A list of events with ISO start and optional end, and a month.",
+    "dataStates": [
+      "loading",
+      "empty",
+      "error",
+      "ready"
+    ],
+    "permissions": [
+      "create"
+    ],
+    "events": [
+      "onMonthChange",
+      "onEventSelect",
+      "onDateSelect",
+      "onCreate",
+      "onRetry"
+    ],
+    "customization": [
+      "classNames for each part",
+      "weekStartsOn and locale",
+      "maxEventsPerDay",
+      "month or defaultMonth"
+    ]
+  },
+  "examples": [
+    "basic",
+    "states",
+    "permissions",
+    "week-starts-monday"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {}
+  }
+}

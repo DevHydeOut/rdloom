@@ -1,0 +1,74 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Bubble",
+  "version": "0.1.0",
+  "category": "ai",
+  "status": "experimental",
+  "description": "A chat bubble for plain, short messages. Bubble is the chrome around one message: alignment and colour for who sent it, an avatar, a name and a time, a delivery status with Retry, grouped bubbles that merge their corners, and a footer for actions. It does not render structured replies. Message renders an AI turn from typed parts (markdown, tools, charts, sources) and Chat holds the whole conversation; use Bubble for person-to-person or simple text chats, or put a Response inside a Bubble when you want the bubble look around formatted text.",
+  "props": {
+    "from": { "type": "enum", "values": ["user", "assistant"], "default": "assistant", "description": "user sits at the end edge in the action colour; assistant sits at the start edge on a subtle surface." },
+    "position": { "type": "enum", "values": ["single", "first", "middle", "last"], "default": "single", "description": "Place in a run of consecutive bubbles from the same sender. Bubbles in a run merge the corners that touch. BubbleGroup sets it for you." },
+    "name": { "type": "string", "description": "Who sent it. Shown above single and first bubbles, and used in the accessible name." },
+    "avatar": { "type": "node", "description": "An Avatar for the sender. Shown beside single and last bubbles; other bubbles in a run keep the space so text lines up." },
+    "timestamp": { "type": "custom", "tsType": "Date | string", "description": "When it was sent. Renders a time element with this value as dateTime." },
+    "timestampText": { "type": "string", "description": "The visible text for the time, e.g. \"10:42\". Without it the time is formatted with the reader's locale." },
+    "status": { "type": "enum", "values": ["sending", "sent", "failed"], "default": "sent", "description": "sending shows \"Sending\". failed shows \"Not sent\" and a Retry button when onRetry is given. sent shows nothing." },
+    "onRetry": { "type": "callback", "description": "Called when Retry is pressed on a failed bubble.", "tsType": "() => void" },
+    "actions": { "type": "node", "description": "The footer: buttons such as copy or regenerate." },
+    "attachments": { "type": "node", "description": "Files attached to the message, usually an AttachmentList. Shown inside the bubble below the text." },
+    "children": { "type": "node", "description": "The message content." }
+  },
+  "variants": ["from", "position", "status"],
+  "states": ["default", "loading", "invalid"],
+  "slots": ["root", "avatar", "name", "bubble", "attachments", "time", "status", "retry", "actions"],
+  "tokens": [
+    "color.action.primary",
+    "color.action.on-primary",
+    "color.surface.subtle",
+    "color.text.default",
+    "color.text.muted",
+    "color.border.default",
+    "color.feedback.danger",
+    "color.focus.ring",
+    "radius.overlay"
+  ],
+  "a11y": {
+    "role": "article",
+    "keyboard": [
+      "Tab: moves to Retry and to the buttons in the footer"
+    ],
+    "requirements": [
+      "Each bubble is an article named by its sender, e.g. \"Alex message\" or \"You message\"",
+      "The time is a real time element with a machine readable dateTime",
+      "A failed message says \"Not sent\" in text, with an icon, and offers Retry as a named button; it is announced as an alert",
+      "Sending is a polite status, not only a dimmed bubble",
+      "Alignment uses start and end, so the bubbles mirror in right to left languages",
+      "A run of bubbles in BubbleGroup is a labelled group and each bubble keeps its own name",
+      "Text meets 4.5:1 on both bubble colours"
+    ],
+    "screenReader": [
+      "\"Alex message, article\" then the text and the time",
+      "\"Not sent\" then \"Retry, button\"",
+      "\"Sending\""
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "A simple chat between people, or with a bot that only sends short text",
+      "Showing delivery state and retry for each message",
+      "Grouping several messages from the same sender"
+    ],
+    "avoid_when": [
+      "An AI reply with tools, tables, charts or sources: use Message",
+      "A whole conversation with an input and scrolling: use Chat"
+    ],
+    "anti_patterns": [
+      "Putting a Bubble inside a Message, which already has its own bubble",
+      "Showing the name and avatar on every message in a run",
+      "Reporting a failure only with a red bubble"
+    ]
+  },
+  "examples": ["conversation", "grouped", "failed-retry", "with-attachments"],
+  "figma": { "componentKey": null, "variantMap": { "from": "From", "status": "Status" } }
+}

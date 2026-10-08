@@ -1,0 +1,42 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "MessageScroller",
+  "version": "0.1.0",
+  "category": "ai",
+  "status": "experimental",
+  "description": "The scrolling region of a conversation. It follows new messages while the reader is at the bottom, stays put when the reader has scrolled up (with a Jump to latest button), and keeps the place when older messages are added at the top.",
+  "props": {
+    "children": { "type": "node", "required": true, "description": "The messages, in order, oldest first." },
+    "label": { "type": "string", "default": "Conversation", "description": "Accessible name of the log." },
+    "unreadCount": { "type": "number", "description": "How many new messages arrived while the reader was scrolled up. Shown on the Jump to latest button." },
+    "onReachTop": { "type": "callback", "tsType": "() => void", "description": "Called when the reader scrolls to the top, so older messages can be loaded. The scroll position is kept when they are added." },
+    "isLoadingOlder": { "type": "boolean", "default": false, "description": "Older messages are being loaded. Shows a status line at the top and pauses onReachTop." },
+    "threshold": { "type": "number", "default": 80, "description": "How many pixels from the bottom still count as being at the bottom." },
+    "onAtBottomChange": { "type": "callback", "tsType": "(isAtBottom: boolean) => void", "description": "Called when the reader moves away from the bottom or back to it. Use it to count and clear unread messages." },
+    "onJumpToLatest": { "type": "callback", "tsType": "() => void", "description": "Called after the reader presses Jump to latest, e.g. to clear the unread count." }
+  },
+  "variants": ["isLoadingOlder"],
+  "states": ["default", "focus", "loading"],
+  "slots": ["scroller", "content", "jumpButton", "loadingStatus"],
+  "tokens": ["color.surface.raised", "color.text.default", "color.text.muted", "color.border.strong", "color.action.primary", "color.action.on-primary", "color.focus.ring", "elevation.floating"],
+  "a11y": {
+    "role": "log",
+    "keyboard": ["Tab moves to the region, then Arrow keys, Page Up, Page Down, Home and End scroll it", "Tab then reaches the Jump to latest button; Enter or Space scrolls to the newest message"],
+    "requirements": [
+      "The region has role log, aria-live polite and an accessible name from label",
+      "The region is focusable so keyboard users can scroll it",
+      "New messages are announced politely; the reader is never moved if they scrolled up",
+      "Smooth scrolling is turned off when the person prefers reduced motion",
+      "The Jump to latest button names the unread count"
+    ],
+    "screenReader": ["The region is announced as a log with its label", "New messages are read after the current speech", "The button is announced as, for example, Jump to latest, 3 new messages"],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["A conversation or activity feed that grows at the bottom", "A chat where older messages load at the top"],
+    "avoid_when": ["A full chat with a message box: use Chat", "A static list that does not grow: use ScrollArea"],
+    "anti_patterns": ["Forcing the reader to the bottom when they scrolled up on purpose", "Giving the region no height, so it never scrolls", "Streaming tokens into a polite live region without a quiet period"]
+  },
+  "examples": ["live-conversation", "load-older", "unread-count"],
+  "figma": { "componentKey": null, "variantMap": { "isLoadingOlder": "Loading" } }
+}

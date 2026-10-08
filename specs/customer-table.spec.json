@@ -62,8 +62,13 @@
     },
     "onQueryChange": {
       "type": "callback",
-      "description": "With serverSide: called with the new query (search, status, plan, sort, page, pageSize). Typing in the search waits for a short pause first.",
+      "description": "With serverSide or a controlled query: called with the new query (search, status, plan, sort, page, pageSize). With serverSide, typing in the search waits for a short pause first.",
       "tsType": "(query: import(\"../customer-table/query\").CustomerQuery) => void"
+    },
+    "query": {
+      "type": "custom",
+      "description": "Controlled query. Pass the search, filters, sort and page you keep somewhere else, such as the address bar (see customerQuerySchema), and update it in onQueryChange. Without it the table keeps its own.",
+      "tsType": "import(\"../customer-table/query\").CustomerQuery"
     },
     "defaultQuery": {
       "type": "custom",
@@ -209,6 +214,7 @@
     "custom-insights",
     "without-insights",
     "row-action",
+    "url-state",
     "permissions",
     "classNames"
   ],

@@ -1,0 +1,44 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Typography",
+  "version": "0.1.0",
+  "category": "display",
+  "status": "experimental",
+  "description": "Text components that use the font of the host app: Heading (H1 to H4) with the visual size separate from the semantic level, Text, Lead, Prose for raw HTML, InlineCode, Blockquote and List.",
+  "props": {
+    "level": { "type": "number", "default": 2, "description": "Heading only: the semantic level, 1 to 4. Pick the level that fits the page outline, not the look." },
+    "size": { "type": "enum", "values": ["sm", "md", "lg", "xl", "2xl"], "default": "xl", "description": "Visual size, independent of the level. Heading takes sm to 2xl; Text takes sm, md or lg (default md)." },
+    "tone": { "type": "enum", "values": ["default", "muted", "danger"], "default": "default", "description": "Text colour. danger is for error text and must say what is wrong in words." },
+    "as": { "type": "enum", "values": ["p", "span"], "default": "p", "description": "Text only: the element, a paragraph or an inline span." },
+    "children": { "type": "node", "required": true, "description": "The text, or for Prose the raw HTML elements to style." }
+  },
+  "variants": ["size", "tone"],
+  "states": ["default"],
+  "slots": ["heading", "text", "lead", "prose", "inline-code", "blockquote", "list"],
+  "tokens": ["color.text.default", "color.text.muted", "color.feedback.danger", "color.border.default", "color.border.strong", "color.surface.subtle", "color.action.primary", "color.focus.ring", "radius.control"],
+  "a11y": {
+    "role": "heading",
+    "keyboard": [],
+    "requirements": [
+      "Heading renders h1 to h4 from level, so the outline is set by level and never by size",
+      "Do not skip levels (h2 then h4)",
+      "Muted text keeps 4.5:1 against the surface; danger text is never the only sign of an error",
+      "Blockquote is a real blockquote element; a source goes in a footer or cite",
+      "List renders ul or ol with real list items",
+      "Links inside Prose keep an underline and a visible focus ring"
+    ],
+    "screenReader": [
+      "Headings are reachable by heading navigation with the right level",
+      "Lists are announced with their item count",
+      "Inline code is read as ordinary text"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["Page and section headings", "Article or CMS content that arrives as HTML (wrap it in Prose)", "Body, helper and error text that must follow the design tokens"],
+    "avoid_when": ["Labels for form fields: use the field's own label", "Choosing a heading level for its size: change size instead"],
+    "anti_patterns": ["Using H1 several times on a page", "Picking h4 because it looks smaller", "Using danger tone without a message"]
+  },
+  "examples": ["headings", "prose", "text-tones", "lists-and-quote"],
+  "figma": { "componentKey": null, "variantMap": { "size": "Size", "tone": "Tone" } }
+}

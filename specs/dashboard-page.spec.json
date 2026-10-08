@@ -106,6 +106,7 @@
   },
   "examples": [
     "basic",
+    "overview",
     "loading"
   ],
   "figma": {

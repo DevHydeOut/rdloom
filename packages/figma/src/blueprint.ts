@@ -346,6 +346,28 @@ const blueprints: Record<string, Blueprint> = {
       text("USD", FONT[c.size ?? "md"] ?? 14, "color.text.muted"),
     ]),
 
+  Item: (c) => {
+    const sm = c.size === "sm";
+    const outline = c.variant === "outline";
+    const muted = c.variant === "muted";
+    return frame(
+      { name: "item", dir: "row", w: 360, gap: sm ? 12 : 16, pad: sm ? [8, 12] : [12, 16], cross: "center", radius: "radius.control", fill: muted ? "color.surface.subtle" : undefined, stroke: outline ? "color.border.default" : undefined },
+      [
+        box(sm ? 32 : 40, sm ? 32 : 40, { fill: "color.surface.subtle", stroke: "color.border.default", radius: "radius.control", name: "media" }),
+        frame({ name: "content", dir: "col", gap: 2, w: "fill" }, [text("Ada Lovelace", sm ? 14 : 16, "color.text.default", "Medium"), text("Engineering lead", 14, "color.text.muted")]),
+      ],
+    );
+  },
+
+  Typography: (c) => {
+    const sizes: Record<string, number> = { sm: 16, md: 18, lg: 20, xl: 24, "2xl": 36 };
+    const tone = c.tone === "muted" ? "color.text.muted" : c.tone === "danger" ? "color.feedback.danger" : "color.text.default";
+    return frame({ name: "typography", dir: "col", gap: 8, w: 360 }, [
+      text("Heading", sizes[String(c.size ?? "xl")] ?? 24, tone, "Semi Bold"),
+      text("Body text uses the host font and the text tokens.", 16, tone),
+    ]);
+  },
+
   Separator: (c) => {
     if (c.orientation === "vertical") return frame({ name: "separator", dir: "row", h: 24 }, [box(1, 24, { fill: "color.border.default", name: "line" })]);
     return frame({ name: "separator", dir: "row", w: 320, gap: 12, cross: "center" }, [
@@ -678,6 +700,32 @@ const blueprints: Record<string, Blueprint> = {
     ]);
   },
 
+  Attachment: (c) =>
+    frame({ name: "attachment", dir: "row", gap: 10, pad: [8, 10], w: 260, cross: "center", fill: "color.surface.subtle", stroke: c.status === "error" ? "color.feedback.danger" : "color.border.default", radius: "radius.control" }, [
+      box(20, 20, { name: "icon", stroke: "color.border.default", radius: 4 }),
+      frame({ name: "details", dir: "col", gap: 4, w: "fill" }, [
+        text("report.pdf", 14, "color.text.default", "Medium"),
+        text(c.status === "error" ? "Upload failed" : "2.4 MB", 12, c.status === "error" ? "color.feedback.danger" : "color.text.muted"),
+      ]),
+      box(24, 24, { name: "remove", radius: PILL, stroke: "color.border.default" }),
+    ]),
+
+  Bubble: (c) => {
+    const mine = c.from === "user";
+    return frame({ name: "bubble row", dir: "row", w: 360, align: mine ? "end" : "start" }, [
+      frame({ name: "bubble", dir: "row", pad: [8, 14], fill: mine ? "color.action.primary" : "color.surface.subtle", stroke: mine ? undefined : "color.border.default", radius: "radius.overlay" }, [
+        text("Can you send the file again?", 14, mine ? "color.action.on-primary" : "color.text.default"),
+      ]),
+    ]);
+  },
+
+  Marker: () =>
+    frame({ name: "marker", dir: "row", w: 360, gap: 12, cross: "center" }, [
+      box("fill", 1, { fill: "color.border.default", name: "line" }),
+      text("Today", 12, "color.text.muted", "Medium"),
+      box("fill", 1, { fill: "color.border.default", name: "line" }),
+    ]),
+
   Message: () =>
     frame({ name: "messages", dir: "col", gap: 16, w: 440 }, [
       frame({ name: "you", dir: "row", w: "fill", align: "end" }, [
@@ -695,6 +743,28 @@ const blueprints: Record<string, Blueprint> = {
       text("Ask anything", 15, "color.text.muted", "Regular", "fill"),
       box(40, 40, { name: "mic", radius: PILL, stroke: "color.border.default" }),
       box(40, 40, { fill: "color.action.primary", radius: PILL, name: "send" }),
+    ]),
+
+  MessageScroller: (c) =>
+    frame({ name: "message scroller", dir: "col", gap: 12, pad: 16, w: 420, h: 240, fill: "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, [
+      on(c, "isLoadingOlder") ? text("Loading older messages", 12, "color.text.muted") : text("Earlier messages", 12, "color.text.muted"),
+      frame({ name: "you", dir: "row", w: "fill", align: "end" }, [
+        frame({ name: "bubble", dir: "row", pad: [8, 14], fill: "color.surface.selected", radius: "radius.overlay" }, [text("Where is my order?", 14)]),
+      ]),
+      frame({ name: "jump", dir: "row", gap: 6, pad: [6, 12], stroke: "color.border.strong", fill: "color.surface.raised", radius: PILL }, [text("Jump to latest", 12, "color.text.default", "Medium")]),
+    ]),
+
+  Questionnaire: () =>
+    frame({ name: "questionnaire", dir: "col", gap: 16, w: 420 }, [
+      text("Question 2 of 4", 14, "color.text.muted"),
+      box("fill", 6, { fill: "color.surface.subtle", radius: PILL, name: "progress" }),
+      text("What will you use it for?", 18, "color.text.default", "Semi Bold"),
+      frame({ name: "option", dir: "row", gap: 12, pad: [12, 16], w: "fill", cross: "center", stroke: "color.action.primary", fill: "color.surface.selected", radius: "radius.control" }, [text("A personal project", 14, "color.text.default", "Medium")]),
+      frame({ name: "option", dir: "row", gap: 12, pad: [12, 16], w: "fill", cross: "center", stroke: "color.border.default", radius: "radius.control" }, [text("My team's work", 14, "color.text.default", "Medium")]),
+      frame({ name: "buttons", dir: "row", w: "fill", align: "between" }, [
+        frame({ dir: "row", pad: [8, 16], stroke: "color.border.strong", radius: "radius.control" }, [text("Back", 14, "color.text.default", "Medium")]),
+        frame({ dir: "row", pad: [8, 16], fill: "color.action.primary", radius: "radius.control" }, [text("Next", 14, "color.action.on-primary", "Medium")]),
+      ]),
     ]),
 
   Chat: () =>
@@ -1154,6 +1224,56 @@ const blueprints: Record<string, Blueprint> = {
     ]);
   },
 
+  EventCalendar: () => {
+    const chip = (title: string, fill: string, dot: string) =>
+      frame({ name: "event", dir: "row", gap: 4, pad: [2, 6], w: "fill", cross: "center", fill, radius: "radius.control" }, [box(6, 6, { fill: dot, radius: 999 }), text(title, 12, "color.text.default", "Medium")]);
+    const day = (n: number, events: Array<[string, string, string]>, today = false) =>
+      frame({ name: "day", dir: "col", gap: 4, pad: 6, w: 96, h: 88, fill: "color.surface.default", stroke: "color.border.default" }, [
+        frame({ dir: "row", w: 22, h: 22, align: "center", cross: "center", radius: 999, fill: today ? "color.action.primary" : undefined }, [text(String(n), 12, today ? "color.action.on-primary" : "color.text.default")]),
+        ...events.map(([t, f, d]) => chip(t, f, d)),
+      ]);
+    const info: [string, string, string] = ["Design review", "color.feedback.info-subtle", "color.feedback.info"];
+    const ok: [string, string, string] = ["Sprint planning", "color.feedback.success-subtle", "color.feedback.success"];
+    const warn: [string, string, string] = ["Budget sync", "color.feedback.warning-subtle", "color.feedback.warning"];
+    const week = (start: number, extra: Record<number, Array<[string, string, string]>>, today = -1) =>
+      frame({ name: "week", dir: "row" }, Array.from({ length: 7 }, (_, i) => day(start + i, extra[i] ?? [], i === today)));
+    return frame({ name: "event calendar", dir: "col", gap: 12, w: 672 }, [
+      frame({ name: "header", dir: "row", w: "fill", align: "between", cross: "center" }, [
+        text("October 2026", 16, "color.text.default", "Semi Bold"),
+        frame({ name: "nav", dir: "row", gap: 4 }, [
+          frame({ dir: "row", pad: [4, 10], stroke: "color.border.default", radius: "radius.control" }, [text("‹", 14, "color.text.default")]),
+          frame({ dir: "row", pad: [4, 10], stroke: "color.border.default", radius: "radius.control" }, [text("Today", 14, "color.text.default", "Medium")]),
+          frame({ dir: "row", pad: [4, 10], stroke: "color.border.default", radius: "radius.control" }, [text("›", 14, "color.text.default")]),
+        ]),
+      ]),
+      frame({ name: "grid", dir: "col", w: "fill", stroke: "color.border.default", radius: "radius.overlay" }, [
+        frame({ name: "weekdays", dir: "row", fill: "color.surface.subtle" }, ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => frame({ dir: "row", w: 96, pad: [6, 8] }, [text(d, 12, "color.text.muted", "Medium")]))),
+        week(4, { 2: [info] }),
+        week(11, { 1: [ok, warn] }, 4),
+        week(18, { 3: [info] }),
+      ]),
+    ]);
+  },
+
+  TimeSlotPicker: () => {
+    const slot = (t: string, selected = false, taken = false) =>
+      frame({ name: "slot", dir: "row", w: "fill", h: 40, align: "center", cross: "center", radius: "radius.control", fill: selected ? "color.action.primary" : taken ? "color.surface.subtle" : "color.surface.default", stroke: selected ? "color.action.primary" : "color.border.default" }, [
+        text(t, 14, selected ? "color.action.on-primary" : taken ? "color.text.muted" : "color.text.default", "Medium"),
+      ]);
+    const row = (a: ReturnType<typeof slot>, b: ReturnType<typeof slot>) => frame({ name: "row", dir: "row", gap: 8, w: "fill" }, [a, b]);
+    return frame({ name: "time slot picker", dir: "row", gap: 24, w: 600 }, [
+      panel({ name: "calendar", dir: "col", gap: 8, pad: 12 }, [text("October 2026", 14, "color.text.default", "Semi Bold"), text("Choose a date", 12, "color.text.muted"), box(252, 150, { fill: "color.surface.subtle", radius: "radius.control", name: "month" })]),
+      frame({ name: "slots", dir: "col", gap: 12, w: "fill" }, [
+        text("Monday, 12 October 2026", 14, "color.text.default", "Semi Bold"),
+        row(slot("9:00 AM", false, true), slot("9:30 AM")),
+        row(slot("10:00 AM", true), slot("10:30 AM")),
+        row(slot("12:00 PM", false, true), slot("1:30 PM")),
+        text("Times shown in Central European Time", 12, "color.text.muted"),
+        frame({ name: "footer", dir: "row", w: "fill", align: "end" }, [button("Confirm", "primary")]),
+      ]),
+    ]);
+  },
+
   PaymentMethodCard: () =>
     frame({ name: "payment method card", dir: "col", gap: 16, pad: 20, w: 420, fill: "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, [
       frame({ name: "method", dir: "row", gap: 12, w: "fill", cross: "center" }, [
@@ -1534,6 +1654,26 @@ const blueprints: Record<string, Blueprint> = {
       ]),
     ]);
   },
+
+  NativeSelect: (c) => {
+    const h = c.size === "sm" ? 32 : c.size === "lg" ? 48 : 40;
+    return frame({ name: "native select", dir: "col", gap: 8, w: 280 }, [
+      text("Country", 14, "color.text.default", "Medium"),
+      frame({ name: "select", dir: "row", w: "fill", h, pad: [0, 12], align: "between", cross: "center", fill: "color.surface.default", stroke: on(c, "isInvalid") ?"color.feedback.danger" : "color.border.default", radius: "radius.control", opacity: on(c, "isDisabled") ? 0.5 : undefined }, [
+        text("Germany", 14, "color.text.default"),
+        text("v", 14, "color.text.muted"),
+      ]),
+      ...(on(c, "isInvalid") ? [text("Choose a country.", 12, "color.feedback.danger")] : []),
+    ]);
+  },
+
+  AspectRatio: (c) =>
+    frame({ name: "aspect ratio", dir: "col", w: 320, h: 180, fill: "color.border.default", radius: on(c, "rounded") ? "radius.control" : undefined }, []),
+
+  Direction: (c) =>
+    frame({ name: "direction", dir: "row", w: 280, gap: 8, pad: 12, align: c.direction === "rtl" ? "end" : "start", stroke: "color.border.default", radius: "radius.control" }, [
+      text(c.direction === "rtl" ? "RTL" : "LTR", 14, "color.text.default", "Medium"),
+    ]),
 };
 
 /** The blueprint for one variant. Unknown components get a labelled box. */

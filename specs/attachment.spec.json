@@ -1,0 +1,76 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Attachment",
+  "version": "0.1.0",
+  "category": "ai",
+  "status": "experimental",
+  "description": "A chip or card for a file attached to a message or a prompt: its name, size, a type icon, an upload progress bar or error, and an optional remove button. A preview variant shows a thumbnail for pictures. AttachmentList groups several as a list.",
+  "props": {
+    "name": { "type": "string", "required": true, "description": "The file name. It is the accessible name of the chip and of its remove button." },
+    "sizeText": { "type": "string", "description": "The size as text, e.g. \"2.4 MB\". Format it yourself so the language and units match the rest of the page." },
+    "mediaType": { "type": "string", "description": "The media type, e.g. \"application/pdf\". It only picks the icon." },
+    "variant": { "type": "enum", "values": ["chip", "preview"], "default": "chip", "description": "chip is a compact row with an icon. preview is a card with a thumbnail above the name." },
+    "status": { "type": "enum", "values": ["ready", "uploading", "error"], "default": "ready", "description": "ready is a normal file. uploading shows a progress bar. error shows the error message." },
+    "progress": { "type": "number", "description": "Upload progress from 0 to 100. Leave it out while uploading for an indeterminate bar." },
+    "errorMessage": { "type": "string", "default": "Upload failed", "description": "What went wrong, shown when status is error." },
+    "thumbnail": { "type": "node", "description": "The picture for the preview variant, usually an img with alt text. Without it the type icon is shown." },
+    "href": { "type": "string", "description": "Makes the name a link that opens the file." },
+    "onPress": { "type": "callback", "description": "Makes the name a button that opens or previews the file. Use href or onPress, not both.", "tsType": "() => void" },
+    "onRemove": { "type": "callback", "description": "Shows a remove button. Called when it is pressed.", "tsType": "() => void" }
+  },
+  "variants": ["variant", "status"],
+  "states": ["default", "hover", "focus", "pressed", "loading", "invalid"],
+  "slots": ["root", "icon", "thumbnail", "name", "size", "progress", "error", "remove"],
+  "tokens": [
+    "color.surface.subtle",
+    "color.surface.default",
+    "color.text.default",
+    "color.text.muted",
+    "color.border.default",
+    "color.action.primary",
+    "color.feedback.danger",
+    "color.focus.ring",
+    "radius.control",
+    "radius.overlay"
+  ],
+  "a11y": {
+    "role": "listitem when inside AttachmentList, otherwise a plain group",
+    "keyboard": [
+      "Tab: moves to the name when it is a link or button, then to the remove button",
+      "Enter: opens the file from the name",
+      "Enter or Space: removes the file from the remove button"
+    ],
+    "requirements": [
+      "The remove button is named \"Remove <file name>\" so several of them are told apart",
+      "Uploading shows a progressbar named \"Uploading <file name>\" with its value; without progress it is indeterminate",
+      "An error is shown as text with an icon, announced as an alert, and never by color alone",
+      "The type icon is decorative; the name and size are real text",
+      "A thumbnail has its own alt text; the card does not repeat it",
+      "The progress bar stands still for reduced motion"
+    ],
+    "screenReader": [
+      "\"report.pdf, 2.4 MB\" then \"Remove report.pdf, button\"",
+      "\"Uploading report.pdf, progress bar, 40\"",
+      "\"Upload failed\""
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "Showing files attached to a prompt before it is sent",
+      "Showing files inside a sent message",
+      "Showing upload progress and failures for each file"
+    ],
+    "avoid_when": [
+      "Choosing files or dropping them: use FileUpload",
+      "A table of documents with many columns: use a table"
+    ],
+    "anti_patterns": [
+      "A remove button for a file in an already sent message",
+      "Showing an uploading state with no way to see it fail: always handle the error status",
+      "A thumbnail with no alt text"
+    ]
+  },
+  "examples": ["prompt-chips", "upload-states", "image-previews"],
+  "figma": { "componentKey": null, "variantMap": { "variant": "Variant", "status": "Status" } }
+}

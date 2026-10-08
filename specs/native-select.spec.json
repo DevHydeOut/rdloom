@@ -1,0 +1,64 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "NativeSelect",
+  "version": "0.1.0",
+  "category": "input",
+  "status": "experimental",
+  "description": "The browser's own select menu, dressed like the other fields. It gives the native picker on phones and works with plain form posts. For custom option rows or search, use Select or Combobox.",
+  "props": {
+    "label": { "type": "string", "required": true, "description": "Visible label." },
+    "description": { "type": "string", "description": "Help text shown under the field." },
+    "errorMessage": { "type": "string", "description": "Shown when the field is invalid." },
+    "placeholder": { "type": "string", "description": "Text of a disabled first option shown while nothing is chosen." },
+    "size": { "type": "enum", "values": ["sm", "md", "lg"], "default": "md", "description": "Field height and font size." },
+    "options": { "type": "custom", "tsType": "Array<{ value: string; label: string; disabled?: boolean } | { label: string; options: Array<{ value: string; label: string; disabled?: boolean }> }>", "description": "Options as data. A group has a label and its own options. Use children instead for hand-written option and optgroup elements." },
+    "name": { "type": "string", "description": "Form field name." },
+    "value": { "type": "string", "description": "Controlled value." },
+    "defaultValue": { "type": "string", "description": "Initial value when uncontrolled." },
+    "onChange": { "type": "callback", "tsType": "(event: import(\"react\").ChangeEvent<HTMLSelectElement>) => void", "description": "Called when the choice changes." },
+    "isDisabled": { "type": "boolean", "default": false, "description": "Prevents changing the value and dims the field." },
+    "isInvalid": { "type": "boolean", "default": false, "description": "Marks the field as invalid and shows errorMessage." },
+    "isRequired": { "type": "boolean", "default": false, "description": "Requires a choice for form submission." },
+    "children": { "type": "node", "description": "option and optgroup elements, used when options is not given." }
+  },
+  "variants": ["size", "isDisabled", "isInvalid"],
+  "states": ["default", "hover", "focus", "disabled", "invalid"],
+  "slots": ["label", "select", "chevron", "description", "error"],
+  "tokens": [
+    "color.surface.default",
+    "color.border.default",
+    "color.border.strong",
+    "color.text.default",
+    "color.text.muted",
+    "color.feedback.danger",
+    "color.focus.ring",
+    "radius.control"
+  ],
+  "a11y": {
+    "role": "combobox",
+    "keyboard": [
+      "Tab moves to the field",
+      "Arrow keys change or browse the options, depending on the browser",
+      "Space, Enter or Alt+Arrow Down opens the native list",
+      "Typing jumps to a matching option"
+    ],
+    "requirements": [
+      "The label is a real label element linked to the select",
+      "Description and error are linked with aria-describedby",
+      "An invalid field sets aria-invalid",
+      "The chevron is decorative and hidden from assistive technology"
+    ],
+    "screenReader": [
+      "On focus: the label, the current value and the kind of control",
+      "The description and error text are read after the label"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["A plain list where the device's own picker is best, especially on phones", "A form that posts to the server without script", "Many options where search is not needed"],
+    "avoid_when": ["Rich option rows with icons or descriptions: use Select", "Searchable or very long lists: use Combobox", "Few options that should be visible: use RadioGroup"],
+    "anti_patterns": ["A placeholder that reads like a real value", "Using a select for yes or no", "Passing isInvalid for required checks: leave it unset so the browser and your validation decide, and pass it only for errors the app finds itself"]
+  },
+  "examples": ["basic", "with-groups", "invalid", "disabled"],
+  "figma": { "componentKey": null, "variantMap": { "size": "Size", "isDisabled": "Disabled", "isInvalid": "Invalid" } }
+}

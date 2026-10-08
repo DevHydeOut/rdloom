@@ -194,12 +194,12 @@ describe("CustomerTable permissions", () => {
     expect(onExport).toHaveBeenCalledTimes(1);
   });
 
-  it("makes names plain text when open is disabled or hidden", () => {
-    for (const open of ["disabled", "hidden"] as const) {
-      const { unmount } = render(<CustomerTable customers={customers} insights="none" onSelect={() => {}} permissions={{ open }} />);
-      expect(screen.queryByRole("button", { name: "Ada Lovelace" })).not.toBeInTheDocument();
-      unmount();
-    }
+  it("makes names plain text when open is hidden, and a described disabled button when it is disabled", () => {
+    const { unmount } = render(<CustomerTable customers={customers} insights="none" onSelect={() => {}} permissions={{ open: "hidden" }} />);
+    expect(screen.queryByRole("button", { name: "Ada Lovelace" })).not.toBeInTheDocument();
+    unmount();
+    render(<CustomerTable customers={customers} insights="none" onSelect={() => {}} permissions={{ open: { state: "disabled", reason: "Ask an admin" } }} />);
+    expect(screen.getAllByRole("button", { name: "Ada Lovelace" })[0]).toHaveAttribute("aria-disabled", "true");
   });
 
   it("has no axe violations with a disabled export", async () => {

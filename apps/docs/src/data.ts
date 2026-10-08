@@ -94,7 +94,7 @@ export const componentGroupDefs: Array<{ id: string; label: string; ids: string[
   { id: "buttons", label: "Buttons", ids: ["button", "action-button", "shimmer-button", "ripple-button", "pulse-button", "gradient-button", "reveal-button", "button-group"] },
   { id: "search", label: "Search and commands", ids: ["command-palette", "combobox"] },
   { id: "text-inputs", label: "Text and number inputs", ids: ["text-field", "input-group", "input-otp", "number-field", "tag-input", "file-upload"] },
-  { id: "choice", label: "Choices and toggles", ids: ["select", "checkbox", "radio-group", "switch", "slider", "segmented-control", "toggle-button", "toggle-group", "color-picker", "rating"] },
+  { id: "choice", label: "Choices and toggles", ids: ["select", "checkbox", "radio-group", "switch", "slider", "segmented-control", "toggle-button", "toggle-group", "color-picker", "rating", "native-select"] },
   { id: "forms", label: "Forms", ids: ["form", "error-summary", "field-array"] },
   { id: "date-time", label: "Dates and times", ids: ["calendar", "date-picker", "date-range-picker", "time-field"] },
   { id: "data", label: "Tables and data", ids: ["data-grid", "table", "tree", "pagination"] },
@@ -102,10 +102,10 @@ export const componentGroupDefs: Array<{ id: string; label: string; ids: string[
   { id: "navigation", label: "Navigation", ids: ["tabs", "breadcrumbs", "steps", "menu", "navigation-menu", "menubar"] },
   { id: "overlays", label: "Dialogs and popovers", ids: ["dialog", "alert-dialog", "sheet", "drawer", "popover", "tooltip", "hover-card", "context-menu"] },
   { id: "feedback", label: "Feedback and status", ids: ["alert", "toast", "progress", "skeleton", "empty-state", "error-state", "badge", "spinner"] },
-  { id: "display", label: "Content and layout", ids: ["card", "accordion", "avatar", "kbd", "collapsible", "scroll-area", "separator", "avatar-group", "carousel", "resizable-panels"] },
-  { id: "ai", label: "AI chat and agents", ids: ["chat", "message", "prompt-input", "response", "tool-call", "agent-activity", "approval-box", "citation", "sources", "generated-table", "generated-chart"] },
+  { id: "display", label: "Content and layout", ids: ["card", "accordion", "avatar", "kbd", "collapsible", "scroll-area", "separator", "avatar-group", "carousel", "resizable-panels", "aspect-ratio", "direction", "item", "typography"] },
+  { id: "ai", label: "AI chat and agents", ids: ["chat", "message", "prompt-input", "response", "tool-call", "agent-activity", "approval-box", "citation", "sources", "generated-table", "generated-chart", "attachment", "bubble", "marker", "message-scroller", "questionnaire"] },
   { id: "motion", label: "Motion and effects", ids: ["text-shimmer", "gradient-text", "blur-fade", "shine-border", "shuttle-border", "ripple"] },
-  { id: "blocks", label: "Blocks", ids: ["dashboard-shell", "dashboard-page", "page-header", "section-header", "app-footer", "auth-card", "sidebar", "customer-table", "data-table", "invite-dialog", "user-form", "settings-section", "plan-card", "usage-meter", "payment-method-card", "api-key-list", "user-menu", "app-header", "top-nav"] },
+  { id: "blocks", label: "Blocks", ids: ["dashboard-shell", "dashboard-page", "page-header", "section-header", "app-footer", "auth-card", "sidebar", "customer-table", "data-table", "invite-dialog", "user-form", "settings-section", "plan-card", "usage-meter", "event-calendar", "time-slot-picker", "payment-method-card", "api-key-list", "user-menu", "app-header", "top-nav"] },
 ];
 
 export interface ComponentGroup {

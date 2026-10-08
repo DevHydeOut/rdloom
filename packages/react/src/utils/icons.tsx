@@ -518,3 +518,21 @@ export function CommentIcon({ className = "size-4 shrink-0", strokeWidth }: Icon
     </Icon>
   );
 }
+
+export function RetryIcon({ className = "size-4 shrink-0", strokeWidth }: IconProps) {
+  return (
+    <Icon className={className} strokeWidth={strokeWidth}>
+      <P d="M13 8a5 5 0 1 1-1.6-3.7" />
+      <P d="M12.5 2v3h-3" />
+    </Icon>
+  );
+}
+
+export function ArchiveIcon({ className = "size-5 shrink-0", strokeWidth }: IconProps) {
+  return (
+    <Icon className={className} strokeWidth={strokeWidth}>
+      <P d="M4.5 2h7a.75.75 0 0 1 .75.75v10.5a.75.75 0 0 1-.75.75h-7a.75.75 0 0 1-.75-.75V2.75A.75.75 0 0 1 4.5 2z" />
+      <P d="M8 2v2.5M8 6.5v1M8 9.5h.01" />
+    </Icon>
+  );
+}

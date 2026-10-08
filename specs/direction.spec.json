@@ -1,0 +1,35 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Direction",
+  "version": "0.1.0",
+  "category": "layout",
+  "status": "experimental",
+  "description": "Sets the reading direction for everything inside it. It writes the dir attribute and gives React Aria the matching locale, so arrow keys and logical CSS flip together.",
+  "props": {
+    "direction": { "type": "enum", "values": ["ltr", "rtl"], "default": "ltr", "description": "Reading direction of the subtree." },
+    "locale": { "type": "string", "description": "BCP 47 locale for the subtree, such as ar-EG. Defaults to en-US for ltr and ar for rtl. Pick one whose script matches the direction." },
+    "children": { "type": "node", "required": true, "description": "The content that takes the direction." }
+  },
+  "variants": ["direction"],
+  "states": ["default"],
+  "slots": ["root"],
+  "tokens": [],
+  "a11y": {
+    "role": "none",
+    "keyboard": ["In rtl, Left Arrow moves forward and Right Arrow moves back in tabs, radio groups and sliders"],
+    "requirements": [
+      "The dir attribute is set on the wrapper so the browser lays out text and logical CSS correctly",
+      "The locale is passed to React Aria so keyboard navigation matches the visual order",
+      "Set lang on content in another language so screen readers pick the right voice"
+    ],
+    "screenReader": ["Not announced itself; text in the subtree is read in its own order"],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["A page or section written in a right to left language such as Arabic or Hebrew", "A single block that differs from the page direction", "Previewing how a layout flips"],
+    "avoid_when": ["The whole app has one direction: set dir on the html element and the provider once"],
+    "anti_patterns": ["Using rtl only to mirror the layout while the text stays left to right", "Mixing physical CSS such as margin-left inside: use logical properties so it flips"]
+  },
+  "examples": ["rtl-form", "side-by-side", "nested"],
+  "figma": { "componentKey": null, "variantMap": { "direction": "Direction" } }
+}

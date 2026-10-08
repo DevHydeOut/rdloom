@@ -193,7 +193,11 @@
     "standalone",
     "in-a-sheet",
     "permissions",
-    "classNames"
+    "classNames",
+    "with-submenus",
+    "icon-rail",
+    "with-header-and-footer",
+    "grouped-sections"
   ],
   "figma": {
     "componentKey": null,

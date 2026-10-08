@@ -1,0 +1,47 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Questionnaire",
+  "version": "0.1.0",
+  "category": "input",
+  "status": "experimental",
+  "description": "A short flow of questions asked one at a time, for onboarding or for an assistant that needs a few details. It shows progress, keeps answers when going back, and ends with a review step where each answer can be edited.",
+  "props": {
+    "questions": { "type": "custom", "required": true, "tsType": "import(\"../questionnaire/questionnaire\").QuestionnaireQuestion[]", "description": "The questions, in order. Plain data: { id, type, title, description?, options?, required? }. Type is single, multiple, text or scale." },
+    "onSubmit": { "type": "callback", "required": true, "tsType": "(answers: import(\"../questionnaire/questionnaire\").QuestionnaireAnswers) => void", "description": "Called from the review step with the answers keyed by question id. Single choice and text give a string, multiple choice an array of values, scale a number." },
+    "onCancel": { "type": "callback", "tsType": "() => void", "description": "Shows a Cancel button and is called when it is pressed." },
+    "defaultAnswers": { "type": "custom", "tsType": "import(\"../questionnaire/questionnaire\").QuestionnaireAnswers", "description": "Answers to start with." },
+    "allowSkip": { "type": "boolean", "default": false, "description": "Shows a Skip button on questions that are not required." },
+    "label": { "type": "string", "default": "Questionnaire", "description": "Accessible name of the group." },
+    "submitLabel": { "type": "string", "default": "Submit", "description": "Text of the final button on the review step." },
+    "isSubmitting": { "type": "boolean", "default": false, "description": "The answers are being sent. Disables the buttons on the review step." }
+  },
+  "variants": ["allowSkip", "isSubmitting"],
+  "states": ["default", "focus", "selected", "invalid", "loading"],
+  "slots": ["progress", "heading", "description", "options", "error", "back", "next", "skip", "review"],
+  "tokens": ["color.surface.default", "color.surface.subtle", "color.surface.selected", "color.text.default", "color.text.muted", "color.border.default", "color.border.strong", "color.action.primary", "color.feedback.danger", "color.focus.ring", "radius.control", "radius.overlay"],
+  "a11y": {
+    "role": "group",
+    "keyboard": [
+      "Tab moves through the options and buttons; Arrow keys move between choices in a single choice or scale question",
+      "Space selects an option; Enter in a text answer moves to the next question",
+      "Back, Next, Skip, Cancel and Edit are buttons"
+    ],
+    "requirements": [
+      "Each question heading takes focus when the step changes",
+      "The step change is announced politely: Question 2 of 5",
+      "Progress is a progressbar with a value, plus the visible text Question 2 of 5",
+      "A required question that is empty shows an error, marks the field invalid and moves focus to the error",
+      "Answers are kept when going back",
+      "The review step lists every answer with an Edit button that names the question"
+    ],
+    "screenReader": ["The heading of each question is read when focus moves to it", "The progress is announced as Question n of total", "A missing answer is announced as an alert"],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["Onboarding with a few questions", "An assistant that needs clarifying answers before it goes on", "Any flow where one question at a time reduces effort"],
+    "avoid_when": ["Many unrelated fields: use Form", "Long surveys with branching logic: build a dedicated flow"],
+    "anti_patterns": ["More than about seven questions", "Marking every question required", "Clearing answers when the reader goes back"]
+  },
+  "examples": ["onboarding", "ai-clarifying", "with-skip"],
+  "figma": { "componentKey": null, "variantMap": { "allowSkip": "Skip", "isSubmitting": "Submitting" } }
+}

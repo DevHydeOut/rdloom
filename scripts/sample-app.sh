@@ -49,6 +49,11 @@ for part in message response tool-call approval-box agent-activity citation sour
 done
 test -e src/components/rdloom/utils/ai.ts || { echo "✗ the message types (utils/ai.ts) were not installed"; exit 1; }
 echo "✓ chat and its parts installed"
+npx rdloom add message-scroller questionnaire --install
+for part in message-scroller questionnaire; do
+  test -e "src/components/rdloom/$part/$part.tsx" || { echo "✗ rdloom add did not bring $part"; exit 1; }
+done
+echo "✓ message scroller and questionnaire installed"
 
 step "Blocks: the customer table and every part it is made of"
 npx rdloom add customer-table --install
@@ -84,6 +89,18 @@ npx rdloom add drawer scroll-area --install
 for part in drawer scroll-area; do
   test -e "src/components/rdloom/$part/$part.tsx" || { echo "✗ rdloom add did not bring $part"; exit 1; }
 done
+npx rdloom add native-select aspect-ratio direction --install
+for part in native-select aspect-ratio direction; do
+  test -e "src/components/rdloom/$part/$part.tsx" || { echo "✗ rdloom add did not bring $part"; exit 1; }
+done
+npx rdloom add attachment bubble marker --install
+for part in attachment bubble marker; do
+  test -e "src/components/rdloom/$part/$part.tsx" || { echo "✗ rdloom add did not bring $part"; exit 1; }
+done
+npx rdloom add item typography --install
+for part in item typography; do
+  test -e "src/components/rdloom/$part/$part.tsx" || { echo "✗ rdloom add did not bring $part"; exit 1; }
+done
 echo "✓ small components installed"
 
 step "Button group and input group"
@@ -111,8 +128,8 @@ test -e src/components/rdloom/data-table/query.ts || { echo "✗ the table logic
 echo "✓ users workflow installed"
 
 step "Navigation, settings and billing blocks, and the last core components"
-npx rdloom add user-menu app-header top-nav settings-section plan-card usage-meter payment-method-card api-key-list carousel resizable-panels hover-card context-menu color-picker rating --install
-for part in user-menu app-header top-nav settings-section plan-card usage-meter payment-method-card api-key-list carousel resizable-panels hover-card context-menu color-picker rating sidebar sheet alert-dialog; do
+npx rdloom add user-menu app-header top-nav settings-section plan-card usage-meter payment-method-card api-key-list carousel resizable-panels hover-card context-menu color-picker rating event-calendar time-slot-picker --install
+for part in user-menu app-header top-nav settings-section plan-card usage-meter payment-method-card api-key-list carousel resizable-panels hover-card context-menu color-picker rating event-calendar time-slot-picker calendar sidebar sheet alert-dialog; do
   test -e "src/components/rdloom/$part/$part.tsx" || { echo "✗ rdloom add did not bring $part"; exit 1; }
 done
 echo "✓ navigation, settings, billing and the last core components installed"

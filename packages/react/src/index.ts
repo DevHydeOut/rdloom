@@ -144,6 +144,15 @@ export { useReducedMotion } from "./utils/motion";
 export { AgentActivity, type AgentActivityProps } from "./agent-activity/agent-activity";
 export { ApprovalBox, type ApprovalBoxProps } from "./approval-box/approval-box";
 export { Chat, type ChatProps } from "./chat/chat";
+export { MessageScroller, isNearBottom, type MessageScrollerProps } from "./message-scroller/message-scroller";
+export {
+  Questionnaire,
+  type QuestionnaireAnswer,
+  type QuestionnaireAnswers,
+  type QuestionnaireOption,
+  type QuestionnaireProps,
+  type QuestionnaireQuestion,
+} from "./questionnaire/questionnaire";
 export { Citation, sourceElementId, type CitationProps } from "./citation/citation";
 export { GeneratedChart, niceScale, type GeneratedChartProps } from "./generated-chart/generated-chart";
 export { GeneratedTable, tableToCsv, type GeneratedTableProps } from "./generated-table/generated-table";
@@ -206,6 +215,12 @@ export {
   type CustomerStatInput,
   type CustomerSummary,
 } from "./customer-table/query";
+export {
+  customerQueryFromUrl,
+  customerQuerySchema,
+  customerQueryToUrl,
+  type CustomerUrlState,
+} from "./customer-table/url";
 export { DataTable, type DataTableClassNames, type DataTableProps, type DataTableSlot } from "./data-table/data-table";
 export {
   applyDataTableQuery,
@@ -241,6 +256,8 @@ export { SettingsSection, SettingsRow, useSettingsSection, type SettingsSectionP
 export { PlanCard, type PlanCardProps } from "./plan-card/plan-card";
 export { PlanPicker, type PlanPickerProps, type PlanOption, type PlanInterval } from "./plan-card/plan-picker";
 export { UsageMeter, UsageMeterList, type UsageMeterProps, type UsageMeterListProps } from "./usage-meter/usage-meter";
+export { EventCalendar, type EventCalendarEvent, type EventCalendarProps } from "./event-calendar/event-calendar";
+export { TimeSlotPicker, type TimeSlot, type TimeSlotPickerProps } from "./time-slot-picker/time-slot-picker";
 export { PaymentMethodCard, type PaymentMethodCardProps } from "./payment-method-card/payment-method-card";
 export { ApiKeyList, type ApiKeyListProps } from "./api-key-list/api-key-list";
 export { UserMenu, type UserMenuProps, type UserMenuItem, type UserMenuGroup } from "./user-menu/user-menu";
@@ -309,3 +326,11 @@ export { Drawer, type DrawerProps } from "./drawer/drawer";
 export { ScrollArea, type ScrollAreaProps } from "./scroll-area/scroll-area";
 export { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuTrigger, type NavigationMenuContentProps, type NavigationMenuItemProps, type NavigationMenuLinkProps, type NavigationMenuProps, type NavigationMenuTriggerProps } from "./navigation-menu/navigation-menu";
 export { Menubar, MenubarGroup, MenubarItem, MenubarMenu, MenubarSeparator, MenubarSubmenu, type MenubarGroupProps, type MenubarItemProps, type MenubarMenuProps, type MenubarProps, type MenubarSubmenuProps } from "./menubar/menubar";
+export { NativeSelect, type NativeSelectProps } from "./native-select/native-select";
+export { AspectRatio, type AspectRatioProps } from "./aspect-ratio/aspect-ratio";
+export { Direction, useDirection, type DirectionProps } from "./direction/direction";
+export { Item, ItemActions, ItemContent, ItemDescription, ItemGroup, ItemMedia, ItemSeparator, ItemTitle, type ItemGroupProps, type ItemMediaProps, type ItemProps } from "./item/item";
+export { Blockquote, H1, H2, H3, H4, Heading, InlineCode, Lead, List, ListItem, Prose, Text, Typography, type BlockquoteProps, type HeadingProps, type ListProps, type ProseProps, type TextProps } from "./typography/typography";
+export { Attachment, AttachmentList, type AttachmentListProps, type AttachmentProps } from "./attachment/attachment";
+export { Bubble, BubbleGroup, type BubbleGroupProps, type BubbleProps } from "./bubble/bubble";
+export { Marker, type MarkerProps } from "./marker/marker";

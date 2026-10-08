@@ -1,0 +1,165 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "TimeSlotPicker",
+  "version": "0.1.0",
+  "category": "block",
+  "status": "experimental",
+  "description": "Pick a day, then a time on that day. A calendar chooses the date; the times for it come from your getSlots function, sync or async, and show as a group of radio buttons. Times that are taken are disabled and say why. A Confirm button hands back the date and the slot. The app owns which times exist. UI permission is not security: the server must check again before it books anything.",
+  "props": {
+    "getSlots": {
+      "type": "callback",
+      "required": true,
+      "tsType": "(date: string) => Array<{ time: string; available: boolean; reason?: string }> | Promise<Array<{ time: string; available: boolean; reason?: string }>>",
+      "description": "Returns the slots for a day. date is YYYY-MM-DD; time is an ISO string such as 2026-10-12T09:30. It is called again when the date changes or after Try again."
+    },
+    "onSelect": {
+      "type": "callback",
+      "tsType": "(selection: { date: string; slot: { time: string; available: boolean; reason?: string } }) => void | Promise<unknown>",
+      "description": "Called when someone presses Confirm, with the date and the chosen slot. Yours, may be async."
+    },
+    "defaultDate": {
+      "type": "string",
+      "description": "The date chosen first, as YYYY-MM-DD. Default: today (or the minDate when later)."
+    },
+    "minDate": {
+      "type": "string",
+      "description": "The earliest date people can pick, as YYYY-MM-DD. Default: today."
+    },
+    "onDateChange": {
+      "type": "callback",
+      "tsType": "(date: string) => void",
+      "description": "Called with YYYY-MM-DD when the date changes."
+    },
+    "timeZone": {
+      "type": "string",
+      "description": "An IANA time zone such as \"Europe/Berlin\". Slot times with an offset are shown in it, and its name is shown under the times. Times without an offset are read as wall time in that zone."
+    },
+    "locale": {
+      "type": "string",
+      "description": "A BCP 47 locale for date and time names. Default: the browser's."
+    },
+    "today": {
+      "type": "string",
+      "description": "The date treated as today, as YYYY-MM-DD. Default: the device's date. Set it for stable screenshots and tests."
+    },
+    "label": {
+      "type": "string",
+      "default": "Available times",
+      "description": "Names the group of times."
+    },
+    "confirmLabel": {
+      "type": "string",
+      "default": "Confirm",
+      "description": "The text of the confirm button."
+    },
+    "permissions": {
+      "type": "custom",
+      "tsType": "import(\"../utils/permissions\").Permissions<\"confirm\">",
+      "description": "What the app allows: confirm. Hidden leaves the button out; disabled keeps it reachable (aria-disabled) with the reason read, and nothing runs. This only changes what people see: the server must check again."
+    },
+    "classNames": {
+      "type": "custom",
+      "description": "Extra class names for single parts, so you can restyle one part without editing the file. Keys: root, calendar, slots, heading, slotList, slot, timeZone, footer, confirmButton.",
+      "tsType": "Partial<Record<\"root\" | \"calendar\" | \"slots\" | \"heading\" | \"slotList\" | \"slot\" | \"timeZone\" | \"footer\" | \"confirmButton\", string>>"
+    }
+  },
+  "states": [
+    "default",
+    "hover",
+    "focus",
+    "selected",
+    "disabled",
+    "loading"
+  ],
+  "slots": [
+    "root",
+    "calendar",
+    "slots",
+    "heading",
+    "slotList",
+    "slot",
+    "timeZone",
+    "footer",
+    "confirmButton"
+  ],
+  "tokens": [
+    "color.surface.default",
+    "color.surface.subtle",
+    "color.border.default",
+    "color.border.strong",
+    "color.text.default",
+    "color.text.muted",
+    "color.action.primary",
+    "color.action.on-primary",
+    "color.focus.ring"
+  ],
+  "a11y": {
+    "role": "radiogroup",
+    "keyboard": [
+      "Tab: moves from the calendar to the times, then to Confirm",
+      "Arrow keys: move between times in the group and choose one",
+      "Enter: presses Confirm"
+    ],
+    "requirements": [
+      "The times are a radio group named by its label and the chosen date",
+      "A taken time is disabled and its reason is part of its name",
+      "A change of date announces how many times there are, or that there are none",
+      "Loading marks the times region busy",
+      "Confirm stays disabled until a time is chosen",
+      "A disabled Confirm because of permission stays reachable and its reason is read"
+    ],
+    "screenReader": [
+      "\"Available times for Monday 12 October 2026, radio group\"",
+      "\"9:00 AM, radio button, 1 of 6\"",
+      "\"10:30 AM, unavailable, Already booked, radio button, dimmed\""
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "Booking an appointment, a call or a delivery window",
+      "Choosing a start time from a list the app offers for a day"
+    ],
+    "avoid_when": [
+      "Typing any time of day: use TimeField",
+      "Seeing many events across a month: use EventCalendar",
+      "Picking only a date: use DatePicker"
+    ],
+    "anti_patterns": [
+      "Treating the permissions prop as protection: UI permission is not security, so the server must check again and refuse a taken time",
+      "Hiding taken times: show them disabled with a reason so people see why a time is missing",
+      "Generating slots in the component: the app owns which times exist"
+    ]
+  },
+  "contract": {
+    "data": "A date, and a function that returns the slots for it with an available flag and an optional reason.",
+    "dataStates": [
+      "loading",
+      "empty",
+      "error",
+      "ready"
+    ],
+    "permissions": [
+      "confirm"
+    ],
+    "events": [
+      "onSelect",
+      "onDateChange"
+    ],
+    "customization": [
+      "classNames for each part",
+      "getSlots, sync or async",
+      "timeZone and locale",
+      "confirmLabel"
+    ]
+  },
+  "examples": [
+    "appointment",
+    "async-slots",
+    "unavailable-times"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {}
+  }
+}

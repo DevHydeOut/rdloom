@@ -1,0 +1,34 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "AspectRatio",
+  "version": "0.1.0",
+  "category": "layout",
+  "status": "experimental",
+  "description": "A box that keeps a fixed width to height ratio for what it holds, such as an image, a video or a map. It reserves the space before the content loads, so the page does not jump.",
+  "props": {
+    "ratio": { "type": "custom", "tsType": "number | \"square\" | \"video\" | \"photo\" | \"wide\" | \"portrait\" | `${number}/${number}`", "default": "video", "description": "Width divided by height as a number (1.5), a \"16/9\" string, or a preset: square 1/1, video 16/9, photo 3/2, wide 21/9, portrait 3/4." },
+    "rounded": { "type": "boolean", "default": false, "description": "Rounds the corners with the control radius." },
+    "children": { "type": "node", "description": "The content. Images, video and iframes are stretched to fill the box and cropped to cover it." }
+  },
+  "variants": ["rounded"],
+  "states": ["default"],
+  "slots": ["root"],
+  "tokens": ["radius.control"],
+  "a11y": {
+    "role": "none",
+    "keyboard": ["Not interactive: it adds no tab stops"],
+    "requirements": [
+      "The box adds no role or name; the content inside carries its own, such as alt text on an image",
+      "Content that is cropped must not lose information that matters: pick a ratio that fits it"
+    ],
+    "screenReader": ["Transparent to screen readers; only the content inside is announced"],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["Media whose size is not known before it loads", "A grid of tiles that must line up", "A video or map embed that should scale with its container"],
+    "avoid_when": ["Text content: it can overflow the fixed box", "Content that must never be cropped, such as a chart with labels at the edges"],
+    "anti_patterns": ["Putting long text inside, which gets clipped", "Setting a height on the box, which fights the ratio"]
+  },
+  "examples": ["video", "square", "portrait"],
+  "figma": { "componentKey": null, "variantMap": { "rounded": "Rounded" } }
+}

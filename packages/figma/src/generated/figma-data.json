@@ -456,6 +456,50 @@
       ]
     },
     {
+      "name": "AspectRatio",
+      "id": "aspect-ratio",
+      "version": "0.1.0",
+      "description": "A box that keeps a fixed width to height ratio for what it holds, such as an image, a video or a map. It reserves the space before the content loads, so the page does not jump.",
+      "properties": [
+        {
+          "prop": "rounded",
+          "name": "Rounded",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
+      "name": "Attachment",
+      "id": "attachment",
+      "version": "0.1.0",
+      "description": "A chip or card for a file attached to a message or a prompt: its name, size, a type icon, an upload progress bar or error, and an optional remove button. A preview variant shows a thumbnail for pictures. AttachmentList groups several as a list.",
+      "properties": [
+        {
+          "prop": "variant",
+          "name": "Variant",
+          "values": [
+            "chip",
+            "preview"
+          ],
+          "default": "chip"
+        },
+        {
+          "prop": "status",
+          "name": "Status",
+          "values": [
+            "ready",
+            "uploading",
+            "error"
+          ],
+          "default": "ready"
+        }
+      ]
+    },
+    {
       "name": "AuthCard",
       "id": "auth-card",
       "version": "0.1.0",
@@ -562,6 +606,44 @@
       "version": "0.1.0",
       "description": "The path from the top of the site to the current page, as links. Use BreadcrumbItem for each step; the last one is the current page.",
       "properties": []
+    },
+    {
+      "name": "Bubble",
+      "id": "bubble",
+      "version": "0.1.0",
+      "description": "A chat bubble for plain, short messages. Bubble is the chrome around one message: alignment and colour for who sent it, an avatar, a name and a time, a delivery status with Retry, grouped bubbles that merge their corners, and a footer for actions. It does not render structured replies. Message renders an AI turn from typed parts (markdown, tools, charts, sources) and Chat holds the whole conversation; use Bubble for person-to-person or simple text chats, or put a Response inside a Bubble when you want the bubble look around formatted text.",
+      "properties": [
+        {
+          "prop": "from",
+          "name": "From",
+          "values": [
+            "user",
+            "assistant"
+          ],
+          "default": "assistant"
+        },
+        {
+          "prop": "position",
+          "name": "position",
+          "values": [
+            "single",
+            "first",
+            "middle",
+            "last"
+          ],
+          "default": "single"
+        },
+        {
+          "prop": "status",
+          "name": "Status",
+          "values": [
+            "sending",
+            "sent",
+            "failed"
+          ],
+          "default": "sent"
+        }
+      ]
     },
     {
       "name": "ButtonGroup",
@@ -1056,6 +1138,23 @@
       ]
     },
     {
+      "name": "Direction",
+      "id": "direction",
+      "version": "0.1.0",
+      "description": "Sets the reading direction for everything inside it. It writes the dir attribute and gives React Aria the matching locale, so arrow keys and logical CSS flip together.",
+      "properties": [
+        {
+          "prop": "direction",
+          "name": "Direction",
+          "values": [
+            "ltr",
+            "rtl"
+          ],
+          "default": "ltr"
+        }
+      ]
+    },
+    {
       "name": "Drawer",
       "id": "drawer",
       "version": "0.1.0",
@@ -1111,6 +1210,13 @@
       "id": "error-summary",
       "version": "0.1.0",
       "description": "The list of problems at the top of a Form after a failed submit. Focus moves to it and each item takes the person to its field. It shows nothing until a submit has failed and goes away when everything is fixed.",
+      "properties": []
+    },
+    {
+      "name": "EventCalendar",
+      "id": "event-calendar",
+      "version": "0.1.0",
+      "description": "A month grid that shows events on the days they happen. People move between months, step through days with the arrow keys, pick an event, and add one from a day when the app allows it. The app owns the events and the month. Days with more events than fit show a +N more button that opens the full list for that day. UI permission is not security: the server must check again.",
       "properties": []
     },
     {
@@ -1349,6 +1455,33 @@
       "properties": []
     },
     {
+      "name": "Item",
+      "id": "item",
+      "version": "0.1.0",
+      "description": "A flexible list row with a leading media slot (icon box, avatar or picture), a title, a description and trailing actions. The whole row can be a link or a button while its actions stay separately clickable.",
+      "properties": [
+        {
+          "prop": "variant",
+          "name": "Variant",
+          "values": [
+            "default",
+            "outline",
+            "muted"
+          ],
+          "default": "default"
+        },
+        {
+          "prop": "size",
+          "name": "Size",
+          "values": [
+            "sm",
+            "md"
+          ],
+          "default": "md"
+        }
+      ]
+    },
+    {
       "name": "Kbd",
       "id": "kbd",
       "version": "0.1.0",
@@ -1362,6 +1495,24 @@
             "md"
           ],
           "default": "md"
+        }
+      ]
+    },
+    {
+      "name": "Marker",
+      "id": "marker",
+      "version": "0.1.0",
+      "description": "A divider that labels a moment inside a conversation or feed: a centered label between two lines. Use date for a new day, unread for where new messages start, and event for something that happened, like someone joining.",
+      "properties": [
+        {
+          "prop": "variant",
+          "name": "Variant",
+          "values": [
+            "date",
+            "unread",
+            "event"
+          ],
+          "default": "date"
         }
       ]
     },
@@ -1391,11 +1542,64 @@
       "properties": []
     },
     {
+      "name": "MessageScroller",
+      "id": "message-scroller",
+      "version": "0.1.0",
+      "description": "The scrolling region of a conversation. It follows new messages while the reader is at the bottom, stays put when the reader has scrolled up (with a Jump to latest button), and keeps the place when older messages are added at the top.",
+      "properties": [
+        {
+          "prop": "isLoadingOlder",
+          "name": "Loading",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
       "name": "Message",
       "id": "message",
       "version": "0.1.0",
       "description": "One message in a conversation, from you or the assistant. It renders each part in order with the right component: text as formatted markdown, tool calls as activity, tables and charts as real components, sources at the end.",
       "properties": []
+    },
+    {
+      "name": "NativeSelect",
+      "id": "native-select",
+      "version": "0.1.0",
+      "description": "The browser's own select menu, dressed like the other fields. It gives the native picker on phones and works with plain form posts. For custom option rows or search, use Select or Combobox.",
+      "properties": [
+        {
+          "prop": "size",
+          "name": "Size",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "default": "md"
+        },
+        {
+          "prop": "isDisabled",
+          "name": "Disabled",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        },
+        {
+          "prop": "isInvalid",
+          "name": "Invalid",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
     },
     {
       "name": "NavigationMenu",
@@ -1604,6 +1808,32 @@
             "lg"
           ],
           "default": "md"
+        }
+      ]
+    },
+    {
+      "name": "Questionnaire",
+      "id": "questionnaire",
+      "version": "0.1.0",
+      "description": "A short flow of questions asked one at a time, for onboarding or for an assistant that needs a few details. It shows progress, keeps answers when going back, and ends with a review step where each answer can be edited.",
+      "properties": [
+        {
+          "prop": "allowSkip",
+          "name": "Skip",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        },
+        {
+          "prop": "isSubmitting",
+          "name": "Submitting",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
         }
       ]
     },
@@ -2382,6 +2612,13 @@
       ]
     },
     {
+      "name": "TimeSlotPicker",
+      "id": "time-slot-picker",
+      "version": "0.1.0",
+      "description": "Pick a day, then a time on that day. A calendar chooses the date; the times for it come from your getSlots function, sync or async, and show as a group of radio buttons. Times that are taken are disabled and say why. A Confirm button hands back the date and the slot. The app owns which times exist. UI permission is not security: the server must check again before it books anything.",
+      "properties": []
+    },
+    {
       "name": "Toast",
       "id": "toast",
       "version": "0.1.0",
@@ -2539,6 +2776,36 @@
             "multiple"
           ],
           "default": "none"
+        }
+      ]
+    },
+    {
+      "name": "Typography",
+      "id": "typography",
+      "version": "0.1.0",
+      "description": "Text components that use the font of the host app: Heading (H1 to H4) with the visual size separate from the semantic level, Text, Lead, Prose for raw HTML, InlineCode, Blockquote and List.",
+      "properties": [
+        {
+          "prop": "size",
+          "name": "Size",
+          "values": [
+            "sm",
+            "md",
+            "lg",
+            "xl",
+            "2xl"
+          ],
+          "default": "xl"
+        },
+        {
+          "prop": "tone",
+          "name": "Tone",
+          "values": [
+            "default",
+            "muted",
+            "danger"
+          ],
+          "default": "default"
         }
       ]
     },

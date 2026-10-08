@@ -1,0 +1,56 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Marker",
+  "version": "0.1.0",
+  "category": "ai",
+  "status": "experimental",
+  "description": "A divider that labels a moment inside a conversation or feed: a centered label between two lines. Use date for a new day, unread for where new messages start, and event for something that happened, like someone joining.",
+  "props": {
+    "label": { "type": "string", "required": true, "description": "The text, e.g. \"Today\", \"New messages\" or \"Alex joined\"." },
+    "variant": { "type": "enum", "values": ["date", "unread", "event"], "default": "date", "description": "date is neutral. unread uses the action colour for the label and lines. event is a smaller, muted note." },
+    "dateTime": { "type": "string", "description": "A machine readable date for a date marker, e.g. \"2026-10-08\". The label becomes a time element." },
+    "onJump": { "type": "callback", "description": "Turns the label of an unread marker into a button, e.g. to scroll to the first new message.", "tsType": "() => void" },
+    "jumpLabel": { "type": "string", "description": "Accessible name of the jump button when it needs more than the label, e.g. \"Jump to first new message\"." }
+  },
+  "variants": ["variant"],
+  "states": ["default", "hover", "focus", "pressed"],
+  "slots": ["root", "line", "label", "jump"],
+  "tokens": ["color.border.default", "color.text.muted", "color.action.primary", "color.focus.ring", "radius.control"],
+  "a11y": {
+    "role": "separator",
+    "keyboard": [
+      "Tab: moves to the jump button when onJump is given",
+      "Enter or Space: runs onJump"
+    ],
+    "requirements": [
+      "Without onJump the marker is a separator named by its label, so the change of moment is announced once",
+      "With onJump the marker is a labelled group holding a real button, because a separator cannot contain controls",
+      "The lines are decorative and hidden from assistive technology",
+      "The unread variant also says its meaning in words (\"New messages\"), not only in colour",
+      "The label meets 4.5:1 on the background"
+    ],
+    "screenReader": [
+      "\"Today, separator\"",
+      "\"New messages, button\" when it can be jumped to"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "Starting a new day in a long conversation",
+      "Showing where unread messages begin",
+      "Noting an event such as a person joining or a topic change"
+    ],
+    "avoid_when": [
+      "A plain line between unrelated content: use Separator",
+      "A section title that structures a page: use a heading"
+    ],
+    "anti_patterns": [
+      "A marker for every message",
+      "A long sentence as the label: keep it to a few words",
+      "Using colour alone to mean unread"
+    ]
+  },
+  "examples": ["dates", "unread", "events"],
+  "figma": { "componentKey": null, "variantMap": { "variant": "Variant" } }
+}
