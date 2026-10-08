@@ -11,7 +11,7 @@ const customers: Customer[] = [
 // Just the list: no totals or chart, euros, a British date format, and a custom color for one status.
 export default function CustomerTableWithoutInsightsExample() {
   return (
-    <div className="w-[56rem] max-w-full">
+    <div className="mx-auto w-[56rem] max-w-full">
       <CustomerTable customers={customers} insights="none" currency="EUR" locale="en-GB" density="compact" statusTones={{ trial: "warning", overdue: "danger" }} />
     </div>
   );

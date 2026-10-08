@@ -9,7 +9,7 @@ const customers: Customer[] = [
 // classNames restyles one part without editing the file: a tinted table header and a different row hover.
 export default function CustomerTableClassNamesExample() {
   return (
-    <div className="w-[56rem] max-w-full">
+    <div className="mx-auto w-[56rem] max-w-full">
       <CustomerTable
         customers={customers}
         insights="none"

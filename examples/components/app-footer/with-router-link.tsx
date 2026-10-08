@@ -4,19 +4,21 @@ import { AppFooter } from "@rdloom/react";
 // and give it the className and children you are handed.
 export default function AppFooterWithRouterLinkExample() {
   return (
-    <div className="w-[64rem] max-w-full">
-      <AppFooter
-        text="© 2026 rdloom"
-        links={[
-          { label: "Help", href: "/help" },
-          { label: "Privacy", href: "/privacy" },
-        ]}
-        renderLink={({ link, className, children }) => (
-          <a href={link.href} className={className}>
-            {children}
-          </a>
-        )}
-      />
+    <div className="flex min-h-[14rem] w-full items-center justify-center">
+      <div className="w-full max-w-5xl">
+        <AppFooter
+          text="© 2026 rdloom"
+          links={[
+            { label: "Help", href: "/help" },
+            { label: "Privacy", href: "/privacy" },
+          ]}
+          renderLink={({ link, className, children }) => (
+            <a href={link.href} className={className}>
+              {children}
+            </a>
+          )}
+        />
+      </div>
     </div>
   );
 }

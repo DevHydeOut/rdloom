@@ -1,9 +1,9 @@
-import { Avatar, Bubble, BubbleGroup, Button } from "@rdloom/react";
+import { Avatar, Bubble, BubbleGroup, BubbleList, Button } from "@rdloom/react";
 
 export default function BubbleGroupedExample() {
   return (
     <div className="flex w-full justify-center">
-      <div className="flex w-[28rem] max-w-full flex-col gap-4">
+      <BubbleList className="w-[28rem] max-w-full">
         <BubbleGroup aria-label="Messages from Alex">
           <Bubble name="Alex" avatar={<Avatar name="Alex Rivera" size="sm" decorative />}>
             Did you see the new design?
@@ -31,7 +31,7 @@ export default function BubbleGroupedExample() {
             Can we ship it today?
           </Bubble>
         </BubbleGroup>
-      </div>
+      </BubbleList>
     </div>
   );
 }

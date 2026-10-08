@@ -112,11 +112,11 @@ describe("SettingsSection", () => {
     expect(screen.queryByRole("button")).toBeNull();
   });
 
-  it("lays out in columns by default and stacked on request, and marks a danger tone", () => {
+  it("lays out stacked by default and split on request, and marks a danger tone", () => {
     const { container, rerender } = render(<Section />);
-    expect(container.querySelector("section")!.className).toContain("md:grid-cols");
-    rerender(<Section layout="stacked" tone="danger" />);
     expect(container.querySelector("section")!.className).not.toContain("md:grid-cols");
+    rerender(<Section orientation="split" tone="danger" />);
+    expect(container.querySelector("section")!.className).toContain("md:grid-cols");
     expect(screen.getByRole("heading", { name: "Profile" }).className).toContain("feedback-danger");
   });
 

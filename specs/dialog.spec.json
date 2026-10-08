@@ -10,6 +10,8 @@
     "description": { "type": "string", "description": "Short supporting text under the title." },
     "size": { "type": "enum", "values": ["sm", "md", "lg"], "default": "md", "description": "Maximum width." },
     "role": { "type": "enum", "values": ["dialog", "alertdialog"], "default": "dialog", "description": "Use alertdialog for destructive or urgent confirmations." },
+    "portalContainer": { "type": "custom", "description": "Draw the panel and its backdrop inside this element instead of over the whole page. Use it to show a sheet inside a preview, a framed app or a phone mock. The element must be positioned (relative) and clip its overflow.", "tsType": "Element | null" },
+    "headerEnd": { "type": "custom", "description": "Small content at the end of the header line, next to the title, such as a count.", "tsType": "import(\"react\").ReactNode" },
     "isDismissable": { "type": "boolean", "default": true, "description": "Closes on backdrop click. Esc always closes." },
     "children": {
       "type": "custom",

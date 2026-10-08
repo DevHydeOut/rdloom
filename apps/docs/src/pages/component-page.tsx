@@ -1,4 +1,4 @@
-import { Suspense, useContext, useEffect, useId, useState, type ReactNode } from "react";
+import { Suspense, useContext, useEffect, useState, type ReactNode } from "react";
 import {
   blockNeighbours,
   blocks,
@@ -18,6 +18,7 @@ import {
   type PropSpec,
   type RegistryFile,
 } from "../data";
+import { Select, SelectItem } from "@rdloom/react";
 import { ArrowLeftIcon, ArrowRightIcon } from "../icons";
 import { Link, navigate } from "../router";
 import { registryBase } from "../routes";
@@ -482,7 +483,6 @@ function BlockExample({ component, example }: { component: DocComponent; example
 function BlockNav({ id }: { id: string }) {
   const { previous, next } = blockNeighbours(id);
   const arrow = "flex size-8 items-center justify-center rounded-lg border border-[var(--site-border)] bg-[var(--site-subtle)] text-[var(--site-muted)] outline-none hover:text-[var(--site-fg)] focus-visible:ring-2 focus-visible:ring-[var(--rd-color-focus-ring)]";
-  const selectId = useId();
   return (
     <nav aria-label="Blocks" className="relative z-10 mb-10 flex flex-wrap items-center gap-3 bg-[var(--site-bg)] py-1">
       <Link href="/blocks" className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-[var(--site-border)] bg-[var(--site-subtle)] px-3 text-sm outline-none hover:text-[var(--site-fg)] focus-visible:ring-2 focus-visible:ring-[var(--rd-color-focus-ring)]">
@@ -490,21 +490,22 @@ function BlockNav({ id }: { id: string }) {
         All blocks
       </Link>
       <div className="flex items-center gap-2">
-        <label htmlFor={selectId} className="text-sm text-[var(--site-muted)]">
+        <span aria-hidden="true" className="text-sm text-[var(--site-muted)]">
           Go to
-        </label>
-        <select
-          id={selectId}
-          value={id}
-          onChange={(e) => navigate(`/blocks/${e.target.value}`)}
-          className="h-8 rounded-lg border border-[var(--site-border)] bg-[var(--site-bg)] px-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-[var(--rd-color-focus-ring)]"
+        </span>
+        <Select
+          label="Go to block"
+          size="sm"
+          className="w-52 [&>span:first-child]:sr-only"
+          selectedKey={id}
+          onSelectionChange={(key) => key && String(key) !== id && navigate(`/blocks/${String(key)}`)}
         >
           {blocks.map((b) => (
-            <option key={b.id} value={b.id}>
+            <SelectItem key={b.id} id={b.id} textValue={displayName(b.spec.name)}>
               {displayName(b.spec.name)}
-            </option>
+            </SelectItem>
           ))}
-        </select>
+        </Select>
       </div>
       <div className="ms-auto flex items-center gap-2">
         {previous ? (

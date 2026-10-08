@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useId, useState, type ReactNode } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "@rdloom/react";
 import { highlight } from "sugar-high";
-import { CheckIcon, CopyIcon, DoIcon, DontIcon, FileIcon, LinkIcon } from "./icons";
+import { ArrowUpIcon, CheckIcon, CopyIcon, DoIcon, DontIcon, FileIcon, LinkIcon } from "./icons";
 import { repoUrl } from "./data";
 
 // The docs' own building blocks: calm, neutral, and the same on every page.
@@ -253,6 +253,33 @@ export function DocTabs({ label, tabs }: { label: string; tabs: Array<{ id: stri
 }
 
 // --- Page furniture ------------------------------------------------------------
+
+/** Appears once the page is scrolled a long way; takes the reader back to the top. */
+export function BackToTop() {
+  const [shown, setShown] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setShown(window.scrollY > 600);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+  if (!shown) return null;
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        window.scrollTo({ top: 0, behavior: calm ? "auto" : "smooth" });
+        // Back at the top, keyboard focus goes to the page title too.
+        document.getElementById("page-title")?.focus({ preventScroll: true });
+      }}
+      className="fixed end-5 bottom-5 z-40 inline-flex h-10 items-center gap-1.5 rounded-full border border-[var(--site-border)] bg-[var(--site-bg)] px-4 text-sm font-medium shadow-lg outline-none transition-colors hover:bg-[var(--site-subtle)] focus-visible:ring-2 focus-visible:ring-[var(--rd-color-focus-ring)]"
+    >
+      <ArrowUpIcon size={15} />
+      Back to top
+    </button>
+  );
+}
 
 export function PageHeader({ title, lead, actions, meta }: { title: ReactNode; lead?: ReactNode; actions?: ReactNode; meta?: ReactNode }) {
   return (

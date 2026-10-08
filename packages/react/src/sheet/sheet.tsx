@@ -58,6 +58,7 @@ export const Sheet = forwardRef<HTMLElement, SheetProps>(function Sheet(
     side = sheetDefaults.side,
     size = sheetDefaults.size,
     isDismissable = sheetDefaults.isDismissable,
+    portalContainer,
     isOpen,
     onOpenChange,
     children,
@@ -71,12 +72,14 @@ export const Sheet = forwardRef<HTMLElement, SheetProps>(function Sheet(
       isDismissable={isDismissable}
       isOpen={isOpen}
       onOpenChange={onOpenChange}
-      className="fixed inset-0 z-50 bg-[var(--rd-color-overlay-backdrop)] backdrop-blur-[2px] data-[entering]:animate-[rd-sheet-fade_200ms] motion-reduce:animate-none"
+      UNSTABLE_portalContainer={portalContainer ?? undefined}
+      className={cx(portalContainer ? "absolute" : "fixed", "inset-0 z-50 bg-[var(--rd-color-overlay-backdrop)] backdrop-blur-[2px] data-[entering]:animate-[rd-sheet-fade_200ms] motion-reduce:animate-none")}
     >
       <style>{keyframes}</style>
       <Modal
         className={cx(
-          "fixed flex flex-col overflow-hidden [box-shadow:var(--rd-elevation-overlay)] bg-[var(--rd-color-surface-raised)] text-[var(--rd-color-text-default)] border-[var(--rd-color-border-default)]",
+          portalContainer ? "absolute" : "fixed",
+          "flex flex-col overflow-hidden [box-shadow:var(--rd-elevation-overlay)] bg-[var(--rd-color-surface-raised)] text-[var(--rd-color-text-default)] border-[var(--rd-color-border-default)]",
           "motion-reduce:!animate-none",
           placement[side],
           sizes[side][size],

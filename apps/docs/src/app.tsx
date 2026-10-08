@@ -6,7 +6,7 @@ import { VisualPage } from "./pages/visual";
 import { guides, routeFor, searchEntries } from "./routes";
 import { Link, navigate, RouterProvider, usePath } from "./router";
 import { ArrowRightIcon, ChevronRightIcon, MenuIcon, MoonIcon, SearchIcon, SunIcon } from "./icons";
-import { ManagerProvider, SiteFooter } from "./ui";
+import { BackToTop, ManagerProvider, SiteFooter } from "./ui";
 
 const sideLink =
   "-ms-px block border-s border-transparent py-1.5 ps-3.5 pe-2 text-[13.5px] leading-5 text-[var(--site-muted)] outline-none transition-colors " +
@@ -341,7 +341,7 @@ function Shell() {
       </header>
 
       {route.wide ? (
-        <main id="main" className={`mx-auto w-full flex-1 px-4 pt-12 pb-24 sm:px-6 ${route.full ? "max-w-[88rem]" : "max-w-screen-xl"}`}>
+        <main id="main" className={`mx-auto w-full flex-1 px-4 pt-8 pb-24 sm:px-6 ${route.full ? "max-w-[88rem]" : "max-w-screen-xl"}`}>
           {route.page}
         </main>
       ) : (
@@ -358,6 +358,7 @@ function Shell() {
         </div>
       )}
       <SiteFooter />
+      <BackToTop />
       <Search open={searchOpen} onOpenChange={setSearchOpen} />
       <ToastRegion />
     </div>

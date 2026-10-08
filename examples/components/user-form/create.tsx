@@ -10,10 +10,11 @@ const teams = [
   { id: "finance", label: "Finance" },
   { id: "operations", label: "Operations" },
 ];
+const wait = () => new Promise<void>((resolve) => setTimeout(resolve, 700));
 
 // Stands in for your own request; it refuses one address so the server error shows.
 async function createUser(values: { email: string }) {
-  await new Promise((resolve) => setTimeout(resolve, 700));
+  await wait();
   if (values.email === "amara.okafor@example.com") {
     return { fieldErrors: { email: "A user with this email already exists." } };
   }
@@ -22,10 +23,13 @@ async function createUser(values: { email: string }) {
 export default function UserFormCreateExample() {
   return (
     <div className="flex w-full justify-center">
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-2xl">
         <UserForm
           mode="create"
+          variant="page"
+          layout="card"
           title="New user"
+          fields={{ address: false, preferences: false, bio: false }}
           roles={roles}
           teams={teams}
           defaultValues={{ role: "viewer" }}

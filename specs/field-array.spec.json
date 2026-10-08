@@ -16,12 +16,14 @@
     "addLabel": { "type": "string", "default": "Add row", "description": "Text of the Add button." },
     "emptyText": { "type": "string", "default": "No rows yet.", "description": "Shown when there are no rows." },
     "allowReorder": { "type": "boolean", "default": true, "description": "Shows Move up and Move down on each row." },
+    "density": { "type": "enum", "values": ["comfortable", "compact"], "default": "comfortable", "description": "Comfortable draws each row as a card. Compact draws one tight line per row, for short rows such as an email and a role." },
+    "maxVisibleRows": { "type": "number", "description": "In compact density, the number of rows shown before the list scrolls inside itself, with a fade at the edge that has more." },
     "allowInsert": { "type": "boolean", "default": false, "description": "Shows Insert below on each row." },
     "validate": { "type": "callback", "tsType": "(rows: any[]) => string | null | undefined | void", "description": "Checks the rows as a whole, for example at least one with a quantity. The message shows under the group." },
     "messages": { "type": "custom", "tsType": "Partial<import(\"../field-array/field-array\").FieldArrayMessages>", "description": "Replaces any sentence the component says (button names, announcements). Use it to translate." },
     "children": { "type": "custom", "required": true, "tsType": "(row: import(\"../field-array/field-array\").FieldArrayRow) => import(\"react\").ReactNode", "description": "Renders the fields of one row. Name them with row.name(\"field\")." }
   },
-  "variants": ["allowReorder", "allowInsert"],
+  "variants": ["density", "allowReorder", "allowInsert"],
   "states": ["default", "disabled", "invalid"],
   "slots": ["legend", "description", "empty", "row", "actions", "add", "status"],
   "tokens": [
@@ -71,6 +73,6 @@
   "examples": ["invoice-lines"],
   "figma": {
     "componentKey": null,
-    "variantMap": { "allowReorder": "Reorder", "allowInsert": "Insert" }
+    "variantMap": { "density": "Density", "allowReorder": "Reorder", "allowInsert": "Insert" }
   }
 }

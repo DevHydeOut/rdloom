@@ -20,7 +20,7 @@ import {
 } from "react-aria-components";
 import { calendarDefaults, type CalendarSpecProps } from "../generated/calendar.types";
 import { cx } from "../utils/cx";
-import { NativeSelect } from "../native-select/native-select";
+import { Select, SelectItem } from "../select/select";
 import { ChevronLeftIcon, ChevronRightIcon } from "../utils/icons";
 
 type Omitted = keyof CalendarSpecProps | "className" | "children" | "visibleDuration";
@@ -87,9 +87,9 @@ function Grids({ visibleMonths, range }: { visibleMonths: number; range: boolean
   );
 }
 
-const selectClass = "w-auto min-w-0 [&>label]:sr-only [&_select]:ps-2 [&_select]:pe-7 [&_svg]:size-3.5";
+const selectClass = "w-auto min-w-0 gap-0 [&>span:first-child]:sr-only [&_button]:gap-1 [&_button]:ps-2 [&_button]:pe-1.5 [&_svg]:size-3.5";
 
-// Month and year as two native selects. They read and move the focused date of the surrounding calendar.
+// Month and year as two of the library's own Select components. They read and move the focused date of the surrounding calendar.
 function CaptionSelects() {
   const single = useContext(CalendarStateContext);
   const range = useContext(RangeCalendarStateContext);
@@ -114,24 +114,34 @@ function CaptionSelects() {
   };
   return (
     <div className="flex items-center gap-1">
-      <NativeSelect
+      <Select
         label="Month"
         size="sm"
         className={selectClass}
         isDisabled={state.isDisabled}
-        value={String(focused.month)}
-        onChange={(e) => state.setFocusedDate(focused.set({ month: Number(e.target.value) }))}
-        options={Array.from({ length: months }, (_, i) => ({ value: String(i + 1), label: monthName(i + 1), disabled: monthDisabled(i + 1) }))}
-      />
-      <NativeSelect
+        selectedKey={String(focused.month)}
+        onSelectionChange={(k) => k != null && state.setFocusedDate(focused.set({ month: Number(k) }))}
+      >
+        {Array.from({ length: months }, (_, i) => (
+          <SelectItem key={i + 1} id={String(i + 1)} isDisabled={monthDisabled(i + 1)}>
+            {monthName(i + 1)}
+          </SelectItem>
+        ))}
+      </Select>
+      <Select
         label="Year"
         size="sm"
         className={selectClass}
         isDisabled={state.isDisabled}
-        value={String(focused.year)}
-        onChange={(e) => state.setFocusedDate(focused.set({ year: Number(e.target.value) }))}
-        options={years.map((y) => ({ value: String(y), label: yearName(y) }))}
-      />
+        selectedKey={String(focused.year)}
+        onSelectionChange={(k) => k != null && state.setFocusedDate(focused.set({ year: Number(k) }))}
+      >
+        {years.map((y) => (
+          <SelectItem key={y} id={String(y)}>
+            {yearName(y)}
+          </SelectItem>
+        ))}
+      </Select>
     </div>
   );
 }

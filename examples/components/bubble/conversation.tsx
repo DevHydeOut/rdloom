@@ -1,9 +1,9 @@
-import { Avatar, Bubble } from "@rdloom/react";
+import { Avatar, Bubble, BubbleList } from "@rdloom/react";
 
 export default function BubbleConversationExample() {
   return (
     <div className="flex w-full justify-center">
-      <div className="flex w-[28rem] max-w-full flex-col gap-4">
+      <BubbleList className="w-[28rem] max-w-full">
         <Bubble from="assistant" name="Support" avatar={<Avatar name="Support" size="sm" decorative />} timestamp="2026-10-08T10:41:00" timestampText="10:41">
           Hi, how can I help today?
         </Bubble>
@@ -13,7 +13,7 @@ export default function BubbleConversationExample() {
         <Bubble from="assistant" name="Support" avatar={<Avatar name="Support" size="sm" decorative />} timestamp="2026-10-08T10:43:00" timestampText="10:43">
           I can fix that. Which address should it show?
         </Bubble>
-      </div>
+      </BubbleList>
     </div>
   );
 }

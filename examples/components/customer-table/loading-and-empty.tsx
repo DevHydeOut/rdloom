@@ -6,7 +6,7 @@ import { Button, CustomerTable } from "@rdloom/react";
 export default function CustomerTableLoadingAndEmptyExample() {
   const [state, setState] = useState<"loading" | "empty" | "error">("loading");
   return (
-    <div className="flex w-[60rem] max-w-full flex-col gap-4">
+    <div className="mx-auto flex w-[60rem] max-w-full flex-col gap-4">
       <div role="group" aria-label="State to show" className="flex gap-2">
         {(["loading", "empty", "error"] as const).map((s) => (
           <Button key={s} size="sm" variant={state === s ? "primary" : "secondary"} onPress={() => setState(s)}>

@@ -6,7 +6,7 @@ const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, 
 export default function SettingsPageExample() {
   return (
     <div className="flex w-full justify-center p-4">
-      <div className="flex w-full max-w-4xl flex-col gap-8">
+      <div className="flex w-full max-w-2xl flex-col gap-8">
         <PageHeader title="Settings" description="Manage your profile and how we contact you." border />
         <SettingsSection
           title="Profile"

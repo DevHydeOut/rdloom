@@ -1244,6 +1244,15 @@
       "description": "Repeating rows of fields inside a Form, such as invoice lines or team members. Add, remove, move up or down and insert are all buttons, so the keyboard does everything; focus lands somewhere sensible and a polite message says what changed. The rows contents and any totals are yours.",
       "properties": [
         {
+          "prop": "density",
+          "name": "Density",
+          "values": [
+            "comfortable",
+            "compact"
+          ],
+          "default": "comfortable"
+        },
+        {
           "prop": "allowReorder",
           "name": "Reorder",
           "values": [
@@ -1469,8 +1478,28 @@
       "name": "InviteDialog",
       "id": "invite-dialog",
       "version": "0.1.0",
-      "description": "A dialog for inviting one or many people: rows of email and role, Add another, checks for format, duplicates and people who are already members, an error summary, and a submit button that says how many invitations it sends. Your onInvite does the work. UI permission is not security: the server must check again.",
-      "properties": []
+      "description": "A dialog for inviting people, in three shapes: typed emails with a role on one compact line each, a search of a directory you pass, or a two-step pick-from-a-list with a role per person. Checks for format, duplicates and people who are already members, an error summary, an optional message and a submit button that says how many invitations it sends. Your onInvite does the work. UI permission is not security: the server must check again.",
+      "properties": [
+        {
+          "prop": "variant",
+          "name": "Variant",
+          "values": [
+            "emails",
+            "search",
+            "list"
+          ],
+          "default": "emails"
+        },
+        {
+          "prop": "allowMessage",
+          "name": "Message",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "true"
+        }
+      ]
     },
     {
       "name": "Item",
@@ -2838,7 +2867,7 @@
       "name": "UserForm",
       "id": "user-form",
       "version": "0.1.0",
-      "description": "A form to create or edit a user: name, email, role, status and team, with a danger zone for suspending and deleting. Save stays disabled until something changes, and Cancel asks before throwing changes away. Your onSubmit does the work. UI permission is not security: the server must check again.",
+      "description": "A form to create or edit a user, in three presentations: a whole page (variant page), a compact form for a Dialog (modal) and a single-column form for a Sheet (sheet). Fields: profile picture, name, job title, email, phone with a calling-code select, address, time zone, language, bio, role, active switch and team, chosen with a plain fields object. Edit mode adds a danger zone to suspend or reinstate and delete, each behind a confirmation. Save stays disabled until something changes, and Cancel asks before throwing changes away. Your onSubmit does the work. UI permission is not security: the server must check again.",
       "properties": []
     },
     {

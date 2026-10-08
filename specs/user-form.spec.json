@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "category": "block",
   "status": "experimental",
-  "description": "A form to create or edit a user: name, email, role, status and team, with a danger zone for suspending and deleting. Save stays disabled until something changes, and Cancel asks before throwing changes away. Your onSubmit does the work. UI permission is not security: the server must check again.",
+  "description": "A form to create or edit a user, in three presentations: a whole page (variant page), a compact form for a Dialog (modal) and a single-column form for a Sheet (sheet). Fields: profile picture, name, job title, email, phone with a calling-code select, address, time zone, language, bio, role, active switch and team, chosen with a plain fields object. Edit mode adds a danger zone to suspend or reinstate and delete, each behind a confirmation. Save stays disabled until something changes, and Cancel asks before throwing changes away. Your onSubmit does the work. UI permission is not security: the server must check again.",
   "props": {
     "mode": {
       "type": "enum",
@@ -15,10 +15,25 @@
       "default": "create",
       "description": "create starts empty and shows no danger zone. edit makes the email read-only, with a hint, and shows the danger zone."
     },
+    "variant": {
+      "type": "enum",
+      "values": [
+        "page",
+        "modal",
+        "sheet"
+      ],
+      "default": "page",
+      "description": "page is a whole page form: sections with the heading on the left and the fields on the right from the lg breakpoint, and a sticky Cancel and Save footer. modal is compact for a Dialog: name, email, role and status only, no danger zone. sheet is single column for a Sheet: avatar header, grouped sections, danger zone at the bottom and a footer pinned to the bottom of the sheet."
+    },
+    "fields": {
+      "type": "custom",
+      "tsType": "Partial<Record<\"avatar\" | \"jobTitle\" | \"phone\" | \"address\" | \"preferences\" | \"bio\" | \"team\" | \"role\" | \"status\", boolean>>",
+      "description": "Which optional fields show. Defaults depend on the variant: page and sheet show all of them (team still needs teams, role still needs the changeRole permission); modal shows role and status only. Name and email always show."
+    },
     "defaultValues": {
       "type": "custom",
-      "tsType": "Partial<{ name: string; email: string; role: string; status: \"active\" | \"suspended\"; team: string | null }>",
-      "description": "The starting values. Only read when the form mounts; give it a key to start over."
+      "tsType": "Partial<{ name: string; email: string; role: string; status: \"active\" | \"suspended\"; team: string | null; avatar: string | null; jobTitle: string; phoneCountry: string; phone: string; street: string; apartment: string; city: string; region: string; postalCode: string; country: string; timeZone: string; language: string; bio: string }>",
+      "description": "The starting values. Only read when the form mounts; give it a key to start over. phoneCountry is an id from the calling-code list (for example US, GB, DE, IN)."
     },
     "roles": {
       "type": "custom",
@@ -33,7 +48,7 @@
     },
     "title": {
       "type": "node",
-      "description": "A heading for the form. Leave it out when the form sits in a Sheet that already has a title."
+      "description": "A heading for the form. Leave it out when the form sits in a Sheet or Dialog that already has a title."
     },
     "headingLevel": {
       "type": "number",
@@ -46,8 +61,8 @@
         "card",
         "plain"
       ],
-      "default": "card",
-      "description": "card draws a bordered card with padding; plain has no chrome, for a Sheet or a page that already has one."
+      "default": "plain",
+      "description": "plain has no chrome, for a Sheet, a Dialog or a page that already has one. card draws a bordered card with padding around the form."
     },
     "submitLabel": {
       "type": "string",
@@ -60,13 +75,13 @@
     },
     "dangerZone": {
       "type": "node",
-      "description": "More actions for the danger zone, shown next to Suspend and Delete user. Edit mode only."
+      "description": "More actions for the danger zone, shown next to Suspend and Delete user. Edit mode only, and never in the modal variant."
     },
     "onSubmit": {
       "type": "callback",
       "required": true,
-      "tsType": "(values: { name: string; email: string; role: string; status: \"active\" | \"suspended\"; team: string | null }) => void | import(\"../form/form\").SubmitResult | Promise<void | import(\"../form/form\").SubmitResult>",
-      "description": "Saves the user; yours, async. Return { fieldErrors } to show a server problem on a field (for example email) or { formError } for the whole form."
+      "tsType": "(values: { name: string; email: string; role: string; status: \"active\" | \"suspended\"; team: string | null; avatar: string | null; avatarFile?: File | null; jobTitle: string; phoneCountry: string; phone: string; street: string; apartment: string; city: string; region: string; postalCode: string; country: string; timeZone: string; language: string; bio: string }) => void | import(\"../form/form\").SubmitResult | Promise<void | import(\"../form/form\").SubmitResult>",
+      "description": "Saves the user; yours, async. Only the values of fields that are shown are sent. avatarFile holds the File when a new picture was chosen. Return { fieldErrors } to show a server problem on a field (for example email) or { formError } for the whole form."
     },
     "onCancel": {
       "type": "callback",
@@ -80,18 +95,33 @@
     },
     "onSuspend": {
       "type": "callback",
-      "tsType": "() => void | Promise<unknown>",
-      "description": "Suspends the user right away; yours. The Suspend button asks first. Without it the button is left out."
+      "tsType": "(suspended: boolean) => void | Promise<unknown>",
+      "description": "Suspends the user right away (called with true), or reinstates one who is suspended (called with false); yours. The button asks first. Without it the button is left out."
     },
     "permissions": {
       "type": "custom",
-      "tsType": "import(\"../utils/permissions\").Permissions<\"edit\" | \"delete\" | \"changeRole\">",
-      "description": "What the app allows: edit (the whole form, and Suspend), delete (Delete user) and changeRole (the role field). Hidden removes it; disabled makes a field read-only but focusable with the reason as its description, and a button stays focusable with the reason. This only changes what people see: the server must check again."
+      "tsType": "import(\"../utils/permissions\").Permissions<\"edit\" | \"delete\" | \"suspend\" | \"changeRole\">",
+      "description": "What the app allows: edit (the whole form), suspend (Suspend and Reinstate; falls back to edit), delete (Delete user) and changeRole (the role field). Hidden removes it; disabled makes a field read-only but focusable with the reason as its description, and a button stays focusable with the reason. This only changes what people see: the server must check again."
     },
     "classNames": {
       "type": "custom",
-      "description": "Extra class names for single parts, so you can restyle one part without editing the file. Keys: root, header, title, form, fields, actions, saveButton, cancelButton, dangerZone, status.",
-      "tsType": "Partial<Record<\"root\" | \"header\" | \"title\" | \"form\" | \"fields\" | \"actions\" | \"saveButton\" | \"cancelButton\" | \"dangerZone\" | \"status\", string>>"
+      "description": "Extra class names for single parts, so you can restyle one part without editing the file. Keys: root, header, title, form, fields, section, avatar, actions, saveButton, cancelButton, dangerZone, status.",
+      "tsType": "Partial<Record<\"root\" | \"header\" | \"title\" | \"form\" | \"fields\" | \"section\" | \"avatar\" | \"actions\" | \"saveButton\" | \"cancelButton\" | \"dangerZone\" | \"status\", string>>"
+    },
+    "countries": {
+      "type": "custom",
+      "tsType": "Array<{ id: string; label: string }>",
+      "description": "The countries in the address country select. A short built-in list is used when left out."
+    },
+    "timeZones": {
+      "type": "custom",
+      "tsType": "Array<{ id: string; label: string }>",
+      "description": "The time zones to choose from, as IANA ids. A short built-in list is used when left out."
+    },
+    "languages": {
+      "type": "custom",
+      "tsType": "Array<{ id: string; label: string }>",
+      "description": "The languages to choose from. A short built-in list is used when left out."
     }
   },
   "states": [
@@ -107,6 +137,8 @@
     "title",
     "form",
     "fields",
+    "section",
+    "avatar",
     "actions",
     "saveButton",
     "cancelButton",
@@ -125,10 +157,11 @@
   "a11y": {
     "role": "form",
     "keyboard": [
-      "Tab: moves through name, email, role, status, team, Cancel and Save, then the danger zone",
+      "Tab: moves through the profile picture buttons, the fields in reading order, the danger zone, then Cancel and Save",
+      "Enter or Space on Upload picture: opens the file chooser; Remove picture clears it",
       "Enter in a text field: saves",
       "Escape: with unsaved changes asks \"Discard changes?\"; without them it does nothing here",
-      "Delete user and Suspend open a confirmation that you answer with Tab and Enter"
+      "Delete user, Suspend and Reinstate open a confirmation that you answer with Tab and Enter"
     ],
     "requirements": [
       "Save is disabled until a value changes",
@@ -136,19 +169,26 @@
       "A failed save moves focus to the error summary; each item moves to its field",
       "A field the person may not change is read-only, stays focusable, and its description gives the reason",
       "The email in edit mode is read-only with a hint saying why",
-      "The danger zone is a labelled group, so it is announced as its own part of the page"
+      "The danger zone is a labelled group, so it is announced as its own part of the page",
+      "The profile picture has an Upload and a Remove button; the result (chosen, removed, or why a file was refused) is announced in a status region",
+      "Pictures are checked for type (PNG, JPEG, WebP, GIF) and size (2 MB) before they are accepted",
+      "Phone numbers are checked for length and characters, the calling code is a labelled select",
+      "Address, phone and name fields carry autocomplete tokens (street-address, postal-code, country-name, tel-national)",
+      "The bio shows its character count and reports it in the field description"
     ],
     "screenReader": [
       "\"Email, edit text, read only\" with \"Email cannot be changed here\"",
       "\"Active, switch, on\" with \"Suspended users cannot sign in\"",
       "\"Discard changes?, alert dialog\"",
-      "\"User saved.\" after a successful save"
+      "\"User saved.\" after a successful save",
+      "\"Picture selected: portrait.png\" after choosing a file",
+      "\"Phone number, edit text\" with a \"Calling code\" select before it"
     ],
     "wcag": "2.2 AA"
   },
   "usage": {
     "use_when": [
-      "Creating a user, or editing one in a Sheet, a page or a card"
+      "Creating a user, or editing one on a page, in a Sheet or in a Dialog"
     ],
     "avoid_when": [
       "Inviting several people by email: use InviteDialog",
@@ -157,7 +197,9 @@
     "anti_patterns": [
       "Treating the permissions prop as protection: UI permission is not security, so the server must check again",
       "Hiding a field the person may see but not change: use disabled with a reason",
-      "Closing a Sheet around the form in a way that skips onCancel, which loses the Discard changes question"
+      "Closing a Sheet around the form in a way that skips onCancel, which loses the Discard changes question",
+      "Putting variant=\"page\" inside a small Dialog: use variant=\"modal\" or sheet",
+      "Showing Suspend or Delete user in a Dialog that has its own buttons for them: the modal variant leaves them out"
     ]
   },
   "contract": {
@@ -168,6 +210,7 @@
     "permissions": [
       "edit",
       "delete",
+      "suspend",
       "changeRole"
     ],
     "events": [
@@ -179,15 +222,19 @@
     "customization": [
       "classNames for each part",
       "dangerZone slot for extra actions",
-      "mode, layout, title, submitLabel and successMessage",
-      "roles and teams"
+      "mode, variant, layout, title, submitLabel and successMessage",
+      "fields to choose what shows",
+      "roles, teams, countries, time zones and languages"
     ]
   },
   "examples": [
     "create",
     "edit",
+    "permissions",
+    "page",
+    "in-a-dialog",
     "in-a-sheet",
-    "permissions"
+    "minimal"
   ],
   "figma": {
     "componentKey": null,

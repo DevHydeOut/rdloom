@@ -2,7 +2,7 @@ import { Button, DashboardPage } from "@rdloom/react";
 
 export default function DashboardPageBasicExample() {
   return (
-    <div className="w-[56rem] max-w-full">
+    <div className="mx-auto w-[56rem] max-w-full">
       <DashboardPage
         title="Customers"
         description="Everyone on a plan, with what they pay."

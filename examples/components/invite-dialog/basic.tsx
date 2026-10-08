@@ -1,9 +1,9 @@
 import { Button, DialogTrigger, InviteDialog } from "@rdloom/react";
 
 const roles = [
-  { id: "viewer", label: "Viewer", description: "Can read everything, change nothing." },
-  { id: "editor", label: "Editor", description: "Can create and change records." },
-  { id: "admin", label: "Admin", description: "Can also manage members and billing." },
+  { id: "viewer", label: "Viewer", description: "reads everything." },
+  { id: "editor", label: "Editor", description: "changes records." },
+  { id: "admin", label: "Admin", description: "manages members and billing." },
 ];
 
 // Stands in for your own request.

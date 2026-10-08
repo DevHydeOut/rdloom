@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
-import { Attachment, AttachmentList, Bubble, BubbleGroup } from "../src";
+import { Attachment, AttachmentList, Bubble, BubbleGroup, BubbleList } from "../src";
 import { axeViolations } from "./axe";
 
 describe("Bubble", () => {
@@ -107,5 +107,22 @@ describe("Bubble", () => {
       </div>,
     );
     expect(await axeViolations(container)).toEqual([]);
+  });
+});
+
+describe("BubbleList", () => {
+  it("is a list with one item per bubble or group and no axe violations", async () => {
+    render(
+      <BubbleList aria-label="Chat">
+        <Bubble from="user">One</Bubble>
+        <BubbleGroup aria-label="Alex">
+          <Bubble>Two</Bubble>
+          <Bubble>Three</Bubble>
+        </BubbleGroup>
+      </BubbleList>,
+    );
+    expect(screen.getByRole("list", { name: "Chat" })).toBeInTheDocument();
+    expect(screen.getAllByRole("listitem")).toHaveLength(2);
+    expect(await axeViolations()).toEqual([]);
   });
 });

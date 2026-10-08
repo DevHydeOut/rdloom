@@ -188,27 +188,29 @@ export default function DataTableUserManagementExample() {
           onRowOpen={(user) => can.edit !== "hidden" && setEditing(user)}
         />
 
-        <Sheet title="Edit user" description="Changes apply when you save." isDismissable={false} isOpen={editing !== null} onOpenChange={(open) => !open && setEditing(null)}>
+        <Sheet title="Edit user" description="Changes apply when you save." isOpen={editing !== null} onOpenChange={(open) => !open && setEditing(null)}>
           {editing && (
-            <div className="min-h-0 flex-1 overflow-auto p-6">
-              <UserForm
-                layout="plain"
-                mode="edit"
-                roles={roles}
-                defaultValues={{ name: editing.name, email: editing.email, role: editing.role, status: editing.status === "suspended" ? "suspended" : "active" }}
-                onSubmit={async (values) => {
-                  await wait(600);
-                  setUsers((all) => all.map((u) => (u.id === editing.id ? { ...u, name: values.name, role: values.role, status: values.status } : u)));
-                  setEditing(null);
-                }}
-                onCancel={() => setEditing(null)}
-                onDelete={async () => {
-                  await remove([editing.id]);
-                  setEditing(null);
-                }}
-                permissions={{ delete: can.remove }}
-              />
-            </div>
+            <UserForm
+              variant="sheet"
+              mode="edit"
+              roles={roles}
+              fields={{ address: false, preferences: false, bio: false, team: false }}
+              defaultValues={{ name: editing.name, email: editing.email, role: editing.role, status: editing.status === "suspended" ? "suspended" : "active" }}
+              onSubmit={async (values) => {
+                await wait(600);
+                setUsers((all) => all.map((u) => (u.id === editing.id ? { ...u, name: values.name, role: values.role, status: values.status } : u)));
+                setEditing(null);
+              }}
+              onCancel={() => setEditing(null)}
+              onSuspend={async (suspended) => {
+                await setStatus([editing.id], suspended ? "suspended" : "active");
+              }}
+              onDelete={async () => {
+                await remove([editing.id]);
+                setEditing(null);
+              }}
+              permissions={{ delete: can.remove, suspend: can.suspend }}
+            />
           )}
         </Sheet>
       </div>

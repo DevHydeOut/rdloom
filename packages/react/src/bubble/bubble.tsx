@@ -65,7 +65,14 @@ export const Bubble = forwardRef<HTMLElement, BubbleProps>(function Bubble(
       data-from={from}
       data-position={position}
       data-status={status}
-      className={cx("flex w-full flex-col gap-1", mine ? "items-end" : "items-start", className)}
+      className={cx(
+        "flex w-full flex-col gap-1",
+        // Standalone bubbles (and the first of a run) sit 12px below what comes before; bubbles
+        // inside a run stay 2px apart. A flex column parent keeps both margins from collapsing.
+        position === "single" || position === "first" ? "mt-3 first:mt-0" : "mt-0.5",
+        mine ? "items-end" : "items-start",
+        className,
+      )}
     >
       {showName && (
         <span className={cx("px-1 text-xs font-medium text-[var(--rd-color-text-muted)]", hasAvatarColumn && !mine && "ms-10")}>{name}</span>
@@ -135,10 +142,34 @@ export const BubbleGroup = forwardRef<HTMLDivElement, BubbleGroupProps>(function
   const items = Children.toArray(children).filter((c): c is ReactElement<BubbleProps> => isValidElement(c));
   const last = items.length - 1;
   return (
-    <div {...rest} ref={ref} role="group" className={cx("flex w-full flex-col gap-0.5", className)}>
+    <div {...rest} ref={ref} role="group" className={cx("flex w-full flex-col mt-3 first:mt-0", className)}>
       {items.map((item, i) =>
         cloneElement(item, { position: last === 0 ? "single" : i === 0 ? "first" : i === last ? "last" : "middle" }),
       )}
+    </div>
+  );
+});
+
+export interface BubbleListProps extends Omit<HTMLAttributes<HTMLDivElement>, "className" | "role"> {
+  className?: string;
+}
+
+/**
+ * A conversation: bubbles and groups one after another with 12px between them. Each child becomes a
+ * list item, so a screen reader announces the number of messages. Use it instead of a bare column when
+ * you want the spacing to come with the component.
+ */
+export const BubbleList = forwardRef<HTMLDivElement, BubbleListProps>(function BubbleList(
+  { className, children, ...rest },
+  ref,
+) {
+  return (
+    <div {...rest} ref={ref} role="list" className={cx("flex w-full flex-col gap-3", className)}>
+      {Children.toArray(children).map((child, i) => (
+        <div key={isValidElement(child) && child.key != null ? child.key : i} role="listitem" className="[&>*]:!mt-0">
+          {child}
+        </div>
+      ))}
     </div>
   );
 });

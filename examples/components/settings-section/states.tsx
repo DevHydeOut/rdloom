@@ -9,7 +9,7 @@ export default function SettingsSectionStatesExample() {
     <div className="flex w-full justify-center">
       <div className="flex w-full max-w-xl flex-col gap-10">
         <SettingsSection
-          layout="stacked"
+          orientation="stacked"
           title="Billing email"
           description="Try saving a changed address: the server refuses it."
           defaultValues={{ email: "billing@example.com" }}
@@ -21,7 +21,7 @@ export default function SettingsSectionStatesExample() {
           <FormTextField name="email" label="Email" type="email" isRequired />
         </SettingsSection>
         <SettingsSection
-          layout="stacked"
+          orientation="stacked"
           title="Time zone"
           description="Try saving a change: the server is unavailable."
           defaultValues={{ zone: "Europe/Berlin" }}

@@ -95,17 +95,17 @@ export const Questionnaire = forwardRef<HTMLDivElement, QuestionnaireProps>(func
   const [announcement, setAnnouncement] = useState("");
   const heading = useRef<HTMLHeadingElement>(null);
   const errorRef = useRef<HTMLParagraphElement>(null);
-  const mounted = useRef(false);
+  // The step last shown. Comparing with it (not a "mounted" flag) keeps the first render, and the
+  // double effect run of React strict mode, from moving focus.
+  const shownStep = useRef(step);
 
   const reviewing = step >= total;
   const question = reviewing ? undefined : questions[step];
 
   // Move focus to the new heading and say where the person is.
   useEffect(() => {
-    if (!mounted.current) {
-      mounted.current = true;
-      return;
-    }
+    if (shownStep.current === step) return;
+    shownStep.current = step;
     heading.current?.focus();
     setAnnouncement(reviewing ? "Review your answers" : `Question ${step + 1} of ${total}`);
   }, [step, reviewing, total]);

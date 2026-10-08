@@ -332,5 +332,5 @@ export { Direction, useDirection, type DirectionProps } from "./direction/direct
 export { Item, ItemActions, ItemContent, ItemDescription, ItemGroup, ItemMedia, ItemSeparator, ItemTitle, type ItemGroupProps, type ItemMediaProps, type ItemProps } from "./item/item";
 export { Blockquote, H1, H2, H3, H4, Heading, InlineCode, Lead, List, ListItem, Prose, Text, Typography, type BlockquoteProps, type HeadingProps, type ListProps, type ProseProps, type TextProps } from "./typography/typography";
 export { Attachment, AttachmentList, type AttachmentListProps, type AttachmentProps } from "./attachment/attachment";
-export { Bubble, BubbleGroup, type BubbleGroupProps, type BubbleProps } from "./bubble/bubble";
+export { Bubble, BubbleGroup, BubbleList, type BubbleGroupProps, type BubbleListProps, type BubbleProps } from "./bubble/bubble";
 export { Marker, type MarkerProps } from "./marker/marker";

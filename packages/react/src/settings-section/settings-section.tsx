@@ -32,7 +32,7 @@ export function useSettingsSection(): SectionContextValue {
 }
 
 /**
- * One group of related settings: title and description beside a card with the content. With onSave the card is a form
+ * One group of related settings: title and description above a card (or beside it with orientation="split") with the content. With onSave the card is a form
  * whose Save and Cancel bar appears only when a value changed. It saves nothing itself.
  * UI permission is not security: the server must check again.
  */
@@ -41,7 +41,7 @@ export function SettingsSection({
   description,
   headingLevel = settingsSectionDefaults.headingLevel,
   children,
-  layout = settingsSectionDefaults.layout,
+  orientation = settingsSectionDefaults.orientation,
   tone = settingsSectionDefaults.tone,
   defaultValues,
   onSave,
@@ -92,7 +92,7 @@ export function SettingsSection({
       aria-labelledby={headingId}
       className={cx(
         "flex w-full flex-col gap-4",
-        layout === "columns" && "md:grid md:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] md:gap-8",
+        orientation === "split" && "md:grid md:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] md:gap-8",
         classNames?.root,
         className,
       )}

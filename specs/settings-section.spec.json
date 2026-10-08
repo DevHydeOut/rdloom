@@ -24,14 +24,14 @@
       "type": "node",
       "description": "The content of the card: form fields (when onSave is set they are connected to the section's form), SettingsRow lines, or any content."
     },
-    "layout": {
+    "orientation": {
       "type": "enum",
       "values": [
-        "columns",
-        "stacked"
+        "stacked",
+        "split"
       ],
-      "default": "columns",
-      "description": "columns puts the title on the left and the card on the right from the md breakpoint up; stacked always puts the title above the card."
+      "default": "stacked",
+      "description": "stacked puts the title and description above the card, full width. split puts them in a left column beside the card from the md breakpoint up and stacks them on a phone."
     },
     "tone": {
       "type": "enum",
@@ -160,7 +160,7 @@
     ],
     "customization": [
       "classNames for each part",
-      "layout and tone",
+      "orientation and tone",
       "title, description, saveLabel and successMessage",
       "any Form fields or SettingsRow lines as children",
       "useSettingsSection() lets your own controls read the read-only state"
@@ -169,6 +169,7 @@
   "examples": [
     "basic",
     "stacked",
+    "split",
     "toggles",
     "danger",
     "states",

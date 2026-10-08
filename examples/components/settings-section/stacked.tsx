@@ -1,12 +1,12 @@
 import { FormTextField, SettingsSection } from "@rdloom/react";
 
-// layout="stacked" keeps the title above the card at every width: good in a narrow column or a sheet.
+// orientation="stacked" (the default) keeps the title above the card at every width.
 export default function SettingsSectionStackedExample() {
   return (
     <div className="flex w-full justify-center">
       <div className="w-full max-w-xl">
         <SettingsSection
-          layout="stacked"
+          orientation="stacked"
           title="Company"
           description="Shown on your invoices."
           defaultValues={{ company: "Brightwater Supplies", vat: "" }}

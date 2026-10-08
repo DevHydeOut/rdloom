@@ -47,7 +47,8 @@ describe("InviteDialog", () => {
     await u.click(screen.getByRole("button", { name: "Add another" }));
     await waitFor(() => expect(emails()).toHaveLength(2));
     await u.type(emails()[1], "tomas.novak@example.com");
-    await u.type(screen.getByLabelText("Message (optional)"), "Welcome aboard");
+    await u.click(screen.getByRole("switch", { name: "Add a message" }));
+    await u.type(await screen.findByLabelText("Message (optional)"), "Welcome aboard");
     await u.click(screen.getByRole("button", { name: "Send 2 invitations" }));
     await waitFor(() => expect(onInvite).toHaveBeenCalledTimes(1));
     expect(onInvite).toHaveBeenCalledWith(
@@ -59,11 +60,12 @@ describe("InviteDialog", () => {
     );
   });
 
-  it("starts rows on defaultRole and shows the description of the role", async () => {
+  it("starts rows on defaultRole and shows the role descriptions once, not per row", async () => {
     const u = userEvent.setup();
     render(<Trigger defaultRole="editor" />);
     await open(u);
-    expect(screen.getByText("Can change records.")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Role 1/ })).toHaveTextContent("Editor");
+    expect(screen.getAllByText(/Can change records\./)).toHaveLength(1);
   });
 
   it("stops at maxInvites and says so", async () => {
@@ -118,7 +120,7 @@ describe("InviteDialog", () => {
     render(<Trigger onInvite={onInvite} />);
     await open(u);
     await u.click(screen.getByRole("button", { name: "Send invitation" }));
-    expect((await screen.findAllByText("Email is required")).length).toBeGreaterThan(0);
+    expect((await screen.findAllByText("Email 1 is required")).length).toBeGreaterThan(0);
     expect(onInvite).not.toHaveBeenCalled();
     await waitFor(() => expect(screen.getByRole("region", { name: /./ })).toHaveFocus());
   });
@@ -209,10 +211,11 @@ describe("InviteDialog", () => {
     await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
   });
 
-  it("can drop the message field", async () => {
+  it("can drop the message entirely", async () => {
     const u = userEvent.setup();
-    render(<Trigger showMessage={false} />);
+    render(<Trigger allowMessage={false} />);
     await open(u);
+    expect(screen.queryByRole("switch", { name: "Add a message" })).not.toBeInTheDocument();
     expect(screen.queryByLabelText("Message (optional)")).not.toBeInTheDocument();
   });
 
@@ -262,11 +265,13 @@ describe("InviteDialog", () => {
     render(
       <Trigger
         permissions={{ invite: { state: "disabled", reason: "Why" } }}
-        classNames={{ dialog: "c-dialog", form: "c-form", list: "c-list", message: "c-message", actions: "c-actions", cancelButton: "c-cancel", submitButton: "c-submit", reason: "c-reason", status: "c-status" }}
+        defaultInvites={[{ email: "a@example.com" }]}
+        classNames={{ dialog: "c-dialog", form: "c-form", list: "c-list", message: "c-message", toggle: "c-toggle", counter: "c-counter", actions: "c-actions", cancelButton: "c-cancel", submitButton: "c-submit", reason: "c-reason", status: "c-status" }}
       />,
     );
     await open(u);
-    for (const name of ["c-dialog", "c-form", "c-list", "c-message", "c-actions", "c-cancel", "c-submit", "c-reason", "c-status"]) {
+    await u.click(screen.getByRole("switch", { name: "Add a message" }));
+    for (const name of ["c-dialog", "c-form", "c-list", "c-message", "c-toggle", "c-counter", "c-actions", "c-cancel", "c-submit", "c-reason", "c-status"]) {
       expect(document.querySelector(`.${name}`), name).not.toBeNull();
     }
   });
@@ -277,7 +282,7 @@ describe("InviteDialog", () => {
     await open(u);
     expect(await axeViolations()).toEqual([]);
     await u.click(screen.getByRole("button", { name: "Send invitation" }));
-    await screen.findAllByText("Email is required");
+    await screen.findAllByText("Email 1 is required");
     expect(await axeViolations()).toEqual([]);
   });
 
@@ -292,5 +297,209 @@ describe("InviteDialog", () => {
     const html = renderToString(<Trigger />);
     expect(html).toContain("Invite people");
     expect(html).not.toContain('role="dialog"');
+  });
+});
+
+const directory = [
+  { id: "u1", name: "Amara Okafor", email: "amara.okafor@example.com" },
+  { id: "u2", name: "Lena Fischer", email: "lena.fischer@example.com" },
+  { id: "u3", name: "Tomas Novak", email: "tomas.novak@example.com" },
+  { id: "u4", name: "Priya Raman", email: "priya.raman@example.com" },
+  { id: "u5", name: "Diego Alvarez", email: "diego.alvarez@example.com" },
+  { id: "u6", name: "Mei Tanaka", email: "mei.tanaka@example.com" },
+];
+const six = ["a", "b", "c", "d", "e", "f"].map((l) => ({ email: `${l}@example.com` }));
+const rolesWithAdmin = [...roles, { id: "admin", label: "Admin" }];
+
+describe("InviteDialog emails: many people and message toggle", () => {
+  it("shows a counter, limits the list height to maxVisibleRows and keeps names unique", async () => {
+    const u = userEvent.setup();
+    render(<Trigger defaultInvites={six} maxVisibleRows={4} />);
+    const dialog = await open(u);
+    expect(within(dialog).getByText("6 people")).toBeInTheDocument();
+    expect(within(dialog).getByLabelText(/^Email 6/)).toBeInTheDocument();
+    expect(within(dialog).getByRole("button", { name: /Role 6/ })).toBeInTheDocument();
+    const scroller = dialog.querySelector<HTMLElement>("[data-rd-field] [style*='max-height']");
+    expect(scroller?.style.maxHeight).toContain("4 *");
+    expect(scroller?.className).toContain("overflow-y-auto");
+    expect(dialog.className).toContain("max-h-[90dvh]");
+    expect(within(dialog).queryByRole("button", { name: /Move invitation/ })).not.toBeInTheDocument();
+  });
+
+  it("focuses the email of a new row", async () => {
+    const u = userEvent.setup();
+    render(<Trigger />);
+    await open(u);
+    await u.click(screen.getByRole("button", { name: "Add another" }));
+    await waitFor(() => expect(emails()).toHaveLength(2));
+    await waitFor(() => expect(emails()[1]).toHaveFocus());
+  });
+
+  it("reveals the message only after the switch, and sends it", async () => {
+    const onInvite = vi.fn();
+    const u = userEvent.setup();
+    render(<Trigger onInvite={onInvite} />);
+    await open(u);
+    expect(screen.queryByLabelText("Message (optional)")).not.toBeInTheDocument();
+    await u.click(screen.getByRole("switch", { name: "Add a message" }));
+    await u.type(await screen.findByLabelText("Message (optional)"), "Hi");
+    await u.type(emails()[0], "lena.fischer@example.com");
+    await u.click(screen.getByRole("button", { name: "Send invitation" }));
+    await waitFor(() => expect(onInvite).toHaveBeenCalledWith([{ email: "lena.fischer@example.com", role: "viewer" }], { message: "Hi" }));
+  });
+
+  it("does not send a typed message after the switch is turned off again", async () => {
+    const onInvite = vi.fn();
+    const u = userEvent.setup();
+    render(<Trigger onInvite={onInvite} />);
+    await open(u);
+    const toggle = screen.getByRole("switch", { name: "Add a message" });
+    await u.click(toggle);
+    await u.type(await screen.findByLabelText("Message (optional)"), "Hi");
+    await u.click(toggle);
+    await u.type(emails()[0], "lena.fischer@example.com");
+    await u.click(screen.getByRole("button", { name: "Send invitation" }));
+    await waitFor(() => expect(onInvite).toHaveBeenCalledWith([{ email: "lena.fischer@example.com", role: "viewer" }], { message: undefined }));
+  });
+
+  it("has no axe violations with six rows and the message open", async () => {
+    const u = userEvent.setup();
+    render(<Trigger defaultInvites={six} />);
+    await open(u);
+    await u.click(screen.getByRole("switch", { name: "Add a message" }));
+    expect(await axeViolations()).toEqual([]);
+  });
+});
+
+describe("InviteDialog search variant", () => {
+  it("adds a person from the directory with a role and sends the person too", async () => {
+    const onInvite = vi.fn();
+    const u = userEvent.setup();
+    render(<Trigger variant="search" roles={rolesWithAdmin} people={directory} onInvite={onInvite} />);
+    await open(u);
+    await u.type(screen.getByRole("searchbox", { name: "Search people" }), "lena");
+    await u.click(await screen.findByRole("option", { name: /Lena Fischer/ }));
+    expect(screen.getByText("1 person")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Remove Lena Fischer" })).toBeInTheDocument();
+    await u.click(screen.getByRole("button", { name: /Role for Lena Fischer/ }));
+    await u.click(await screen.findByRole("option", { name: "Editor" }));
+    await u.click(screen.getByRole("button", { name: "Send invitation" }));
+    await waitFor(() =>
+      expect(onInvite).toHaveBeenCalledWith([{ email: "lena.fischer@example.com", role: "editor", person: directory[1] }], { message: undefined }),
+    );
+  });
+
+  it("offers Invite <email> for a full address that is not in the directory", async () => {
+    const onInvite = vi.fn();
+    const u = userEvent.setup();
+    render(<Trigger variant="search" people={directory} onInvite={onInvite} />);
+    await open(u);
+    await u.type(screen.getByRole("searchbox", { name: "Search people" }), "new.person@acme.io");
+    await u.click(await screen.findByRole("option", { name: "Invite new.person@acme.io" }));
+    await u.click(screen.getByRole("button", { name: "Send invitation" }));
+    await waitFor(() => expect(onInvite).toHaveBeenCalledWith([{ email: "new.person@acme.io", role: "viewer" }], { message: undefined }));
+  });
+
+  it("uses an async onSearch and removes a picked person", async () => {
+    const onSearch = vi.fn(async (q: string) => directory.filter((p) => p.name.toLowerCase().includes(q.toLowerCase())));
+    const u = userEvent.setup();
+    render(<Trigger variant="search" people={[]} onSearch={onSearch} />);
+    await open(u);
+    await u.type(screen.getByRole("searchbox", { name: "Search people" }), "tomas");
+    await u.click(await screen.findByRole("option", { name: /Tomas Novak/ }));
+    expect(onSearch).toHaveBeenLastCalledWith("tomas");
+    await u.click(screen.getByRole("button", { name: "Remove Tomas Novak" }));
+    expect(screen.getAllByText("0 people").length).toBeGreaterThan(0);
+    expect(screen.getByRole("button", { name: "Send invitations" })).toBeDisabled();
+  });
+
+  it("hides existing members and has no axe violations", async () => {
+    const u = userEvent.setup();
+    render(<Trigger variant="search" people={directory} existingEmails={["amara.okafor@example.com"]} />);
+    await open(u);
+    expect(screen.queryByRole("option", { name: /Amara/ })).not.toBeInTheDocument();
+    expect(await axeViolations()).toEqual([]);
+  });
+});
+
+describe("InviteDialog list variant", () => {
+  it("runs the two steps with the keyboard and sends person and role", async () => {
+    const onInvite = vi.fn();
+    const u = userEvent.setup();
+    render(<Trigger variant="list" roles={rolesWithAdmin} people={directory} onInvite={onInvite} />);
+    const dialog = await open(u);
+    expect(within(dialog).getByRole("heading", { name: "Select users" })).toBeInTheDocument();
+    expect(within(dialog).getByText("0 selected")).toBeInTheDocument();
+    expect(within(dialog).getByText("6 users")).toBeInTheDocument();
+    const next = within(dialog).getByRole("button", { name: "Next" });
+    expect(next).toBeDisabled();
+    const list = within(dialog).getByRole("listbox", { name: "Choose users" });
+    expect(list).toHaveAttribute("aria-multiselectable", "true");
+
+    await u.click(within(list).getAllByRole("option")[0]);
+    await u.keyboard("{ArrowDown}{Enter}");
+    await u.keyboard("{ArrowDown}{ }");
+    expect(within(dialog).getByText("3 selected")).toBeInTheDocument();
+    await u.keyboard("{ }");
+    expect(within(dialog).getByText("2 selected")).toBeInTheDocument();
+    expect(next).toBeEnabled();
+
+    await u.click(next);
+    const heading = await within(dialog).findByRole("heading", { name: "Give user role" });
+    await waitFor(() => expect(heading).toHaveFocus());
+    expect(within(dialog).getByText("2 users")).toBeInTheDocument();
+    expect(screen.getAllByRole("status").some((el) => /Step 2 of 2/.test(el.textContent ?? ""))).toBe(true);
+
+    await u.click(within(dialog).getByRole("button", { name: "Prev" }));
+    const back = await within(dialog).findByRole("heading", { name: "Select users" });
+    await waitFor(() => expect(back).toHaveFocus());
+    expect(within(dialog).getByText("2 selected")).toBeInTheDocument();
+
+    await u.click(within(dialog).getByRole("button", { name: "Next" }));
+    await u.click(await within(dialog).findByRole("button", { name: /Role for Lena Fischer/ }));
+    await u.click(await screen.findByRole("option", { name: "Admin" }));
+    await u.click(within(dialog).getByRole("button", { name: "Add" }));
+    await waitFor(() => expect(onInvite).toHaveBeenCalledTimes(1));
+    expect(onInvite).toHaveBeenCalledWith(
+      [
+        { email: "amara.okafor@example.com", role: "viewer", person: directory[0] },
+        { email: "lena.fischer@example.com", role: "admin", person: directory[1] },
+      ],
+      { message: undefined },
+    );
+  });
+
+  it("filters by the search and keeps picks that are filtered out", async () => {
+    const u = userEvent.setup();
+    render(<Trigger variant="list" people={directory} />);
+    const dialog = await open(u);
+    await u.click(within(dialog).getByRole("option", { name: /Amara/ }));
+    await u.type(within(dialog).getByRole("searchbox", { name: "Search user" }), "mei");
+    expect(within(dialog).getAllByRole("option")).toHaveLength(1);
+    expect(within(dialog).getByText("1 selected")).toBeInTheDocument();
+  });
+
+  it("starts over after closing", async () => {
+    const u = userEvent.setup();
+    render(<Trigger variant="list" people={directory} />);
+    let dialog = await open(u);
+    await u.click(within(dialog).getAllByRole("option")[0]);
+    await u.click(within(dialog).getByRole("button", { name: "Next" }));
+    await u.keyboard("{Escape}");
+    await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+    dialog = await open(u);
+    expect(within(dialog).getByRole("heading", { name: "Select users" })).toBeInTheDocument();
+    expect(within(dialog).getByText("0 selected")).toBeInTheDocument();
+  });
+
+  it("has no axe violations on either step", async () => {
+    const u = userEvent.setup();
+    render(<Trigger variant="list" people={directory} />);
+    const dialog = await open(u);
+    expect(await axeViolations()).toEqual([]);
+    await u.click(within(dialog).getAllByRole("option")[0]);
+    await u.click(within(dialog).getByRole("button", { name: "Next" }));
+    await within(dialog).findByRole("heading", { name: "Give user role" });
+    expect(await axeViolations()).toEqual([]);
   });
 });

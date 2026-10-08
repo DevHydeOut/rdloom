@@ -32,7 +32,7 @@ export default function AuthCardVerifyCodeExample() {
           <ErrorSummary title="We could not check your code" />
           <Field<string> name="code" label="Verification code" validate={(v) => (v.length < 6 ? "Enter all 6 digits." : null)}>
             {({ value, setValue, onBlur, isInvalid, errorMessage }) => (
-              <InputOTP label="Verification code" length={6} autoFocus value={value} onChange={setValue} onBlur={onBlur} isInvalid={isInvalid} errorMessage={errorMessage} />
+              <InputOTP label="Verification code" length={6} value={value} onChange={setValue} onBlur={onBlur} isInvalid={isInvalid} errorMessage={errorMessage} />
             )}
           </Field>
           <FormSubmitButton className="w-full">Verify</FormSubmitButton>

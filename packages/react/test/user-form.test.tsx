@@ -17,8 +17,10 @@ const teams = [
 ];
 const lena = { name: "Lena Fischer", email: "lena.fischer@example.com", role: "editor", status: "active" as const, team: "finance" };
 
+const noExtras = { avatar: false, jobTitle: false, phone: false, address: false, preferences: false, bio: false };
+
 function Edit(props: Partial<UserFormProps>) {
-  return <UserForm mode="edit" roles={roles} teams={teams} defaultValues={lena} onSubmit={() => {}} onCancel={() => {}} {...props} />;
+  return <UserForm mode="edit" variant="sheet" fields={noExtras} roles={roles} teams={teams} defaultValues={lena} onSubmit={() => {}} onCancel={() => {}} {...props} />;
 }
 
 const save = () => screen.getByRole("button", { name: /^(Save changes|Create user)$/ });
@@ -28,7 +30,7 @@ describe("UserForm", () => {
     it("starts empty, needs a name, email and role, and sends the values", async () => {
       const onSubmit = vi.fn();
       const u = userEvent.setup();
-      render(<UserForm roles={roles} teams={teams} onSubmit={onSubmit} />);
+      render(<UserForm variant="modal" roles={roles} teams={teams} onSubmit={onSubmit} />);
       expect(save()).toBeDisabled();
       await u.type(screen.getByLabelText(/^Name/), "Tomas Novak");
       await u.type(screen.getByLabelText(/^Email/), "tomas.novak@example.com");
@@ -46,7 +48,7 @@ describe("UserForm", () => {
     it("checks the email format", async () => {
       const onSubmit = vi.fn();
       const u = userEvent.setup();
-      render(<UserForm roles={roles} defaultValues={{ role: "viewer" }} onSubmit={onSubmit} />);
+      render(<UserForm variant="modal" roles={roles} defaultValues={{ role: "viewer" }} onSubmit={onSubmit} />);
       await u.type(screen.getByLabelText(/^Name/), "Tomas");
       await u.type(screen.getByLabelText(/^Email/), "nope");
       await u.click(save());
@@ -56,13 +58,13 @@ describe("UserForm", () => {
     });
 
     it("has no danger zone and leaves the team out when there are no teams", () => {
-      render(<UserForm roles={roles} onSubmit={() => {}} onDelete={() => {}} />);
+      render(<UserForm variant="modal" roles={roles} onSubmit={() => {}} onDelete={() => {}} />);
       expect(screen.queryByRole("group", { name: "Danger zone" })).not.toBeInTheDocument();
       expect(screen.queryByRole("button", { name: /Team/ })).not.toBeInTheDocument();
     });
 
     it("shows the description of the chosen role", () => {
-      render(<UserForm roles={roles} defaultValues={{ role: "admin" }} onSubmit={() => {}} />);
+      render(<UserForm variant="modal" roles={roles} defaultValues={{ role: "admin" }} onSubmit={() => {}} />);
       expect(screen.getByText("Can manage members.")).toBeInTheDocument();
     });
   });
@@ -196,7 +198,7 @@ describe("UserForm", () => {
         const [isOpen, setOpen] = useState(true);
         return (
           <Sheet title="Edit user" isOpen={isOpen} onOpenChange={setOpen}>
-            <UserForm layout="plain" mode="edit" roles={roles} defaultValues={lena} onSubmit={() => {}} onCancel={() => setOpen(false)} />
+            <UserForm variant="sheet" fields={noExtras} mode="edit" roles={roles} defaultValues={lena} onSubmit={() => {}} onCancel={() => setOpen(false)} />
           </Sheet>
         );
       }
@@ -314,6 +316,141 @@ describe("UserForm", () => {
     });
   });
 
+  describe("variants and fields", () => {
+    it("modal shows only the essential fields and never a danger zone", () => {
+      render(<UserForm variant="modal" mode="edit" roles={roles} teams={teams} defaultValues={lena} onSubmit={() => {}} onDelete={() => {}} onSuspend={() => {}} />);
+      expect(screen.getByLabelText(/^Name/)).toBeInTheDocument();
+      expect(screen.getByRole("switch", { name: "Active" })).toBeInTheDocument();
+      expect(screen.queryByRole("group", { name: "Danger zone" })).not.toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: "Delete user" })).not.toBeInTheDocument();
+      expect(screen.queryByLabelText(/Phone number/)).not.toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: "Upload picture" })).not.toBeInTheDocument();
+    });
+
+    it("page shows every section, in order, and the danger zone last", () => {
+      render(<UserForm variant="page" mode="edit" roles={roles} teams={teams} defaultValues={lena} onSubmit={() => {}} onDelete={() => {}} onSuspend={() => {}} />);
+      const names = screen.getAllByRole("heading", { level: 3 }).map((h) => h.textContent);
+      expect(names).toEqual(["Profile", "Contact", "Address", "Preferences", "Access", "Danger zone"]);
+      expect(screen.getByLabelText(/^Street address/)).toHaveAttribute("autocomplete", "street-address");
+      expect(screen.getByLabelText(/^Postal code/)).toHaveAttribute("autocomplete", "postal-code");
+      expect(screen.getByLabelText(/^Phone number/)).toHaveAttribute("autocomplete", "tel-national");
+      expect(screen.getByLabelText(/^Phone number/)).toHaveAttribute("type", "tel");
+    });
+
+    it("fields turns parts off and on", () => {
+      render(<UserForm variant="page" fields={{ address: false, preferences: false, bio: false, phone: false }} roles={roles} onSubmit={() => {}} />);
+      expect(screen.queryByLabelText(/^Street address/)).not.toBeInTheDocument();
+      expect(screen.queryByLabelText(/^Short bio/)).not.toBeInTheDocument();
+      expect(screen.getByLabelText(/^Job title/)).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "Upload picture" })).toBeInTheDocument();
+    });
+
+    it("checks the phone number and the postal code", async () => {
+      const onSubmit = vi.fn();
+      const u = userEvent.setup();
+      render(<UserForm variant="page" roles={roles} defaultValues={{ name: "Ana", email: "ana@example.com", role: "viewer" }} onSubmit={onSubmit} />);
+      await u.type(screen.getByLabelText(/^Phone number/), "12ab");
+      await u.type(screen.getByLabelText(/^Postal code/), "!");
+      await u.click(save());
+      expect((await screen.findAllByText("Use digits, spaces, dashes and brackets only.")).length).toBeGreaterThan(0);
+      expect(screen.getAllByText("Enter a valid postal code.").length).toBeGreaterThan(0);
+      expect(onSubmit).not.toHaveBeenCalled();
+      await u.clear(screen.getByLabelText(/^Phone number/));
+      await u.type(screen.getByLabelText(/^Phone number/), "415 555 0132");
+      await u.clear(screen.getByLabelText(/^Postal code/));
+      await u.type(screen.getByLabelText(/^Postal code/), "94107");
+      await u.click(save());
+      await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1));
+      expect(onSubmit.mock.calls[0][0]).toMatchObject({ phoneCountry: "US", phone: "415 555 0132", postalCode: "94107" });
+    });
+
+    it("counts the bio and refuses a bio that is too long", async () => {
+      const u = userEvent.setup();
+      render(<UserForm variant="page" roles={roles} defaultValues={{ name: "Ana", email: "ana@example.com", role: "viewer", bio: "x".repeat(281) }} onSubmit={() => {}} />);
+      expect(screen.getByLabelText(/^Short bio/)).toHaveAccessibleDescription("281 of 280 characters");
+      await u.type(screen.getByLabelText(/^Name/), "a");
+      await u.click(save());
+      expect((await screen.findAllByText("Keep the bio to 280 characters or fewer.")).length).toBeGreaterThan(0);
+    });
+  });
+
+  describe("profile picture", () => {
+    const pick = (file: File) => {
+      const input = document.querySelector('input[type="file"]') as HTMLInputElement;
+      return userEvent.upload(input, file, { applyAccept: false });
+    };
+
+    it("takes a picture, announces it, and removes it again", async () => {
+      const u = userEvent.setup();
+      render(<UserForm variant="sheet" roles={roles} defaultValues={{ name: "Ana", email: "ana@example.com", role: "viewer" }} onSubmit={() => {}} />);
+      expect(screen.getByRole("button", { name: "Upload picture" })).toHaveAccessibleDescription(/up to 2 MB/);
+      await pick(new File(["x"], "portrait.png", { type: "image/png" }));
+      expect(await screen.findByText(/Picture selected: portrait.png/)).toBeInTheDocument();
+      expect(save()).toBeEnabled();
+      await u.click(screen.getByRole("button", { name: "Remove picture" }));
+      expect(await screen.findByText(/Picture removed/)).toBeInTheDocument();
+      expect(save()).toBeDisabled();
+    });
+
+    it("refuses a wrong type and a file over 2 MB, with a message", async () => {
+      render(<UserForm variant="sheet" roles={roles} onSubmit={() => {}} />);
+      await pick(new File(["x"], "notes.pdf", { type: "application/pdf" }));
+      expect(await screen.findByRole("alert")).toHaveTextContent("notes.pdf is not a PNG, JPEG, WebP or GIF picture.");
+      await pick(new File([new Uint8Array(2 * 1024 * 1024 + 1)], "big.png", { type: "image/png" }));
+      expect(await screen.findByRole("alert")).toHaveTextContent("big.png is larger than 2 MB");
+      expect(screen.queryByRole("button", { name: "Remove picture" })).not.toBeInTheDocument();
+    });
+
+    it("sends the file with the values", async () => {
+      const onSubmit = vi.fn();
+      const u = userEvent.setup();
+      render(<UserForm variant="sheet" roles={roles} defaultValues={{ name: "Ana", email: "ana@example.com", role: "viewer" }} onSubmit={onSubmit} />);
+      const file = new File(["x"], "portrait.png", { type: "image/png" });
+      await pick(file);
+      await u.click(save());
+      await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1));
+      expect(onSubmit.mock.calls[0][0].avatarFile).toBe(file);
+    });
+  });
+
+  describe("suspend and reinstate", () => {
+    it("calls onSuspend with true, then offers Reinstate", async () => {
+      const onSuspend = vi.fn();
+      const u = userEvent.setup();
+      render(<Edit onSuspend={onSuspend} />);
+      await u.click(screen.getByRole("button", { name: "Suspend" }));
+      await u.click(within(await screen.findByRole("alertdialog", { name: "Suspend this user?" })).getByRole("button", { name: "Suspend" }));
+      await waitFor(() => expect(onSuspend).toHaveBeenCalledWith(true));
+      expect(await screen.findByRole("button", { name: "Reinstate" })).toBeInTheDocument();
+      expect(screen.getByRole("switch", { name: "Active" })).not.toBeChecked();
+      expect(save()).toBeDisabled();
+    });
+
+    it("shows Reinstate for a suspended user", async () => {
+      const onSuspend = vi.fn();
+      const u = userEvent.setup();
+      render(<Edit defaultValues={{ ...lena, status: "suspended" }} onSuspend={onSuspend} />);
+      await u.click(screen.getByRole("button", { name: "Reinstate" }));
+      await u.click(within(await screen.findByRole("alertdialog", { name: "Reinstate this user?" })).getByRole("button", { name: "Reinstate" }));
+      await waitFor(() => expect(onSuspend).toHaveBeenCalledWith(false));
+    });
+
+    it("disables Suspend with its own permission and a reason", () => {
+      render(<Edit onSuspend={() => {}} permissions={{ suspend: { state: "disabled", reason: "Only owners can suspend." } }} />);
+      const button = screen.getByRole("button", { name: "Suspend" });
+      expect(button).toHaveAttribute("aria-disabled", "true");
+      expect(button).toHaveAccessibleDescription("Only owners can suspend.");
+    });
+  });
+
+  it("has no axe violations in the page and sheet variants", async () => {
+    const page = render(<UserForm variant="page" mode="edit" title="Edit" roles={roles} teams={teams} defaultValues={lena} onSubmit={() => {}} onDelete={() => {}} onSuspend={() => {}} />);
+    expect(await axeViolations(page.container)).toEqual([]);
+    page.unmount();
+    const sheet = render(<UserForm variant="sheet" mode="edit" roles={roles} teams={teams} defaultValues={lena} onSubmit={() => {}} onDelete={() => {}} onSuspend={() => {}} />);
+    expect(await axeViolations(sheet.container)).toEqual([]);
+  });
+
   it("uses the heading level and the title", () => {
     render(<Edit title="Edit Lena Fischer" headingLevel={3} />);
     expect(screen.getByRole("heading", { level: 3, name: "Edit Lena Fischer" })).toBeInTheDocument();
@@ -321,14 +458,14 @@ describe("UserForm", () => {
   });
 
   it("applies classNames to its parts", () => {
-    const names = ["root", "header", "title", "form", "fields", "actions", "saveButton", "cancelButton", "dangerZone", "status"] as const;
+    const names = ["root", "header", "title", "form", "fields", "section", "actions", "saveButton", "cancelButton", "dangerZone", "status"] as const;
     const classNames = Object.fromEntries(names.map((n) => [n, `c-${n}`])) as Record<(typeof names)[number], string>;
     render(<Edit title="Edit" onDelete={() => {}} classNames={classNames} />);
     for (const n of names.filter((n) => n !== "status")) expect(document.querySelector(`.c-${n}`), n).not.toBeNull();
   });
 
   it("has no axe violations in create, edit, with errors and with permissions", async () => {
-    const { container, unmount } = render(<UserForm roles={roles} teams={teams} onSubmit={() => {}} />);
+    const { container, unmount } = render(<UserForm variant="modal" roles={roles} teams={teams} onSubmit={() => {}} />);
     expect(await axeViolations(container)).toEqual([]);
     unmount();
     const edit = render(<Edit title="Edit" onDelete={() => {}} onSuspend={() => {}} />);

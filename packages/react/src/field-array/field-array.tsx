@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { Button as AriaButton } from "react-aria-components";
 import { fieldArrayDefaults, type FieldArraySpecProps } from "../generated/field-array.types";
 import { Button } from "../button/button";
@@ -8,6 +8,7 @@ import { firstFocusable } from "../form/focus";
 import { useFormContext } from "../form/form";
 import { useEngineArray } from "../form/form-engine";
 import { cx } from "../utils/cx";
+import { scrollHintYClass, useVerticalScrollHint } from "../utils/scroll-hint";
 import { fieldError, fieldHelp, fieldLabel } from "../utils/field";
 import { ArrowDownIcon, ArrowUpIcon, CloseIcon, PlusIcon } from "../utils/icons";
 
@@ -94,6 +95,8 @@ export function FieldArray({
   maxRows,
   addLabel = fieldArrayDefaults.addLabel,
   emptyText = fieldArrayDefaults.emptyText,
+  density = fieldArrayDefaults.density,
+  maxVisibleRows,
   allowReorder = fieldArrayDefaults.allowReorder,
   allowInsert = fieldArrayDefaults.allowInsert,
   validate,
@@ -114,6 +117,14 @@ export function FieldArray({
   if (ids.current.length > count) ids.current.length = count;
 
   const root = useRef<HTMLFieldSetElement>(null);
+  const btn = cx(rowButton, density === "compact" && "!size-8");
+  const scroller = useRef<HTMLDivElement>(null);
+  const compact = density === "compact";
+  const vhint = useVerticalScrollHint(scroller, count);
+  const scrollStyle: CSSProperties | undefined =
+    compact && maxVisibleRows
+      ? { maxHeight: `calc(${maxVisibleRows} * var(--rd-size-control-sm) + ${maxVisibleRows - 1} * 0.5rem + 0.5rem)` }
+      : undefined;
   const addButton = useRef<HTMLButtonElement>(null);
   const pending = useRef<PendingFocus | null>(null);
   const [announcement, setAnnouncement] = useState("");
@@ -212,6 +223,12 @@ export function FieldArray({
           {emptyText}
         </p>
       ) : (
+        <div
+          ref={scroller}
+          data-vhint={vhint}
+          style={scrollStyle}
+          className={cx(compact && !!maxVisibleRows && "-mx-1 -my-1 overflow-y-auto px-1 py-1 overscroll-contain", scrollHintYClass)}
+        >
         <ul className="flex flex-col gap-2">
           {ids.current.map((id, index) => {
             const n = index + 1;
@@ -234,11 +251,13 @@ export function FieldArray({
                   aria-label={m.rowLabel(itemLabel, n)}
                   data-rd-row-id={id}
                   className={
-                    "flex flex-col-reverse gap-3 sm:flex-row sm:items-start rounded-[var(--rd-radius-overlay)] border border-[var(--rd-color-border-default)] " +
-                    "bg-[var(--rd-color-surface-default)] p-3 [box-shadow:var(--rd-elevation-raised)]"
+                    compact
+                      ? "flex items-start gap-1.5"
+                      : "flex flex-col-reverse gap-3 sm:flex-row sm:items-start rounded-[var(--rd-radius-overlay)] border border-[var(--rd-color-border-default)] " +
+                        "bg-[var(--rd-color-surface-default)] p-3 [box-shadow:var(--rd-elevation-raised)]"
                   }
                 >
-                  <div data-rd-row-content className="grid min-w-0 flex-1 gap-3">
+                  <div data-rd-row-content className={cx("min-w-0 flex-1", compact ? "flex items-start gap-2" : "grid gap-3")}>
                     {children(row)}
                   </div>
                   <div className="flex shrink-0 items-center justify-end gap-0.5">
@@ -249,7 +268,7 @@ export function FieldArray({
                           aria-label={m.moveUp(itemLabel, n)}
                           isDisabled={row.isFirst}
                           onPress={row.moveUp}
-                          className={rowButton}
+                          className={btn}
                         >
                           <ArrowUpIcon />
                         </AriaButton>
@@ -258,7 +277,7 @@ export function FieldArray({
                           aria-label={m.moveDown(itemLabel, n)}
                           isDisabled={row.isLast}
                           onPress={row.moveDown}
-                          className={rowButton}
+                          className={btn}
                         >
                           <ArrowDownIcon />
                         </AriaButton>
@@ -270,7 +289,7 @@ export function FieldArray({
                         aria-label={m.insertBelow(itemLabel, n)}
                         isDisabled={atMax}
                         onPress={row.insertBelow}
-                        className={rowButton}
+                        className={btn}
                       >
                         <PlusIcon />
                       </AriaButton>
@@ -280,7 +299,7 @@ export function FieldArray({
                       aria-label={m.remove(itemLabel, n)}
                       isDisabled={atMin}
                       onPress={row.remove}
-                      className={rowButton}
+                      className={btn}
                     >
                       <CloseIcon className="size-4" />
                     </AriaButton>
@@ -290,6 +309,7 @@ export function FieldArray({
             );
           })}
         </ul>
+        </div>
       )}
 
       {error && (

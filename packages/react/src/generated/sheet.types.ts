@@ -27,6 +27,10 @@ export interface SheetSpecProps {
    */
   size?: "sm" | "md" | "lg";
   /**
+   * Draw the panel and its backdrop inside this element instead of over the whole page. Use it to show a sheet inside a preview, a framed app or a phone mock. The element must be positioned (relative) and clip its overflow.
+   */
+  portalContainer?: Element | null;
+  /**
    * Closes on backdrop click. Esc always closes.
    * @default true
    */

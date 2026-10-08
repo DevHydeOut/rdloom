@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef } from "react";
+import { forwardRef, type ReactNode } from "react";
 import {
   Dialog as AriaDialog,
   DialogTrigger,
@@ -18,6 +18,8 @@ export interface DialogProps
   extends DialogSpecProps,
     Omit<AriaDialogProps, keyof DialogSpecProps | "className" | "children"> {
   className?: string;
+  /** Small content shown at the end of the header line, next to the title. */
+  headerEnd?: ReactNode;
   /** Controlled open state, for dialogs opened without a DialogTrigger. */
   isOpen?: boolean;
   onOpenChange?: (isOpen: boolean) => void;
@@ -36,6 +38,8 @@ export const Dialog = forwardRef<HTMLElement, DialogProps>(function Dialog(
     size = dialogDefaults.size,
     role = dialogDefaults.role,
     isDismissable = dialogDefaults.isDismissable,
+    portalContainer,
+    headerEnd,
     isOpen,
     onOpenChange,
     children,
@@ -49,7 +53,8 @@ export const Dialog = forwardRef<HTMLElement, DialogProps>(function Dialog(
       isDismissable={isDismissable}
       isOpen={isOpen}
       onOpenChange={onOpenChange}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[var(--rd-color-overlay-backdrop)] backdrop-blur-[2px]"
+      UNSTABLE_portalContainer={portalContainer ?? undefined}
+      className={cx(portalContainer ? "absolute" : "fixed", "inset-0 z-50 flex items-center justify-center p-4 bg-[var(--rd-color-overlay-backdrop)] backdrop-blur-[2px]")}
     >
       <Modal
         className={cx(
@@ -62,9 +67,18 @@ export const Dialog = forwardRef<HTMLElement, DialogProps>(function Dialog(
           {(renderProps) => (
             <>
               <div className="flex flex-col gap-1">
-                <Heading slot="title" className="text-lg font-semibold">
-                  {title}
-                </Heading>
+                {headerEnd ? (
+                  <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
+                    <Heading slot="title" className="text-lg font-semibold">
+                      {title}
+                    </Heading>
+                    {headerEnd}
+                  </div>
+                ) : (
+                  <Heading slot="title" className="text-lg font-semibold">
+                    {title}
+                  </Heading>
+                )}
                 {description && <p className="text-sm text-[var(--rd-color-text-muted)]">{description}</p>}
               </div>
               {typeof children === "function" ? children(renderProps) : children}

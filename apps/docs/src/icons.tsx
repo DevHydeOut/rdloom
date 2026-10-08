@@ -44,6 +44,12 @@ export const ArrowLeftIcon = (p: P) => (
   </Icon>
 );
 
+export const ArrowUpIcon = (p: P) => (
+  <Icon {...p}>
+    <path d="M10 16V4M5 9l5-5 5 5" />
+  </Icon>
+);
+
 export const ArrowRightIcon = (p: P) => (
   <Icon {...p}>
     <path d="M4 10h12M11 5l5 5-5 5" />

@@ -8,6 +8,7 @@
   "props": {
     "title": { "type": "string", "description": "Heading, also used as the drawer accessible name. Without a title, pass aria-label." },
     "description": { "type": "string", "description": "Short supporting text under the title." },
+    "portalContainer": { "type": "custom", "description": "Draw the panel and its backdrop inside this element instead of over the whole page. Use it to show a sheet inside a preview, a framed app or a phone mock. The element must be positioned (relative) and clip its overflow.", "tsType": "Element | null" },
     "isDismissable": { "type": "boolean", "default": true, "description": "Closes on backdrop click and on a swipe or drag down. Esc always closes." },
     "children": {
       "type": "custom",

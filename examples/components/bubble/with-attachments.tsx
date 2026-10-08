@@ -1,9 +1,9 @@
-import { Attachment, AttachmentList, Bubble } from "@rdloom/react";
+import { Attachment, AttachmentList, Bubble, BubbleList } from "@rdloom/react";
 
 export default function BubbleWithAttachmentsExample() {
   return (
     <div className="flex w-full justify-center">
-      <div className="flex w-[28rem] max-w-full flex-col gap-4">
+      <BubbleList className="w-[28rem] max-w-full">
         <Bubble
           from="user"
           name="You"
@@ -18,7 +18,7 @@ export default function BubbleWithAttachmentsExample() {
         >
           Here are the two files.
         </Bubble>
-      </div>
+      </BubbleList>
     </div>
   );
 }

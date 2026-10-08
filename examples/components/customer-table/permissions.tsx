@@ -10,7 +10,7 @@ const customers: Customer[] = [
 // The server must check both again: what the page shows is not security.
 export default function CustomerTablePermissionsExample() {
   return (
-    <div className="w-[56rem] max-w-full">
+    <div className="mx-auto w-[56rem] max-w-full">
       <CustomerTable
         customers={customers}
         insights="none"

@@ -3,7 +3,7 @@ import { DashboardPage } from "@rdloom/react";
 // While numbers are on their way pass isLoading: they become skeletons and the page is marked busy.
 export default function DashboardPageLoadingExample() {
   return (
-    <div className="w-[56rem] max-w-full">
+    <div className="mx-auto w-[56rem] max-w-full">
       <DashboardPage
         title="Customers"
         isLoading

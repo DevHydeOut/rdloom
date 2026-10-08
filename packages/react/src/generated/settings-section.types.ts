@@ -3,7 +3,7 @@
 
 import type { ReactNode } from "react";
 
-export const settingsSectionLayoutValues = ["columns", "stacked"] as const;
+export const settingsSectionOrientationValues = ["stacked", "split"] as const;
 export const settingsSectionToneValues = ["default", "danger"] as const;
 
 /** The repeating unit of a settings page: a title and description on the left, a card with the content on the right, and a Save and Cancel bar that appears only when something has changed. Use SettingsRow inside for toggle lists. Your onSave does the work. UI permission is not security: the server must check again. */
@@ -26,10 +26,10 @@ export interface SettingsSectionSpecProps {
    */
   children?: ReactNode;
   /**
-   * columns puts the title on the left and the card on the right from the md breakpoint up; stacked always puts the title above the card.
-   * @default "columns"
+   * stacked puts the title and description above the card, full width. split puts them in a left column beside the card from the md breakpoint up and stacks them on a phone.
+   * @default "stacked"
    */
-  layout?: "columns" | "stacked";
+  orientation?: "stacked" | "split";
   /**
    * danger marks a section with destructive actions: a danger-colored border and title. The color is never the only signal: say it in the title.
    * @default "default"
@@ -69,7 +69,7 @@ export interface SettingsSectionSpecProps {
 
 export const settingsSectionDefaults = {
   headingLevel: 2,
-  layout: "columns",
+  orientation: "stacked",
   tone: "default",
   saveLabel: "Save changes",
   successMessage: "Changes saved",

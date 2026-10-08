@@ -24,7 +24,7 @@ const insights: CustomerInsights = {
 
 export default function CustomerTableCustomInsightsExample() {
   return (
-    <div className="w-[60rem] max-w-full">
+    <div className="mx-auto w-[60rem] max-w-full">
       <CustomerTable customers={customers} insights={insights} />
     </div>
   );

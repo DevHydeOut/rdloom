@@ -11,7 +11,7 @@ const customers: Customer[] = [
 export default function CustomerTableRowActionExample() {
   const [open, setOpen] = useState<Customer | null>(null);
   return (
-    <div className="flex w-[56rem] max-w-full flex-col gap-4">
+    <div className="mx-auto flex w-[56rem] max-w-full flex-col gap-4">
       {open && (
         <Alert title={open.name} onDismiss={() => setOpen(null)}>
           {open.email}, on the {open.plan} plan.

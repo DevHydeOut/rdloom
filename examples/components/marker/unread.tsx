@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { Bubble, Marker } from "@rdloom/react";
+import { Bubble, BubbleList, Marker } from "@rdloom/react";
 
 export default function MarkerUnreadExample() {
   const [jumped, setJumped] = useState(false);
   return (
     <div className="flex w-full justify-center">
-      <div className="flex w-full max-w-md flex-col gap-3">
+      <BubbleList className="w-full max-w-md">
         <Bubble>Thanks for the update.</Bubble>
         <Marker variant="unread" label="New messages" jumpLabel="Jump to first new message" onJump={() => setJumped(true)} />
         <Bubble>Can you review the draft?</Bubble>
@@ -14,7 +14,7 @@ export default function MarkerUnreadExample() {
             Jumped to the first new message
           </p>
         )}
-      </div>
+      </BubbleList>
     </div>
   );
 }

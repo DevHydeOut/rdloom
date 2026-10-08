@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Bubble } from "@rdloom/react";
+import { Bubble, BubbleList } from "@rdloom/react";
 
 export default function BubbleFailedRetryExample() {
   const [status, setStatus] = useState<"failed" | "sending" | "sent">("failed");
@@ -9,11 +9,11 @@ export default function BubbleFailedRetryExample() {
   };
   return (
     <div className="flex w-full justify-center">
-      <div className="flex w-[28rem] max-w-full flex-col gap-4">
+      <BubbleList className="w-[28rem] max-w-full">
         <Bubble from="user" status={status} onRetry={retry} timestamp="2026-10-08T14:02:00" timestampText="14:02">
           Please move the call to Friday.
         </Bubble>
-      </div>
+      </BubbleList>
     </div>
   );
 }

@@ -4,9 +4,10 @@
 import type { ReactNode } from "react";
 
 export const userFormModeValues = ["create", "edit"] as const;
+export const userFormVariantValues = ["page", "modal", "sheet"] as const;
 export const userFormLayoutValues = ["card", "plain"] as const;
 
-/** A form to create or edit a user: name, email, role, status and team, with a danger zone for suspending and deleting. Save stays disabled until something changes, and Cancel asks before throwing changes away. Your onSubmit does the work. UI permission is not security: the server must check again. */
+/** A form to create or edit a user, in three presentations: a whole page (variant page), a compact form for a Dialog (modal) and a single-column form for a Sheet (sheet). Fields: profile picture, name, job title, email, phone with a calling-code select, address, time zone, language, bio, role, active switch and team, chosen with a plain fields object. Edit mode adds a danger zone to suspend or reinstate and delete, each behind a confirmation. Save stays disabled until something changes, and Cancel asks before throwing changes away. Your onSubmit does the work. UI permission is not security: the server must check again. */
 export interface UserFormSpecProps {
   /**
    * create starts empty and shows no danger zone. edit makes the email read-only, with a hint, and shows the danger zone.
@@ -14,9 +15,18 @@ export interface UserFormSpecProps {
    */
   mode?: "create" | "edit";
   /**
-   * The starting values. Only read when the form mounts; give it a key to start over.
+   * page is a whole page form: sections with the heading on the left and the fields on the right from the lg breakpoint, and a sticky Cancel and Save footer. modal is compact for a Dialog: name, email, role and status only, no danger zone. sheet is single column for a Sheet: avatar header, grouped sections, danger zone at the bottom and a footer pinned to the bottom of the sheet.
+   * @default "page"
    */
-  defaultValues?: Partial<{ name: string; email: string; role: string; status: "active" | "suspended"; team: string | null }>;
+  variant?: "page" | "modal" | "sheet";
+  /**
+   * Which optional fields show. Defaults depend on the variant: page and sheet show all of them (team still needs teams, role still needs the changeRole permission); modal shows role and status only. Name and email always show.
+   */
+  fields?: Partial<Record<"avatar" | "jobTitle" | "phone" | "address" | "preferences" | "bio" | "team" | "role" | "status", boolean>>;
+  /**
+   * The starting values. Only read when the form mounts; give it a key to start over. phoneCountry is an id from the calling-code list (for example US, GB, DE, IN).
+   */
+  defaultValues?: Partial<{ name: string; email: string; role: string; status: "active" | "suspended"; team: string | null; avatar: string | null; jobTitle: string; phoneCountry: string; phone: string; street: string; apartment: string; city: string; region: string; postalCode: string; country: string; timeZone: string; language: string; bio: string }>;
   /**
    * The roles a user can have. The description of the chosen role is shown under its Select.
    */
@@ -26,7 +36,7 @@ export interface UserFormSpecProps {
    */
   teams?: Array<{ id: string; label: string }>;
   /**
-   * A heading for the form. Leave it out when the form sits in a Sheet that already has a title.
+   * A heading for the form. Leave it out when the form sits in a Sheet or Dialog that already has a title.
    */
   title?: ReactNode;
   /**
@@ -35,8 +45,8 @@ export interface UserFormSpecProps {
    */
   headingLevel?: number;
   /**
-   * card draws a bordered card with padding; plain has no chrome, for a Sheet or a page that already has one.
-   * @default "card"
+   * plain has no chrome, for a Sheet, a Dialog or a page that already has one. card draws a bordered card with padding around the form.
+   * @default "plain"
    */
   layout?: "card" | "plain";
   /**
@@ -49,13 +59,13 @@ export interface UserFormSpecProps {
    */
   successMessage?: string;
   /**
-   * More actions for the danger zone, shown next to Suspend and Delete user. Edit mode only.
+   * More actions for the danger zone, shown next to Suspend and Delete user. Edit mode only, and never in the modal variant.
    */
   dangerZone?: ReactNode;
   /**
-   * Saves the user; yours, async. Return { fieldErrors } to show a server problem on a field (for example email) or { formError } for the whole form.
+   * Saves the user; yours, async. Only the values of fields that are shown are sent. avatarFile holds the File when a new picture was chosen. Return { fieldErrors } to show a server problem on a field (for example email) or { formError } for the whole form.
    */
-  onSubmit: (values: { name: string; email: string; role: string; status: "active" | "suspended"; team: string | null }) => void | import("../form/form").SubmitResult | Promise<void | import("../form/form").SubmitResult>;
+  onSubmit: (values: { name: string; email: string; role: string; status: "active" | "suspended"; team: string | null; avatar: string | null; avatarFile?: File | null; jobTitle: string; phoneCountry: string; phone: string; street: string; apartment: string; city: string; region: string; postalCode: string; country: string; timeZone: string; language: string; bio: string }) => void | import("../form/form").SubmitResult | Promise<void | import("../form/form").SubmitResult>;
   /**
    * Called when the person cancels. With unsaved changes it is called after they confirm Discard.
    */
@@ -65,23 +75,36 @@ export interface UserFormSpecProps {
    */
   onDelete?: () => void | Promise<unknown>;
   /**
-   * Suspends the user right away; yours. The Suspend button asks first. Without it the button is left out.
+   * Suspends the user right away (called with true), or reinstates one who is suspended (called with false); yours. The button asks first. Without it the button is left out.
    */
-  onSuspend?: () => void | Promise<unknown>;
+  onSuspend?: (suspended: boolean) => void | Promise<unknown>;
   /**
-   * What the app allows: edit (the whole form, and Suspend), delete (Delete user) and changeRole (the role field). Hidden removes it; disabled makes a field read-only but focusable with the reason as its description, and a button stays focusable with the reason. This only changes what people see: the server must check again.
+   * What the app allows: edit (the whole form), suspend (Suspend and Reinstate; falls back to edit), delete (Delete user) and changeRole (the role field). Hidden removes it; disabled makes a field read-only but focusable with the reason as its description, and a button stays focusable with the reason. This only changes what people see: the server must check again.
    */
-  permissions?: import("../utils/permissions").Permissions<"edit" | "delete" | "changeRole">;
+  permissions?: import("../utils/permissions").Permissions<"edit" | "delete" | "suspend" | "changeRole">;
   /**
-   * Extra class names for single parts, so you can restyle one part without editing the file. Keys: root, header, title, form, fields, actions, saveButton, cancelButton, dangerZone, status.
+   * Extra class names for single parts, so you can restyle one part without editing the file. Keys: root, header, title, form, fields, section, avatar, actions, saveButton, cancelButton, dangerZone, status.
    */
-  classNames?: Partial<Record<"root" | "header" | "title" | "form" | "fields" | "actions" | "saveButton" | "cancelButton" | "dangerZone" | "status", string>>;
+  classNames?: Partial<Record<"root" | "header" | "title" | "form" | "fields" | "section" | "avatar" | "actions" | "saveButton" | "cancelButton" | "dangerZone" | "status", string>>;
+  /**
+   * The countries in the address country select. A short built-in list is used when left out.
+   */
+  countries?: Array<{ id: string; label: string }>;
+  /**
+   * The time zones to choose from, as IANA ids. A short built-in list is used when left out.
+   */
+  timeZones?: Array<{ id: string; label: string }>;
+  /**
+   * The languages to choose from. A short built-in list is used when left out.
+   */
+  languages?: Array<{ id: string; label: string }>;
 }
 
 export const userFormDefaults = {
   mode: "create",
+  variant: "page",
   headingLevel: 2,
-  layout: "card",
+  layout: "plain",
   successMessage: "User saved.",
 } as const;
 

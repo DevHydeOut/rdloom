@@ -31,6 +31,14 @@ const sizes: Record<NonNullable<SelectSpecProps["size"]>, string> = {
   lg: "h-[var(--rd-size-control-lg)] px-[var(--rd-space-control-x-lg)] text-base",
 };
 
+// Long lists (a year picker) open with the chosen option in view, not at the top.
+function centerSelected(list: HTMLElement | null) {
+  const item = list?.querySelector<HTMLElement>('[role="option"][aria-selected="true"]');
+  if (!list || !item) return;
+  const offset = item.getBoundingClientRect().top - list.getBoundingClientRect().top + list.scrollTop;
+  list.scrollTop = offset - (list.clientHeight - item.offsetHeight) / 2;
+}
+
 export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
   {
     label,
@@ -90,7 +98,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
           "bg-[var(--rd-color-surface-raised)] border border-[var(--rd-color-border-default)] rounded-[var(--rd-radius-overlay)]"
         }
       >
-        <ListBox className="outline-none max-h-72">{children}</ListBox>
+        <ListBox ref={centerSelected} className="max-h-72 overflow-auto outline-none">{children}</ListBox>
       </Popover>
     </AriaSelect>
   );

@@ -112,6 +112,7 @@ export const Drawer = forwardRef<HTMLElement, DrawerProps>(function Drawer(
     title,
     description,
     isDismissable = drawerDefaults.isDismissable,
+    portalContainer,
     isOpen,
     onOpenChange,
     children,
@@ -128,14 +129,16 @@ export const Drawer = forwardRef<HTMLElement, DrawerProps>(function Drawer(
       isDismissable={isDismissable}
       isOpen={isOpen}
       onOpenChange={onOpenChange}
-      className="fixed inset-0 z-50 bg-[var(--rd-color-overlay-backdrop)] backdrop-blur-[2px] data-[entering]:animate-[rd-drawer-fade_200ms] motion-reduce:animate-none"
+      UNSTABLE_portalContainer={portalContainer ?? undefined}
+      className={cx(portalContainer ? "absolute" : "fixed", "inset-0 z-50 bg-[var(--rd-color-overlay-backdrop)] backdrop-blur-[2px] data-[entering]:animate-[rd-drawer-fade_200ms] motion-reduce:animate-none")}
     >
       <style>{keyframes}</style>
       <Modal
         data-rd-drawer=""
         style={{ transform: drag ? `translateY(${drag}px)` : undefined }}
         className={cx(
-          "fixed inset-x-0 bottom-0 flex max-h-[90dvh] w-full flex-col overflow-hidden rounded-t-[var(--rd-radius-overlay)] border-t",
+          portalContainer ? "absolute" : "fixed",
+          "inset-x-0 bottom-0 flex max-h-[90dvh] w-full flex-col overflow-hidden rounded-t-[var(--rd-radius-overlay)] border-t",
           "[box-shadow:var(--rd-elevation-overlay)] bg-[var(--rd-color-surface-raised)] text-[var(--rd-color-text-default)] border-[var(--rd-color-border-default)]",
           "data-[entering]:animate-[rd-drawer-up_200ms_ease-out] motion-reduce:!animate-none",
           dragging ? "transition-none" : "transition-transform duration-200 ease-out motion-reduce:transition-none",

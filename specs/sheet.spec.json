@@ -10,6 +10,7 @@
     "description": { "type": "string", "description": "Short supporting text under the title." },
     "side": { "type": "enum", "values": ["end", "start", "bottom"], "default": "end", "description": "The edge it slides in from. end is the right in left-to-right languages." },
     "size": { "type": "enum", "values": ["sm", "md", "lg"], "default": "md", "description": "Width (or height for bottom sheets)." },
+    "portalContainer": { "type": "custom", "description": "Draw the panel and its backdrop inside this element instead of over the whole page. Use it to show a sheet inside a preview, a framed app or a phone mock. The element must be positioned (relative) and clip its overflow.", "tsType": "Element | null" },
     "isDismissable": { "type": "boolean", "default": true, "description": "Closes on backdrop click. Esc always closes." },
     "children": {
       "type": "custom",

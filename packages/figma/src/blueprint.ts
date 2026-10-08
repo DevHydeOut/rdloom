@@ -1140,22 +1140,19 @@ const blueprints: Record<string, Blueprint> = {
   },
 
   InviteDialog: () => {
-    const input = (label: string, value: string, w: number | "fill") =>
-      frame({ name: "field", dir: "col", gap: 6, w }, [
-        text(label, 14, "color.text.default", "Medium"),
-        frame({ name: "input", dir: "row", w: "fill", h: 40, pad: 12, cross: "center", stroke: "color.border.default", radius: "radius.control" }, [text(value, 14, "color.text.default")]),
-      ]);
-    const row = (n: number, email: string, role: string) =>
-      frame({ name: `invitation ${n}`, dir: "row", gap: 12, pad: 12, w: "fill", stroke: "color.border.default", radius: "radius.overlay", fill: "color.surface.default" }, [
-        input("Email", email, "fill"),
-        input("Role", role, 160),
-      ]);
+    const field = (value: string, w: number | "fill", muted = false) =>
+      frame({ name: "input", dir: "row", w, h: 32, pad: 10, cross: "center", stroke: "color.border.default", radius: "radius.control" }, [text(value, 14, muted ? "color.text.muted" : "color.text.default")]);
+    const row = (email: string, role: string) =>
+      frame({ name: "invitation", dir: "row", gap: 8, w: "fill", cross: "center" }, [field(email, "fill"), field(role, 152), text("x", 14, "color.text.muted")]);
     return frame({ name: "invite dialog", dir: "col", gap: 16, pad: 24, w: 672, fill: "color.surface.raised", stroke: "color.border.default", radius: "radius.overlay" }, [
       frame({ name: "header", dir: "col", gap: 4 }, [text("Invite people", 18, "color.text.default", "Semi Bold"), text("They get an email with a link to join your workspace.", 14, "color.text.muted")]),
-      row(1, "amara.okafor@example.com", "Editor"),
-      row(2, "lena.fischer@example.com", "Viewer"),
+      text("People to invite", 14, "color.text.default", "Medium"),
+      row("amara.okafor@example.com", "Editor"),
+      row("lena.fischer@example.com", "Viewer"),
+      row("tomas.novak@example.com", "Viewer"),
       button("Add another", "secondary"),
-      frame({ name: "actions", dir: "row", gap: 8, w: "fill", align: "end" }, [button("Cancel", "secondary"), button("Send 2 invitations", "primary")]),
+      text("Add a message", 14, "color.text.default"),
+      frame({ name: "actions", dir: "row", gap: 8, w: "fill", cross: "center" }, [text("3 people", 14, "color.text.muted"), frame({ name: "spacer", dir: "row", w: "fill" }, []), button("Cancel", "secondary"), button("Send 3 invitations", "primary")]),
     ]);
   },
 

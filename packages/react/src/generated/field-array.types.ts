@@ -3,6 +3,8 @@
 
 import type { ReactNode } from "react";
 
+export const fieldArrayDensityValues = ["comfortable", "compact"] as const;
+
 /** Repeating rows of fields inside a Form, such as invoice lines or team members. Add, remove, move up or down and insert are all buttons, so the keyboard does everything; focus lands somewhere sensible and a polite message says what changed. The rows contents and any totals are yours. */
 export interface FieldArraySpecProps {
   /**
@@ -51,6 +53,15 @@ export interface FieldArraySpecProps {
    */
   allowReorder?: boolean;
   /**
+   * Comfortable draws each row as a card. Compact draws one tight line per row, for short rows such as an email and a role.
+   * @default "comfortable"
+   */
+  density?: "comfortable" | "compact";
+  /**
+   * In compact density, the number of rows shown before the list scrolls inside itself, with a fade at the edge that has more.
+   */
+  maxVisibleRows?: number;
+  /**
    * Shows Insert below on each row.
    * @default false
    */
@@ -75,6 +86,7 @@ export const fieldArrayDefaults = {
   addLabel: "Add row",
   emptyText: "No rows yet.",
   allowReorder: true,
+  density: "comfortable",
   allowInsert: false,
 } as const;
 

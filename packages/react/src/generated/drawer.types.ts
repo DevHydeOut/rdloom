@@ -14,6 +14,10 @@ export interface DrawerSpecProps {
    */
   description?: string;
   /**
+   * Draw the panel and its backdrop inside this element instead of over the whole page. Use it to show a sheet inside a preview, a framed app or a phone mock. The element must be positioned (relative) and clip its overflow.
+   */
+  portalContainer?: Element | null;
+  /**
    * Closes on backdrop click and on a swipe or drag down. Esc always closes.
    * @default true
    */

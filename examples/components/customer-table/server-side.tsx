@@ -37,7 +37,7 @@ export default function CustomerTableServerSideExample() {
   useEffect(() => load({ search: "", status: [], plan: [], sort: null, page: 1, pageSize: 8 }), []);
 
   return (
-    <div className="w-[60rem] max-w-full">
+    <div className="mx-auto w-[60rem] max-w-full">
       <CustomerTable
         customers={page.rows}
         totalCount={page.total}
