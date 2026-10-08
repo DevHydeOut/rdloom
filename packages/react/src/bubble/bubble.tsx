@@ -69,7 +69,7 @@ export const Bubble = forwardRef<HTMLElement, BubbleProps>(function Bubble(
         "flex w-full flex-col gap-1",
         // Standalone bubbles (and the first of a run) sit 12px below what comes before; bubbles
         // inside a run stay 2px apart. A flex column parent keeps both margins from collapsing.
-        position === "single" || position === "first" ? "mt-3 first:mt-0" : "mt-0.5",
+        position === "single" || position === "first" ? "mt-4 first:mt-0" : "mt-1.5",
         mine ? "items-end" : "items-start",
         className,
       )}
@@ -142,7 +142,7 @@ export const BubbleGroup = forwardRef<HTMLDivElement, BubbleGroupProps>(function
   const items = Children.toArray(children).filter((c): c is ReactElement<BubbleProps> => isValidElement(c));
   const last = items.length - 1;
   return (
-    <div {...rest} ref={ref} role="group" className={cx("flex w-full flex-col mt-3 first:mt-0", className)}>
+    <div {...rest} ref={ref} role="group" className={cx("flex flex-col mt-4 first:mt-0", className)}>
       {items.map((item, i) =>
         cloneElement(item, { position: last === 0 ? "single" : i === 0 ? "first" : i === last ? "last" : "middle" }),
       )}
@@ -164,7 +164,7 @@ export const BubbleList = forwardRef<HTMLDivElement, BubbleListProps>(function B
   ref,
 ) {
   return (
-    <div {...rest} ref={ref} role="list" className={cx("flex w-full flex-col gap-3", className)}>
+    <div {...rest} ref={ref} role="list" className={cx("flex flex-col gap-4", className)}>
       {Children.toArray(children).map((child, i) => (
         <div key={isValidElement(child) && child.key != null ? child.key : i} role="listitem" className="[&>*]:!mt-0">
           {child}
