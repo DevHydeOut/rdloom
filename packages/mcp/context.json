@@ -2808,6 +2808,136 @@
       ]
     },
     {
+      "id": "bento-grid",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "BentoGrid",
+        "version": "0.1.0",
+        "category": "motion",
+        "status": "experimental",
+        "description": "A responsive grid of feature cards of different sizes. It is a real list: each BentoCard is a list item with its own heading, icon, description, optional background and optional link or action. Cards lift a little on hover.",
+        "props": {
+          "children": {
+            "type": "node",
+            "description": "The BentoCard items.",
+            "required": true
+          },
+          "label": {
+            "type": "string",
+            "description": "Accessible name of the list. Leave it out when a nearby heading already names the section and pass aria-labelledby instead."
+          },
+          "isStill": {
+            "type": "boolean",
+            "description": "Turns off the hover lift and its transition.",
+            "default": false
+          }
+        },
+        "variants": [
+          "isStill"
+        ],
+        "states": [
+          "default",
+          "hover",
+          "focus"
+        ],
+        "slots": [
+          "root",
+          "card",
+          "icon",
+          "title",
+          "description",
+          "background",
+          "action"
+        ],
+        "tokens": [
+          "color.surface.default",
+          "color.border.default",
+          "color.text.default",
+          "color.text.muted",
+          "color.focus.ring",
+          "radius.overlay"
+        ],
+        "a11y": {
+          "role": "list",
+          "keyboard": [
+            "Tab: moves to the link or button of each card in reading order",
+            "Enter: follows the link; Enter or Space presses the button"
+          ],
+          "requirements": [
+            "The grid is a ul and each BentoCard an li, so the number of cards is announced",
+            "Each card title is a real heading; set headingLevel on the cards to fit the page outline",
+            "The icon and the background slot are decoration and are hidden from assistive technology",
+            "A card with a link or action is operated by that one control, whose area covers the whole card; the card never has two tab stops",
+            "The hover lift is off for prefers-reduced-motion, inside rdm-still and with isStill, and only runs where there is a real pointer",
+            "On phones the cards stack in one column; from the medium breakpoint they use three columns, and column and row spans apply there",
+            "Real text in the server HTML; readable with no JavaScript"
+          ],
+          "screenReader": [
+            "List with the number of items, then each card: heading, description, then the link or button name"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "A feature overview with a few cards that deserve different emphasis",
+            "A landing page section of capabilities"
+          ],
+          "avoid_when": [
+            "Data that must be compared row by row (use a table)",
+            "Long lists of equal items (use a plain list or cards in a regular grid)"
+          ],
+          "anti_patterns": [
+            "Putting several links inside one card",
+            "Using spans so large that the grid leaves holes"
+          ]
+        },
+        "examples": [
+          "basic",
+          "with-links",
+          "with-background"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {}
+        }
+      },
+      "install": {
+        "command": "npx rdloom add bento-grid",
+        "dependencies": [
+          "react-aria-components@^1.21.1"
+        ],
+        "registryDependencies": [
+          "tokens",
+          "motion-css",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import { BentoCard, BentoGrid, ChartIcon, SettingsIcon, SparkleIcon, UsersIcon } from \"@rdloom/react\";\n\nexport default function BentoGridBasicExample() {\n  return (\n    <div className=\"flex w-full justify-center\">\n      <BentoGrid label=\"Features\" className=\"max-w-2xl\">\n        <BentoCard\n          colSpan={2}\n          icon={<SparkleIcon />}\n          title=\"Components that ship ready\"\n          description=\"Each one is built on React Aria, so keyboard and screen reader support is there from the first render.\"\n        />\n        <BentoCard icon={<UsersIcon />} title=\"Made for teams\" description=\"Shared tokens keep every screen consistent.\" />\n        <BentoCard icon={<ChartIcon />} title=\"Readable data\" description=\"Tables and charts with real text behind them.\" />\n        <BentoCard colSpan={2} icon={<SettingsIcon />} title=\"Yours to change\" description=\"The source is copied into your project, so you can edit it.\" />\n      </BentoGrid>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "with-links",
+          "code": "import { BentoCard, BentoGrid, ChartIcon, SparkleIcon, UsersIcon } from \"@rdloom/react\";\n\nexport default function BentoGridWithLinksExample() {\n  return (\n    <div className=\"flex w-full justify-center\">\n      <BentoGrid label=\"Guides\" className=\"max-w-2xl\">\n        <BentoCard\n          rowSpan={2}\n          icon={<SparkleIcon />}\n          title=\"Start here\"\n          description=\"Install the CLI, add your first component and see it in your app.\"\n          href=\"#install\"\n          actionLabel=\"Read the install guide\"\n        />\n        <BentoCard icon={<UsersIcon />} title=\"Theming\" description=\"Change the tokens once and every component follows.\" href=\"#theming\" actionLabel=\"Open theming\" />\n        <BentoCard icon={<ChartIcon />} title=\"Accessibility\" description=\"What each component promises and how it is tested.\" href=\"#a11y\" actionLabel=\"See the checklist\" />\n        <BentoCard\n          colSpan={2}\n          title=\"Need a custom flow?\"\n          description=\"Press the button to see how an action card behaves.\"\n          onAction={() => undefined}\n          actionLabel=\"Show me\"\n        />\n      </BentoGrid>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "with-background",
+          "code": "import { BentoCard, BentoGrid, GlobeIcon, SparkleIcon } from \"@rdloom/react\";\n\nconst glow = (angle: number) => (\n  <div\n    className=\"size-full opacity-40\"\n    style={{ background: `linear-gradient(${angle}deg, color-mix(in srgb, var(--rd-color-action-primary) 30%, transparent), transparent 60%)` }}\n  />\n);\n\nexport default function BentoGridWithBackgroundExample() {\n  return (\n    <div className=\"flex w-full justify-center\">\n      <BentoGrid label=\"Highlights\" className=\"max-w-2xl\">\n        <BentoCard colSpan={2} background={glow(135)} icon={<SparkleIcon />} title=\"Polish by default\" description=\"Spacing, focus rings and states are already done.\" />\n        <BentoCard background={glow(225)} icon={<GlobeIcon />} title=\"Any language\" description=\"Right-to-left layouts work without extra code.\" />\n      </BentoGrid>\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "bento-grid/bento-grid.tsx",
+          "content": "\"use client\";\n\nimport { forwardRef, type HTMLAttributes, type ReactNode } from \"react\";\nimport { Button, Link } from \"react-aria-components\";\nimport { bentoGridDefaults, type BentoGridSpecProps } from \"../generated/bento-grid.types\";\nimport { cx } from \"../utils/cx\";\n\nexport interface BentoGridProps\n  extends BentoGridSpecProps,\n    Omit<HTMLAttributes<HTMLUListElement>, keyof BentoGridSpecProps | \"className\"> {\n  className?: string;\n}\n\n/**\n * A responsive grid of feature cards. It is a real list: put BentoCard children inside. One column on\n * phones, three from the medium breakpoint, where each card can span columns and rows.\n */\nexport const BentoGrid = forwardRef<HTMLUListElement, BentoGridProps>(function BentoGrid(\n  { children, label, isStill = bentoGridDefaults.isStill, className, ...rest },\n  ref,\n) {\n  return (\n    <ul\n      {...rest}\n      ref={ref}\n      aria-label={label ?? rest[\"aria-label\"]}\n      data-rdm-still={isStill || undefined}\n      className={cx(\"rdm-bento m-0 grid w-full list-none grid-cols-1 gap-4 p-0 md:auto-rows-[minmax(11rem,auto)] md:grid-cols-3\", className)}\n    >\n      {children}\n    </ul>\n  );\n});\n\nconst colSpans = { 1: \"\", 2: \"md:col-span-2\", 3: \"md:col-span-3\" } as const;\nconst rowSpans = { 1: \"\", 2: \"md:row-span-2\" } as const;\n\nexport interface BentoCardProps extends Omit<HTMLAttributes<HTMLLIElement>, \"title\"> {\n  /** The card heading. */\n  title: ReactNode;\n  /** A sentence or two under the heading. */\n  description?: ReactNode;\n  /** A decorative icon above the heading. Hidden from assistive technology. */\n  icon?: ReactNode;\n  /** Decoration behind the content, such as a gradient or an illustration. Hidden from assistive technology. */\n  background?: ReactNode;\n  /** Columns the card takes from the medium breakpoint. */\n  colSpan?: 1 | 2 | 3;\n  /** Rows the card takes from the medium breakpoint. */\n  rowSpan?: 1 | 2;\n  /** Heading level of the title, to fit the page outline. */\n  headingLevel?: 2 | 3 | 4 | 5 | 6;\n  /** Makes the card a link. */\n  href?: string;\n  /** Makes the card a button, when there is no href. */\n  onAction?: () => void;\n  /** Name of the link or button. Defaults to \"Learn more\". */\n  actionLabel?: string;\n  className?: string;\n}\n\n/** One card of a BentoGrid. With href or onAction the whole card is operated by a single link or button. */\nexport const BentoCard = forwardRef<HTMLLIElement, BentoCardProps>(function BentoCard(\n  { title, description, icon, background, colSpan = 1, rowSpan = 1, headingLevel = 3, href, onAction, actionLabel = \"Learn more\", className, ...rest },\n  ref,\n) {\n  const Heading = `h${headingLevel}` as \"h3\";\n  const stretch =\n    \"mt-auto inline-flex w-fit items-center gap-1 text-sm font-medium text-[var(--rd-color-action-primary)] outline-none after:absolute after:inset-0 after:rounded-[var(--rd-radius-overlay)] data-[focus-visible]:after:ring-2 data-[focus-visible]:after:ring-[var(--rd-color-focus-ring)]\";\n  return (\n    <li\n      {...rest}\n      ref={ref}\n      className={cx(\n        \"rdm-bento-card relative flex min-h-0 flex-col gap-2 overflow-hidden rounded-[var(--rd-radius-overlay)] border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-default)] p-5 text-[var(--rd-color-text-default)]\",\n        colSpans[colSpan],\n        rowSpans[rowSpan],\n        className,\n      )}\n    >\n      {background ? (\n        <div aria-hidden=\"true\" className=\"pointer-events-none absolute inset-0\">\n          {background}\n        </div>\n      ) : null}\n      {icon ? (\n        <span aria-hidden=\"true\" className=\"relative inline-flex size-9 items-center justify-center rounded-[var(--rd-radius-control)] border border-[var(--rd-color-border-default)]\">\n          {icon}\n        </span>\n      ) : null}\n      <Heading className=\"relative m-0 text-base font-semibold\">{title}</Heading>\n      {description ? <p className=\"relative m-0 text-sm text-[var(--rd-color-text-muted)]\">{description}</p> : null}\n      {href ? (\n        <Link href={href} className={stretch}>\n          {actionLabel}\n        </Link>\n      ) : onAction ? (\n        <Button onPress={onAction} className={stretch}>\n          {actionLabel}\n        </Button>\n      ) : null}\n    </li>\n  );\n});\n"
+        },
+        {
+          "path": "generated/bento-grid.types.ts",
+          "content": "// Generated by rdloom codegen from specs/bento-grid.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nimport type { ReactNode } from \"react\";\n\n/** A responsive grid of feature cards of different sizes. It is a real list: each BentoCard is a list item with its own heading, icon, description, optional background and optional link or action. Cards lift a little on hover. */\nexport interface BentoGridSpecProps {\n  /**\n   * The BentoCard items.\n   */\n  children: ReactNode;\n  /**\n   * Accessible name of the list. Leave it out when a nearby heading already names the section and pass aria-labelledby instead.\n   */\n  label?: string;\n  /**\n   * Turns off the hover lift and its transition.\n   * @default false\n   */\n  isStill?: boolean;\n}\n\nexport const bentoGridDefaults = {\n  isStill: false,\n} as const;\n\nexport const bentoGridMeta = {\n  \"name\": \"BentoGrid\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"list\"\n} as const;\n"
+        }
+      ]
+    },
+    {
       "id": "blur-fade",
       "spec": {
         "$schema": "./schema/component.schema.json",
@@ -4960,6 +5090,148 @@
         {
           "path": "generated/citation.types.ts",
           "content": "// Generated by rdloom codegen from specs/citation.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\n/** A small numbered marker, like [1], inside a reply that jumps to the source it refers to. */\nexport interface CitationSpecProps {\n  /**\n   * The number shown, starting at 1.\n   */\n  index: number;\n  /**\n   * The source this marker points to.\n   */\n  source: import(\"../utils/ai\").CitationPart;\n  /**\n   * Where the marker goes. Defaults to the matching entry in a Sources list on the same page.\n   */\n  href?: string;\n}\n\nexport const citationDefaults = {\n} as const;\n\nexport const citationMeta = {\n  \"name\": \"Citation\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"link\"\n} as const;\n"
+        }
+      ]
+    },
+    {
+      "id": "code-comparison",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "CodeComparison",
+        "version": "0.1.0",
+        "category": "motion",
+        "status": "experimental",
+        "description": "Two code panels, before and after, side by side on wider screens and stacked on phones. Each has a label, line numbers and optional highlighted lines. It does no syntax colouring and has no dependency.",
+        "props": {
+          "before": {
+            "type": "string",
+            "description": "The code shown in the first panel.",
+            "required": true
+          },
+          "after": {
+            "type": "string",
+            "description": "The code shown in the second panel.",
+            "required": true
+          },
+          "beforeLabel": {
+            "type": "string",
+            "description": "Caption of the first panel.",
+            "default": "Before"
+          },
+          "afterLabel": {
+            "type": "string",
+            "description": "Caption of the second panel.",
+            "default": "After"
+          },
+          "beforeHighlight": {
+            "type": "custom",
+            "tsType": "number[]",
+            "description": "Line numbers (starting at 1) to mark in the first panel."
+          },
+          "afterHighlight": {
+            "type": "custom",
+            "tsType": "number[]",
+            "description": "Line numbers (starting at 1) to mark in the second panel."
+          },
+          "label": {
+            "type": "string",
+            "description": "Accessible name of the whole comparison.",
+            "default": "Code comparison"
+          },
+          "language": {
+            "type": "string",
+            "description": "Language name, shown in the caption and used as a data attribute. No colouring is applied."
+          }
+        },
+        "variants": [],
+        "states": [
+          "default",
+          "focus"
+        ],
+        "slots": [
+          "root",
+          "panel",
+          "caption",
+          "code",
+          "line",
+          "lineNumber"
+        ],
+        "tokens": [
+          "color.surface.subtle",
+          "color.border.default",
+          "color.text.default",
+          "color.text.muted",
+          "color.action.primary",
+          "color.focus.ring",
+          "radius.control"
+        ],
+        "a11y": {
+          "role": "group",
+          "keyboard": [
+            "Tab: moves to each code area, which scrolls with the arrow keys when a line is wide"
+          ],
+          "requirements": [
+            "The comparison is a group named by label; each panel is a figure with a caption",
+            "The code is real text in pre and code, in the server HTML, with no JavaScript needed",
+            "Highlighted lines are marked by a bar and a tint, not by colour alone, and the caption lists them in text for screen readers",
+            "Line numbers are decoration and are not read or copied",
+            "Panels stack on phones and sit side by side from the medium breakpoint, and the page never scrolls sideways",
+            "No motion"
+          ],
+          "screenReader": [
+            "Group, then each figure with its caption, the highlighted line numbers, then the code"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "Showing a migration or a fix as before and after",
+            "Docs that compare two ways to write the same thing"
+          ],
+          "avoid_when": [
+            "A line-by-line diff of real files (use a diff tool)",
+            "Code that needs syntax colouring"
+          ],
+          "anti_patterns": [
+            "Highlighting most of the lines",
+            "Comparing code in different languages"
+          ]
+        },
+        "examples": [
+          "basic",
+          "with-highlights"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {}
+        }
+      },
+      "install": {
+        "command": "npx rdloom add code-comparison",
+        "dependencies": [],
+        "registryDependencies": [
+          "tokens",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import { CodeComparison } from \"@rdloom/react\";\n\nconst before = `function total(items) {\n  let sum = 0;\n  for (const item of items) {\n    sum += item.price;\n  }\n  return sum;\n}`;\n\nconst after = `function total(items) {\n  return items.reduce((sum, item) => sum + item.price, 0);\n}`;\n\nexport default function CodeComparisonBasicExample() {\n  return (\n    <div className=\"flex w-full justify-center\">\n      <CodeComparison className=\"max-w-3xl\" before={before} after={after} language=\"javascript\" />\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "with-highlights",
+          "code": "import { CodeComparison } from \"@rdloom/react\";\n\nconst before = `<button onClick={save}>\n  Save\n</button>`;\n\nconst after = `<Button onPress={save}>\n  Save\n</Button>`;\n\nexport default function CodeComparisonWithHighlightsExample() {\n  return (\n    <div className=\"flex w-full justify-center\">\n      <CodeComparison\n        className=\"max-w-3xl\"\n        label=\"Button migration\"\n        beforeLabel=\"Plain element\"\n        afterLabel=\"Library button\"\n        before={before}\n        after={after}\n        beforeHighlight={[1]}\n        afterHighlight={[1]}\n      />\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "code-comparison/code-comparison.tsx",
+          "content": "\"use client\";\n\nimport { forwardRef, type HTMLAttributes } from \"react\";\nimport { type CodeComparisonSpecProps } from \"../generated/code-comparison.types\";\nimport { cx } from \"../utils/cx\";\n\nexport interface CodeComparisonProps\n  extends CodeComparisonSpecProps,\n    Omit<HTMLAttributes<HTMLDivElement>, keyof CodeComparisonSpecProps | \"className\" | \"children\"> {\n  className?: string;\n}\n\ninterface PanelProps {\n  title: string;\n  code: string;\n  language?: string;\n  highlight?: number[];\n}\n\nfunction Panel({ title, code, language, highlight = [] }: PanelProps) {\n  const lines = code.replace(/\\n$/, \"\").split(\"\\n\");\n  const marked = lines.map((_, i) => i + 1).filter((n) => highlight.includes(n));\n  return (\n    <figure\n      data-language={language || undefined}\n      className=\"m-0 min-w-0 overflow-hidden rounded-[var(--rd-radius-control)] border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-subtle)]\"\n    >\n      <figcaption className=\"border-b border-[var(--rd-color-border-default)] px-3 py-1.5 text-xs text-[var(--rd-color-text-muted)]\">\n        <span className=\"font-medium text-[var(--rd-color-text-default)]\">{title}</span>\n        {language ? <span>{` (${language})`}</span> : null}\n        {marked.length ? <span className=\"sr-only\">{`. Highlighted lines: ${marked.join(\", \")}`}</span> : null}\n      </figcaption>\n      {/* A wide line scrolls inside the panel, so the code must be reachable without a mouse. */}\n      <pre\n        tabIndex={0}\n        className=\"m-0 overflow-x-auto py-3 text-sm leading-relaxed outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--rd-color-focus-ring)]\"\n      >\n        <code className=\"block w-max min-w-full font-mono\">\n          {lines.map((line, i) => {\n            const on = highlight.includes(i + 1);\n            return (\n              <span\n                key={i}\n                data-highlighted={on || undefined}\n                className={cx(\n                  \"block border-s-2 border-transparent pe-3 ps-3\",\n                  on && \"border-[var(--rd-color-action-primary)] bg-[color-mix(in_srgb,var(--rd-color-action-primary)_14%,transparent)]\",\n                )}\n              >\n                <span aria-hidden=\"true\" className=\"inline-block w-7 select-none pe-3 text-end text-[var(--rd-color-text-muted)]\">\n                  {i + 1}\n                </span>\n                {line || \" \"}\n              </span>\n            );\n          })}\n        </code>\n      </pre>\n    </figure>\n  );\n}\n\n/** Before and after code in two panels: side by side from the medium breakpoint, stacked on phones. */\nexport const CodeComparison = forwardRef<HTMLDivElement, CodeComparisonProps>(function CodeComparison(\n  { before, after, beforeLabel = \"Before\", afterLabel = \"After\", beforeHighlight, afterHighlight, label = \"Code comparison\", language, className, ...rest },\n  ref,\n) {\n  return (\n    <div {...rest} ref={ref} role=\"group\" aria-label={label} className={cx(\"grid w-full grid-cols-1 gap-4 md:grid-cols-2\", className)}>\n      <Panel title={beforeLabel} code={before} language={language} highlight={beforeHighlight} />\n      <Panel title={afterLabel} code={after} language={language} highlight={afterHighlight} />\n    </div>\n  );\n});\n"
+        },
+        {
+          "path": "generated/code-comparison.types.ts",
+          "content": "// Generated by rdloom codegen from specs/code-comparison.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\n/** Two code panels, before and after, side by side on wider screens and stacked on phones. Each has a label, line numbers and optional highlighted lines. It does no syntax colouring and has no dependency. */\nexport interface CodeComparisonSpecProps {\n  /**\n   * The code shown in the first panel.\n   */\n  before: string;\n  /**\n   * The code shown in the second panel.\n   */\n  after: string;\n  /**\n   * Caption of the first panel.\n   * @default \"Before\"\n   */\n  beforeLabel?: string;\n  /**\n   * Caption of the second panel.\n   * @default \"After\"\n   */\n  afterLabel?: string;\n  /**\n   * Line numbers (starting at 1) to mark in the first panel.\n   */\n  beforeHighlight?: number[];\n  /**\n   * Line numbers (starting at 1) to mark in the second panel.\n   */\n  afterHighlight?: number[];\n  /**\n   * Accessible name of the whole comparison.\n   * @default \"Code comparison\"\n   */\n  label?: string;\n  /**\n   * Language name, shown in the caption and used as a data attribute. No colouring is applied.\n   */\n  language?: string;\n}\n\nexport const codeComparisonDefaults = {\n  beforeLabel: \"Before\",\n  afterLabel: \"After\",\n  label: \"Code comparison\",\n} as const;\n\nexport const codeComparisonMeta = {\n  \"name\": \"CodeComparison\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"group\"\n} as const;\n"
         }
       ]
     },
@@ -8292,6 +8564,292 @@
       ]
     },
     {
+      "id": "dock",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "Dock",
+        "version": "0.1.0",
+        "category": "motion",
+        "status": "experimental",
+        "description": "A row of icon buttons that grow toward the pointer, like an app launcher. Every item is a real button or link with a visible label (a tooltip) that is also its accessible name. Magnification is off on touch and for reduced motion.",
+        "props": {
+          "children": {
+            "type": "node",
+            "description": "DockItem elements.",
+            "required": true
+          },
+          "label": {
+            "type": "string",
+            "description": "Accessible name of the toolbar, for example Applications.",
+            "required": true
+          },
+          "orientation": {
+            "type": "enum",
+            "values": [
+              "horizontal",
+              "vertical"
+            ],
+            "description": "Layout direction and which arrow keys move focus.",
+            "default": "horizontal"
+          },
+          "magnification": {
+            "type": "number",
+            "description": "Scale of the item directly under the pointer. 1 turns magnification off.",
+            "default": 1.6
+          },
+          "distance": {
+            "type": "number",
+            "description": "Pixels from the pointer within which items grow.",
+            "default": 120
+          },
+          "isPaused": {
+            "type": "boolean",
+            "description": "Turns magnification off. Items still enlarge slightly on focus.",
+            "default": false
+          }
+        },
+        "variants": [
+          "orientation"
+        ],
+        "states": [
+          "default",
+          "hover",
+          "focus",
+          "disabled"
+        ],
+        "slots": [
+          "root",
+          "item",
+          "tooltip"
+        ],
+        "tokens": [
+          "color.surface.raised",
+          "color.border.default",
+          "color.text.default",
+          "color.focus.ring",
+          "radius.overlay",
+          "radius.control",
+          "elevation.raised"
+        ],
+        "a11y": {
+          "role": "toolbar",
+          "keyboard": [
+            "Tab moves into the dock on one item and out again (roving focus)",
+            "Left and Right arrows (Up and Down when vertical) move between items, swapped in right-to-left layouts",
+            "Home and End jump to the first and last item",
+            "Enter or Space activates the focused item"
+          ],
+          "requirements": [
+            "Each item is a real button (or a link when it has an href) named by its label",
+            "The label also shows as a tooltip on hover and keyboard focus",
+            "Focus enlarges the focused item too, so keyboard users get the same feedback",
+            "Magnification does not run on touch, for prefers-reduced-motion, in a .rdm-still container or when isPaused is set",
+            "Scaling is visual only: layout does not shift and hit areas stay at least 24px",
+            "Forced colors: items keep a visible border and focus ring"
+          ],
+          "screenReader": [
+            "Announced as a toolbar with its label; each item as a button or link with its label"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "A small set of app-level shortcuts or tools"
+          ],
+          "avoid_when": [
+            "Primary site navigation: use NavigationMenu",
+            "More than about ten items"
+          ],
+          "anti_patterns": [
+            "Icon items without a label",
+            "Hiding essential actions only in the dock"
+          ]
+        },
+        "examples": [
+          "basic",
+          "vertical",
+          "links"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {
+            "orientation": "Orientation"
+          }
+        }
+      },
+      "install": {
+        "command": "npx rdloom add dock",
+        "dependencies": [
+          "react-aria-components@^1.21.1"
+        ],
+        "registryDependencies": [
+          "tokens",
+          "motion-css",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import { Dock, DockItem, HomeIcon, InboxIcon, SearchIcon, SettingsIcon } from \"@rdloom/react\";\n\nexport default function DockBasicExample() {\n  return (\n    <div className=\"flex w-full justify-center py-6\">\n      <Dock label=\"Applications\">\n        <DockItem label=\"Home\"><HomeIcon className=\"size-5\" /></DockItem>\n        <DockItem label=\"Search\"><SearchIcon className=\"size-5\" /></DockItem>\n        <DockItem label=\"Inbox\"><InboxIcon className=\"size-5\" /></DockItem>\n        <DockItem label=\"Settings\"><SettingsIcon className=\"size-5\" /></DockItem>\n      </Dock>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "vertical",
+          "code": "import { CalendarIcon, ChartIcon, Dock, DockItem, UsersIcon } from \"@rdloom/react\";\n\nexport default function DockVerticalExample() {\n  return (\n    <div className=\"flex w-full justify-center py-4\">\n      <Dock label=\"Workspace tools\" orientation=\"vertical\">\n        <DockItem label=\"Calendar\"><CalendarIcon className=\"size-5\" /></DockItem>\n        <DockItem label=\"Reports\"><ChartIcon className=\"size-5\" /></DockItem>\n        <DockItem label=\"Team\"><UsersIcon className=\"size-5\" /></DockItem>\n      </Dock>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "links",
+          "code": "import { Dock, DockItem, FileIcon, GlobeIcon, HomeIcon } from \"@rdloom/react\";\n\nexport default function DockLinksExample() {\n  return (\n    <div className=\"flex w-full justify-center py-6\">\n      <Dock label=\"Quick links\" magnification={1.4}>\n        <DockItem label=\"Home page\" href=\"#home\"><HomeIcon className=\"size-5\" /></DockItem>\n        <DockItem label=\"Documents\" href=\"#documents\"><FileIcon className=\"size-5\" /></DockItem>\n        <DockItem label=\"Website\" href=\"#website\"><GlobeIcon className=\"size-5\" /></DockItem>\n      </Dock>\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "dock/dock.tsx",
+          "content": "\"use client\";\n\nimport { createContext, forwardRef, useCallback, useContext, useRef, type KeyboardEvent, type PointerEvent, type ReactNode } from \"react\";\nimport { Button as AriaButton, Link as AriaLink, Tooltip as AriaTooltip, TooltipTrigger } from \"react-aria-components\";\nimport { dockDefaults, type DockSpecProps } from \"../generated/dock.types\";\nimport { cx } from \"../utils/cx\";\nimport { prefersReducedMotion, useIsomorphicLayoutEffect } from \"../utils/motion\";\n\nconst ITEMS = \"[data-rdm-dock-item]:not([data-disabled])\";\nconst DockContext = createContext<\"horizontal\" | \"vertical\">(\"horizontal\");\n\nexport interface DockProps extends DockSpecProps, Omit<React.HTMLAttributes<HTMLDivElement>, keyof DockSpecProps | \"role\" | \"aria-label\"> {\n  className?: string;\n}\n\n/**\n * A toolbar of icon buttons that grow toward the pointer. Arrow keys move between items (roving focus),\n * the focused item grows too, and magnification is off for touch, reduced motion and isPaused.\n */\nexport const Dock = forwardRef<HTMLDivElement, DockProps>(function Dock(\n  {\n    children,\n    label,\n    orientation = dockDefaults.orientation,\n    magnification = dockDefaults.magnification,\n    distance = dockDefaults.distance,\n    isPaused = dockDefaults.isPaused,\n    className,\n    onKeyDown,\n    onPointerMove,\n    onPointerLeave,\n    onFocus,\n    ...rest\n  },\n  ref,\n) {\n  const root = useRef<HTMLDivElement | null>(null);\n  const vertical = orientation === \"vertical\";\n\n  const items = () => Array.from(root.current?.querySelectorAll<HTMLElement>(ITEMS) ?? []);\n  // One tab stop: the given item (or the one that already has it, or the first) is reachable by Tab.\n  const setTab = (target?: HTMLElement) => {\n    const list = items();\n    const active = target ?? list.find((el) => el.tabIndex === 0) ?? list[0];\n    for (const el of list) el.tabIndex = el === active ? 0 : -1;\n  };\n  // Re-applied after every render, since items can come and go.\n  useIsomorphicLayoutEffect(() => {\n    setTab(items().find((el) => el === document.activeElement));\n  });\n\n  const reset = useCallback(() => {\n    for (const el of Array.from(root.current?.querySelectorAll<HTMLElement>(\"[data-rdm-dock-item]\") ?? [])) el.style.removeProperty(\"--rdm-dock-s\");\n  }, []);\n\n  const handleMove = (e: PointerEvent<HTMLDivElement>) => {\n    onPointerMove?.(e);\n    if (e.pointerType === \"touch\" || isPaused || magnification <= 1 || prefersReducedMotion() || root.current?.closest(\".rdm-still\")) {\n      reset();\n      return;\n    }\n    const pointer = vertical ? e.clientY : e.clientX;\n    for (const el of items()) {\n      const rect = el.getBoundingClientRect();\n      const centre = vertical ? rect.top + rect.height / 2 : rect.left + rect.width / 2;\n      const t = Math.max(0, 1 - Math.abs(pointer - centre) / distance);\n      // Smooth falloff: the full scale under the pointer, easing to the resting size at `distance`.\n      const scale = 1 + (magnification - 1) * Math.pow(Math.sin((t * Math.PI) / 2), 2);\n      el.style.setProperty(\"--rdm-dock-s\", scale.toFixed(3));\n    }\n  };\n\n  const handleKey = (e: KeyboardEvent<HTMLDivElement>) => {\n    onKeyDown?.(e);\n    if (e.defaultPrevented) return;\n    const rtl = getComputedStyle(e.currentTarget).direction === \"rtl\";\n    const next = vertical ? \"ArrowDown\" : rtl ? \"ArrowLeft\" : \"ArrowRight\";\n    const prev = vertical ? \"ArrowUp\" : rtl ? \"ArrowRight\" : \"ArrowLeft\";\n    const list = items();\n    const index = list.findIndex((el) => el === document.activeElement);\n    if (index < 0) return;\n    let to = -1;\n    if (e.key === next) to = (index + 1) % list.length;\n    else if (e.key === prev) to = (index - 1 + list.length) % list.length;\n    else if (e.key === \"Home\") to = 0;\n    else if (e.key === \"End\") to = list.length - 1;\n    if (to < 0) return;\n    e.preventDefault();\n    setTab(list[to]);\n    list[to].focus();\n  };\n\n  return (\n    <DockContext.Provider value={orientation}>\n      <div\n        {...rest}\n        ref={(node) => {\n          root.current = node;\n          if (typeof ref === \"function\") ref(node);\n          else if (ref) ref.current = node;\n        }}\n        role=\"toolbar\"\n        aria-label={label}\n        aria-orientation={orientation}\n        data-orientation={orientation}\n        data-rdm-paused={isPaused || undefined}\n        onKeyDown={handleKey}\n        onPointerMove={handleMove}\n        onPointerLeave={(e) => {\n          onPointerLeave?.(e);\n          reset();\n        }}\n        onFocus={(e) => {\n          onFocus?.(e);\n          const target = (e.target as HTMLElement).closest<HTMLElement>(\"[data-rdm-dock-item]\");\n          if (target) setTab(target);\n        }}\n        className={cx(\n          \"inline-flex items-center gap-2 p-2 border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-raised)] [box-shadow:var(--rd-elevation-raised)] rounded-[var(--rd-radius-overlay)]\",\n          vertical ? \"flex-col\" : \"flex-row\",\n          className,\n        )}\n      >\n        {children}\n      </div>\n    </DockContext.Provider>\n  );\n});\n\nexport interface DockItemProps {\n  /** The icon. Decorative: the label is the accessible name. */\n  children: ReactNode;\n  /** Names the item: shown as a tooltip and used as its accessible name. */\n  label: string;\n  /** Makes the item a link. Without it the item is a button. */\n  href?: string;\n  onPress?: () => void;\n  isDisabled?: boolean;\n  className?: string;\n}\n\nconst itemClass =\n  \"rdm-dock-item inline-flex size-11 items-center justify-center rounded-[var(--rd-radius-control)] border border-[var(--rd-color-border-default)] \" +\n  \"bg-[var(--rd-color-surface-default)] text-[var(--rd-color-text-default)] outline-none cursor-pointer \" +\n  \"data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)] data-[disabled]:opacity-50 data-[disabled]:cursor-not-allowed\";\n\n/** One icon button (or link) in a Dock. */\nexport const DockItem = forwardRef<HTMLElement, DockItemProps>(function DockItem({ children, label, href, onPress, isDisabled, className }, ref) {\n  const orientation = useContext(DockContext);\n  const common = {\n    \"aria-label\": label,\n    \"data-rdm-dock-item\": \"\",\n    isDisabled,\n    className: cx(itemClass, className),\n  };\n  const icon = (\n    <span aria-hidden=\"true\" className=\"inline-flex\">\n      {children}\n    </span>\n  );\n  return (\n    <TooltipTrigger delay={200} closeDelay={0}>\n      {href ? (\n        <AriaLink {...common} ref={ref as React.Ref<HTMLAnchorElement>} href={href} onPress={onPress}>\n          {icon}\n        </AriaLink>\n      ) : (\n        <AriaButton {...common} ref={ref as React.Ref<HTMLButtonElement>} type=\"button\" onPress={onPress}>\n          {icon}\n        </AriaButton>\n      )}\n      <AriaTooltip\n        placement={orientation === \"vertical\" ? \"end\" : \"top\"}\n        offset={12}\n        className=\"px-2.5 py-1.5 text-xs font-medium bg-[var(--rd-color-text-default)] text-[var(--rd-color-surface-default)] rounded-[var(--rd-radius-control)] [box-shadow:var(--rd-elevation-floating)]\"\n      >\n        {label}\n      </AriaTooltip>\n    </TooltipTrigger>\n  );\n});\n"
+        },
+        {
+          "path": "generated/dock.types.ts",
+          "content": "// Generated by rdloom codegen from specs/dock.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nimport type { ReactNode } from \"react\";\n\nexport const dockOrientationValues = [\"horizontal\", \"vertical\"] as const;\n\n/** A row of icon buttons that grow toward the pointer, like an app launcher. Every item is a real button or link with a visible label (a tooltip) that is also its accessible name. Magnification is off on touch and for reduced motion. */\nexport interface DockSpecProps {\n  /**\n   * DockItem elements.\n   */\n  children: ReactNode;\n  /**\n   * Accessible name of the toolbar, for example Applications.\n   */\n  label: string;\n  /**\n   * Layout direction and which arrow keys move focus.\n   * @default \"horizontal\"\n   */\n  orientation?: \"horizontal\" | \"vertical\";\n  /**\n   * Scale of the item directly under the pointer. 1 turns magnification off.\n   * @default 1.6\n   */\n  magnification?: number;\n  /**\n   * Pixels from the pointer within which items grow.\n   * @default 120\n   */\n  distance?: number;\n  /**\n   * Turns magnification off. Items still enlarge slightly on focus.\n   * @default false\n   */\n  isPaused?: boolean;\n}\n\nexport const dockDefaults = {\n  orientation: \"horizontal\",\n  magnification: 1.6,\n  distance: 120,\n  isPaused: false,\n} as const;\n\nexport const dockMeta = {\n  \"name\": \"Dock\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"toolbar\"\n} as const;\n"
+        }
+      ]
+    },
+    {
+      "id": "dot-pattern",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "DotPattern",
+        "version": "0.1.0",
+        "category": "motion",
+        "status": "experimental",
+        "description": "A field of evenly spaced dots that fills its parent, with an optional edge fade and a slow drift.",
+        "props": {
+          "size": {
+            "type": "number",
+            "description": "Dot diameter in pixels.",
+            "default": 2
+          },
+          "gap": {
+            "type": "number",
+            "description": "Space between dots in pixels.",
+            "default": 20
+          },
+          "color": {
+            "type": "string",
+            "description": "Colour of the pattern: any CSS colour or a token such as var(--rd-color-border-default).",
+            "default": "var(--rd-color-border-default)"
+          },
+          "fade": {
+            "type": "boolean",
+            "description": "Fades the pattern out toward its edges.",
+            "default": true
+          },
+          "animated": {
+            "type": "boolean",
+            "description": "Drifts the pattern slowly, one tile per cycle. Off by default.",
+            "default": false
+          },
+          "isStill": {
+            "type": "boolean",
+            "description": "Stops the drift. Moving content should be stoppable.",
+            "default": false
+          },
+          "duration": {
+            "type": "number",
+            "description": "Seconds one drift cycle takes.",
+            "default": 10
+          }
+        },
+        "variants": [
+          "fade",
+          "animated",
+          "isStill"
+        ],
+        "states": [
+          "default"
+        ],
+        "slots": [
+          "root",
+          "layer"
+        ],
+        "tokens": [
+          "color.border.default"
+        ],
+        "a11y": {
+          "role": "presentation",
+          "keyboard": [],
+          "requirements": [
+            "Pure decoration: aria-hidden, never focusable, and pointer-events none so content on top stays usable",
+            "It is drawn with CSS only, so it needs no JavaScript and is safe in server HTML",
+            "Stands still for visitors who ask for less motion (prefers-reduced-motion), with isStill, and inside an rdm-still container",
+            "Drift is slow and never flashes (WCAG 2.2.2, 2.3.1)",
+            "Hidden in forced-colors (high contrast) mode so it never fights system colours",
+            "Keep text on top at 4.5:1 against the lines: use a low-contrast token for the pattern"
+          ],
+          "screenReader": [
+            "Ignored: it is not announced"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "A quiet dotted behind a hero, card or empty state",
+            "Giving a flat surface a little texture"
+          ],
+          "avoid_when": [
+            "Behind long text where the lines reduce legibility",
+            "As the only way to show a boundary or meaning"
+          ],
+          "anti_patterns": [
+            "A high-contrast colour that competes with the content",
+            "Animating several patterns on one screen"
+          ]
+        },
+        "examples": [
+          "basic",
+          "faded",
+          "animated"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {
+            "animated": "Animated"
+          }
+        }
+      },
+      "install": {
+        "command": "npx rdloom add dot-pattern",
+        "dependencies": [],
+        "registryDependencies": [
+          "tokens",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import { DotPattern } from \"@rdloom/react\";\n\nexport default function DotPatternExample() {\n  return (\n    <div className=\"flex w-full justify-center\">\n      <div className=\"relative flex h-48 w-full max-w-md items-center justify-center overflow-hidden rounded-xl border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-default)]\">\n        <DotPattern fade={false} />\n        <div className=\"relative text-center\">\n          <p className=\"text-lg font-medium text-[var(--rd-color-text-default)]\">Dot field</p>\n          <p className=\"text-sm text-[var(--rd-color-text-muted)]\">Dots every 22 pixels</p>\n        </div>\n      </div>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "faded",
+          "code": "import { DotPattern } from \"@rdloom/react\";\n\nexport default function DotPatternExample() {\n  return (\n    <div className=\"flex w-full justify-center\">\n      <div className=\"relative flex h-48 w-full max-w-md items-center justify-center overflow-hidden rounded-xl border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-default)]\">\n        <DotPattern size={3} gap={17} fade />\n        <div className=\"relative text-center\">\n          <p className=\"text-lg font-medium text-[var(--rd-color-text-default)]\">Faded edges</p>\n          <p className=\"text-sm text-[var(--rd-color-text-muted)]\">Heavier dots that dissolve outward</p>\n        </div>\n      </div>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "animated",
+          "code": "import { DotPattern } from \"@rdloom/react\";\n\nexport default function DotPatternExample() {\n  return (\n    <div className=\"flex w-full justify-center\">\n      <div className=\"relative flex h-48 w-full max-w-md items-center justify-center overflow-hidden rounded-xl border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-default)]\">\n        <DotPattern animated fade />\n        <div className=\"relative text-center\">\n          <p className=\"text-lg font-medium text-[var(--rd-color-text-default)]\">Slow drift</p>\n          <p className=\"text-sm text-[var(--rd-color-text-muted)]\">Stops for reduced motion</p>\n        </div>\n      </div>\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "dot-pattern/dot-pattern.tsx",
+          "content": "\"use client\";\n\nimport { forwardRef } from \"react\";\nimport { dotPatternDefaults, type DotPatternSpecProps } from \"../generated/dot-pattern.types\";\nimport { PatternShell, type PatternDivProps } from \"../utils/pattern\";\n\nexport interface DotPatternProps extends DotPatternSpecProps, Omit<PatternDivProps, keyof DotPatternSpecProps> {}\n\n/** A field of dots that fills its parent. Decoration only: hidden from assistive technology, ignores the pointer. */\nexport const DotPattern = forwardRef<HTMLDivElement, DotPatternProps>(function DotPattern(\n  {\n    size = dotPatternDefaults.size,\n    gap = dotPatternDefaults.gap,\n    color = dotPatternDefaults.color,\n    fade = dotPatternDefaults.fade,\n    animated = dotPatternDefaults.animated,\n    isStill = dotPatternDefaults.isStill,\n    duration = dotPatternDefaults.duration,\n    ...rest\n  },\n  ref,\n) {\n  const tile = size + gap;\n  const r = size / 2;\n  return (\n    <PatternShell\n      {...rest}\n      ref={ref}\n      color={color}\n      fade={fade}\n      animated={animated}\n      isStill={isStill}\n      duration={duration}\n      period={tile}\n      travel={[tile, tile]}\n      fill={{\n        backgroundImage: `radial-gradient(circle at center, var(--rdm-pc) ${r}px, transparent ${r + 0.5}px)`,\n        backgroundSize: `${tile}px ${tile}px`,\n      }}\n    />\n  );\n});\n"
+        },
+        {
+          "path": "generated/dot-pattern.types.ts",
+          "content": "// Generated by rdloom codegen from specs/dot-pattern.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\n/** A field of evenly spaced dots that fills its parent, with an optional edge fade and a slow drift. */\nexport interface DotPatternSpecProps {\n  /**\n   * Dot diameter in pixels.\n   * @default 2\n   */\n  size?: number;\n  /**\n   * Space between dots in pixels.\n   * @default 20\n   */\n  gap?: number;\n  /**\n   * Colour of the pattern: any CSS colour or a token such as var(--rd-color-border-default).\n   * @default \"var(--rd-color-border-default)\"\n   */\n  color?: string;\n  /**\n   * Fades the pattern out toward its edges.\n   * @default true\n   */\n  fade?: boolean;\n  /**\n   * Drifts the pattern slowly, one tile per cycle. Off by default.\n   * @default false\n   */\n  animated?: boolean;\n  /**\n   * Stops the drift. Moving content should be stoppable.\n   * @default false\n   */\n  isStill?: boolean;\n  /**\n   * Seconds one drift cycle takes.\n   * @default 10\n   */\n  duration?: number;\n}\n\nexport const dotPatternDefaults = {\n  size: 2,\n  gap: 20,\n  color: \"var(--rd-color-border-default)\",\n  fade: true,\n  animated: false,\n  isStill: false,\n  duration: 10,\n} as const;\n\nexport const dotPatternMeta = {\n  \"name\": \"DotPattern\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"presentation\"\n} as const;\n"
+        }
+      ]
+    },
+    {
       "id": "drawer",
       "spec": {
         "$schema": "./schema/component.schema.json",
@@ -10226,6 +10784,278 @@
       ]
     },
     {
+      "id": "grid-pattern",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "GridPattern",
+        "version": "0.1.0",
+        "category": "motion",
+        "status": "experimental",
+        "description": "A grid of thin lines that fills its parent, with an optional edge fade and a slow drift.",
+        "props": {
+          "size": {
+            "type": "number",
+            "description": "Cell size in pixels.",
+            "default": 32
+          },
+          "strokeWidth": {
+            "type": "number",
+            "description": "Line thickness in pixels.",
+            "default": 1
+          },
+          "color": {
+            "type": "string",
+            "description": "Colour of the pattern: any CSS colour or a token such as var(--rd-color-border-default).",
+            "default": "var(--rd-color-border-default)"
+          },
+          "fade": {
+            "type": "boolean",
+            "description": "Fades the pattern out toward its edges.",
+            "default": true
+          },
+          "animated": {
+            "type": "boolean",
+            "description": "Drifts the pattern slowly, one tile per cycle. Off by default.",
+            "default": false
+          },
+          "isStill": {
+            "type": "boolean",
+            "description": "Stops the drift. Moving content should be stoppable.",
+            "default": false
+          },
+          "duration": {
+            "type": "number",
+            "description": "Seconds one drift cycle takes.",
+            "default": 10
+          }
+        },
+        "variants": [
+          "fade",
+          "animated",
+          "isStill"
+        ],
+        "states": [
+          "default"
+        ],
+        "slots": [
+          "root",
+          "layer"
+        ],
+        "tokens": [
+          "color.border.default"
+        ],
+        "a11y": {
+          "role": "presentation",
+          "keyboard": [],
+          "requirements": [
+            "Pure decoration: aria-hidden, never focusable, and pointer-events none so content on top stays usable",
+            "It is drawn with CSS only, so it needs no JavaScript and is safe in server HTML",
+            "Stands still for visitors who ask for less motion (prefers-reduced-motion), with isStill, and inside an rdm-still container",
+            "Drift is slow and never flashes (WCAG 2.2.2, 2.3.1)",
+            "Hidden in forced-colors (high contrast) mode so it never fights system colours",
+            "Keep text on top at 4.5:1 against the lines: use a low-contrast token for the pattern"
+          ],
+          "screenReader": [
+            "Ignored: it is not announced"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "A quiet grid behind a hero, card or empty state",
+            "Giving a flat surface a little texture"
+          ],
+          "avoid_when": [
+            "Behind long text where the lines reduce legibility",
+            "As the only way to show a boundary or meaning"
+          ],
+          "anti_patterns": [
+            "A high-contrast colour that competes with the content",
+            "Animating several patterns on one screen"
+          ]
+        },
+        "examples": [
+          "basic",
+          "faded",
+          "animated"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {
+            "animated": "Animated"
+          }
+        }
+      },
+      "install": {
+        "command": "npx rdloom add grid-pattern",
+        "dependencies": [],
+        "registryDependencies": [
+          "tokens",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import { GridPattern } from \"@rdloom/react\";\n\nexport default function GridPatternExample() {\n  return (\n    <div className=\"flex w-full justify-center\">\n      <div className=\"relative flex h-48 w-full max-w-md items-center justify-center overflow-hidden rounded-xl border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-default)]\">\n        <GridPattern fade={false} />\n        <div className=\"relative text-center\">\n          <p className=\"text-lg font-medium text-[var(--rd-color-text-default)]\">Plain grid</p>\n          <p className=\"text-sm text-[var(--rd-color-text-muted)]\">Lines at every 32 pixels</p>\n        </div>\n      </div>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "faded",
+          "code": "import { GridPattern } from \"@rdloom/react\";\n\nexport default function GridPatternExample() {\n  return (\n    <div className=\"flex w-full justify-center\">\n      <div className=\"relative flex h-48 w-full max-w-md items-center justify-center overflow-hidden rounded-xl border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-default)]\">\n        <GridPattern size={24} fade />\n        <div className=\"relative text-center\">\n          <p className=\"text-lg font-medium text-[var(--rd-color-text-default)]\">Faded edges</p>\n          <p className=\"text-sm text-[var(--rd-color-text-muted)]\">The grid dissolves toward the sides</p>\n        </div>\n      </div>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "animated",
+          "code": "import { GridPattern } from \"@rdloom/react\";\n\nexport default function GridPatternExample() {\n  return (\n    <div className=\"flex w-full justify-center\">\n      <div className=\"relative flex h-48 w-full max-w-md items-center justify-center overflow-hidden rounded-xl border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-default)]\">\n        <GridPattern animated fade />\n        <div className=\"relative text-center\">\n          <p className=\"text-lg font-medium text-[var(--rd-color-text-default)]\">Slow drift</p>\n          <p className=\"text-sm text-[var(--rd-color-text-muted)]\">Stops for reduced motion</p>\n        </div>\n      </div>\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "grid-pattern/grid-pattern.tsx",
+          "content": "\"use client\";\n\nimport { forwardRef } from \"react\";\nimport { gridPatternDefaults, type GridPatternSpecProps } from \"../generated/grid-pattern.types\";\nimport { PatternShell, type PatternDivProps } from \"../utils/pattern\";\n\nexport interface GridPatternProps extends GridPatternSpecProps, Omit<PatternDivProps, keyof GridPatternSpecProps> {}\n\n/** A grid of thin lines that fills its parent. Decoration only: hidden from assistive technology, ignores the pointer. */\nexport const GridPattern = forwardRef<HTMLDivElement, GridPatternProps>(function GridPattern(\n  {\n    size = gridPatternDefaults.size,\n    strokeWidth = gridPatternDefaults.strokeWidth,\n    color = gridPatternDefaults.color,\n    fade = gridPatternDefaults.fade,\n    animated = gridPatternDefaults.animated,\n    isStill = gridPatternDefaults.isStill,\n    duration = gridPatternDefaults.duration,\n    ...rest\n  },\n  ref,\n) {\n  const line = (dir: string) => `linear-gradient(${dir}, var(--rdm-pc) ${strokeWidth}px, transparent ${strokeWidth}px)`;\n  return (\n    <PatternShell\n      {...rest}\n      ref={ref}\n      color={color}\n      fade={fade}\n      animated={animated}\n      isStill={isStill}\n      duration={duration}\n      period={size}\n      travel={[size, size]}\n      fill={{ backgroundImage: `${line(\"to right\")}, ${line(\"to bottom\")}`, backgroundSize: `${size}px ${size}px` }}\n    />\n  );\n});\n"
+        },
+        {
+          "path": "generated/grid-pattern.types.ts",
+          "content": "// Generated by rdloom codegen from specs/grid-pattern.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\n/** A grid of thin lines that fills its parent, with an optional edge fade and a slow drift. */\nexport interface GridPatternSpecProps {\n  /**\n   * Cell size in pixels.\n   * @default 32\n   */\n  size?: number;\n  /**\n   * Line thickness in pixels.\n   * @default 1\n   */\n  strokeWidth?: number;\n  /**\n   * Colour of the pattern: any CSS colour or a token such as var(--rd-color-border-default).\n   * @default \"var(--rd-color-border-default)\"\n   */\n  color?: string;\n  /**\n   * Fades the pattern out toward its edges.\n   * @default true\n   */\n  fade?: boolean;\n  /**\n   * Drifts the pattern slowly, one tile per cycle. Off by default.\n   * @default false\n   */\n  animated?: boolean;\n  /**\n   * Stops the drift. Moving content should be stoppable.\n   * @default false\n   */\n  isStill?: boolean;\n  /**\n   * Seconds one drift cycle takes.\n   * @default 10\n   */\n  duration?: number;\n}\n\nexport const gridPatternDefaults = {\n  size: 32,\n  strokeWidth: 1,\n  color: \"var(--rd-color-border-default)\",\n  fade: true,\n  animated: false,\n  isStill: false,\n  duration: 10,\n} as const;\n\nexport const gridPatternMeta = {\n  \"name\": \"GridPattern\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"presentation\"\n} as const;\n"
+        }
+      ]
+    },
+    {
+      "id": "hexagon-pattern",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "HexagonPattern",
+        "version": "0.1.0",
+        "category": "motion",
+        "status": "experimental",
+        "description": "A honeycomb of hexagon outlines that fills its parent, with an optional edge fade and a slow drift.",
+        "props": {
+          "size": {
+            "type": "number",
+            "description": "Hexagon radius (centre to corner) in pixels.",
+            "default": 24
+          },
+          "strokeWidth": {
+            "type": "number",
+            "description": "Line thickness in pixels.",
+            "default": 1
+          },
+          "color": {
+            "type": "string",
+            "description": "Colour of the pattern: any CSS colour or a token such as var(--rd-color-border-default).",
+            "default": "var(--rd-color-border-default)"
+          },
+          "fade": {
+            "type": "boolean",
+            "description": "Fades the pattern out toward its edges.",
+            "default": true
+          },
+          "animated": {
+            "type": "boolean",
+            "description": "Drifts the pattern slowly, one tile per cycle. Off by default.",
+            "default": false
+          },
+          "isStill": {
+            "type": "boolean",
+            "description": "Stops the drift. Moving content should be stoppable.",
+            "default": false
+          },
+          "duration": {
+            "type": "number",
+            "description": "Seconds one drift cycle takes.",
+            "default": 12
+          }
+        },
+        "variants": [
+          "fade",
+          "animated",
+          "isStill"
+        ],
+        "states": [
+          "default"
+        ],
+        "slots": [
+          "root",
+          "layer"
+        ],
+        "tokens": [
+          "color.border.default"
+        ],
+        "a11y": {
+          "role": "presentation",
+          "keyboard": [],
+          "requirements": [
+            "Pure decoration: aria-hidden, never focusable, and pointer-events none so content on top stays usable",
+            "It is drawn with CSS only, so it needs no JavaScript and is safe in server HTML",
+            "Stands still for visitors who ask for less motion (prefers-reduced-motion), with isStill, and inside an rdm-still container",
+            "Drift is slow and never flashes (WCAG 2.2.2, 2.3.1)",
+            "Hidden in forced-colors (high contrast) mode so it never fights system colours",
+            "Keep text on top at 4.5:1 against the lines: use a low-contrast token for the pattern"
+          ],
+          "screenReader": [
+            "Ignored: it is not announced"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "A quiet honeycomb behind a hero, card or empty state",
+            "Giving a flat surface a little texture"
+          ],
+          "avoid_when": [
+            "Behind long text where the lines reduce legibility",
+            "As the only way to show a boundary or meaning"
+          ],
+          "anti_patterns": [
+            "A high-contrast colour that competes with the content",
+            "Animating several patterns on one screen"
+          ]
+        },
+        "examples": [
+          "basic",
+          "faded",
+          "animated"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {
+            "animated": "Animated"
+          }
+        }
+      },
+      "install": {
+        "command": "npx rdloom add hexagon-pattern",
+        "dependencies": [],
+        "registryDependencies": [
+          "tokens",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import { HexagonPattern } from \"@rdloom/react\";\n\nexport default function HexagonPatternExample() {\n  return (\n    <div className=\"flex w-full justify-center\">\n      <div className=\"relative flex h-48 w-full max-w-md items-center justify-center overflow-hidden rounded-xl border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-default)]\">\n        <HexagonPattern fade={false} />\n        <div className=\"relative text-center\">\n          <p className=\"text-lg font-medium text-[var(--rd-color-text-default)]\">Honeycomb</p>\n          <p className=\"text-sm text-[var(--rd-color-text-muted)]\">Hexagon outlines, 24 pixel radius</p>\n        </div>\n      </div>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "faded",
+          "code": "import { HexagonPattern } from \"@rdloom/react\";\n\nexport default function HexagonPatternExample() {\n  return (\n    <div className=\"flex w-full justify-center\">\n      <div className=\"relative flex h-48 w-full max-w-md items-center justify-center overflow-hidden rounded-xl border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-default)]\">\n        <HexagonPattern size={18} fade />\n        <div className=\"relative text-center\">\n          <p className=\"text-lg font-medium text-[var(--rd-color-text-default)]\">Smaller cells</p>\n          <p className=\"text-sm text-[var(--rd-color-text-muted)]\">Fading toward the edges</p>\n        </div>\n      </div>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "animated",
+          "code": "import { HexagonPattern } from \"@rdloom/react\";\n\nexport default function HexagonPatternExample() {\n  return (\n    <div className=\"flex w-full justify-center\">\n      <div className=\"relative flex h-48 w-full max-w-md items-center justify-center overflow-hidden rounded-xl border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-default)]\">\n        <HexagonPattern animated fade />\n        <div className=\"relative text-center\">\n          <p className=\"text-lg font-medium text-[var(--rd-color-text-default)]\">Slow drift</p>\n          <p className=\"text-sm text-[var(--rd-color-text-muted)]\">Stops for reduced motion</p>\n        </div>\n      </div>\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "hexagon-pattern/hexagon-pattern.tsx",
+          "content": "\"use client\";\n\nimport { forwardRef } from \"react\";\nimport { hexagonPatternDefaults, type HexagonPatternSpecProps } from \"../generated/hexagon-pattern.types\";\nimport { PatternShell, type PatternDivProps } from \"../utils/pattern\";\n\nexport interface HexagonPatternProps extends HexagonPatternSpecProps, Omit<PatternDivProps, keyof HexagonPatternSpecProps> {}\n\nconst round = (n: number) => Math.round(n * 100) / 100;\n\n/** The honeycomb outline as a CSS mask. It is escaped so no markup sits in the component source; the colour comes from the layer's background. */\nfunction honeycombMask(size: number, strokeWidth: number) {\n  const w = round(Math.sqrt(3) * size);\n  const h = size * 3;\n  const path = [\n    `M0 ${size / 2}L${w / 2} 0L${w} ${size / 2}`,\n    `M0 ${size * 1.5}L${w / 2} ${size * 2}L${w} ${size * 1.5}`,\n    `M0 ${size / 2}V${size * 1.5}`,\n    `M${w} ${size / 2}V${size * 1.5}`,\n    `M${w / 2} ${size * 2}V${h}`,\n  ].join(\"\");\n  const markup = [\"<\", \"svg xmlns='http://www.w3.org/2000/svg' width='\", w, \"' height='\", h, \"' viewBox='0 0 \", w, \" \", h, \"'><path d='\", path, \"' fill='none' stroke='#000' stroke-width='\", strokeWidth, \"'/></\", \"svg>\"].join(\"\");\n  return { w, h, url: `url(\"data:image/svg+xml,${encodeURIComponent(markup)}\")` };\n}\n\n/** A honeycomb of hexagon outlines that fills its parent. Decoration only: hidden from assistive technology, ignores the pointer. */\nexport const HexagonPattern = forwardRef<HTMLDivElement, HexagonPatternProps>(function HexagonPattern(\n  {\n    size = hexagonPatternDefaults.size,\n    strokeWidth = hexagonPatternDefaults.strokeWidth,\n    color = hexagonPatternDefaults.color,\n    fade = hexagonPatternDefaults.fade,\n    animated = hexagonPatternDefaults.animated,\n    isStill = hexagonPatternDefaults.isStill,\n    duration = hexagonPatternDefaults.duration,\n    ...rest\n  },\n  ref,\n) {\n  const { w, h, url } = honeycombMask(size, strokeWidth);\n  return (\n    <PatternShell\n      {...rest}\n      ref={ref}\n      color={color}\n      fade={fade}\n      animated={animated}\n      isStill={isStill}\n      duration={duration}\n      period={Math.max(w, h)}\n      travel={[0, h]}\n      fill={{\n        backgroundColor: \"var(--rdm-pc)\",\n        WebkitMaskImage: url,\n        maskImage: url,\n        WebkitMaskSize: `${w}px ${h}px`,\n        maskSize: `${w}px ${h}px`,\n      }}\n    />\n  );\n});\n"
+        },
+        {
+          "path": "generated/hexagon-pattern.types.ts",
+          "content": "// Generated by rdloom codegen from specs/hexagon-pattern.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\n/** A honeycomb of hexagon outlines that fills its parent, with an optional edge fade and a slow drift. */\nexport interface HexagonPatternSpecProps {\n  /**\n   * Hexagon radius (centre to corner) in pixels.\n   * @default 24\n   */\n  size?: number;\n  /**\n   * Line thickness in pixels.\n   * @default 1\n   */\n  strokeWidth?: number;\n  /**\n   * Colour of the pattern: any CSS colour or a token such as var(--rd-color-border-default).\n   * @default \"var(--rd-color-border-default)\"\n   */\n  color?: string;\n  /**\n   * Fades the pattern out toward its edges.\n   * @default true\n   */\n  fade?: boolean;\n  /**\n   * Drifts the pattern slowly, one tile per cycle. Off by default.\n   * @default false\n   */\n  animated?: boolean;\n  /**\n   * Stops the drift. Moving content should be stoppable.\n   * @default false\n   */\n  isStill?: boolean;\n  /**\n   * Seconds one drift cycle takes.\n   * @default 12\n   */\n  duration?: number;\n}\n\nexport const hexagonPatternDefaults = {\n  size: 24,\n  strokeWidth: 1,\n  color: \"var(--rd-color-border-default)\",\n  fade: true,\n  animated: false,\n  isStill: false,\n  duration: 12,\n} as const;\n\nexport const hexagonPatternMeta = {\n  \"name\": \"HexagonPattern\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"presentation\"\n} as const;\n"
+        }
+      ]
+    },
+    {
       "id": "hover-card",
       "spec": {
         "$schema": "./schema/component.schema.json",
@@ -10784,6 +11614,143 @@
         {
           "path": "generated/input-otp.types.ts",
           "content": "// Generated by rdloom codegen from specs/input-otp.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nexport const inputOTPTypeValues = [\"numeric\", \"alphanumeric\"] as const;\n\n/** One-time code input for verification and two-factor sign in. One real input holds the code and drawn cells show it, so paste, autofill from SMS and screen readers all work. */\nexport interface InputOTPSpecProps {\n  /**\n   * Visible label, such as Verification code. Names the group.\n   */\n  label: string;\n  /**\n   * Help text shown under the cells.\n   */\n  description?: string;\n  /**\n   * Shown when the code is invalid.\n   */\n  errorMessage?: string;\n  /**\n   * Number of characters in the code.\n   * @default 6\n   */\n  length?: number;\n  /**\n   * Characters accepted. Numeric also opens the numeric keypad on phones.\n   * @default \"numeric\"\n   */\n  type?: \"numeric\" | \"alphanumeric\";\n  /**\n   * Controlled value.\n   */\n  value?: string;\n  /**\n   * Initial value when uncontrolled.\n   */\n  defaultValue?: string;\n  /**\n   * Called with the code on every edit.\n   */\n  onChange?: (value: string) => void;\n  /**\n   * Called once when every cell is filled.\n   */\n  onComplete?: (value: string) => void;\n  /**\n   * Draws a separator after these cell counts, for example [3] groups a 6 digit code as 3 + 3.\n   */\n  separatorAt?: number[];\n  /**\n   * Shows dots instead of the characters.\n   * @default false\n   */\n  mask?: boolean;\n  /**\n   * Focuses the input on mount.\n   * @default false\n   */\n  autoFocus?: boolean;\n  /**\n   * Prevents editing and dims the cells.\n   * @default false\n   */\n  isDisabled?: boolean;\n  /**\n   * Marks the code as wrong and shows errorMessage.\n   * @default false\n   */\n  isInvalid?: boolean;\n}\n\nexport const inputOTPDefaults = {\n  length: 6,\n  type: \"numeric\",\n  mask: false,\n  autoFocus: false,\n  isDisabled: false,\n  isInvalid: false,\n} as const;\n\nexport const inputOTPMeta = {\n  \"name\": \"InputOTP\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"group\"\n} as const;\n"
+        }
+      ]
+    },
+    {
+      "id": "interactive-grid-pattern",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "InteractiveGridPattern",
+        "version": "0.1.0",
+        "category": "motion",
+        "status": "experimental",
+        "description": "A grid whose cells light up under the mouse or pen. Decoration only: it does nothing on touch or for reduced motion and never takes focus.",
+        "props": {
+          "size": {
+            "type": "number",
+            "description": "Cell size in pixels.",
+            "default": 40
+          },
+          "strokeWidth": {
+            "type": "number",
+            "description": "Line thickness in pixels.",
+            "default": 1
+          },
+          "color": {
+            "type": "string",
+            "description": "Colour of the grid lines.",
+            "default": "var(--rd-color-border-default)"
+          },
+          "activeColor": {
+            "type": "string",
+            "description": "Colour of the lit cells.",
+            "default": "var(--rd-color-action-primary)"
+          },
+          "variant": {
+            "type": "enum",
+            "values": [
+              "fill",
+              "trail"
+            ],
+            "default": "fill",
+            "description": "fill lights the cell under the pointer; trail leaves a short fading trail of cells."
+          },
+          "fade": {
+            "type": "boolean",
+            "description": "Fades the grid out toward its edges.",
+            "default": true
+          },
+          "isStill": {
+            "type": "boolean",
+            "description": "Turns the lighting off.",
+            "default": false
+          }
+        },
+        "variants": [
+          "variant",
+          "fade",
+          "isStill"
+        ],
+        "states": [
+          "default"
+        ],
+        "slots": [
+          "root",
+          "layer"
+        ],
+        "tokens": [
+          "color.border.default"
+        ],
+        "a11y": {
+          "role": "presentation",
+          "keyboard": [],
+          "requirements": [
+            "Pure decoration: aria-hidden, never focusable, and pointer-events none so content on top stays usable",
+            "It is drawn with CSS only, so it needs no JavaScript and is safe in server HTML",
+            "Stands still for visitors who ask for less motion (prefers-reduced-motion), with isStill, and inside an rdm-still container",
+            "Drift is slow and never flashes (WCAG 2.2.2, 2.3.1)",
+            "Hidden in forced-colors (high contrast) mode so it never fights system colours",
+            "Keep text on top at 4.5:1 against the lines: use a low-contrast token for the pattern",
+            "The pointer is read from the parent element only for mouse and pen; touch does nothing",
+            "It never takes the pointer or focus and never replaces a focus ring"
+          ],
+          "screenReader": [
+            "Ignored: it is not announced"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "A hero or empty state where a little pointer feedback adds life"
+          ],
+          "avoid_when": [
+            "Anything people must click: the effect is never a control",
+            "Touch-first screens, where it does nothing"
+          ],
+          "anti_patterns": [
+            "Using it as the only hover feedback",
+            "Putting several on one screen"
+          ]
+        },
+        "examples": [
+          "basic",
+          "trail"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {
+            "variant": "Variant"
+          }
+        }
+      },
+      "install": {
+        "command": "npx rdloom add interactive-grid-pattern",
+        "dependencies": [],
+        "registryDependencies": [
+          "tokens",
+          "motion-css",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import { InteractiveGridPattern } from \"@rdloom/react\";\n\nexport default function InteractiveGridPatternExample() {\n  return (\n    <div className=\"flex w-full justify-center\">\n      <div className=\"relative flex h-48 w-full max-w-md items-center justify-center overflow-hidden rounded-xl border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-default)]\">\n        <InteractiveGridPattern />\n        <div className=\"relative text-center\">\n          <p className=\"text-lg font-medium text-[var(--rd-color-text-default)]\">Move the mouse here</p>\n          <p className=\"text-sm text-[var(--rd-color-text-muted)]\">Cells light up under a mouse or pen, not on touch</p>\n        </div>\n      </div>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "trail",
+          "code": "import { InteractiveGridPattern } from \"@rdloom/react\";\n\nexport default function InteractiveGridPatternExample() {\n  return (\n    <div className=\"flex w-full justify-center\">\n      <div className=\"relative flex h-48 w-full max-w-md items-center justify-center overflow-hidden rounded-xl border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-default)]\">\n        <InteractiveGridPattern variant=\"trail\" size={32} />\n        <div className=\"relative text-center\">\n          <p className=\"text-lg font-medium text-[var(--rd-color-text-default)]\">A short fading trail</p>\n          <p className=\"text-sm text-[var(--rd-color-text-muted)]\">Cells light up under a mouse or pen, not on touch</p>\n        </div>\n      </div>\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "interactive-grid-pattern/interactive-grid-pattern.tsx",
+          "content": "\"use client\";\n\nimport { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState, type CSSProperties } from \"react\";\nimport {\n  interactiveGridPatternDefaults,\n  type InteractiveGridPatternSpecProps,\n} from \"../generated/interactive-grid-pattern.types\";\nimport { cx } from \"../utils/cx\";\nimport { useReducedMotion } from \"../utils/motion\";\nimport type { PatternDivProps } from \"../utils/pattern\";\n\nexport interface InteractiveGridPatternProps\n  extends InteractiveGridPatternSpecProps,\n    Omit<PatternDivProps, keyof InteractiveGridPatternSpecProps> {}\n\ninterface Cell {\n  id: number;\n  col: number;\n  row: number;\n}\n\nconst TRAIL = 8;\n\n/**\n * A grid whose cells light up under the mouse or pen. It is decoration: hidden from assistive technology,\n * it never takes the pointer or focus, it does nothing on touch, and it stays dark for reduced motion\n * and isStill. The pointer is read from the parent element, so the content on top keeps working.\n */\nexport const InteractiveGridPattern = forwardRef<HTMLDivElement, InteractiveGridPatternProps>(function InteractiveGridPattern(\n  {\n    size = interactiveGridPatternDefaults.size,\n    strokeWidth = interactiveGridPatternDefaults.strokeWidth,\n    color = interactiveGridPatternDefaults.color,\n    activeColor = interactiveGridPatternDefaults.activeColor,\n    variant = interactiveGridPatternDefaults.variant,\n    fade = interactiveGridPatternDefaults.fade,\n    isStill = interactiveGridPatternDefaults.isStill,\n    className,\n    style,\n    ...rest\n  },\n  forwarded,\n) {\n  const node = useRef<HTMLDivElement | null>(null);\n  useImperativeHandle(forwarded, () => node.current as HTMLDivElement);\n  const reduced = useReducedMotion();\n  const off = isStill || reduced;\n  const [cells, setCells] = useState<Cell[]>([]);\n  const last = useRef(\"\");\n  const counter = useRef(0);\n\n  const leave = useCallback(() => {\n    last.current = \"\";\n    if (variant === \"fill\") setCells([]);\n  }, [variant]);\n\n  useEffect(() => {\n    const el = node.current;\n    const parent = el?.parentElement;\n    if (!el || !parent || off) {\n      setCells([]);\n      return;\n    }\n    const move = (e: PointerEvent) => {\n      if (e.pointerType === \"touch\") return;\n      const rect = el.getBoundingClientRect();\n      const x = e.clientX - rect.left;\n      const y = e.clientY - rect.top;\n      if (x < 0 || y < 0 || x > rect.width || y > rect.height) return;\n      const col = Math.floor(x / size);\n      const row = Math.floor(y / size);\n      const key = `${col}:${row}`;\n      if (key === last.current) return;\n      last.current = key;\n      const cell = { id: ++counter.current, col, row };\n      setCells((c) => (variant === \"fill\" ? [cell] : [...c, cell].slice(-TRAIL)));\n    };\n    parent.addEventListener(\"pointermove\", move);\n    parent.addEventListener(\"pointerleave\", leave);\n    return () => {\n      parent.removeEventListener(\"pointermove\", move);\n      parent.removeEventListener(\"pointerleave\", leave);\n    };\n  }, [off, size, variant, leave]);\n\n  const line = (dir: string) => `linear-gradient(${dir}, var(--rdm-pc) ${strokeWidth}px, transparent ${strokeWidth}px)`;\n  const vars = { \"--rdm-pc\": color, \"--rdm-ac\": activeColor } as CSSProperties;\n\n  return (\n    <div\n      {...rest}\n      ref={node}\n      aria-hidden=\"true\"\n      data-fade={fade ? \"edge\" : undefined}\n      data-variant={variant}\n      data-rdm-still={isStill || undefined}\n      className={cx(\"rdm-pattern rdm-igrid\", className)}\n      style={{ ...style, ...vars }}\n    >\n      <div\n        className=\"rdm-igrid-lines\"\n        style={{ backgroundImage: `${line(\"to right\")}, ${line(\"to bottom\")}`, backgroundSize: `${size}px ${size}px` }}\n      />\n      {cells.map((cell) => (\n        <span\n          key={cell.id}\n          className=\"rdm-igrid-cell\"\n          data-cell={variant}\n          style={{ insetInlineStart: cell.col * size, top: cell.row * size, width: size, height: size }}\n          onAnimationEnd={variant === \"trail\" ? () => setCells((c) => c.filter((x) => x.id !== cell.id)) : undefined}\n        />\n      ))}\n    </div>\n  );\n});\n"
+        },
+        {
+          "path": "generated/interactive-grid-pattern.types.ts",
+          "content": "// Generated by rdloom codegen from specs/interactive-grid-pattern.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nexport const interactiveGridPatternVariantValues = [\"fill\", \"trail\"] as const;\n\n/** A grid whose cells light up under the mouse or pen. Decoration only: it does nothing on touch or for reduced motion and never takes focus. */\nexport interface InteractiveGridPatternSpecProps {\n  /**\n   * Cell size in pixels.\n   * @default 40\n   */\n  size?: number;\n  /**\n   * Line thickness in pixels.\n   * @default 1\n   */\n  strokeWidth?: number;\n  /**\n   * Colour of the grid lines.\n   * @default \"var(--rd-color-border-default)\"\n   */\n  color?: string;\n  /**\n   * Colour of the lit cells.\n   * @default \"var(--rd-color-action-primary)\"\n   */\n  activeColor?: string;\n  /**\n   * fill lights the cell under the pointer; trail leaves a short fading trail of cells.\n   * @default \"fill\"\n   */\n  variant?: \"fill\" | \"trail\";\n  /**\n   * Fades the grid out toward its edges.\n   * @default true\n   */\n  fade?: boolean;\n  /**\n   * Turns the lighting off.\n   * @default false\n   */\n  isStill?: boolean;\n}\n\nexport const interactiveGridPatternDefaults = {\n  size: 40,\n  strokeWidth: 1,\n  color: \"var(--rd-color-border-default)\",\n  activeColor: \"var(--rd-color-action-primary)\",\n  variant: \"fill\",\n  fade: true,\n  isStill: false,\n} as const;\n\nexport const interactiveGridPatternMeta = {\n  \"name\": \"InteractiveGridPattern\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"presentation\"\n} as const;\n"
         }
       ]
     },
@@ -14996,6 +15963,171 @@
       ]
     },
     {
+      "id": "rainbow-button",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "RainbowButton",
+        "version": "0.1.0",
+        "category": "motion",
+        "status": "experimental",
+        "description": "A button with a multicolour border and soft glow that slowly travels around it. The label sits on the normal button surface, so its contrast is the plain Button's. Builds on Button.",
+        "props": {
+          "children": {
+            "type": "node",
+            "description": "Button label. Icon-only buttons must pass aria-label instead.",
+            "required": true
+          },
+          "variant": {
+            "type": "enum",
+            "values": [
+              "primary",
+              "secondary",
+              "ghost",
+              "danger"
+            ],
+            "description": "Visual emphasis, as on Button.",
+            "default": "primary"
+          },
+          "size": {
+            "type": "enum",
+            "values": [
+              "sm",
+              "md",
+              "lg"
+            ],
+            "description": "Height, padding and font size, as on Button.",
+            "default": "md"
+          },
+          "duration": {
+            "type": "number",
+            "description": "Seconds for one full turn of the colours.",
+            "default": 4
+          },
+          "isPaused": {
+            "type": "boolean",
+            "description": "Stops the animation. Moving content that lasts more than five seconds should be stoppable.",
+            "default": false
+          },
+          "isDisabled": {
+            "type": "boolean",
+            "description": "Prevents interaction and dims the button.",
+            "default": false
+          },
+          "isLoading": {
+            "type": "boolean",
+            "description": "Shows a spinner and blocks presses; the pending state is announced.",
+            "default": false
+          },
+          "onPress": {
+            "type": "callback",
+            "tsType": "() => void",
+            "description": "Called when the button is pressed by mouse, touch or keyboard."
+          }
+        },
+        "variants": [
+          "variant",
+          "size"
+        ],
+        "states": [
+          "default"
+        ],
+        "slots": [
+          "root",
+          "border",
+          "glow",
+          "label"
+        ],
+        "tokens": [
+          "color.action.primary",
+          "color.action.on-primary",
+          "color.action.danger",
+          "color.surface.default",
+          "color.text.default",
+          "color.border.default",
+          "color.focus.ring",
+          "radius.control"
+        ],
+        "a11y": {
+          "role": "button",
+          "keyboard": [
+            "Tab focuses it",
+            "Enter or Space presses it"
+          ],
+          "requirements": [
+            "Decoration only: the animated layers are hidden from assistive technology and never take focus",
+            "Stands still for visitors who ask for less motion (prefers-reduced-motion), and can also be shown still with the rdm-still class or isPaused",
+            "Does not flash: nothing changes more than three times in a second (WCAG 2.3.1)",
+            "Forced colors: the effect is dropped and the Button's own border and text remain",
+            "Optional: it is a separate component, so projects that do not add it carry none of its code",
+            "The label keeps the Button's contrast: the colours live only in the border and glow, never behind the text"
+          ],
+          "screenReader": [
+            "Announced exactly as a Button: its label, as a button; the effect adds nothing to what is read"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "A single standout action, like Upgrade plan"
+          ],
+          "avoid_when": [
+            "More than one per screen: it stops standing out",
+            "Dense toolbars and forms"
+          ],
+          "anti_patterns": [
+            "Using it for every button",
+            "A very short duration, which reads as flicker"
+          ]
+        },
+        "examples": [
+          "basic",
+          "variants",
+          "paused"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {
+            "variant": "Variant",
+            "size": "Size"
+          }
+        }
+      },
+      "install": {
+        "command": "npx rdloom add rainbow-button",
+        "dependencies": [],
+        "registryDependencies": [
+          "tokens",
+          "motion-css",
+          "button",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import { RainbowButton } from \"@rdloom/react\";\n\nexport default function RainbowButtonBasicExample() {\n  return (\n    <div className=\"flex w-full justify-center\">\n      <RainbowButton>Upgrade plan</RainbowButton>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "variants",
+          "code": "import { RainbowButton } from \"@rdloom/react\";\n\nexport default function RainbowButtonVariantsExample() {\n  return (\n    <div className=\"flex w-full flex-wrap items-center justify-center gap-4\">\n      <RainbowButton size=\"sm\">Small</RainbowButton>\n      <RainbowButton variant=\"secondary\">Secondary</RainbowButton>\n      <RainbowButton variant=\"ghost\" size=\"lg\">Large ghost</RainbowButton>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "paused",
+          "code": "import { useState } from \"react\";\nimport { Button, RainbowButton } from \"@rdloom/react\";\n\n// Anything that keeps moving should be stoppable: isPaused freezes the effect.\nexport default function RainbowButtonPausedExample() {\n  const [paused, setPaused] = useState(false);\n  return (\n    <div className=\"flex w-full items-center justify-center gap-3\">\n      <RainbowButton isPaused={paused}>Get started</RainbowButton>\n      <Button variant=\"ghost\" size=\"sm\" onPress={() => setPaused((p) => !p)} aria-pressed={paused}>\n        {paused ? \"Resume motion\" : \"Pause motion\"}\n      </Button>\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "rainbow-button/rainbow-button.tsx",
+          "content": "\"use client\";\n\nimport { forwardRef } from \"react\";\nimport { Button, type ButtonProps } from \"../button/button\";\nimport { rainbowButtonDefaults, type RainbowButtonSpecProps } from \"../generated/rainbow-button.types\";\nimport { cx } from \"../utils/cx\";\nimport { motionVars } from \"../utils/motion\";\n\nexport interface RainbowButtonProps extends RainbowButtonSpecProps, Omit<ButtonProps, keyof RainbowButtonSpecProps> {}\n\n/**\n * A button with a multicolour border and a soft glow that travel round it. The label sits on the\n * normal button surface, so its contrast is the plain Button's. Builds on Button.\n */\nexport const RainbowButton = forwardRef<HTMLButtonElement, RainbowButtonProps>(function RainbowButton(\n  {\n    children,\n    duration = rainbowButtonDefaults.duration,\n    isPaused = rainbowButtonDefaults.isPaused,\n    variant = rainbowButtonDefaults.variant,\n    isDisabled,\n    className,\n    ...rest\n  },\n  ref,\n) {\n  return (\n    <span\n      data-rdm-paused={isPaused || isDisabled || undefined}\n      className={cx(\"rdm-rainbow inline-flex rounded-[var(--rd-radius-control)] p-0.5\", isDisabled && \"opacity-50\")}\n      style={motionVars({ \"--rdm-d\": `${duration}s` })}\n    >\n      <span aria-hidden=\"true\" className=\"rdm-rainbow-glow\" />\n      <Button\n        {...rest}\n        ref={ref}\n        variant={variant}\n        isDisabled={isDisabled}\n        className={cx(\"!border-transparent\", variant === \"ghost\" && \"!bg-[var(--rd-color-surface-default)]\", className)}\n        style={{ borderRadius: \"calc(var(--rd-radius-control) - 2px)\" }}\n      >\n        {children}\n      </Button>\n    </span>\n  );\n});\n"
+        },
+        {
+          "path": "generated/rainbow-button.types.ts",
+          "content": "// Generated by rdloom codegen from specs/rainbow-button.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nimport type { ReactNode } from \"react\";\n\nexport const rainbowButtonVariantValues = [\"primary\", \"secondary\", \"ghost\", \"danger\"] as const;\nexport const rainbowButtonSizeValues = [\"sm\", \"md\", \"lg\"] as const;\n\n/** A button with a multicolour border and soft glow that slowly travels around it. The label sits on the normal button surface, so its contrast is the plain Button's. Builds on Button. */\nexport interface RainbowButtonSpecProps {\n  /**\n   * Button label. Icon-only buttons must pass aria-label instead.\n   */\n  children: ReactNode;\n  /**\n   * Visual emphasis, as on Button.\n   * @default \"primary\"\n   */\n  variant?: \"primary\" | \"secondary\" | \"ghost\" | \"danger\";\n  /**\n   * Height, padding and font size, as on Button.\n   * @default \"md\"\n   */\n  size?: \"sm\" | \"md\" | \"lg\";\n  /**\n   * Seconds for one full turn of the colours.\n   * @default 4\n   */\n  duration?: number;\n  /**\n   * Stops the animation. Moving content that lasts more than five seconds should be stoppable.\n   * @default false\n   */\n  isPaused?: boolean;\n  /**\n   * Prevents interaction and dims the button.\n   * @default false\n   */\n  isDisabled?: boolean;\n  /**\n   * Shows a spinner and blocks presses; the pending state is announced.\n   * @default false\n   */\n  isLoading?: boolean;\n  /**\n   * Called when the button is pressed by mouse, touch or keyboard.\n   */\n  onPress?: () => void;\n}\n\nexport const rainbowButtonDefaults = {\n  variant: \"primary\",\n  size: \"md\",\n  duration: 4,\n  isPaused: false,\n  isDisabled: false,\n  isLoading: false,\n} as const;\n\nexport const rainbowButtonMeta = {\n  \"name\": \"RainbowButton\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"button\"\n} as const;\n"
+        }
+      ]
+    },
+    {
       "id": "rating",
       "spec": {
         "$schema": "./schema/component.schema.json",
@@ -17389,6 +18521,170 @@
       ]
     },
     {
+      "id": "shiny-button",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "ShinyButton",
+        "version": "0.1.0",
+        "category": "motion",
+        "status": "experimental",
+        "description": "A button with a band of light that sweeps across its surface on hover and keyboard focus, and slowly now and then at rest. Builds on Button.",
+        "props": {
+          "children": {
+            "type": "node",
+            "description": "Button label. Icon-only buttons must pass aria-label instead.",
+            "required": true
+          },
+          "variant": {
+            "type": "enum",
+            "values": [
+              "primary",
+              "secondary",
+              "ghost",
+              "danger"
+            ],
+            "description": "Visual emphasis, as on Button.",
+            "default": "primary"
+          },
+          "size": {
+            "type": "enum",
+            "values": [
+              "sm",
+              "md",
+              "lg"
+            ],
+            "description": "Height, padding and font size, as on Button.",
+            "default": "md"
+          },
+          "duration": {
+            "type": "number",
+            "description": "Seconds for one sweep at rest, including the pause before the next.",
+            "default": 3.6
+          },
+          "isPaused": {
+            "type": "boolean",
+            "description": "Stops the animation. Moving content that lasts more than five seconds should be stoppable.",
+            "default": false
+          },
+          "isDisabled": {
+            "type": "boolean",
+            "description": "Prevents interaction and dims the button.",
+            "default": false
+          },
+          "isLoading": {
+            "type": "boolean",
+            "description": "Shows a spinner and blocks presses; the pending state is announced.",
+            "default": false
+          },
+          "onPress": {
+            "type": "callback",
+            "tsType": "() => void",
+            "description": "Called when the button is pressed by mouse, touch or keyboard."
+          }
+        },
+        "variants": [
+          "variant",
+          "size"
+        ],
+        "states": [
+          "default"
+        ],
+        "slots": [
+          "root",
+          "label",
+          "shine"
+        ],
+        "tokens": [
+          "color.action.primary",
+          "color.action.on-primary",
+          "color.action.danger",
+          "color.surface.default",
+          "color.text.default",
+          "color.border.default",
+          "color.focus.ring",
+          "radius.control"
+        ],
+        "a11y": {
+          "role": "button",
+          "keyboard": [
+            "Tab focuses it",
+            "Enter or Space presses it"
+          ],
+          "requirements": [
+            "Decoration only: the animated layers are hidden from assistive technology and never take focus",
+            "Stands still for visitors who ask for less motion (prefers-reduced-motion), and can also be shown still with the rdm-still class or isPaused",
+            "Does not flash: nothing changes more than three times in a second (WCAG 2.3.1)",
+            "Forced colors: the effect is dropped and the Button's own border and text remain",
+            "Optional: it is a separate component, so projects that do not add it carry none of its code",
+            "The label keeps the Button's contrast: the sweep is a translucent overlay behind the text"
+          ],
+          "screenReader": [
+            "Announced exactly as a Button: its label, as a button; the effect adds nothing to what is read"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "A primary call to action that should feel polished"
+          ],
+          "avoid_when": [
+            "More than one per screen: it stops standing out",
+            "Dense toolbars and forms"
+          ],
+          "anti_patterns": [
+            "Using it for every button",
+            "A very short duration, which reads as flicker"
+          ]
+        },
+        "examples": [
+          "basic",
+          "variants",
+          "paused"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {
+            "variant": "Variant",
+            "size": "Size"
+          }
+        }
+      },
+      "install": {
+        "command": "npx rdloom add shiny-button",
+        "dependencies": [],
+        "registryDependencies": [
+          "tokens",
+          "motion-css",
+          "button",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import { ShinyButton } from \"@rdloom/react\";\n\nexport default function ShinyButtonBasicExample() {\n  return (\n    <div className=\"flex w-full justify-center\">\n      <ShinyButton>Upgrade plan</ShinyButton>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "variants",
+          "code": "import { ShinyButton } from \"@rdloom/react\";\n\nexport default function ShinyButtonVariantsExample() {\n  return (\n    <div className=\"flex w-full flex-wrap items-center justify-center gap-4\">\n      <ShinyButton size=\"sm\">Small</ShinyButton>\n      <ShinyButton variant=\"secondary\">Secondary</ShinyButton>\n      <ShinyButton variant=\"ghost\" size=\"lg\">Large ghost</ShinyButton>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "paused",
+          "code": "import { useState } from \"react\";\nimport { Button, ShinyButton } from \"@rdloom/react\";\n\n// Anything that keeps moving should be stoppable: isPaused freezes the effect.\nexport default function ShinyButtonPausedExample() {\n  const [paused, setPaused] = useState(false);\n  return (\n    <div className=\"flex w-full items-center justify-center gap-3\">\n      <ShinyButton isPaused={paused}>Get started</ShinyButton>\n      <Button variant=\"ghost\" size=\"sm\" onPress={() => setPaused((p) => !p)} aria-pressed={paused}>\n        {paused ? \"Resume motion\" : \"Pause motion\"}\n      </Button>\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "shiny-button/shiny-button.tsx",
+          "content": "\"use client\";\n\nimport { forwardRef } from \"react\";\nimport { Button, type ButtonProps } from \"../button/button\";\nimport { shinyButtonDefaults, type ShinyButtonSpecProps } from \"../generated/shiny-button.types\";\nimport { cx } from \"../utils/cx\";\nimport { motionVars } from \"../utils/motion\";\n\nexport interface ShinyButtonProps extends ShinyButtonSpecProps, Omit<ButtonProps, keyof ShinyButtonSpecProps> {}\n\n/** A button with a band of light that sweeps across it on hover and focus, and slowly at rest. Builds on Button. */\nexport const ShinyButton = forwardRef<HTMLButtonElement, ShinyButtonProps>(function ShinyButton(\n  { children, duration = shinyButtonDefaults.duration, isPaused = shinyButtonDefaults.isPaused, className, style, ...rest },\n  ref,\n) {\n  return (\n    <Button\n      {...rest}\n      ref={ref}\n      data-rdm-paused={isPaused || undefined}\n      className={cx(\"rdm-shiny relative overflow-hidden\", className)}\n      style={(values) => ({ ...motionVars({ \"--rdm-d\": `${duration}s` }), ...(typeof style === \"function\" ? style(values) : style) })}\n    >\n      <span className=\"relative z-[1] inline-flex items-center gap-2\">{children}</span>\n      <span aria-hidden=\"true\" className=\"rdm-shiny-sweep\" />\n    </Button>\n  );\n});\n"
+        },
+        {
+          "path": "generated/shiny-button.types.ts",
+          "content": "// Generated by rdloom codegen from specs/shiny-button.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nimport type { ReactNode } from \"react\";\n\nexport const shinyButtonVariantValues = [\"primary\", \"secondary\", \"ghost\", \"danger\"] as const;\nexport const shinyButtonSizeValues = [\"sm\", \"md\", \"lg\"] as const;\n\n/** A button with a band of light that sweeps across its surface on hover and keyboard focus, and slowly now and then at rest. Builds on Button. */\nexport interface ShinyButtonSpecProps {\n  /**\n   * Button label. Icon-only buttons must pass aria-label instead.\n   */\n  children: ReactNode;\n  /**\n   * Visual emphasis, as on Button.\n   * @default \"primary\"\n   */\n  variant?: \"primary\" | \"secondary\" | \"ghost\" | \"danger\";\n  /**\n   * Height, padding and font size, as on Button.\n   * @default \"md\"\n   */\n  size?: \"sm\" | \"md\" | \"lg\";\n  /**\n   * Seconds for one sweep at rest, including the pause before the next.\n   * @default 3.6\n   */\n  duration?: number;\n  /**\n   * Stops the animation. Moving content that lasts more than five seconds should be stoppable.\n   * @default false\n   */\n  isPaused?: boolean;\n  /**\n   * Prevents interaction and dims the button.\n   * @default false\n   */\n  isDisabled?: boolean;\n  /**\n   * Shows a spinner and blocks presses; the pending state is announced.\n   * @default false\n   */\n  isLoading?: boolean;\n  /**\n   * Called when the button is pressed by mouse, touch or keyboard.\n   */\n  onPress?: () => void;\n}\n\nexport const shinyButtonDefaults = {\n  variant: \"primary\",\n  size: \"md\",\n  duration: 3.6,\n  isPaused: false,\n  isDisabled: false,\n  isLoading: false,\n} as const;\n\nexport const shinyButtonMeta = {\n  \"name\": \"ShinyButton\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"button\"\n} as const;\n"
+        }
+      ]
+    },
+    {
       "id": "shuttle-border",
       "spec": {
         "$schema": "./schema/component.schema.json",
@@ -18878,6 +20174,147 @@
       ]
     },
     {
+      "id": "striped-pattern",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "StripedPattern",
+        "version": "0.1.0",
+        "category": "motion",
+        "status": "experimental",
+        "description": "Diagonal stripes that fill their parent, with an optional edge fade and a slow drift along the stripes.",
+        "props": {
+          "size": {
+            "type": "number",
+            "description": "Stripe width in pixels.",
+            "default": 2
+          },
+          "gap": {
+            "type": "number",
+            "description": "Space between stripes in pixels.",
+            "default": 10
+          },
+          "angle": {
+            "type": "number",
+            "description": "Stripe direction in degrees.",
+            "default": 45
+          },
+          "color": {
+            "type": "string",
+            "description": "Colour of the pattern: any CSS colour or a token such as var(--rd-color-border-default).",
+            "default": "var(--rd-color-border-default)"
+          },
+          "fade": {
+            "type": "boolean",
+            "description": "Fades the pattern out toward its edges.",
+            "default": true
+          },
+          "animated": {
+            "type": "boolean",
+            "description": "Drifts the pattern slowly, one tile per cycle. Off by default.",
+            "default": false
+          },
+          "isStill": {
+            "type": "boolean",
+            "description": "Stops the drift. Moving content should be stoppable.",
+            "default": false
+          },
+          "duration": {
+            "type": "number",
+            "description": "Seconds one drift cycle takes.",
+            "default": 6
+          }
+        },
+        "variants": [
+          "fade",
+          "animated",
+          "isStill"
+        ],
+        "states": [
+          "default"
+        ],
+        "slots": [
+          "root",
+          "layer"
+        ],
+        "tokens": [
+          "color.border.default"
+        ],
+        "a11y": {
+          "role": "presentation",
+          "keyboard": [],
+          "requirements": [
+            "Pure decoration: aria-hidden, never focusable, and pointer-events none so content on top stays usable",
+            "It is drawn with CSS only, so it needs no JavaScript and is safe in server HTML",
+            "Stands still for visitors who ask for less motion (prefers-reduced-motion), with isStill, and inside an rdm-still container",
+            "Drift is slow and never flashes (WCAG 2.2.2, 2.3.1)",
+            "Hidden in forced-colors (high contrast) mode so it never fights system colours",
+            "Keep text on top at 4.5:1 against the lines: use a low-contrast token for the pattern"
+          ],
+          "screenReader": [
+            "Ignored: it is not announced"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "A quiet striped behind a hero, card or empty state",
+            "Giving a flat surface a little texture"
+          ],
+          "avoid_when": [
+            "Behind long text where the lines reduce legibility",
+            "As the only way to show a boundary or meaning"
+          ],
+          "anti_patterns": [
+            "A high-contrast colour that competes with the content",
+            "Animating several patterns on one screen"
+          ]
+        },
+        "examples": [
+          "basic",
+          "faded",
+          "animated"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {
+            "animated": "Animated"
+          }
+        }
+      },
+      "install": {
+        "command": "npx rdloom add striped-pattern",
+        "dependencies": [],
+        "registryDependencies": [
+          "tokens",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import { StripedPattern } from \"@rdloom/react\";\n\nexport default function StripedPatternExample() {\n  return (\n    <div className=\"flex w-full justify-center\">\n      <div className=\"relative flex h-48 w-full max-w-md items-center justify-center overflow-hidden rounded-xl border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-default)]\">\n        <StripedPattern fade={false} />\n        <div className=\"relative text-center\">\n          <p className=\"text-lg font-medium text-[var(--rd-color-text-default)]\">Diagonal stripes</p>\n          <p className=\"text-sm text-[var(--rd-color-text-muted)]\">A calm texture behind content</p>\n        </div>\n      </div>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "faded",
+          "code": "import { StripedPattern } from \"@rdloom/react\";\n\nexport default function StripedPatternExample() {\n  return (\n    <div className=\"flex w-full justify-center\">\n      <div className=\"relative flex h-48 w-full max-w-md items-center justify-center overflow-hidden rounded-xl border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-default)]\">\n        <StripedPattern size={3} gap={14} angle={-45} fade />\n        <div className=\"relative text-center\">\n          <p className=\"text-lg font-medium text-[var(--rd-color-text-default)]\">Opposite angle</p>\n          <p className=\"text-sm text-[var(--rd-color-text-muted)]\">Fading toward the edges</p>\n        </div>\n      </div>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "animated",
+          "code": "import { StripedPattern } from \"@rdloom/react\";\n\nexport default function StripedPatternExample() {\n  return (\n    <div className=\"flex w-full justify-center\">\n      <div className=\"relative flex h-48 w-full max-w-md items-center justify-center overflow-hidden rounded-xl border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-default)]\">\n        <StripedPattern animated fade />\n        <div className=\"relative text-center\">\n          <p className=\"text-lg font-medium text-[var(--rd-color-text-default)]\">Slow drift</p>\n          <p className=\"text-sm text-[var(--rd-color-text-muted)]\">Moves along the stripes</p>\n        </div>\n      </div>\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "striped-pattern/striped-pattern.tsx",
+          "content": "\"use client\";\n\nimport { forwardRef } from \"react\";\nimport { stripedPatternDefaults, type StripedPatternSpecProps } from \"../generated/striped-pattern.types\";\nimport { PatternShell, type PatternDivProps } from \"../utils/pattern\";\n\nexport interface StripedPatternProps extends StripedPatternSpecProps, Omit<PatternDivProps, keyof StripedPatternSpecProps> {}\n\n/** Diagonal stripes that fill their parent. Decoration only: hidden from assistive technology, ignores the pointer. */\nexport const StripedPattern = forwardRef<HTMLDivElement, StripedPatternProps>(function StripedPattern(\n  {\n    size = stripedPatternDefaults.size,\n    gap = stripedPatternDefaults.gap,\n    angle = stripedPatternDefaults.angle,\n    color = stripedPatternDefaults.color,\n    fade = stripedPatternDefaults.fade,\n    animated = stripedPatternDefaults.animated,\n    isStill = stripedPatternDefaults.isStill,\n    duration = stripedPatternDefaults.duration,\n    ...rest\n  },\n  ref,\n) {\n  const period = size + gap;\n  const rad = (angle * Math.PI) / 180;\n  // Moving one period along the gradient direction repeats the stripes exactly, so the loop has no jump.\n  const travel: [number, number] = [Math.round(Math.sin(rad) * period * 100) / 100, Math.round(-Math.cos(rad) * period * 100) / 100];\n  return (\n    <PatternShell\n      {...rest}\n      ref={ref}\n      color={color}\n      fade={fade}\n      animated={animated}\n      isStill={isStill}\n      duration={duration}\n      period={period}\n      travel={travel}\n      fill={{ backgroundImage: `repeating-linear-gradient(${angle}deg, var(--rdm-pc) 0 ${size}px, transparent ${size}px ${period}px)` }}\n    />\n  );\n});\n"
+        },
+        {
+          "path": "generated/striped-pattern.types.ts",
+          "content": "// Generated by rdloom codegen from specs/striped-pattern.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\n/** Diagonal stripes that fill their parent, with an optional edge fade and a slow drift along the stripes. */\nexport interface StripedPatternSpecProps {\n  /**\n   * Stripe width in pixels.\n   * @default 2\n   */\n  size?: number;\n  /**\n   * Space between stripes in pixels.\n   * @default 10\n   */\n  gap?: number;\n  /**\n   * Stripe direction in degrees.\n   * @default 45\n   */\n  angle?: number;\n  /**\n   * Colour of the pattern: any CSS colour or a token such as var(--rd-color-border-default).\n   * @default \"var(--rd-color-border-default)\"\n   */\n  color?: string;\n  /**\n   * Fades the pattern out toward its edges.\n   * @default true\n   */\n  fade?: boolean;\n  /**\n   * Drifts the pattern slowly, one tile per cycle. Off by default.\n   * @default false\n   */\n  animated?: boolean;\n  /**\n   * Stops the drift. Moving content should be stoppable.\n   * @default false\n   */\n  isStill?: boolean;\n  /**\n   * Seconds one drift cycle takes.\n   * @default 6\n   */\n  duration?: number;\n}\n\nexport const stripedPatternDefaults = {\n  size: 2,\n  gap: 10,\n  angle: 45,\n  color: \"var(--rd-color-border-default)\",\n  fade: true,\n  animated: false,\n  isStill: false,\n  duration: 6,\n} as const;\n\nexport const stripedPatternMeta = {\n  \"name\": \"StripedPattern\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"presentation\"\n} as const;\n"
+        }
+      ]
+    },
+    {
       "id": "switch",
       "spec": {
         "$schema": "./schema/component.schema.json",
@@ -19539,6 +20976,169 @@
         {
           "path": "generated/tag-input.types.ts",
           "content": "// Generated by rdloom codegen from specs/tag-input.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\n/** A text field that turns what you type into removable tags when you press Enter or comma: for keywords, recipients and labels. */\nexport interface TagInputSpecProps {\n  /**\n   * Visible label, also the accessible name.\n   */\n  label: string;\n  /**\n   * Help text, e.g. \"Press Enter or comma to add\".\n   */\n  description?: string;\n  /**\n   * Shown when the field is invalid.\n   */\n  errorMessage?: string;\n  /**\n   * Controlled list of tags.\n   */\n  value?: readonly string[];\n  /**\n   * Initial tags when uncontrolled.\n   */\n  defaultValue?: readonly string[];\n  /**\n   * Called with the full list whenever it changes.\n   */\n  onChange?: (tags: string[]) => void;\n  /**\n   * Hint shown while there are no tags.\n   */\n  placeholder?: string;\n  /**\n   * Most tags allowed. The input is disabled once reached.\n   */\n  maxTags?: number;\n  /**\n   * Allow the same tag twice.\n   * @default false\n   */\n  allowDuplicates?: boolean;\n  /**\n   * Prevents interaction and dims the field.\n   * @default false\n   */\n  isDisabled?: boolean;\n  /**\n   * Marks the field invalid.\n   * @default false\n   */\n  isInvalid?: boolean;\n}\n\nexport const tagInputDefaults = {\n  allowDuplicates: false,\n  isDisabled: false,\n  isInvalid: false,\n} as const;\n\nexport const tagInputMeta = {\n  \"name\": \"TagInput\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"group\"\n} as const;\n"
+        }
+      ]
+    },
+    {
+      "id": "terminal",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "Terminal",
+        "version": "0.1.0",
+        "category": "motion",
+        "status": "experimental",
+        "description": "A command-line style panel that types its lines in once: a prompt, the commands, then the output. It has a copy button, and a still mode that shows every line at once. The lines are real text in the page from the start.",
+        "props": {
+          "lines": {
+            "type": "custom",
+            "tsType": "{ text: string; kind?: \"command\" | \"output\" }[]",
+            "description": "The lines, each { text, kind }. kind is \"command\" (typed, with a prompt) or \"output\" (appears whole after a short pause). Default kind is command.",
+            "required": true
+          },
+          "label": {
+            "type": "string",
+            "description": "Accessible name of the panel.",
+            "default": "Terminal"
+          },
+          "prompt": {
+            "type": "string",
+            "description": "Text shown before each command.",
+            "default": "$"
+          },
+          "speed": {
+            "type": "number",
+            "description": "Milliseconds per typed character.",
+            "default": 35
+          },
+          "lineDelay": {
+            "type": "number",
+            "description": "Milliseconds to wait between lines.",
+            "default": 450
+          },
+          "showCopy": {
+            "type": "boolean",
+            "description": "Shows a Copy button that copies the commands (without prompts or output).",
+            "default": true
+          },
+          "copyLabel": {
+            "type": "string",
+            "description": "Text of the button.",
+            "default": "Copy"
+          },
+          "copiedLabel": {
+            "type": "string",
+            "description": "Text of the button after copying.",
+            "default": "Copied"
+          },
+          "isPaused": {
+            "type": "boolean",
+            "description": "Still mode: shows every line at once and does not type.",
+            "default": false
+          }
+        },
+        "variants": [
+          "isPaused",
+          "showCopy"
+        ],
+        "states": [
+          "default",
+          "focus"
+        ],
+        "slots": [
+          "root",
+          "header",
+          "line",
+          "prompt",
+          "output",
+          "button"
+        ],
+        "tokens": [
+          "color.surface.subtle",
+          "color.border.default",
+          "color.text.default",
+          "color.text.muted",
+          "color.focus.ring",
+          "radius.control"
+        ],
+        "a11y": {
+          "role": "group",
+          "keyboard": [
+            "Tab: moves to the Copy button and to the scrollable text area",
+            "Enter or Space: copies the commands"
+          ],
+          "requirements": [
+            "The panel is a group named by label",
+            "Every line is real text in the server HTML and is readable with no JavaScript",
+            "While a line is being typed, the full text of the line is available to screen readers at once and the typed copy is hidden; nothing is read letter by letter",
+            "Typing runs once and stops; it never loops, so there is no moving content to stop after the lines are in",
+            "Reduced motion, isPaused and anything inside rdm-still show every line at once",
+            "The Copy button confirms with a polite status message",
+            "The text area scrolls and takes keyboard focus, so long lines are reachable without a mouse"
+          ],
+          "screenReader": [
+            "Group named by label, then the lines as plain text, then the Copy button"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "Showing an install or setup command",
+            "A short scripted demo of a command-line tool"
+          ],
+          "avoid_when": [
+            "A real interactive shell",
+            "Long logs (use a log viewer)"
+          ],
+          "anti_patterns": [
+            "Putting secrets in the lines",
+            "Typing very long scripts that delay the reader"
+          ]
+        },
+        "examples": [
+          "basic",
+          "install",
+          "still"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {
+            "isPaused": "Still"
+          }
+        }
+      },
+      "install": {
+        "command": "npx rdloom add terminal",
+        "dependencies": [
+          "react-aria-components@^1.21.1"
+        ],
+        "registryDependencies": [
+          "tokens",
+          "motion-css",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import { Terminal } from \"@rdloom/react\";\n\nexport default function TerminalBasicExample() {\n  return (\n    <div className=\"flex w-full justify-center\">\n      <Terminal\n        className=\"w-full max-w-md\"\n        lines={[\n          { text: \"npx rdloom init\" },\n          { text: \"Created rdloom.json\", kind: \"output\" },\n          { text: \"npx rdloom add button\" },\n          { text: \"Added button to src/components/ui\", kind: \"output\" },\n        ]}\n      />\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "install",
+          "code": "import { Terminal } from \"@rdloom/react\";\n\nexport default function TerminalInstallExample() {\n  return (\n    <div className=\"flex w-full justify-center\">\n      <Terminal\n        className=\"w-full max-w-md\"\n        label=\"Install steps\"\n        prompt=\">\"\n        speed={25}\n        copyLabel=\"Copy commands\"\n        lines={[{ text: \"npm install @rdloom/react\" }, { text: \"npx rdloom add dialog\" }]}\n      />\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "still",
+          "code": "import { Terminal } from \"@rdloom/react\";\n\nexport default function TerminalStillExample() {\n  return (\n    <div className=\"flex w-full justify-center\">\n      <Terminal\n        isPaused\n        className=\"w-full max-w-md\"\n        label=\"Build output\"\n        lines={[\n          { text: \"npm run build\" },\n          { text: \"Built 42 pages in 6.1s\", kind: \"output\" },\n          { text: \"No problems found\", kind: \"output\" },\n        ]}\n      />\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "terminal/terminal.tsx",
+          "content": "\"use client\";\n\nimport { forwardRef, useEffect, useRef, useState, type HTMLAttributes } from \"react\";\nimport { Button } from \"react-aria-components\";\nimport { terminalDefaults, type TerminalSpecProps } from \"../generated/terminal.types\";\nimport { cx } from \"../utils/cx\";\nimport { CheckIcon, CopyIcon } from \"../utils/icons\";\nimport { prefersReducedMotion, useIsomorphicLayoutEffect, useReducedMotion } from \"../utils/motion\";\n\nexport interface TerminalProps\n  extends TerminalSpecProps,\n    Omit<HTMLAttributes<HTMLDivElement>, keyof TerminalSpecProps | \"className\" | \"children\"> {\n  className?: string;\n}\n\ninterface Progress {\n  line: number;\n  chars: number;\n}\n\n/**\n * A command-line style panel. All lines are real text in the server HTML. After mount the commands\n * are typed once; while a line is typed its full text stays available to screen readers and the typed\n * copy is hidden. Reduced motion and isPaused show every line at once.\n */\nexport const Terminal = forwardRef<HTMLDivElement, TerminalProps>(function Terminal(\n  {\n    lines,\n    label = terminalDefaults.label,\n    prompt = terminalDefaults.prompt,\n    speed = terminalDefaults.speed,\n    lineDelay = terminalDefaults.lineDelay,\n    showCopy = terminalDefaults.showCopy,\n    copyLabel = terminalDefaults.copyLabel,\n    copiedLabel = terminalDefaults.copiedLabel,\n    isPaused = terminalDefaults.isPaused,\n    className,\n    ...rest\n  },\n  ref,\n) {\n  const reduced = useReducedMotion();\n  const still = isPaused || reduced;\n  // null means \"show everything\": the server render, no JavaScript, reduced motion and isPaused.\n  const [progress, setProgress] = useState<Progress | null>(null);\n  const [copied, setCopied] = useState(false);\n  const copyTimer = useRef<ReturnType<typeof setTimeout>>(undefined);\n  useEffect(() => () => clearTimeout(copyTimer.current), []);\n\n  const signature = lines.map((l) => `${l.kind ?? \"command\"}:${l.text}`).join(\"\\n\");\n  useIsomorphicLayoutEffect(() => {\n    setProgress(still || prefersReducedMotion() ? null : { line: 0, chars: 0 });\n  }, [still, signature]);\n\n  useEffect(() => {\n    if (!progress || progress.line >= lines.length) return;\n    const current = lines[progress.line];\n    const isCommand = (current.kind ?? \"command\") === \"command\";\n    const typing = isCommand && progress.chars < Array.from(current.text).length;\n    // Commands type one character at a time; a finished command and an output line wait, then move on.\n    const timer = setTimeout(\n      () => setProgress(typing ? { line: progress.line, chars: progress.chars + 1 } : { line: progress.line + 1, chars: 0 }),\n      typing ? speed : lineDelay,\n    );\n    return () => clearTimeout(timer);\n  }, [progress, lines, speed, lineDelay]);\n\n  const copy = async () => {\n    const text = lines\n      .filter((l) => (l.kind ?? \"command\") === \"command\")\n      .map((l) => l.text)\n      .join(\"\\n\");\n    try {\n      await navigator.clipboard.writeText(text);\n      setCopied(true);\n      clearTimeout(copyTimer.current);\n      copyTimer.current = setTimeout(() => setCopied(false), 2000);\n    } catch {\n      /* clipboard blocked: nothing to confirm */\n    }\n  };\n\n  return (\n    <div\n      {...rest}\n      ref={ref}\n      role=\"group\"\n      aria-label={label}\n      data-rdm-paused={isPaused || undefined}\n      className={cx(\n        \"rdm-terminal overflow-hidden rounded-[var(--rd-radius-control)] border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-subtle)] text-[var(--rd-color-text-default)]\",\n        className,\n      )}\n    >\n      <div className=\"flex items-center justify-between border-b border-[var(--rd-color-border-default)] ps-3 pe-1 text-xs text-[var(--rd-color-text-muted)]\">\n        <span aria-hidden=\"true\" className=\"flex gap-1.5\">\n          <span className=\"size-2.5 rounded-full border border-[var(--rd-color-border-default)]\" />\n          <span className=\"size-2.5 rounded-full border border-[var(--rd-color-border-default)]\" />\n          <span className=\"size-2.5 rounded-full border border-[var(--rd-color-border-default)]\" />\n        </span>\n        {showCopy ? (\n          <Button\n            onPress={copy}\n            className=\"my-1 inline-flex h-7 items-center gap-1.5 rounded px-2 text-xs outline-none data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)] data-[hovered]:bg-[var(--rd-color-surface-selected)]\"\n          >\n            {copied ? <CheckIcon className=\"size-4\" /> : <CopyIcon />}\n            <span>{copied ? copiedLabel : copyLabel}</span>\n          </Button>\n        ) : (\n          <span />\n        )}\n      </div>\n      {/* A long line scrolls inside the panel, so the text must be reachable without a mouse. */}\n      <pre\n        tabIndex={0}\n        className=\"m-0 overflow-x-auto p-3 font-mono text-sm leading-relaxed outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--rd-color-focus-ring)]\"\n      >\n        {lines.map((line, i) => {\n          const isCommand = (line.kind ?? \"command\") === \"command\";\n          if (progress && i > progress.line) return null;\n          const active = progress !== null && i === progress.line;\n          // An output line waits its turn, then shows whole.\n          if (active && !isCommand) return null;\n          return (\n            <div key={i} className=\"rdm-terminal-line\">\n              {isCommand ? (\n                <span aria-hidden=\"true\" className=\"select-none pe-2 text-[var(--rd-color-text-muted)]\">\n                  {prompt}\n                </span>\n              ) : null}\n              {active ? (\n                <>\n                  <span className=\"sr-only\">{line.text}</span>\n                  <span aria-hidden=\"true\">\n                    {Array.from(line.text).slice(0, progress.chars).join(\"\")}\n                    <span className=\"rdm-caret\" />\n                  </span>\n                </>\n              ) : (\n                <span className={isCommand ? undefined : \"text-[var(--rd-color-text-muted)]\"}>{line.text}</span>\n              )}\n            </div>\n          );\n        })}\n      </pre>\n      <span role=\"status\" className=\"sr-only\">\n        {copied ? copiedLabel : \"\"}\n      </span>\n    </div>\n  );\n});\n"
+        },
+        {
+          "path": "generated/terminal.types.ts",
+          "content": "// Generated by rdloom codegen from specs/terminal.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\n/** A command-line style panel that types its lines in once: a prompt, the commands, then the output. It has a copy button, and a still mode that shows every line at once. The lines are real text in the page from the start. */\nexport interface TerminalSpecProps {\n  /**\n   * The lines, each { text, kind }. kind is \"command\" (typed, with a prompt) or \"output\" (appears whole after a short pause). Default kind is command.\n   */\n  lines: { text: string; kind?: \"command\" | \"output\" }[];\n  /**\n   * Accessible name of the panel.\n   * @default \"Terminal\"\n   */\n  label?: string;\n  /**\n   * Text shown before each command.\n   * @default \"$\"\n   */\n  prompt?: string;\n  /**\n   * Milliseconds per typed character.\n   * @default 35\n   */\n  speed?: number;\n  /**\n   * Milliseconds to wait between lines.\n   * @default 450\n   */\n  lineDelay?: number;\n  /**\n   * Shows a Copy button that copies the commands (without prompts or output).\n   * @default true\n   */\n  showCopy?: boolean;\n  /**\n   * Text of the button.\n   * @default \"Copy\"\n   */\n  copyLabel?: string;\n  /**\n   * Text of the button after copying.\n   * @default \"Copied\"\n   */\n  copiedLabel?: string;\n  /**\n   * Still mode: shows every line at once and does not type.\n   * @default false\n   */\n  isPaused?: boolean;\n}\n\nexport const terminalDefaults = {\n  label: \"Terminal\",\n  prompt: \"$\",\n  speed: 35,\n  lineDelay: 450,\n  showCopy: true,\n  copyLabel: \"Copy\",\n  copiedLabel: \"Copied\",\n  isPaused: false,\n} as const;\n\nexport const terminalMeta = {\n  \"name\": \"Terminal\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"group\"\n} as const;\n"
         }
       ]
     },
@@ -23260,6 +24860,10 @@
         {
           "path": "utils/motion.tsx",
           "content": "\"use client\";\n\nimport { useEffect, useLayoutEffect, useState } from \"react\";\n\n// Shared by the motion components. They are optional extras: a project that never\n// adds one never carries this file's callers. Every effect follows the same rules:\n//   - it is decoration, so the animated layers are hidden from assistive technology\n//   - it stands still for people who ask for less motion\n//   - it can be paused (isPaused), because moving content must be stoppable\n//   - its keyframes and still rules live in one CSS file (motion/rdloom-motion.css) that\n//     `rdloom add` installs and imports from your tokens file, so there is nothing to set up\n\n/** useLayoutEffect in the browser, useEffect on the server (which would otherwise warn). */\nexport const useIsomorphicLayoutEffect = typeof window === \"undefined\" ? useEffect : useLayoutEffect;\n\n/** Does the visitor ask for less motion? Reads the setting at call time, so it is safe to use in a layout effect. */\nexport const prefersReducedMotion = () =>\n  typeof window !== \"undefined\" && typeof window.matchMedia === \"function\" && window.matchMedia(\"(prefers-reduced-motion: reduce)\").matches;\n\n/** True when the visitor asks for less motion, and updates if they change the setting. */\nexport function useReducedMotion(): boolean {\n  const [reduced, setReduced] = useState(false);\n  useEffect(() => {\n    if (typeof window.matchMedia !== \"function\") return;\n    const query = window.matchMedia(\"(prefers-reduced-motion: reduce)\");\n    const update = () => setReduced(query.matches);\n    update();\n    query.addEventListener(\"change\", update);\n    return () => query.removeEventListener(\"change\", update);\n  }, []);\n  return reduced;\n}\n\n/** The inline style for the optional CSS variables an effect reads: only the ones that were given. */\nexport function motionVars(vars: Record<string, string | number | undefined>): React.CSSProperties {\n  return Object.fromEntries(Object.entries(vars).filter(([, v]) => v !== undefined)) as React.CSSProperties;\n}\n"
+        },
+        {
+          "path": "utils/pattern.tsx",
+          "content": "\"use client\";\n\nimport { forwardRef, type CSSProperties, type HTMLAttributes } from \"react\";\nimport { cx } from \"./cx\";\n\n/** Props every background pattern shares. */\nexport interface PatternBaseProps {\n  /** Any CSS colour or token, for example var(--rd-color-border-default). */\n  color?: string;\n  /** Fades the pattern out toward its edges. */\n  fade?: boolean;\n  /** Slowly drifts the pattern by one tile per cycle. */\n  animated?: boolean;\n  /** Stops the drift. */\n  isStill?: boolean;\n  /** Seconds one drift cycle takes. */\n  duration?: number;\n}\n\nexport type PatternDivProps = Omit<HTMLAttributes<HTMLDivElement>, \"className\" | \"color\" | \"children\"> & { className?: string };\n\ninterface ShellProps extends PatternBaseProps {\n  /** Style of the pattern layer itself: background, mask and sizes. */\n  fill: CSSProperties;\n  /** Tile size in px, used to loop the drift without a jump. */\n  period: number;\n  /** Drift vector for one cycle in px. */\n  travel: [number, number];\n}\n\n/**\n * The shared frame of the background patterns: a decoration layer that fills its parent, ignores the\n * pointer, is hidden from assistive technology and stands still for reduced motion and isStill.\n */\nexport const PatternShell = forwardRef<HTMLDivElement, ShellProps & PatternDivProps>(function PatternShell(\n  { color, fade, animated, isStill, duration, fill, period, travel, className, style, ...rest },\n  ref,\n) {\n  const vars = {\n    \"--rdm-pc\": color,\n    \"--rdm-p\": `${period}px`,\n    \"--rdm-tx\": `${travel[0]}px`,\n    \"--rdm-ty\": `${travel[1]}px`,\n    \"--rdm-d\": duration ? `${duration}s` : undefined,\n  } as CSSProperties;\n  return (\n    <div\n      {...rest}\n      ref={ref}\n      aria-hidden=\"true\"\n      data-fade={fade ? \"edge\" : undefined}\n      data-animated={animated || undefined}\n      data-rdm-still={isStill || undefined}\n      className={cx(\"rdm-pattern\", className)}\n      style={{ ...style, ...vars }}\n    >\n      <div className=\"rdm-pattern-fill\" style={fill} />\n    </div>\n  );\n});\n"
         },
         {
           "path": "utils/permissions.ts",

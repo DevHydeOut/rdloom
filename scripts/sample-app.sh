@@ -38,7 +38,7 @@ npx rdloom list | head -3
 
 step "Motion components: one stylesheet, installed and imported for you"
 test ! -e src/styles/rdloom-motion.css || { echo "✗ motion CSS exists before any motion component was added"; exit 1; }
-npx rdloom add shimmer-button text-shimmer typing-animation word-rotate text-reveal text-animate blur-fade animated-list interactive-hover-button animated-circular-progress number-ticker marquee --install
+npx rdloom add shimmer-button text-shimmer typing-animation word-rotate text-reveal text-animate blur-fade animated-list interactive-hover-button animated-circular-progress number-ticker marquee bento-grid terminal code-comparison rainbow-button shiny-button dock grid-pattern dot-pattern striped-pattern hexagon-pattern interactive-grid-pattern --install
 test -e src/styles/rdloom-motion.css || { echo "✗ rdloom add did not write the motion CSS"; exit 1; }
 grep -q 'rdloom-motion.css' src/styles/rdloom-tokens.css || { echo "✗ the tokens file does not import the motion CSS"; exit 1; }
 

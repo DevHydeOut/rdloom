@@ -90,7 +90,8 @@ else {
     for (const pre of html.matchAll(/<pre[\s\S]*?<\/pre>/g)) {
       const code = pre[0].replace(/<[^>]+>/g, "").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&").replace(/&quot;/g, '"');
       for (const line of code.split(/\r?\n/)) {
-        const m = line.match(/npx\s+rdloom\s+add\s+([^#]*)/);
+        // Only a line that is itself the command: a string inside example source that shows a command is not one.
+        const m = line.match(/^\s*(?:\$\s*)?npx\s+rdloom\s+add\s+([^#]*)/);
         if (!m) continue;
         for (const token of m[1].trim().split(/\s+/)) {
           if (token.startsWith("-")) break;
