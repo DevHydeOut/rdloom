@@ -155,11 +155,11 @@ function Header({ captionLayout }: { captionLayout: "label" | "dropdowns" }) {
       {captionLayout === "dropdowns" ? (
         <>
           {/* Keeps the month announcement for screen readers while the selects do the visible work. */}
-          <Heading className="sr-only" />
+          <Heading className="sr-only" suppressHydrationWarning />
           <CaptionSelects />
         </>
       ) : (
-        <Heading className="text-sm font-semibold text-[var(--rd-color-text-default)]" />
+        <Heading className="text-sm font-semibold text-[var(--rd-color-text-default)]" suppressHydrationWarning />
       )}
       <NavButton slot="next" />
     </div>

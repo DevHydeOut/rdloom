@@ -22,6 +22,7 @@ import { useEffect, useMemo, useRef, useState, type ClipboardEvent, type CSSProp
 import { Button } from "../button/button";
 import { dataGridDefaults, type DataGridSpecProps } from "../generated/data-grid.types";
 import { cx } from "../utils/cx";
+import { useDefaultLocale } from "../utils/use-default-locale";
 import { scrollHintClass, useScrollHint } from "../utils/scroll-hint";
 import { ArrowDownIcon, ArrowUpIcon, ChevronRightIcon, SpinnerIcon } from "../utils/icons";
 import { columnFilter, filteredRowModel, searchFilter, sortedRowModel } from "./hierarchy";
@@ -78,7 +79,6 @@ function fillTarget(source: Rect, row: number, col: number): Rect {
 const isSystemColumn = (id: string) => id === SELECT_ID || id === REORDER_ID;
 const RESIZE_STEP = 16;
 const MAX_SELECT_OPTIONS = 200;
-const numberFormat = new Intl.NumberFormat();
 
 const toSelection = (ids?: readonly string[]): RowSelectionState =>
   Object.fromEntries((ids ?? []).map((id) => [id, true]));
@@ -196,6 +196,8 @@ export function DataGrid<T>({
   detailHeight = dataGridDefaults.detailHeight,
   className,
 }: DataGridProps<T>) {
+  const locale = useDefaultLocale();
+  const numberFormat = useMemo(() => new Intl.NumberFormat(locale), [locale]);
   const [sorting, setSorting] = useState<SortingState>(defaultSorting ?? []);
   const [expanded, setExpanded] = useState<ExpandedState>(defaultExpanded ? true : {});
   // The server can't group or nest rows for us, so those stay off in serverSide.

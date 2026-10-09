@@ -40,3 +40,13 @@ export const listItem =
 export const overlayPanel =
   "[box-shadow:var(--rd-elevation-floating)] p-1.5 bg-[var(--rd-color-surface-raised)] text-[var(--rd-color-text-default)] " +
   "border border-[var(--rd-color-border-default)] rounded-[var(--rd-radius-overlay)]";
+
+/**
+ * The text between date or time segments comes from Intl, and Node and browsers disagree on which
+ * space it is (normal, narrow no-break, thin). Reading it as one normal space keeps the server HTML
+ * and the first client render identical.
+ */
+export function tidySegment<T extends { text: string }>(seg: T): T {
+  const text = seg.text.replace(/[   ]/g, " ");
+  return text === seg.text ? seg : { ...seg, text };
+}

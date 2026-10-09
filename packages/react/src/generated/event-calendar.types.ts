@@ -25,7 +25,7 @@ export interface EventCalendarSpecProps {
    */
   weekStartsOn?: number;
   /**
-   * A BCP 47 locale for month, day and time names, e.g. "de-DE". Default: the browser's.
+   * A BCP 47 locale for month, day and time names, e.g. "de-DE". Default: en-US on the server and during hydration, then the browser's.
    */
   locale?: string;
   /**

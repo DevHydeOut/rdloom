@@ -2,6 +2,7 @@
 
 import { forwardRef, useEffect, useId, useRef, useState, type KeyboardEvent, type MouseEvent } from "react";
 import { Button } from "../button/button";
+import { useDefaultLocale } from "../utils/use-default-locale";
 import { chartDefaults, type ChartSpecProps } from "../generated/chart.types";
 import type { ChartData } from "../utils/ai";
 import { cx } from "../utils/cx";
@@ -107,6 +108,7 @@ export const Chart = forwardRef<HTMLElement, ChartProps>(function Chart(
   },
   ref,
 ) {
+  const locale = useDefaultLocale();
   const [asTable, setAsTable] = useState(false);
   const [width, setWidth] = useState(FALLBACK_WIDTH);
   const [active, setActive] = useState<number | null>(null);
@@ -123,8 +125,8 @@ export const Chart = forwardRef<HTMLElement, ChartProps>(function Chart(
   const n = labels.length;
   const empty = n === 0 || series.length === 0;
   const donut = type === "donut";
-  const exact = valueFormat ?? ((v: number) => withUnit(exactNumber(v), unit));
-  const axisFormat = valueFormat ?? ((v: number) => withUnit(compact(v), unit));
+  const exact = valueFormat ?? ((v: number) => withUnit(exactNumber(v, locale), unit));
+  const axisFormat = valueFormat ?? ((v: number) => withUnit(compact(v, locale), unit));
   const text = summary ?? describe(data, type, stacked, exact);
   const showingPlot = !isLoading && !empty && !asTable;
 

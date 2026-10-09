@@ -8,6 +8,7 @@ import { Avatar } from "../avatar/avatar";
 import { Badge } from "../badge/badge";
 import { Button } from "../button/button";
 import { Chart } from "../chart/chart";
+import { useDefaultLocale } from "../utils/use-default-locale";
 import { EmptyState } from "../empty-state/empty-state";
 import { Pagination } from "../pagination/pagination";
 import { Select, SelectItem } from "../select/select";
@@ -74,7 +75,7 @@ export const CustomerTable = forwardRef<HTMLElement, CustomerTableProps>(functio
     label = customerTableDefaults.label,
     pageSize = customerTableDefaults.pageSize,
     currency = customerTableDefaults.currency,
-    locale,
+    locale: localeProp,
     isLoading = customerTableDefaults.isLoading,
     error,
     onRetry,
@@ -97,6 +98,7 @@ export const CustomerTable = forwardRef<HTMLElement, CustomerTableProps>(functio
   },
   ref,
 ) {
+  const locale = useDefaultLocale(localeProp);
   const [ownQuery, setQuery] = useState<CustomerQuery>(() => ({ ...emptyQuery(pageSize), ...defaultQuery, pageSize }));
   // A query passed in (for example one read from the address) replaces the table's own.
   const query = controlledQuery ?? ownQuery;

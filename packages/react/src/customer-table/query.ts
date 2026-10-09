@@ -138,15 +138,15 @@ export function customersToCsv(customers: Customer[]): string {
 
 // --- Display
 
-export function formatMoney(value: number, currency = "USD", locale?: string): string {
+export function formatMoney(value: number, currency = "USD", locale = "en-US"): string {
   try {
     return new Intl.NumberFormat(locale, { style: "currency", currency, maximumFractionDigits: 0 }).format(value);
   } catch {
-    return `${currency} ${Math.round(value).toLocaleString()}`;
+    return `${currency} ${Math.round(value).toLocaleString(locale)}`;
   }
 }
 
-export function formatDate(value: string, locale?: string): string {
+export function formatDate(value: string, locale = "en-US"): string {
   const time = Date.parse(value);
   if (!Number.isFinite(time)) return value;
   // A date with no time is a calendar day: read it in UTC so it can't slip a day in other time zones.

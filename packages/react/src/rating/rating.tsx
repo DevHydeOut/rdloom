@@ -1,7 +1,8 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Button, FieldError, Radio, RadioGroup, Text, useLocale } from "react-aria-components";
+import { Button, FieldError, Radio, RadioGroup, Text } from "react-aria-components";
+import { useDefaultLocale } from "../utils/use-default-locale";
 import { ratingDefaults, type RatingSpecProps } from "../generated/rating.types";
 import { cx } from "../utils/cx";
 import { fieldHelp, fieldLabel } from "../utils/field";
@@ -67,7 +68,7 @@ export function Rating({
   name,
   className,
 }: RatingProps) {
-  const { locale } = useLocale();
+  const locale = useDefaultLocale();
   const [inner, setInner] = useState(defaultValue);
   const [hover, setHover] = useState<number | null>(null);
   const groupRef = useRef<HTMLDivElement>(null);

@@ -6,7 +6,7 @@ export default function AvatarFallbackExample() {
   return (
     <div className="flex flex-col gap-3 text-sm">
       <div className="flex items-center gap-2">
-        <Avatar name="Katherine Johnson" src="https://invalid.example/missing.png" />
+        <Avatar name="Katherine Johnson" src="data:image/png;base64,AAAA" />
         <span>Image fails to load</span>
       </div>
       <div className="flex items-center gap-2">

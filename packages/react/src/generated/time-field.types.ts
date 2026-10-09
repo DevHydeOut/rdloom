@@ -58,7 +58,7 @@ export interface TimeFieldSpecProps {
    */
   isDisabled?: boolean;
   /**
-   * Marks the field invalid. Leave undefined to let validation decide.
+   * Marks the field invalid. Leave it unset to let validation decide.
    */
   isInvalid?: boolean;
   /**

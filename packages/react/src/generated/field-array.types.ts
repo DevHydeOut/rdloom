@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
 
 export const fieldArrayDensityValues = ["comfortable", "compact"] as const;
 
-/** Repeating rows of fields inside a Form, such as invoice lines or team members. Add, remove, move up or down and insert are all buttons, so the keyboard does everything; focus lands somewhere sensible and a polite message says what changed. The rows contents and any totals are yours. */
+/** Repeating rows of fields inside a Form, such as invoice lines or team members. Add, remove, move up or down and insert are all buttons, so the keyboard does everything; focus lands somewhere sensible and a polite message says what changed. The contents of the rows and any totals are yours. */
 export interface FieldArraySpecProps {
   /**
    * Where the rows live in the Form values, for example "lines". Each row field is named with row.name("qty"), which gives "lines[0].qty".

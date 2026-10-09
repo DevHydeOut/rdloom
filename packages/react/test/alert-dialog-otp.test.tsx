@@ -29,10 +29,10 @@ describe("AlertDialog", () => {
     const trigger = screen.getByRole("button", { name: "Delete user" });
     await user.click(trigger);
     await screen.findByRole("alertdialog");
-    expect(screen.getByRole("button", { name: "Cancel" })).toHaveFocus();
+    await waitFor(() => expect(screen.getByRole("button", { name: "Cancel" })).toHaveFocus());
     await user.keyboard("{Escape}");
     await waitFor(() => expect(screen.queryByRole("alertdialog")).toBeNull());
-    expect(trigger).toHaveFocus();
+    await waitFor(() => expect(trigger).toHaveFocus());
   });
 
   it("Escape cancels and calls onCancel", async () => {

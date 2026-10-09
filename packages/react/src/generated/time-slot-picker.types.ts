@@ -28,7 +28,7 @@ export interface TimeSlotPickerSpecProps {
    */
   timeZone?: string;
   /**
-   * A BCP 47 locale for date and time names. Default: the browser's.
+   * A BCP 47 locale for date and time names. Default: en-US on the server and during hydration, then the browser's.
    */
   locale?: string;
   /**

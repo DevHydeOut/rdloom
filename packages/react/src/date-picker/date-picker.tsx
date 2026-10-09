@@ -26,6 +26,7 @@ import {
   iconButton,
   overlayPanel,
   segment,
+  tidySegment,
 } from "../utils/field";
 import { CalendarIcon } from "../utils/icons";
 
@@ -65,7 +66,7 @@ export function DatePicker<T extends DateValue = DateValue>({
         {isRequired && <span aria-hidden="true" className="text-[var(--rd-color-feedback-danger)]"> *</span>}
       </Label>
       <Group className={cx(fieldGroup, fieldGroupSizes[size])}>
-        <DateInput className="flex flex-1">{(seg) => <DateSegment segment={seg} className={segment} />}</DateInput>
+        <DateInput className="flex flex-1">{(seg) => <DateSegment segment={tidySegment(seg)} className={segment} />}</DateInput>
         <Button className={iconButton}>
           <CalendarIcon />
         </Button>

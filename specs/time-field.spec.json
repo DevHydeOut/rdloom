@@ -76,7 +76,7 @@
     },
     "isInvalid": {
       "type": "boolean",
-      "description": "Marks the field invalid. Leave undefined to let validation decide."
+      "description": "Marks the field invalid. Leave it unset to let validation decide."
     },
     "isRequired": {
       "type": "boolean",

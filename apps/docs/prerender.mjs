@@ -10,11 +10,14 @@ import { build } from "vite";
 import { neutralizeDemoLinks } from "./seo-regions.mjs";
 
 const root = path.dirname(fileURLToPath(import.meta.url));
-const dist = path.join(root, "dist");
-const serverOut = path.join(root, "dist-server");
+// DOCS_DIST builds into another folder (a second copy of the site for a test that must not disturb the first).
+const dist = process.env.DOCS_DIST ? path.resolve(process.env.DOCS_DIST) : path.join(root, "dist");
+const serverOut = dist + "-server";
 
-await build({ root, logLevel: "warn" });
-await build({ root, logLevel: "warn", build: { ssr: "src/entry-server.tsx", outDir: serverOut } });
+// DOCS_MODE=development builds with React's development version, whose hydration errors say what differed.
+const mode = process.env.DOCS_MODE === "development" ? "development" : "production";
+await build({ root, mode, logLevel: "warn", build: { outDir: dist } });
+await build({ root, mode, logLevel: "warn", build: { ssr: "src/entry-server.tsx", outDir: serverOut } });
 
 const { render, allPaths, previewPaths, siteUrl, faq } = await import(pathToFileURL(path.join(serverOut, "entry-server.js")).href);
 const template = fs.readFileSync(path.join(dist, "index.html"), "utf8");

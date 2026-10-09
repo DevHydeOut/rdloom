@@ -13,7 +13,7 @@ import {
 } from "react-aria-components";
 import { timeFieldDefaults, type TimeFieldSpecProps } from "../generated/time-field.types";
 import { cx } from "../utils/cx";
-import { fieldGroup, fieldGroupSizes, segment } from "../utils/field";
+import { fieldGroup, fieldGroupSizes, segment, tidySegment } from "../utils/field";
 
 export interface TimeFieldProps
   extends TimeFieldSpecProps,
@@ -53,7 +53,7 @@ export const TimeField = forwardRef<HTMLDivElement, TimeFieldProps>(function Tim
         {isRequired && <span aria-hidden="true" className="text-[var(--rd-color-feedback-danger)]"> *</span>}
       </Label>
       <DateInput className={cx(fieldGroup, fieldGroupSizes[size], "tabular-nums")}>
-        {(seg) => <DateSegment segment={seg} className={segment} />}
+        {(seg) => <DateSegment segment={tidySegment(seg)} className={segment} />}
       </DateInput>
       {description && (
         <Text slot="description" className="text-xs text-[var(--rd-color-text-muted)]">

@@ -1241,7 +1241,7 @@
       "name": "FieldArray",
       "id": "field-array",
       "version": "0.1.0",
-      "description": "Repeating rows of fields inside a Form, such as invoice lines or team members. Add, remove, move up or down and insert are all buttons, so the keyboard does everything; focus lands somewhere sensible and a polite message says what changed. The rows contents and any totals are yours.",
+      "description": "Repeating rows of fields inside a Form, such as invoice lines or team members. Add, remove, move up or down and insert are all buttons, so the keyboard does everything; focus lands somewhere sensible and a polite message says what changed. The contents of the rows and any totals are yours.",
       "properties": [
         {
           "prop": "density",

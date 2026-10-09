@@ -1,9 +1,10 @@
 "use client";
 
-import { Children, cloneElement, forwardRef, isValidElement, type HTMLAttributes, type ReactElement } from "react";
+import { Children, cloneElement, forwardRef, isValidElement, useEffect, useState, type HTMLAttributes, type ReactElement } from "react";
 import { Button as AriaButton } from "react-aria-components";
 import { bubbleDefaults, type BubbleSpecProps } from "../generated/bubble.types";
 import { cx } from "../utils/cx";
+import { plainSpaces, useDefaultLocale } from "../utils/use-default-locale";
 import { ErrorIcon, RetryIcon } from "../utils/icons";
 
 export interface BubbleProps
@@ -14,9 +15,11 @@ export interface BubbleProps
 
 const focusRing = "outline-none data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)]";
 
-function timeText(value: Date | string): string {
+// The time is shown in the visitor's own language and time zone, so it is read after mount: the server
+// cannot know either, and a different first render would be a hydration mismatch.
+function timeText(value: Date | string, locale: string): string {
   const date = value instanceof Date ? value : new Date(value);
-  return Number.isNaN(date.getTime()) ? "" : date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  return Number.isNaN(date.getTime()) ? "" : plainSpaces(date.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" }));
 }
 
 /**
@@ -49,7 +52,11 @@ export const Bubble = forwardRef<HTMLElement, BubbleProps>(function Bubble(
   const joinedAbove = position === "middle" || position === "last";
   const joinedBelow = position === "first" || position === "middle";
   const failed = status === "failed";
-  const visibleTime = timestamp !== undefined ? (timestampText ?? timeText(timestamp)) : undefined;
+  const locale = useDefaultLocale();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
+  const visibleTime = timestamp === undefined ? undefined : (timestampText ?? (mounted ? timeText(timestamp, locale) : ""));
   const hasFooter = timestamp !== undefined || status !== "sent" || !!actions;
 
   // The corners that touch the neighbouring bubble go square on the side the bubble is anchored to.

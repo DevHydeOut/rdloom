@@ -1,5 +1,5 @@
 import { Suspense, useContext } from "react";
-import { components, EagerExamples, hrefOf } from "../data";
+import { blocks, components, EagerExamples, hrefOf, parts } from "../data";
 import { faq } from "../faq";
 import { Link } from "../router";
 import { CodeBlock } from "../ui";
@@ -157,7 +157,7 @@ export function Home() {
 
       <section aria-labelledby="all" className="flex flex-col gap-4">
         <h2 id="all" className="font-display text-[26px] leading-9 tracking-[-0.03em]">
-          {components.length} components
+          {parts.length} components and {blocks.length} blocks
         </h2>
         <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {components.map((c) => (

@@ -7,6 +7,7 @@ import { timeSlotPickerDefaults, type TimeSlotPickerSpecProps } from "../generat
 import { ActionButton } from "../action-button/action-button";
 import { Button } from "../button/button";
 import { Calendar } from "../calendar/calendar";
+import { useDefaultLocale } from "../utils/use-default-locale";
 import { EmptyState } from "../empty-state/empty-state";
 import { ErrorState } from "../error-state/error-state";
 import { Skeleton } from "../skeleton/skeleton";
@@ -29,7 +30,7 @@ export interface TimeSlotPickerProps extends TimeSlotPickerSpecProps {
 const WALL = /^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})(?::\d{2}(?:\.\d+)?)?$/;
 
 /** Formats a slot time. A time with no offset is wall time and is shown as written. */
-function formatSlot(time: string, locale: string | undefined, timeZone: string | undefined) {
+function formatSlot(time: string, locale: string, timeZone: string | undefined) {
   const wall = WALL.exec(time);
   const options: Intl.DateTimeFormatOptions = { hour: "numeric", minute: "2-digit" };
   if (wall) {
@@ -57,7 +58,7 @@ export function TimeSlotPicker({
   minDate,
   onDateChange,
   timeZone,
-  locale,
+  locale: localeProp,
   today: todayProp,
   label = timeSlotPickerDefaults.label,
   confirmLabel = timeSlotPickerDefaults.confirmLabel,
@@ -65,6 +66,7 @@ export function TimeSlotPicker({
   classNames,
   className,
 }: TimeSlotPickerProps) {
+  const locale = useDefaultLocale(localeProp);
   const headingId = useId();
   const todayDate = useMemo(() => {
     if (todayProp) {

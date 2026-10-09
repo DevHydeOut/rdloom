@@ -7,6 +7,7 @@ import { Button } from "../button/button";
 import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "../table/table";
 import type { TableData } from "../utils/ai";
 import { cx } from "../utils/cx";
+import { useDefaultLocale } from "../utils/use-default-locale";
 
 export interface GeneratedTableProps extends GeneratedTableSpecProps {
   className?: string;
@@ -44,6 +45,7 @@ export const GeneratedTable = forwardRef<HTMLDivElement, GeneratedTableProps>(fu
   ref,
 ) {
   const [sort, setSort] = useState<SortDescriptor | null>(null);
+  const locale = useDefaultLocale();
   const [all, setAll] = useState(false);
   const [notice, setNotice] = useState("");
   const titleId = useId();
@@ -115,7 +117,7 @@ export const GeneratedTable = forwardRef<HTMLDivElement, GeneratedTableProps>(fu
             <TableRow id={row.id}>
               {data.columns.map((_, c) => (
                 <TableCell key={c} className={numeric[c] ? "!text-end tabular-nums" : undefined}>
-                  {row.cells[c] === null || row.cells[c] === undefined ? "" : isNumber(row.cells[c]) ? (row.cells[c] as number).toLocaleString() : String(row.cells[c])}
+                  {row.cells[c] === null || row.cells[c] === undefined ? "" : isNumber(row.cells[c]) ? (row.cells[c] as number).toLocaleString(locale) : String(row.cells[c])}
                 </TableCell>
               ))}
             </TableRow>

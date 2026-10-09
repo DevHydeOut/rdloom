@@ -25,7 +25,7 @@ export interface CustomerTableSpecProps {
    */
   currency?: string;
   /**
-   * Locale for numbers and dates, e.g. "en-GB". Defaults to the visitor's.
+   * Locale for numbers and dates, e.g. "en-GB". Defaults to en-US while rendering on the server and during hydration, then the visitor's language.
    */
   locale?: string;
   /**

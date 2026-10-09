@@ -11,7 +11,7 @@ export interface StatSpecProps {
    */
   label: string;
   /**
-   * The number. A number is formatted with toLocaleString unless format is given; a string is shown as is.
+   * The number. A number is formatted as en-US (the same on the server and in the browser) unless format is given; a string is shown as is.
    */
   value: string | number;
   /**

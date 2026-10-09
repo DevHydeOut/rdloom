@@ -13,6 +13,7 @@ import { cx } from "../utils/cx";
 import { ChevronLeftIcon, ChevronRightIcon, PlusIcon } from "../utils/icons";
 import { resolvePermission } from "../utils/permissions";
 import { StateBoundary } from "../utils/state-boundary";
+import { useDefaultLocale } from "../utils/use-default-locale";
 
 export interface EventCalendarEvent {
   id: string;
@@ -77,7 +78,7 @@ export function EventCalendar({
   defaultMonth,
   onMonthChange,
   weekStartsOn = eventCalendarDefaults.weekStartsOn,
-  locale,
+  locale: localeProp,
   today: todayProp,
   maxEventsPerDay = eventCalendarDefaults.maxEventsPerDay,
   label = eventCalendarDefaults.label,
@@ -90,6 +91,7 @@ export function EventCalendar({
   classNames,
   className,
 }: EventCalendarProps) {
+  const locale = useDefaultLocale(localeProp);
   const titleId = useId();
   const todayDate = useMemo(() => {
     if (todayProp) {

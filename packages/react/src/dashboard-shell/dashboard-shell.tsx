@@ -62,6 +62,11 @@ export const DashboardShell = forwardRef<HTMLDivElement, DashboardShellProps>(fu
   const mainId = useId();
   const root = useRef<HTMLDivElement | null>(null);
 
+  // A shell placed inside a page that already has a main landmark (a docs preview, a tab of a larger app) must not add a second one.
+  const [nested, setNested] = useState(false);
+  useEffect(() => {
+    if (root.current?.parentElement?.closest("main, [role=main]")) setNested(true);
+  }, []);
   // Narrow means the space the shell is in, not the screen: a shell inside a small frame folds the same way a phone does.
   const [compact, setCompact] = useState(false);
   useEffect(() => {
@@ -72,6 +77,7 @@ export const DashboardShell = forwardRef<HTMLDivElement, DashboardShellProps>(fu
     return () => observer.disconnect();
   }, []);
 
+  const Main = nested ? "div" : "main";
   const inset = sidebarAppearance === "inset";
   // The parts the sidebar draws; the others belong to the shell itself.
   const navClasses = { nav: classNames?.nav, group: classNames?.group, item: classNames?.item, "sub-list": classNames?.["sub-list"], account: classNames?.account, "team-switcher": classNames?.["team-switcher"] };
@@ -177,9 +183,9 @@ export const DashboardShell = forwardRef<HTMLDivElement, DashboardShellProps>(fu
           )}
           {actions && <div className={cx("flex shrink-0 items-center gap-2", classNames?.actions)}>{actions}</div>}
         </header>
-        <main id={mainId} tabIndex={-1} className={cx("min-h-0 flex-1 overflow-y-auto outline-none", classNames?.main)}>
+        <Main id={mainId} tabIndex={-1} className={cx("min-h-0 flex-1 overflow-y-auto outline-none", classNames?.main)}>
           {children as ReactNode}
-        </main>
+        </Main>
         </div>
       </div>
     </div>

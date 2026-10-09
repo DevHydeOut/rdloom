@@ -9,7 +9,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { withoutPreviews } from "./seo-regions.mjs";
 
-const dist = path.join(path.dirname(fileURLToPath(import.meta.url)), "dist");
+const dist = process.env.DOCS_DIST ? path.resolve(process.env.DOCS_DIST) : path.join(path.dirname(fileURLToPath(import.meta.url)), "dist");
 const problems = [];
 const warnings = [];
 
@@ -76,6 +76,30 @@ for (const f of files) {
   for (const m of own.matchAll(/<a [^>]*href="(\/[^"#?][^"]*)"/g)) {
     const href = m[1].replace(/&amp;/g, "&");
     if (!exists(href) && !href.startsWith("/r/")) problems.push(`${where} link to ${href} goes nowhere`);
+  }
+}
+
+// Install commands shown in the docs must name real registry items (a copied command that fails is a bug a visitor meets first).
+const registryFile = path.join(dist, "r", "registry.json");
+if (!fs.existsSync(registryFile)) problems.push("r/registry.json is missing from the build (run npm run gen before the docs build)");
+else {
+  const names = new Set(JSON.parse(fs.readFileSync(registryFile, "utf8")).items.map((i) => i.name));
+  for (const f of files) {
+    const html = fs.readFileSync(f, "utf8");
+    // Only code blocks: the highlighter splits words into spans, so tags are removed without adding spaces.
+    for (const pre of html.matchAll(/<pre[\s\S]*?<\/pre>/g)) {
+      const code = pre[0].replace(/<[^>]+>/g, "").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&").replace(/&quot;/g, '"');
+      for (const line of code.split(/\r?\n/)) {
+        const m = line.match(/npx\s+rdloom\s+add\s+([^#]*)/);
+        if (!m) continue;
+        for (const token of m[1].trim().split(/\s+/)) {
+          if (token.startsWith("-")) break;
+          // Placeholders (<name...>), other registries (acme/kit, @acme/kit) and addresses are not names in this registry.
+          if (/[/@<.:]/.test(token)) continue;
+          if (!names.has(token)) problems.push(`${routeOf(f)}: the command "rdloom add ${token}" names nothing in the registry`);
+        }
+      }
+    }
   }
 }
 

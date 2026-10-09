@@ -15,7 +15,7 @@
       "type": "custom",
       "tsType": "string | number",
       "required": true,
-      "description": "The number. A number is formatted with toLocaleString unless format is given; a string is shown as is."
+      "description": "The number. A number is formatted as en-US (the same on the server and in the browser) unless format is given; a string is shown as is."
     },
     "format": {
       "type": "callback",

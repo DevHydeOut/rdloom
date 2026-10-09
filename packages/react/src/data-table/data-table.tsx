@@ -15,6 +15,7 @@ import { Sheet } from "../sheet/sheet";
 import { Skeleton } from "../skeleton/skeleton";
 import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "../table/table";
 import { cx } from "../utils/cx";
+import { useDefaultLocale } from "../utils/use-default-locale";
 import { CheckIcon, CloseIcon, DotsIcon, MinusIcon, SearchIcon } from "../utils/icons";
 import { permissionFor, resolvePermission, type PermissionValue } from "../utils/permissions";
 import { toDataState } from "../utils/state";
@@ -126,6 +127,7 @@ export function DataTable<Row>({
   const all = rows as Row[];
   const root = useRef<HTMLElement>(null);
   const body = useRef<HTMLDivElement>(null);
+  const locale = useDefaultLocale();
   const [narrow, setNarrow] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [notice, setNotice] = useState("");
@@ -212,7 +214,7 @@ export function DataTable<Row>({
   const nameOf = (row: Row) => (first ? valueText(cellValue(row, first)) : "") || getRowId(row);
   const plain = (row: Row, column: DataTableColumn<Row>) => {
     const value = cellValue(row, column);
-    return value instanceof Date ? value.toLocaleDateString() : valueText(value);
+    return value instanceof Date ? value.toLocaleDateString(locale, { timeZone: "UTC" }) : valueText(value);
   };
   const cellOf = (row: Row, column: DataTableColumn<Row>): ReactNode => (column.cell ? column.cell(row) : plain(row, column));
 
@@ -411,7 +413,7 @@ export function DataTable<Row>({
   const skeletonCount = Math.min(Math.max(1, pageSize), 5);
   const skeletonWidths = ["70%", "50%", "60%", "40%", "55%"];
 
-  const countText = loading ? `Loading ${lowerLabel}` : failed ? `Could not load ${lowerLabel}` : `${total.toLocaleString()} ${plural(total, "result", "results")}`;
+  const countText = loading ? `Loading ${lowerLabel}` : failed ? `Could not load ${lowerLabel}` : `${total.toLocaleString(locale)} ${plural(total, "result", "results")}`;
   const firstShown = total === 0 ? 0 : (page - 1) * pageSize + 1;
   const lastShown = Math.min(page * pageSize, total);
 
@@ -642,7 +644,7 @@ export function DataTable<Row>({
       {showRows && !loading && total > 0 && (
         <div className={cx("flex flex-wrap items-center justify-between gap-3", classNames?.footer)}>
           <p className="text-sm text-[var(--rd-color-text-muted)]">
-            Showing {firstShown.toLocaleString()} to {lastShown.toLocaleString()} of {total.toLocaleString()}
+            Showing {firstShown.toLocaleString(locale)} to {lastShown.toLocaleString(locale)} of {total.toLocaleString(locale)}
           </p>
           {pageCount > 1 && <Pagination pageCount={pageCount} page={page} onChange={(p) => update({ page: p })} size="sm" label={`${label} pages`} className={classNames?.pagination} />}
         </div>
@@ -681,7 +683,7 @@ export function DataTable<Row>({
                   Clear filters
                 </Button>
               )}
-              <Button onPress={() => setFiltersOpen(false)}>Show {total.toLocaleString()} {plural(total, "result", "results")}</Button>
+              <Button onPress={() => setFiltersOpen(false)}>Show {total.toLocaleString(locale)} {plural(total, "result", "results")}</Button>
             </div>
           </div>
         </Sheet>

@@ -11,7 +11,7 @@ export const faq = [
   },
   {
     q: "Does it work with Next.js, Vite and other React setups?",
-    a: "It needs React 19 and Tailwind CSS. rdloom has no router and no data layer of its own, so it should fit most React apps. Our test app uses Vite. Other setups have not been tested yet.",
+    a: "It is built for React 19 and Tailwind CSS 4, and also supports React 18.3 and Tailwind CSS 3.4. rdloom has no router and no data layer of its own, and every component is marked \"use client\", so it should fit most React apps. Our test app uses Vite. The Next.js App Router and other setups have not been tested yet.",
   },
   {
     q: "Is it accessible?",

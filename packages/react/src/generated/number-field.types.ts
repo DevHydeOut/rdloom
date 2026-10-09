@@ -18,7 +18,7 @@ export interface NumberFieldSpecProps {
    */
   errorMessage?: string;
   /**
-   * Controlled value. NaN means empty.
+   * Controlled value. An empty field has no number.
    */
   value?: number;
   /**
@@ -26,7 +26,7 @@ export interface NumberFieldSpecProps {
    */
   defaultValue?: number;
   /**
-   * Called with the number, or NaN when the field is emptied.
+   * Called with the number, or with a value that is not a number when the field is emptied (test it with Number.isNaN).
    */
   onChange?: (value: number) => void;
   /**
@@ -62,7 +62,7 @@ export interface NumberFieldSpecProps {
    */
   isDisabled?: boolean;
   /**
-   * Marks the field invalid. Leave undefined to let validation decide.
+   * Marks the field invalid. Leave it unset to let validation decide.
    */
   isInvalid?: boolean;
   /**

@@ -5,7 +5,8 @@ import { Sparkline } from "../sparkline/sparkline";
 import { cx } from "../utils/cx";
 import { MinusIcon, TrendDownIcon, TrendUpIcon } from "../utils/icons";
 
-// Plain markup with no hooks, so it also works in a React Server Component.
+// Plain markup with no hooks, so it also works in a React Server Component. Numbers read as en-US on
+// the server and in the browser alike; pass `format` for another style.
 
 export interface StatProps
   extends StatSpecProps,
@@ -70,14 +71,14 @@ export const Stat = forwardRef<HTMLDivElement, StatProps>(function Stat(
     );
   }
 
-  const valueText = typeof value === "number" ? (format ? format(value) : value.toLocaleString()) : value;
+  const valueText = typeof value === "number" ? (format ? format(value) : value.toLocaleString("en-US")) : value;
 
   // The change is a signed percentage: its sign picks the arrow and the word.
   const change = trend?.change ?? 0;
   const dir = change > 0 ? "up" : change < 0 ? "down" : "flat";
   const goodWhen = trend?.goodWhen ?? "up";
   const tone = dir === "flat" ? "neutral" : dir === goodWhen ? "good" : "bad";
-  const amount = Math.abs(change).toLocaleString();
+  const amount = Math.abs(change).toLocaleString("en-US");
   const words = dir === "up" ? "Up" : dir === "down" ? "Down" : "No change";
   const shown = dir === "flat" ? "0%" : `${dir === "up" ? "+" : "-"}${amount}%`;
 

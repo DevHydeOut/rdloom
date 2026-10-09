@@ -11,7 +11,7 @@
     "name": { "type": "string", "description": "Who sent it. Shown above single and first bubbles, and used in the accessible name." },
     "avatar": { "type": "node", "description": "An Avatar for the sender. Shown beside single and last bubbles; other bubbles in a run keep the space so text lines up." },
     "timestamp": { "type": "custom", "tsType": "Date | string", "description": "When it was sent. Renders a time element with this value as dateTime." },
-    "timestampText": { "type": "string", "description": "The visible text for the time, e.g. \"10:42\". Without it the time is formatted with the reader's locale." },
+    "timestampText": { "type": "string", "description": "The visible text for the time, e.g. \"10:42\". Without it the time is formatted in the reader's locale and time zone after the page loads (the server HTML leaves it empty, so the server and the browser never disagree)." },
     "status": { "type": "enum", "values": ["sending", "sent", "failed"], "default": "sent", "description": "sending shows \"Sending\". failed shows \"Not sent\" and a Retry button when onRetry is given. sent shows nothing." },
     "onRetry": { "type": "callback", "description": "Called when Retry is pressed on a failed bubble.", "tsType": "() => void" },
     "actions": { "type": "node", "description": "The footer: buttons such as copy or regenerate." },

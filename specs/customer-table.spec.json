@@ -29,7 +29,7 @@
     },
     "locale": {
       "type": "string",
-      "description": "Locale for numbers and dates, e.g. \"en-GB\". Defaults to the visitor's."
+      "description": "Locale for numbers and dates, e.g. \"en-GB\". Defaults to en-US while rendering on the server and during hydration, then the visitor's language."
     },
     "isLoading": {
       "type": "boolean",

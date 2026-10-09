@@ -32,7 +32,7 @@ export interface BubbleSpecProps {
    */
   timestamp?: Date | string;
   /**
-   * The visible text for the time, e.g. "10:42". Without it the time is formatted with the reader's locale.
+   * The visible text for the time, e.g. "10:42". Without it the time is formatted in the reader's locale and time zone after the page loads (the server HTML leaves it empty, so the server and the browser never disagree).
    */
   timestampText?: string;
   /**

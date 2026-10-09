@@ -14,14 +14,14 @@ export function niceRange(min: number, max: number, wanted = 4): { min: number; 
 }
 
 /** 12400 -> "12.4K" for the axis; exact values stay in the tooltip and the table. */
-export const compact = (value: number) => new Intl.NumberFormat(undefined, { notation: "compact", maximumFractionDigits: 1 }).format(value);
+export const compact = (value: number, locale: string) => new Intl.NumberFormat(locale, { notation: "compact", maximumFractionDigits: 1 }).format(value);
 
 export function withUnit(text: string, unit?: string) {
   if (!unit) return text;
   return /^[$€£¥₹]$/.test(unit) ? `${unit}${text}` : `${text}${/^[%‰]$/.test(unit) ? "" : " "}${unit}`;
 }
 
-export const exactNumber = (value: number) => value.toLocaleString(undefined, { maximumFractionDigits: 3 });
+export const exactNumber = (value: number, locale: string) => value.toLocaleString(locale, { maximumFractionDigits: 3 });
 
 /** Whole percentages that add up to exactly 100 (largest remainder), so a legend never reads 99% or 101%. */
 export function percentages(values: number[]): number[] {

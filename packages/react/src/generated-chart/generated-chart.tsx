@@ -5,6 +5,7 @@ import { Button } from "../button/button";
 import { generatedChartDefaults, type GeneratedChartSpecProps } from "../generated/generated-chart.types";
 import type { ChartData } from "../utils/ai";
 import { cx } from "../utils/cx";
+import { useDefaultLocale } from "../utils/use-default-locale";
 
 export interface GeneratedChartProps extends GeneratedChartSpecProps {
   className?: string;
@@ -36,7 +37,7 @@ export function niceScale(max: number, wanted = 4): { max: number; ticks: number
 }
 
 /** 12400 -> "12.4K" for the axis; exact values stay in the table. */
-const compact = (value: number) => new Intl.NumberFormat(undefined, { notation: "compact", maximumFractionDigits: 1 }).format(value);
+const compact = (value: number, locale: string) => new Intl.NumberFormat(locale, { notation: "compact", maximumFractionDigits: 1 }).format(value);
 
 function withUnit(text: string, unit?: string) {
   if (!unit) return text;
@@ -56,7 +57,7 @@ function Marker({ shape, x, y, color, size = 4.5 }: { shape: number; x: number; 
 }
 
 /** A short sentence for the summary when the sender didn't write one. */
-function describe(data: ChartData, type: "bar" | "line"): string {
+function describe(data: ChartData, type: "bar" | "line", locale: string): string {
   const { labels, series, unit } = data;
   if (labels.length === 0 || series.length === 0) return "No data";
   const first = series[0];
@@ -65,7 +66,7 @@ function describe(data: ChartData, type: "bar" | "line"): string {
   const low = Math.min(...values);
   const at = (v: number) => labels[values.indexOf(v)];
   const lead = `${type === "bar" ? "Bar" : "Line"} chart of ${series.map((s) => s.name).join(", ")} across ${labels.length} points.`;
-  return `${lead} ${first.name} is highest at ${withUnit(high.toLocaleString(), unit)} (${at(high)}) and lowest at ${withUnit(low.toLocaleString(), unit)} (${at(low)}).`;
+  return `${lead} ${first.name} is highest at ${withUnit(high.toLocaleString(locale), unit)} (${at(high)}) and lowest at ${withUnit(low.toLocaleString(locale), unit)} (${at(low)}).`;
 }
 
 /**
@@ -76,6 +77,7 @@ export const GeneratedChart = forwardRef<HTMLElement, GeneratedChartProps>(funct
   { data, title, summary, type = generatedChartDefaults.type, className },
   ref,
 ) {
+  const locale = useDefaultLocale();
   const [asTable, setAsTable] = useState(false);
   const titleId = useId();
   const tableId = useId();
@@ -91,7 +93,7 @@ export const GeneratedChart = forwardRef<HTMLElement, GeneratedChartProps>(funct
   const groupW = Math.min(band * 0.7, 56 * series.length);
   const barW = series.length > 0 ? groupW / series.length : groupW;
   const direct = labels.length * series.length <= 12; // few enough bars to label each one
-  const text = summary ?? describe(data, type);
+  const text = summary ?? describe(data, type, locale);
   const empty = labels.length === 0 || series.length === 0;
 
   return (
@@ -138,7 +140,7 @@ export const GeneratedChart = forwardRef<HTMLElement, GeneratedChartProps>(funct
                       </th>
                       {series.map((s) => (
                         <td key={s.name} className="border-b border-[var(--rd-color-border-default)] px-3 py-2 text-end tabular-nums">
-                          {s.values[i] === undefined ? "" : withUnit(s.values[i].toLocaleString(), unit)}
+                          {s.values[i] === undefined ? "" : withUnit(s.values[i].toLocaleString(locale), unit)}
                         </td>
                       ))}
                     </tr>
@@ -154,7 +156,7 @@ export const GeneratedChart = forwardRef<HTMLElement, GeneratedChartProps>(funct
                   <g key={tick}>
                     <line x1={PAD.left} x2={WIDTH - PAD.right} y1={y(tick)} y2={y(tick)} stroke="var(--rd-color-border-default)" strokeWidth={tick === 0 ? 1.5 : 1} />
                     <text x={PAD.left - 8} y={y(tick)} textAnchor="end" dominantBaseline="middle" fontSize="11" fill="currentColor">
-                      {withUnit(compact(tick), unit)}
+                      {withUnit(compact(tick, locale), unit)}
                     </text>
                   </g>
                 ))}
@@ -174,7 +176,7 @@ export const GeneratedChart = forwardRef<HTMLElement, GeneratedChartProps>(funct
                           <rect x={left + 1} y={top} width={Math.max(1, barW - 2)} height={Math.max(0, y(0) - top)} rx="2" fill={SERIES_COLORS[si % SERIES_COLORS.length]} />
                           {direct && (
                             <text x={left + barW / 2} y={top - 5} textAnchor="middle" fontSize="11" fill="var(--rd-color-text-default)">
-                              {withUnit(compact(value), unit)}
+                              {withUnit(compact(value, locale), unit)}
                             </text>
                           )}
                         </g>

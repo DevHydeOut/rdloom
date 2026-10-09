@@ -1,6 +1,6 @@
 # @rdloom/mcp
 
-An MCP server that gives AI coding agents the real [rdloom](https://www.npmjs.com/package/rdloom) component APIs — props, usage rules, accessibility requirements, tokens and source — so they stop inventing props that don't exist.
+An MCP server that gives AI coding agents the real [rdloom](https://www.npmjs.com/package/rdloom) component APIs (props, usage rules, accessibility requirements, tokens and source), so they stop inventing props that don't exist.
 
 ## Setup
 
@@ -38,13 +38,13 @@ All read-only; nothing is written to your project.
 
 ```
 "outline" isn't allowed for `variant`
-`disabled` isn't in the spec — did you mean `isDisabled`?
+`disabled` isn't in the spec. Did you mean `isDisabled`?
 Missing required prop `children`
 ```
 
 ## Why it exists
 
-Component APIs change, and a model's training data doesn't. This server reads from the same specs that generate the components, the documentation and the Figma library — so what the agent is told always matches what the code does.
+Component APIs change, and a model's training data doesn't. This server reads from the same specs that generate the components, the documentation and the Figma library, so what the agent is told always matches what the code does.
 
 ---
 

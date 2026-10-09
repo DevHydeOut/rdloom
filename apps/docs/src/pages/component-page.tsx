@@ -66,7 +66,7 @@ function PropsTable({ props }: { props: Record<string, PropSpec> }) {
               <td className="px-4 py-3">
                 <code className="text-xs break-words">{propType(p)}</code>
               </td>
-              <td className="px-4 py-3">{p.default === undefined ? <span className="text-[var(--site-muted)]">—</span> : <code>{JSON.stringify(p.default)}</code>}</td>
+              <td className="px-4 py-3">{p.default === undefined ? <span className="text-[var(--site-muted)]">none</span> : <code>{JSON.stringify(p.default)}</code>}</td>
             </tr>
           ))}
         </tbody>

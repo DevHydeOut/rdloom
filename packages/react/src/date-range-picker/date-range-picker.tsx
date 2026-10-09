@@ -28,6 +28,7 @@ import {
   iconButton,
   overlayPanel,
   segment,
+  tidySegment,
 } from "../utils/field";
 import { CalendarIcon } from "../utils/icons";
 import { useMediaQuery } from "../utils/use-media-query";
@@ -134,13 +135,13 @@ export function DateRangePicker<T extends DateValue = DateValue>({
       </Label>
       <Group className={cx(fieldGroup, fieldGroupSizes[size])}>
         <DateInput slot="start" className="flex">
-          {(seg) => <DateSegment segment={seg} className={segment} />}
+          {(seg) => <DateSegment segment={tidySegment(seg)} className={segment} />}
         </DateInput>
         <span aria-hidden="true" className="px-1 text-[var(--rd-color-text-muted)]">
           –
         </span>
         <DateInput slot="end" className="flex flex-1">
-          {(seg) => <DateSegment segment={seg} className={segment} />}
+          {(seg) => <DateSegment segment={tidySegment(seg)} className={segment} />}
         </DateInput>
         <Button className={iconButton}>
           <CalendarIcon />
