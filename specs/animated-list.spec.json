@@ -1,0 +1,90 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "AnimatedList",
+  "version": "0.1.0",
+  "category": "motion",
+  "status": "experimental",
+  "description": "A list whose items slide and fade in one after another, and stack as new ones are added. It is a real list (ul with li items), and every item is in the page from the start.",
+  "props": {
+    "children": {
+      "type": "node",
+      "description": "The items. Each child becomes one list item; give each a stable key so only genuinely new items animate.",
+      "required": true
+    },
+    "delay": {
+      "type": "number",
+      "description": "Seconds between one item appearing and the next, for items that arrive together.",
+      "default": 0.15
+    },
+    "duration": {
+      "type": "number",
+      "description": "Seconds each item takes to slide in.",
+      "default": 0.4
+    },
+    "announce": {
+      "type": "boolean",
+      "description": "Marks the list as a polite live region so screen readers announce items that are added later. Leave it off for a static list.",
+      "default": false
+    },
+    "isStill": {
+      "type": "boolean",
+      "description": "Shows every item at once with no movement. Moving content should be stoppable.",
+      "default": false
+    }
+  },
+  "variants": [
+    "isStill",
+    "announce"
+  ],
+  "states": [
+    "default"
+  ],
+  "slots": [
+    "root",
+    "item"
+  ],
+  "tokens": [
+    "color.text.default"
+  ],
+  "a11y": {
+    "role": "list",
+    "keyboard": [],
+    "requirements": [
+      "A real list: ul with one li per item, so the item count is announced",
+      "Every item is real DOM in the server HTML and visible without JavaScript or CSS animation",
+      "Stands still for visitors who ask for less motion (prefers-reduced-motion), and with isStill or inside an rdm-still container",
+      "Each item moves once and stops, so nothing keeps moving and nothing flashes (WCAG 2.2.2, 2.3.1)",
+      "Items keep their own focus order and content; the animation never moves focus",
+      "Optional: it is a separate component, so projects that do not add it carry none of its code"
+    ],
+    "screenReader": [
+      "Read as a list with its number of items",
+      "With announce on, items added later are read out politely, once, without interrupting"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "A feed or activity log where new entries arrive",
+      "A short list that should feel built up rather than dropped in"
+    ],
+    "avoid_when": [
+      "Long lists: staggered delays make the last items wait",
+      "Lists people scan quickly or sort and filter often"
+    ],
+    "anti_patterns": [
+      "A delay so long that content is hidden for several seconds",
+      "Turning on announce for a list that changes every second"
+    ]
+  },
+  "examples": [
+    "basic",
+    "live-feed"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {
+      "isStill": "Still"
+    }
+  }
+}

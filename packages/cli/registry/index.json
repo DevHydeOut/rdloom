@@ -50,6 +50,18 @@
       "description": "An inline message about the state of the page or a task: a tip, a success, a warning or an error. For brief confirmations that disappear, use Toast."
     },
     {
+      "name": "animated-circular-progress",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A ring that fills to its value after it appears, with the value in the middle. It can also spin when the amount of work is not known."
+    },
+    {
+      "name": "animated-list",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A list whose items slide and fade in one after another, and stack as new ones are added. It is a real list (ul with li items), and every item is in the page from the start."
+    },
+    {
       "name": "api-key-list",
       "type": "registry:ui",
       "version": "0.1.0",
@@ -356,6 +368,12 @@
       "description": "One-time code input for verification and two-factor sign in. One real input holds the code and drawn cells show it, so paste, autofill from SMS and screen readers all work."
     },
     {
+      "name": "interactive-hover-button",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A button whose label slides away to an arrow, or to a second label with an arrow, on hover and keyboard focus. Builds on Button."
+    },
+    {
       "name": "invite-dialog",
       "type": "registry:ui",
       "version": "0.1.0",
@@ -378,6 +396,12 @@
       "type": "registry:ui",
       "version": "0.1.0",
       "description": "A divider that labels a moment inside a conversation or feed: a centered label between two lines. Use date for a new day, unread for where new messages start, and event for something that happened, like someone joining."
+    },
+    {
+      "name": "marquee",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "An endless scrolling row (or column) of content, such as logos or short quotes. It pauses on hover and focus, and can show a visible Pause button."
     },
     {
       "name": "menu",
@@ -420,6 +444,12 @@
       "type": "registry:ui",
       "version": "0.1.0",
       "description": "A text field for numbers, with increment and decrement buttons, keyboard stepping, and locale-aware formatting for decimals, currency, units and percentages."
+    },
+    {
+      "name": "number-ticker",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A number that counts up (or down) to its value once after it appears. The final number is always the text that is read and that is in the server HTML."
     },
     {
       "name": "page-header",
@@ -650,10 +680,22 @@
       "description": "A text field that turns what you type into removable tags when you press Enter or comma: for keywords, recipients and labels."
     },
     {
+      "name": "text-animate",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "Text that animates in by character, word or line using a preset: fade in, blur in, slide up or scale up. The words are real text in the page from the start."
+    },
+    {
       "name": "text-field",
       "type": "registry:ui",
       "version": "0.1.1",
       "description": "Single-line or multi-line text input with a label, help text and error message."
+    },
+    {
+      "name": "text-reveal",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A passage whose words come into full strength as you scroll it into view, or all together when it appears. The real text is always in the page."
     },
     {
       "name": "text-shimmer",
@@ -716,6 +758,12 @@
       "description": "An expandable hierarchy such as folders and files or a nested menu, with keyboard navigation and optional selection. Build it from nested TreeItem elements."
     },
     {
+      "name": "typing-animation",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "Text that types itself out one character at a time, with an optional blinking cursor and an optional loop. The full text is in the page from the start."
+    },
+    {
       "name": "typography",
       "type": "registry:ui",
       "version": "0.1.0",
@@ -738,6 +786,12 @@
       "type": "registry:ui",
       "version": "0.1.0",
       "description": "The avatar button that opens the account menu: the person's name and email at the top, your own entries (settings, billing, help) in groups, a row for the theme, and a Sign out entry that can ask first, shows that it is working, and tells screen readers how it went."
+    },
+    {
+      "name": "word-rotate",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A phrase where one word swaps for the next in the same spot, cycling through a list. The slot is as wide as the longest word, so nothing around it jumps."
     }
   ]
 }

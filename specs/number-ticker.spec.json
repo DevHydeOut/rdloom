@@ -1,0 +1,56 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "NumberTicker",
+  "version": "0.1.0",
+  "category": "motion",
+  "status": "experimental",
+  "description": "A number that counts up (or down) to its value once after it appears. The final number is always the text that is read and that is in the server HTML.",
+  "props": {
+    "value": { "type": "number", "description": "The number to count to.", "required": true },
+    "from": { "type": "number", "description": "The number the count starts from.", "default": 0 },
+    "decimals": { "type": "number", "description": "Digits after the decimal point, always shown.", "default": 0 },
+    "duration": { "type": "number", "description": "Seconds the count takes.", "default": 1.6 },
+    "startWhenInView": { "type": "boolean", "description": "Waits until the number scrolls into view before counting.", "default": false },
+    "locale": { "type": "string", "description": "BCP 47 locale for the digits and separators. Defaults to the locale of the visitor." },
+    "isPaused": { "type": "boolean", "description": "Skips the count and shows the final value.", "default": false }
+  },
+  "variants": ["startWhenInView", "isPaused"],
+  "states": ["default"],
+  "slots": ["root"],
+  "tokens": ["color.text.default"],
+  "a11y": {
+    "role": "text",
+    "keyboard": [],
+    "requirements": [
+      "The final formatted value is always in the accessible text; the counting digits are hidden from assistive technology so nothing is read number by number",
+      "The server HTML contains the final value, so it is correct with no JavaScript",
+      "The count starts after mount only and runs once, for under two seconds by default",
+      "Visitors who ask for less motion (prefers-reduced-motion), and anything inside rdm-still, see the final value at once",
+      "Digits use tabular figures so the number does not jitter while it counts",
+      "Formats with the locale of the visitor through useDefaultLocale, so server and browser agree on first render"
+    ],
+    "screenReader": [
+      "Read once as the final number, never as a stream of changing values"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "A headline figure on a landing page or dashboard that should feel alive",
+      "A statistic that appears as the section scrolls into view"
+    ],
+    "avoid_when": [
+      "Figures people compare closely or copy, where a static number is calmer",
+      "Values that update often"
+    ],
+    "anti_patterns": [
+      "Counting every number in a table",
+      "Running the count for many seconds"
+    ]
+  },
+  "examples": ["basic", "decimals", "in-view"],
+  "figma": {
+    "componentKey": null,
+    "variantMap": { "isPaused": "Paused" }
+  }
+}

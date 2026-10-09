@@ -29,6 +29,11 @@
       "type": "number",
       "default": 10000,
       "description": "Auto-dismiss after this many ms (10 seconds by default). 0 keeps it open until the person closes it. Timers pause while the pointer is over the toast or it has keyboard focus, so nobody loses a message they are reading."
+    },
+    "animated": {
+      "type": "boolean",
+      "default": false,
+      "description": "Opt in to a fuller slide: the toast glides in from the edge and slides back out when dismissed. Off by default, which keeps the existing small rise and fade. Visitors who ask for less motion get no movement either way."
     }
   },
   "variants": [
@@ -65,7 +70,8 @@
     "requirements": [
       "New toasts are announced by screen readers",
       "Auto-dismiss pauses on hover and focus",
-      "Messages with actions should not auto-dismiss"
+      "Messages with actions should not auto-dismiss",
+      "The optional animated slide is skipped for visitors who prefer reduced motion, and never delays the message"
     ],
     "screenReader": [
       "A new toast is announced without moving focus",
@@ -92,7 +98,8 @@
   "examples": [
     "success",
     "danger",
-    "persistent"
+    "persistent",
+    "animated"
   ],
   "figma": {
     "componentKey": null,
