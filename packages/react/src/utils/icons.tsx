@@ -536,3 +536,31 @@ export function ArchiveIcon({ className = "size-5 shrink-0", strokeWidth }: Icon
     </Icon>
   );
 }
+
+// --- Theme
+
+export function SunIcon({ className = "size-4 shrink-0", strokeWidth }: IconProps) {
+  return (
+    <Icon className={className} strokeWidth={strokeWidth}>
+      <C cx={8} cy={8} r={2.75} />
+      <P d="M8 1.5v1.25M8 13.25v1.25M1.5 8h1.25M13.25 8h1.25M3.4 3.4l.9.9M11.7 11.7l.9.9M12.6 3.4l-.9.9M4.3 11.7l-.9.9" />
+    </Icon>
+  );
+}
+
+export function MoonIcon({ className = "size-4 shrink-0", strokeWidth }: IconProps) {
+  return (
+    <Icon className={className} strokeWidth={strokeWidth}>
+      <P d="M13.5 9.25A5.75 5.75 0 0 1 6.75 2.5a5.75 5.75 0 1 0 6.75 6.75z" />
+    </Icon>
+  );
+}
+
+export function MonitorIcon({ className = "size-4 shrink-0", strokeWidth }: IconProps) {
+  return (
+    <Icon className={className} strokeWidth={strokeWidth}>
+      <R x={1.75} y={2.75} width={12.5} height={8.5} rx={1.25} />
+      <P d="M5.5 13.75h5M8 11.25v2.5" />
+    </Icon>
+  );
+}

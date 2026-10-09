@@ -1,0 +1,95 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "HyperText",
+  "version": "0.1.0",
+  "category": "motion",
+  "status": "experimental",
+  "description": "Text whose letters scramble into random characters and then settle left to right on the real text, when it scrolls into view or when it is hovered. The final text is always in the page.",
+  "props": {
+    "children": {
+      "type": "string",
+      "description": "The final text.",
+      "required": true
+    },
+    "duration": {
+      "type": "number",
+      "default": 800,
+      "description": "Milliseconds until the last letter has settled."
+    },
+    "whenInView": {
+      "type": "boolean",
+      "default": true,
+      "description": "Scrambles once when the text scrolls into view."
+    },
+    "onHover": {
+      "type": "boolean",
+      "default": true,
+      "description": "Scrambles again when the pointer enters the text."
+    },
+    "isPaused": {
+      "type": "boolean",
+      "default": false,
+      "description": "Stops the animation and shows the finished text. Moving content that lasts more than five seconds should be stoppable."
+    }
+  },
+  "variants": [
+    "whenInView",
+    "onHover",
+    "isPaused"
+  ],
+  "states": [
+    "default"
+  ],
+  "slots": [
+    "root"
+  ],
+  "tokens": [
+    "color.text.default"
+  ],
+  "a11y": {
+    "role": "group",
+    "keyboard": [],
+    "requirements": [
+      "The full final text is in a visually hidden copy; the scrambling copy is hidden from assistive technology, so random characters are never read",
+      "The scramble lasts under about a second and runs once per trigger; it never loops",
+      "Hover only repeats the effect and is never needed to read the text",
+      "Decoration only: the animated layers are hidden from assistive technology and never take focus",
+      "Stands still for visitors who ask for less motion (prefers-reduced-motion), and can also be shown still with the rdm-still class or isPaused",
+      "In forced-colors (high contrast) mode the text is drawn in the system colours with no effect",
+      "Does not flash: nothing changes more than three times in a second (WCAG 2.3.1)",
+      "The text is real text in the server HTML, readable with no script",
+      "Optional: it is a separate component, so projects that do not add it carry none of its code"
+    ],
+    "screenReader": [
+      "The text, once"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "A short heading or label that should feel techy or alive",
+      "Revealing a name or status"
+    ],
+    "avoid_when": [
+      "Body text and any text people must read quickly",
+      "Text people must copy accurately while it is scrambling"
+    ],
+    "anti_patterns": [
+      "Using a very long duration, which leaves unreadable characters on screen",
+      "Relying on hover to show the real text"
+    ]
+  },
+  "examples": [
+    "basic",
+    "on-hover-only",
+    "slow"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {
+      "whenInView": "When in view",
+      "onHover": "On hover",
+      "isPaused": "Paused"
+    }
+  }
+}

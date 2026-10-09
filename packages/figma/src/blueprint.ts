@@ -1395,6 +1395,25 @@ const blueprints: Record<string, Blueprint> = {
   DotPattern: () => frame({ name: "dot pattern", dir: "col", w: 240, h: 120, fill: "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, []),
   StripedPattern: () => frame({ name: "striped pattern", dir: "col", w: 240, h: 120, fill: "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, []),
   HexagonPattern: () => frame({ name: "hexagon pattern", dir: "col", w: 240, h: 120, fill: "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, []),
+  FlickeringGrid: () => frame({ name: "flickering grid", dir: "col", w: 240, h: 120, fill: "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, []),
+  RetroGrid: () => frame({ name: "retro grid", dir: "col", w: 240, h: 120, fill: "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, []),
+  LightRays: () => frame({ name: "light rays", dir: "col", w: 240, h: 120, fill: "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, []),
+  Noise: () => frame({ name: "noise", dir: "col", w: 240, h: 120, fill: "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, []),
+  WeaveGrid: () => frame({ name: "weave grid", dir: "col", w: 240, h: 120, fill: "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, []),
+  ScrollProgress: () => frame({ name: "scroll progress", dir: "col", w: 240, h: 4, fill: "color.border.default", radius: "radius.overlay" }, []),
+  SelvedgeBlur: () => frame({ name: "selvedge blur", dir: "col", w: 240, h: 64, fill: "color.surface.subtle", radius: "radius.control" }, []),
+  Lens: () => frame({ name: "lens", dir: "col", w: 240, h: 150, fill: "color.surface.subtle", stroke: "color.border.strong", radius: "radius.overlay" }, []),
+  PixelImage: (c) => frame({ name: "pixel image", dir: "col", w: 240, h: 150, fill: c.isStill ? "color.surface.subtle" : "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, []),
+  ThemeToggler: (c) =>
+    frame({ name: "theme toggler", dir: "row", gap: 0, stroke: "color.border.default", radius: "radius.control" }, ["Light", "Dark", "System"].map((t) =>
+      frame({ name: t, dir: "row", w: HEIGHTS[c.size ?? "md"] ?? 40, h: HEIGHTS[c.size ?? "md"] ?? 40, align: "center", cross: "center", fill: t === "System" ? "color.surface.subtle" : "color.surface.default" }, [
+        text(t[0], FONT[c.size ?? "md"] ?? 14, "color.text.default"),
+      ]),
+    )),
+  HeroVideoDialog: () =>
+    frame({ name: "hero video dialog", dir: "col", w: 320, h: 180, align: "center", cross: "center", fill: "color.surface.subtle", stroke: "color.border.default", radius: "radius.overlay" }, [
+      frame({ name: "play", dir: "row", w: 56, h: 56, align: "center", cross: "center", fill: "color.surface.raised", stroke: "color.border.default", radius: "radius.overlay" }, [text("Play", 12, "color.text.default")]),
+    ]),
   InteractiveGridPattern: () => frame({ name: "interactive grid pattern", dir: "col", w: 240, h: 120, fill: "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, []),
   InteractiveHoverButton: (c) => buttonBlueprint(c, "Get started"),
   RainbowButton: (c) =>
@@ -1411,6 +1430,23 @@ const blueprints: Record<string, Blueprint> = {
       ),
     ]),
   TextShimmer: () => frame({ name: "text shimmer", dir: "row" }, [text("Thinking…", 18, "color.text.muted", "Medium")]),
+  AnimatedBeam: () =>
+    frame({ name: "animated beam", dir: "row", gap: 96, pad: 24, align: "center", cross: "center", stroke: "color.border.default", radius: "radius.overlay" }, [
+      frame({ name: "from", dir: "row", w: 48, h: 48, fill: "color.surface.default", stroke: "color.action.primary", radius: "radius.control" }, []),
+      frame({ name: "to", dir: "row", w: 48, h: 48, fill: "color.surface.default", stroke: "color.action.primary", radius: "radius.control" }, []),
+    ]),
+  SpotlightCard: () =>
+    frame({ name: "spotlight card", dir: "col", gap: 6, pad: 20, w: 280, fill: "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, [
+      text("Card title", 16, "color.text.default", "Medium"),
+      text("A soft light follows the pointer.", 14, "color.text.muted"),
+    ]),
+  GlareHover: () =>
+    frame({ name: "glare hover", dir: "col", w: 240, h: 140, align: "center", cross: "center", fill: "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, [
+      text("Hover me", 14, "color.text.default", "Medium"),
+    ]),
+  Meteors: () => frame({ name: "meteors", dir: "col", w: 280, h: 160, fill: "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, []),
+  Confetti: () => frame({ name: "confetti", dir: "col", w: 280, h: 160, fill: "color.surface.default", stroke: "color.action.primary", radius: "radius.overlay" }, []),
+  Particles: () => frame({ name: "particles", dir: "col", w: 280, h: 160, fill: "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, []),
   AnimatedCircularProgress: () =>
     frame({ name: "circular progress", dir: "col", gap: 4, pad: 16, w: 96, fill: "color.surface.default", stroke: "color.action.primary", radius: "radius.overlay" }, [
       text("72%", 16, "color.text.default", "Medium"),
@@ -1453,6 +1489,22 @@ const blueprints: Record<string, Blueprint> = {
   WordRotate: () => frame({ name: "word rotate", dir: "row", gap: 6 }, [text("Built for", 24, "color.text.default"), text("teams", 24, "color.action.primary", "Semi Bold")]),
   TextReveal: () => frame({ name: "text reveal", dir: "col", w: 320 }, [text("Words arrive as you scroll, one after another.", 20, "color.text.default", "Medium")]),
   TextAnimate: () => frame({ name: "text animate", dir: "row" }, [text("Hello, world", 24, "color.text.default", "Semi Bold")]),
+  SparklesText: () => frame({ name: "sparkles text", dir: "row" }, [text("Magic text", 28, "color.text.default", "Semi Bold")]),
+  AuroraText: () => frame({ name: "aurora text", dir: "row" }, [text("Northern lights", 28, "color.action.primary", "Semi Bold")]),
+  LineShadowText: () => frame({ name: "line shadow text", dir: "row" }, [text("Bold shadow", 28, "color.text.default", "Semi Bold")]),
+  Text3dFlip: () => frame({ name: "text 3d flip", dir: "row" }, [text("Flip me", 28, "color.text.default", "Semi Bold")]),
+  ComicText: () => frame({ name: "comic text", dir: "row" }, [text("POW!", 32, "color.text.default", "Semi Bold")]),
+  VideoText: () => frame({ name: "video text", dir: "row" }, [text("Motion", 40, "color.action.primary", "Semi Bold")]),
+  ScrollVelocity: () =>
+    frame({ name: "scroll velocity", dir: "col", gap: 4, w: 320 }, [
+      text("Scroll to speed up", 28, "color.text.default", "Semi Bold"),
+      text("Scroll to slow down", 28, "color.text.muted", "Semi Bold"),
+    ]),
+  MorphingText: () => frame({ name: "morphing text", dir: "row" }, [text("Design, then ship", 24, "color.text.default", "Semi Bold")]),
+  SpinningText: () => frame({ name: "spinning text", dir: "row" }, [text("round and round, ", 16, "color.text.default", "Medium")]),
+  KineticText: () => frame({ name: "kinetic text", dir: "row" }, [text("Wave hello", 24, "color.text.default", "Semi Bold")]),
+  TextHighlighter: () => frame({ name: "text highlighter", dir: "row", pad: 4, fill: "color.action.primary" }, [text("Mark this phrase", 18, "color.text.default")]),
+  HyperText: () => frame({ name: "hyper text", dir: "row" }, [text("DECRYPTING", 24, "color.text.default", "Semi Bold")]),
   GradientText: () => frame({ name: "gradient text", dir: "row" }, [text("Build faster", 28, "color.action.primary", "Semi Bold")]),
 
   BlurFade: () =>

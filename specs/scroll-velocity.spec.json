@@ -1,0 +1,109 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "ScrollVelocity",
+  "version": "0.1.0",
+  "category": "motion",
+  "status": "experimental",
+  "states": [
+    "default",
+    "focus"
+  ],
+  "slots": [
+    "root",
+    "row",
+    "track",
+    "button"
+  ],
+  "a11y": {
+    "role": "text",
+    "keyboard": [],
+    "requirements": [
+      "The text is ordinary text in the page from the server render, readable with no JavaScript, and read once by screen readers",
+      "Decoration only: the animated layers are hidden from assistive technology and never take focus",
+      "Stands still for visitors who ask for less motion (prefers-reduced-motion), and can also be shown still with the rdm-still class or isPaused",
+      "In forced-colors (high contrast) mode the text is drawn in the system colours with no effect",
+      "Does not flash: nothing changes more than three times in a second (WCAG 2.3.1)",
+      "Optional: it is a separate component, so projects that do not add it carry none of its code",
+      "Moving content can be stopped: by isPaused, by the Pause button, and by anything inside rdm-still",
+      "Only the first copy of each row is in the accessibility tree; repeats are aria-hidden",
+      "Reduced motion gives static rows that can be scrolled by hand, with the repeats removed"
+    ],
+    "screenReader": [
+      "Each row is read once as ordinary text"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "figma": {
+    "componentKey": null,
+    "variantMap": {
+      "isPaused": "Paused"
+    }
+  },
+  "description": "Rows of large text that drift sideways, speeding up and reversing with how fast the page is scrolled. Rows alternate direction.",
+  "props": {
+    "rows": {
+      "type": "custom",
+      "tsType": "readonly string[]",
+      "description": "The text of each row.",
+      "required": true
+    },
+    "speed": {
+      "type": "number",
+      "default": 60,
+      "description": "Resting speed in pixels per second."
+    },
+    "velocityFactor": {
+      "type": "number",
+      "default": 0.4,
+      "description": "How strongly page scrolling adds to the speed. 0 ignores scrolling."
+    },
+    "showPauseButton": {
+      "type": "boolean",
+      "default": true,
+      "description": "Shows a visible Pause and Play button (WCAG 2.2.2)."
+    },
+    "pauseLabel": {
+      "type": "string",
+      "default": "Pause",
+      "description": "Text of the button while moving."
+    },
+    "playLabel": {
+      "type": "string",
+      "default": "Play",
+      "description": "Text of the button while paused."
+    },
+    "isPaused": {
+      "type": "boolean",
+      "default": false,
+      "description": "Stops the animation and shows the text plainly. Moving content that lasts more than five seconds should be stoppable."
+    }
+  },
+  "variants": [
+    "showPauseButton",
+    "isPaused"
+  ],
+  "tokens": [
+    "color.text.default",
+    "color.border.default",
+    "color.surface.default",
+    "radius.control"
+  ],
+  "usage": {
+    "use_when": [
+      "Large decorative words between page sections"
+    ],
+    "avoid_when": [
+      "Content people must read closely",
+      "Navigation"
+    ],
+    "anti_patterns": [
+      "Essential information in a moving row",
+      "Very high velocity factors"
+    ]
+  },
+  "examples": [
+    "basic",
+    "single-row",
+    "slow"
+  ]
+}

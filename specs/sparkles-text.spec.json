@@ -1,0 +1,83 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "SparklesText",
+  "version": "0.1.0",
+  "category": "motion",
+  "status": "experimental",
+  "states": [
+    "default"
+  ],
+  "slots": [
+    "root"
+  ],
+  "a11y": {
+    "role": "text",
+    "keyboard": [],
+    "requirements": [
+      "The text is ordinary text in the page from the server render, readable with no JavaScript, and read once by screen readers",
+      "Decoration only: the animated layers are hidden from assistive technology and never take focus",
+      "Stands still for visitors who ask for less motion (prefers-reduced-motion), and can also be shown still with the rdm-still class or isPaused",
+      "In forced-colors (high contrast) mode the text is drawn in the system colours with no effect",
+      "Does not flash: nothing changes more than three times in a second (WCAG 2.3.1)",
+      "Optional: it is a separate component, so projects that do not add it carry none of its code",
+      "Choose a text colour with enough contrast on its own; the sparkles are small decoration and carry no meaning"
+    ],
+    "screenReader": [
+      "Read as ordinary text: the effect is purely visual"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "figma": {
+    "componentKey": null,
+    "variantMap": {
+      "isPaused": "Paused"
+    }
+  },
+  "description": "Text with small four-point sparkles that twinkle around it. The sparkles are drawn with CSS shapes and appear after the page loads.",
+  "props": {
+    "children": {
+      "type": "string",
+      "description": "The text.",
+      "required": true
+    },
+    "count": {
+      "type": "number",
+      "default": 8,
+      "description": "How many sparkles, from 1 to 20."
+    },
+    "color": {
+      "type": "string",
+      "default": "var(--rd-color-action-primary)",
+      "description": "Colour of the sparkles, any CSS colour."
+    },
+    "isPaused": {
+      "type": "boolean",
+      "default": false,
+      "description": "Stops the animation and shows the text plainly. Moving content that lasts more than five seconds should be stoppable."
+    }
+  },
+  "variants": [
+    "isPaused"
+  ],
+  "tokens": [
+    "color.text.default",
+    "color.action.primary"
+  ],
+  "usage": {
+    "use_when": [
+      "One short heading or a highlighted word that should feel special"
+    ],
+    "avoid_when": [
+      "Body text or anything people read closely",
+      "Several instances on one screen"
+    ],
+    "anti_patterns": [
+      "More than about 12 sparkles",
+      "Sparkles carrying meaning, such as a status"
+    ]
+  },
+  "examples": [
+    "basic",
+    "custom-color"
+  ]
+}

@@ -1,0 +1,104 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "version": "0.1.0",
+  "category": "motion",
+  "status": "experimental",
+  "states": [
+    "default"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {
+      "fade": "Fade",
+      "isStill": "Still"
+    }
+  },
+  "name": "WeaveGrid",
+  "description": "rdloom's signature backdrop: warp and weft threads crossing in a woven grid, with an ember shuttle that passes through slowly.",
+  "props": {
+    "size": {
+      "type": "number",
+      "description": "Distance between threads in pixels.",
+      "default": 24
+    },
+    "warpColor": {
+      "type": "string",
+      "description": "Colour of the vertical warp threads.",
+      "default": "var(--rd-color-border-default)"
+    },
+    "weftColor": {
+      "type": "string",
+      "description": "Colour of the horizontal weft threads.",
+      "default": "var(--rd-color-border-default)"
+    },
+    "accent": {
+      "type": "string",
+      "description": "Colour of the shuttle pass. Defaults to the ember token.",
+      "default": "var(--rd-color-ember-500)"
+    },
+    "fade": {
+      "type": "boolean",
+      "description": "Fades the weave out toward its edges.",
+      "default": true
+    },
+    "duration": {
+      "type": "number",
+      "description": "Seconds one shuttle pass takes.",
+      "default": 9
+    },
+    "isStill": {
+      "type": "boolean",
+      "description": "Stops all movement. Moving content should be stoppable.",
+      "default": false
+    }
+  },
+  "variants": [
+    "fade",
+    "isStill"
+  ],
+  "slots": [
+    "root",
+    "warp",
+    "weft",
+    "shuttle"
+  ],
+  "tokens": [
+    "color.border.default"
+  ],
+  "a11y": {
+    "role": "presentation",
+    "keyboard": [],
+    "requirements": [
+      "Pure decoration: aria-hidden, never focusable, and pointer-events none so content on top stays usable",
+      "Drawn with CSS only, so it needs no JavaScript and is safe in server HTML",
+      "The shuttle is a soft band that crosses slowly, never a flash",
+      "Stands still for visitors who ask for less motion (prefers-reduced-motion), with isStill, and inside an rdm-still container",
+      "Nothing flashes more than 3 times a second (WCAG 2.3.1) and moving content can be stopped (WCAG 2.2.2)",
+      "Hidden in forced-colors (high contrast) mode so it never fights system colours",
+      "Keep text on top at 4.5:1 against the effect: use a low-contrast colour"
+    ],
+    "screenReader": [
+      "Ignored: it is not announced"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "Branded hero sections and empty states",
+      "A signature backdrop for rdloom-styled pages"
+    ],
+    "avoid_when": [
+      "Behind long text",
+      "Next to other animated backgrounds"
+    ],
+    "anti_patterns": [
+      "A strong thread colour that competes with content",
+      "Running more than one WeaveGrid in view"
+    ]
+  },
+  "examples": [
+    "basic",
+    "faded",
+    "still"
+  ]
+}

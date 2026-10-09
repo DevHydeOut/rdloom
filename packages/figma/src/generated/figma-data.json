@@ -397,6 +397,32 @@
       ]
     },
     {
+      "name": "AnimatedBeam",
+      "id": "animated-beam",
+      "version": "0.1.0",
+      "description": "A light that travels along a curved line between two elements, such as two cards in a diagram. The line is drawn on a canvas that fills the container, so nothing is added to the accessibility tree.",
+      "properties": [
+        {
+          "prop": "reverse",
+          "name": "Reverse",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        },
+        {
+          "prop": "isPaused",
+          "name": "Paused",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
       "name": "AnimatedCircularProgress",
       "id": "animated-circular-progress",
       "version": "0.1.0",
@@ -557,6 +583,23 @@
             "error"
           ],
           "default": "ready"
+        }
+      ]
+    },
+    {
+      "name": "AuroraText",
+      "id": "aurora-text",
+      "version": "0.1.0",
+      "description": "Text filled with a slow, drifting aurora gradient. Falls back to plain text colour for reduced motion and high contrast.",
+      "properties": [
+        {
+          "prop": "isPaused",
+          "name": "Paused",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
         }
       ]
     },
@@ -1062,11 +1105,54 @@
       ]
     },
     {
+      "name": "ComicText",
+      "id": "comic-text",
+      "version": "0.1.0",
+      "description": "Bold, outlined, comic-style text with a hard offset shadow and an optional pop-in when it first appears.",
+      "properties": [
+        {
+          "prop": "popIn",
+          "name": "Pop in",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        },
+        {
+          "prop": "isPaused",
+          "name": "Paused",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
       "name": "CommandPalette",
       "id": "command-palette",
       "version": "0.1.0",
       "description": "A search box in a dialog that finds and runs commands, jumps to pages and triggers actions from the keyboard. Opens with Ctrl or Cmd + K. Use CommandGroup and CommandItem for the results.",
       "properties": []
+    },
+    {
+      "name": "Confetti",
+      "id": "confetti",
+      "version": "0.1.0",
+      "description": "A short burst of paper pieces, launched from a fire() handle or when isActive turns true. The canvas appears for the burst, then removes itself.",
+      "properties": [
+        {
+          "prop": "isPaused",
+          "name": "Paused",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
     },
     {
       "name": "ContextMenu",
@@ -1427,6 +1513,23 @@
       ]
     },
     {
+      "name": "FlickeringGrid",
+      "id": "flickering-grid",
+      "version": "0.1.0",
+      "description": "A grid of small squares that gently fade in and out, drawn on a canvas that fills its parent.",
+      "properties": [
+        {
+          "prop": "isStill",
+          "name": "Still",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
       "name": "Form",
       "id": "form",
       "version": "0.1.0",
@@ -1456,6 +1559,23 @@
       "version": "0.1.0",
       "description": "A table an assistant produced, shown as a real sortable table with a title and summary, numbers aligned, long results cut to a few rows, and a CSV download.",
       "properties": []
+    },
+    {
+      "name": "GlareHover",
+      "id": "glare-hover",
+      "version": "0.1.0",
+      "description": "A band of light that sweeps across a card or an image when the pointer or keyboard focus reaches it.",
+      "properties": [
+        {
+          "prop": "isPaused",
+          "name": "Paused",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
     },
     {
       "name": "GradientButton",
@@ -1539,6 +1659,23 @@
       ]
     },
     {
+      "name": "HeroVideoDialog",
+      "id": "hero-video-dialog",
+      "version": "0.1.0",
+      "description": "A poster thumbnail with a play button that opens a dialog with your video. No video is bundled and none is fetched until the dialog opens. Focus moves into the dialog and returns to the thumbnail on close; Escape closes.",
+      "properties": [
+        {
+          "prop": "isStill",
+          "name": "isStill",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
       "name": "HexagonPattern",
       "id": "hexagon-pattern",
       "version": "0.1.0",
@@ -1589,6 +1726,41 @@
             "end"
           ],
           "default": "bottom"
+        }
+      ]
+    },
+    {
+      "name": "HyperText",
+      "id": "hyper-text",
+      "version": "0.1.0",
+      "description": "Text whose letters scramble into random characters and then settle left to right on the real text, when it scrolls into view or when it is hovered. The final text is always in the page.",
+      "properties": [
+        {
+          "prop": "whenInView",
+          "name": "When in view",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "true"
+        },
+        {
+          "prop": "onHover",
+          "name": "On hover",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "true"
+        },
+        {
+          "prop": "isPaused",
+          "name": "Paused",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
         }
       ]
     },
@@ -1817,6 +1989,84 @@
       ]
     },
     {
+      "name": "KineticText",
+      "id": "kinetic-text",
+      "version": "0.1.0",
+      "description": "Text whose letters move one after another in a loop: a wave, a bounce or a pulse. Plain CSS, staggered by letter position.",
+      "properties": [
+        {
+          "prop": "effect",
+          "name": "Effect",
+          "values": [
+            "wave",
+            "bounce",
+            "pulse"
+          ],
+          "default": "wave"
+        },
+        {
+          "prop": "isPaused",
+          "name": "Paused",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
+      "name": "Lens",
+      "id": "lens",
+      "version": "0.1.0",
+      "description": "A magnifier that follows the mouse over an image or any content. The real content stays in place and fully accessible; the lens is a hidden, inert enlarged copy that appears only under a real pointer.",
+      "properties": [
+        {
+          "prop": "isStill",
+          "name": "isStill",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
+      "name": "LightRays",
+      "id": "light-rays",
+      "version": "0.1.0",
+      "description": "Soft angled rays of light that sweep slowly across the parent, drawn with CSS only.",
+      "properties": [
+        {
+          "prop": "isStill",
+          "name": "Still",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
+      "name": "LineShadowText",
+      "id": "line-shadow-text",
+      "version": "0.1.0",
+      "description": "Text with a diagonal line-pattern shadow behind it that slowly slides. The shadow copy is hidden from assistive technology.",
+      "properties": [
+        {
+          "prop": "isPaused",
+          "name": "Paused",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
       "name": "Marker",
       "id": "marker",
       "version": "0.1.0",
@@ -1937,6 +2187,40 @@
       "properties": []
     },
     {
+      "name": "Meteors",
+      "id": "meteors",
+      "version": "0.1.0",
+      "description": "Streaks that fall across a container, for a hero or an empty background. They are real DOM positioned from the index, so the server and the browser agree.",
+      "properties": [
+        {
+          "prop": "isPaused",
+          "name": "Paused",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
+      "name": "MorphingText",
+      "id": "morphing-text",
+      "version": "0.1.0",
+      "description": "A phrase that blurs and cross-fades into the next phrase in a list, in the same spot. The slot is as wide as the longest phrase, so nothing around it jumps.",
+      "properties": [
+        {
+          "prop": "isPaused",
+          "name": "Paused",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
       "name": "NativeSelect",
       "id": "native-select",
       "version": "0.1.0",
@@ -1978,6 +2262,32 @@
       "version": "0.1.0",
       "description": "Site navigation along the top of a page: plain links, and triggers that open a shared panel of grouped links (a mega-menu). Built from NavigationMenuItem, NavigationMenuTrigger, NavigationMenuContent and NavigationMenuLink. It is a set of links, not a menu of actions.",
       "properties": []
+    },
+    {
+      "name": "Noise",
+      "id": "noise",
+      "version": "0.1.0",
+      "description": "A fine static grain laid over a surface with CSS, still by default.",
+      "properties": [
+        {
+          "prop": "animated",
+          "name": "Animated",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        },
+        {
+          "prop": "isStill",
+          "name": "Still",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
     },
     {
       "name": "NumberField",
@@ -2094,11 +2404,54 @@
       ]
     },
     {
+      "name": "Particles",
+      "id": "particles",
+      "version": "0.1.0",
+      "description": "A canvas of small dots that drift and lean toward the pointer, for a background. They pause when off-screen and stop for reduced motion, leaving a still scatter.",
+      "properties": [
+        {
+          "prop": "isPaused",
+          "name": "Paused",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
       "name": "PaymentMethodCard",
       "id": "payment-method-card",
       "version": "0.1.0",
       "description": "One payment method: a generic card mark, the last four digits, the expiry with an expires soon notice, a default badge, and the actions Update, Remove (confirmed) and Make default. With no method it offers Add a payment method. It never holds a full card number; your callbacks do the work. UI permission is not security: the server must check again.",
       "properties": []
+    },
+    {
+      "name": "PixelImage",
+      "id": "pixel-image",
+      "version": "0.1.0",
+      "description": "An image that resolves from coarse pixel blocks to sharp when it scrolls into view. The real image is always in the page (server HTML, no JavaScript, print); the blocks are a hidden canvas drawn over it and removed when done.",
+      "properties": [
+        {
+          "prop": "whenInView",
+          "name": "whenInView",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "true"
+        },
+        {
+          "prop": "isStill",
+          "name": "Still",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
     },
     {
       "name": "PlanCard",
@@ -2359,6 +2712,23 @@
       "properties": []
     },
     {
+      "name": "RetroGrid",
+      "id": "retro-grid",
+      "version": "0.1.0",
+      "description": "A perspective floor grid that scrolls slowly toward the viewer, drawn with CSS only.",
+      "properties": [
+        {
+          "prop": "isStill",
+          "name": "Still",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
       "name": "RevealButton",
       "id": "reveal-button",
       "version": "0.1.0",
@@ -2461,6 +2831,49 @@
       ]
     },
     {
+      "name": "ScrollProgress",
+      "id": "scroll-progress",
+      "version": "0.1.0",
+      "description": "A thin bar showing how far the page, or a scrolling container, has been read.",
+      "properties": [
+        {
+          "prop": "position",
+          "name": "Position",
+          "values": [
+            "top",
+            "bottom"
+          ],
+          "default": "top"
+        }
+      ]
+    },
+    {
+      "name": "ScrollVelocity",
+      "id": "scroll-velocity",
+      "version": "0.1.0",
+      "description": "Rows of large text that drift sideways, speeding up and reversing with how fast the page is scrolled. Rows alternate direction.",
+      "properties": [
+        {
+          "prop": "showPauseButton",
+          "name": "showPauseButton",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "true"
+        },
+        {
+          "prop": "isPaused",
+          "name": "Paused",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
       "name": "SectionHeader",
       "id": "section-header",
       "version": "0.1.0",
@@ -2545,6 +2958,25 @@
             "true"
           ],
           "default": "false"
+        }
+      ]
+    },
+    {
+      "name": "SelvedgeBlur",
+      "id": "selvedge-blur",
+      "version": "0.1.0",
+      "description": "A progressive blur along one edge of a scrolling area or image: stacked layers of backdrop blur that fade from sharp to blurred, so content softens as it nears the edge. Pure decoration: it ignores the pointer and is hidden from assistive technology.",
+      "properties": [
+        {
+          "prop": "position",
+          "name": "Position",
+          "values": [
+            "top",
+            "bottom",
+            "start",
+            "end"
+          ],
+          "default": "bottom"
         }
       ]
     },
@@ -2763,6 +3195,23 @@
       "properties": []
     },
     {
+      "name": "SparklesText",
+      "id": "sparkles-text",
+      "version": "0.1.0",
+      "description": "Text with small four-point sparkles that twinkle around it. The sparkles are drawn with CSS shapes and appear after the page loads.",
+      "properties": [
+        {
+          "prop": "isPaused",
+          "name": "Paused",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
       "name": "Sparkline",
       "id": "sparkline",
       "version": "0.1.0",
@@ -2810,6 +3259,49 @@
         {
           "prop": "decorative",
           "name": "decorative",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
+      "name": "SpinningText",
+      "id": "spinning-text",
+      "version": "0.1.0",
+      "description": "Text laid out round a circle that turns slowly. The layout is plain CSS (each letter is rotated about the centre), and the real text is in a visually hidden copy.",
+      "properties": [
+        {
+          "prop": "reverse",
+          "name": "Reverse",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        },
+        {
+          "prop": "isPaused",
+          "name": "Paused",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
+      "name": "SpotlightCard",
+      "id": "spotlight-card",
+      "version": "0.1.0",
+      "description": "A card with a soft light that follows the pointer. The light is off for touch and for visitors who ask for less motion, and the card keeps its own focus ring.",
+      "properties": [
+        {
+          "prop": "isPaused",
+          "name": "Paused",
           "values": [
             "false",
             "true"
@@ -3122,6 +3614,32 @@
       ]
     },
     {
+      "name": "TextHighlighter",
+      "id": "text-highlighter",
+      "version": "0.1.0",
+      "description": "A marker highlight that sweeps behind text when it scrolls into view. The text itself is untouched, ordinary inline text that wraps normally.",
+      "properties": [
+        {
+          "prop": "whenInView",
+          "name": "When in view",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "true"
+        },
+        {
+          "prop": "isPaused",
+          "name": "Paused",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
       "name": "TextReveal",
       "id": "text-reveal",
       "version": "0.1.0",
@@ -3165,6 +3683,77 @@
         {
           "prop": "isPaused",
           "name": "Paused",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
+      "name": "Text3dFlip",
+      "id": "text3d-flip",
+      "version": "0.1.0",
+      "description": "Letters or words that flip over in 3D, when the pointer or focus arrives or once when the text comes into view.",
+      "properties": [
+        {
+          "prop": "by",
+          "name": "By",
+          "values": [
+            "letter",
+            "word"
+          ],
+          "default": "letter"
+        },
+        {
+          "prop": "trigger",
+          "name": "Trigger",
+          "values": [
+            "hover",
+            "view"
+          ],
+          "default": "hover"
+        },
+        {
+          "prop": "isPaused",
+          "name": "Paused",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
+      "name": "ThemeToggler",
+      "id": "theme-toggler",
+      "version": "0.1.0",
+      "description": "A light, dark and system theme switch, as a three-option button group or a single cycling button, with a small animated icon change. It only reports the choice; it can optionally set data-theme on the page root. It reads and writes no storage: saving the choice is up to your app.",
+      "properties": [
+        {
+          "prop": "mode",
+          "name": "Mode",
+          "values": [
+            "group",
+            "button"
+          ],
+          "default": "group"
+        },
+        {
+          "prop": "size",
+          "name": "Size",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "default": "md"
+        },
+        {
+          "prop": "isStill",
+          "name": "Still",
           "values": [
             "false",
             "true"
@@ -3479,6 +4068,58 @@
             "end"
           ],
           "default": "end"
+        }
+      ]
+    },
+    {
+      "name": "VideoText",
+      "id": "video-text",
+      "version": "0.1.0",
+      "description": "Large text that shows a video you supply through its letters. The text stays real text; a gradient fallback shows until the video plays.",
+      "properties": [
+        {
+          "prop": "tone",
+          "name": "Tone",
+          "values": [
+            "light",
+            "dark"
+          ],
+          "default": "light"
+        },
+        {
+          "prop": "isPaused",
+          "name": "Paused",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
+      "name": "WeaveGrid",
+      "id": "weave-grid",
+      "version": "0.1.0",
+      "description": "rdloom's signature backdrop: warp and weft threads crossing in a woven grid, with an ember shuttle that passes through slowly.",
+      "properties": [
+        {
+          "prop": "fade",
+          "name": "Fade",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "true"
+        },
+        {
+          "prop": "isStill",
+          "name": "Still",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
         }
       ]
     },

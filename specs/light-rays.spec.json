@@ -1,0 +1,85 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "version": "0.1.0",
+  "category": "motion",
+  "status": "experimental",
+  "states": [
+    "default"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {
+      "isStill": "Still"
+    }
+  },
+  "name": "LightRays",
+  "description": "Soft angled rays of light that sweep slowly across the parent, drawn with CSS only.",
+  "props": {
+    "color": {
+      "type": "string",
+      "description": "Colour of the rays: any CSS colour or token.",
+      "default": "var(--rd-color-ember-400)"
+    },
+    "angle": {
+      "type": "number",
+      "description": "Angle of the rays in degrees.",
+      "default": 20
+    },
+    "duration": {
+      "type": "number",
+      "description": "Seconds one sweep takes.",
+      "default": 14
+    },
+    "isStill": {
+      "type": "boolean",
+      "description": "Stops all movement. Moving content should be stoppable.",
+      "default": false
+    }
+  },
+  "variants": [
+    "isStill"
+  ],
+  "slots": [
+    "root",
+    "rays"
+  ],
+  "tokens": [
+    "color.border.default"
+  ],
+  "a11y": {
+    "role": "presentation",
+    "keyboard": [],
+    "requirements": [
+      "Pure decoration: aria-hidden, never focusable, and pointer-events none so content on top stays usable",
+      "Drawn with CSS gradients only, so it needs no JavaScript and is safe in server HTML",
+      "The sweep is slow and soft, with no hard edge crossing the screen",
+      "Stands still for visitors who ask for less motion (prefers-reduced-motion), with isStill, and inside an rdm-still container",
+      "Nothing flashes more than 3 times a second (WCAG 2.3.1) and moving content can be stopped (WCAG 2.2.2)",
+      "Hidden in forced-colors (high contrast) mode so it never fights system colours",
+      "Keep text on top at 4.5:1 against the effect: use a low-contrast colour"
+    ],
+    "screenReader": [
+      "Ignored: it is not announced"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "A soft glow behind a hero heading",
+      "Adding depth to a dark surface"
+    ],
+    "avoid_when": [
+      "Behind small text",
+      "On very bright surfaces where the rays disappear"
+    ],
+    "anti_patterns": [
+      "A saturated colour at full strength behind text",
+      "A short duration that makes the light feel restless"
+    ]
+  },
+  "examples": [
+    "basic",
+    "colored",
+    "still"
+  ]
+}

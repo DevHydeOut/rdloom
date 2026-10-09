@@ -1,0 +1,88 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "GlareHover",
+  "version": "0.1.0",
+  "category": "motion",
+  "status": "experimental",
+  "description": "A band of light that sweeps across a card or an image when the pointer or keyboard focus reaches it.",
+  "props": {
+    "children": {
+      "type": "node",
+      "description": "The content to sweep across.",
+      "required": true
+    },
+    "angle": {
+      "type": "number",
+      "description": "Tilt of the band in degrees.",
+      "default": -20
+    },
+    "duration": {
+      "type": "number",
+      "description": "Seconds for one sweep.",
+      "default": 0.7
+    },
+    "color": {
+      "type": "string",
+      "description": "Colour of the glare, any CSS colour. Defaults to white at low strength."
+    },
+    "isPaused": {
+      "type": "boolean",
+      "description": "Stops the effect and shows it still.",
+      "default": false
+    }
+  },
+  "variants": [
+    "isPaused"
+  ],
+  "states": [
+    "default",
+    "hover",
+    "focus"
+  ],
+  "slots": [
+    "root",
+    "band"
+  ],
+  "tokens": [
+    "radius.overlay",
+    "color.border.default"
+  ],
+  "a11y": {
+    "role": "group",
+    "keyboard": [],
+    "requirements": [
+      "The glare is decoration: aria-hidden and never blocks the pointer",
+      "It sweeps once on hover and once on focus-within, so keyboard users see the same effect, and it is not a way to show state",
+      "Off for reduced motion, inside rdm-still and with isPaused",
+      "The glare is a faint tint, so the text or image underneath keeps its contrast",
+      "In forced-colors (high contrast) mode the band is removed"
+    ],
+    "screenReader": [
+      "Read as ordinary content: the glare is not announced"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "Product images and feature cards",
+      "A hover accent on a photo"
+    ],
+    "avoid_when": [
+      "Text the reader must keep reading while the band crosses it"
+    ],
+    "anti_patterns": [
+      "Using the glare as the only sign that something is clickable",
+      "Strong, opaque glare colours"
+    ]
+  },
+  "examples": [
+    "basic",
+    "on-image"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {
+      "isPaused": "Paused"
+    }
+  }
+}
