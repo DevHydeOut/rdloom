@@ -1391,7 +1391,25 @@ const blueprints: Record<string, Blueprint> = {
     frame({ name: "animated list", dir: "col", gap: 8, w: 280 }, ["Payment received", "Invoice sent", "Stock reserved"].map((t) =>
       frame({ name: "item", dir: "row", pad: [12, 16], cross: "center", radius: "radius.control", fill: "color.surface.raised", stroke: "color.border.default" }, [text(t, 14, "color.text.default")]),
     )),
+  GridPattern: () => frame({ name: "grid pattern", dir: "col", w: 240, h: 120, fill: "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, []),
+  DotPattern: () => frame({ name: "dot pattern", dir: "col", w: 240, h: 120, fill: "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, []),
+  StripedPattern: () => frame({ name: "striped pattern", dir: "col", w: 240, h: 120, fill: "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, []),
+  HexagonPattern: () => frame({ name: "hexagon pattern", dir: "col", w: 240, h: 120, fill: "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, []),
+  InteractiveGridPattern: () => frame({ name: "interactive grid pattern", dir: "col", w: 240, h: 120, fill: "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, []),
   InteractiveHoverButton: (c) => buttonBlueprint(c, "Get started"),
+  RainbowButton: (c) =>
+    frame({ name: "rainbow edge", dir: "row", pad: 2, fill: "color.action.primary", radius: "radius.control" }, [
+      frame({ name: "button", dir: "row", pad: [0, 16], h: HEIGHTS[c.size ?? "md"] ?? 40, align: "center", cross: "center", fill: "color.surface.default", radius: "radius.control" }, [
+        text("Upgrade plan", FONT[c.size ?? "md"] ?? 14, "color.text.default", "Medium"),
+      ]),
+    ]),
+  ShinyButton: (c) => buttonBlueprint(c, "Get started"),
+  Dock: () =>
+    frame({ name: "dock", dir: "row", gap: 8, pad: 8, fill: "color.surface.raised", stroke: "color.border.default", radius: "radius.overlay" }, [
+      ...["Home", "Search", "Inbox", "Settings"].map(() =>
+        frame({ name: "dock item", dir: "row", w: 44, h: 44, align: "center", cross: "center", fill: "color.surface.default", stroke: "color.border.default", radius: "radius.control" }, []),
+      ),
+    ]),
   TextShimmer: () => frame({ name: "text shimmer", dir: "row" }, [text("Thinking…", 18, "color.text.muted", "Medium")]),
   AnimatedCircularProgress: () =>
     frame({ name: "circular progress", dir: "col", gap: 4, pad: 16, w: 96, fill: "color.surface.default", stroke: "color.action.primary", radius: "radius.overlay" }, [
@@ -1403,6 +1421,33 @@ const blueprints: Record<string, Blueprint> = {
       text("Northwind", 14, "color.text.default"),
       text("Harbor Labs", 14, "color.text.default"),
       text("Lumen", 14, "color.text.default"),
+    ]),
+  BentoGrid: () =>
+    frame({ name: "bento grid", dir: "row", gap: 12, w: 360 }, [
+      frame({ name: "bento card", dir: "col", gap: 6, pad: 16, w: 174, fill: "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, [
+        text("Fast setup", 14, "color.text.default", "Semi Bold"),
+        text("One command to start.", 12, "color.text.muted"),
+      ]),
+      frame({ name: "bento card", dir: "col", gap: 6, pad: 16, w: 174, fill: "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, [
+        text("Accessible", 14, "color.text.default", "Semi Bold"),
+        text("Keyboard ready.", 12, "color.text.muted"),
+      ]),
+    ]),
+  Terminal: () =>
+    frame({ name: "terminal", dir: "col", gap: 4, pad: 12, w: 320, fill: "color.surface.subtle", stroke: "color.border.default", radius: "radius.control" }, [
+      text("$ npx rdloom add button", 13, "color.text.default"),
+      text("Added button", 13, "color.text.muted"),
+    ]),
+  CodeComparison: () =>
+    frame({ name: "code comparison", dir: "row", gap: 12, w: 360 }, [
+      frame({ name: "before", dir: "col", gap: 4, pad: 12, w: 174, fill: "color.surface.subtle", stroke: "color.border.default", radius: "radius.control" }, [
+        text("Before", 12, "color.text.muted"),
+        text("const a = 1;", 13, "color.text.default"),
+      ]),
+      frame({ name: "after", dir: "col", gap: 4, pad: 12, w: 174, fill: "color.surface.subtle", stroke: "color.border.default", radius: "radius.control" }, [
+        text("After", 12, "color.text.muted"),
+        text("const a = 2;", 13, "color.text.default"),
+      ]),
     ]),
   TypingAnimation: () => frame({ name: "typing animation", dir: "row" }, [text("Ship it with care", 18, "color.text.default", "Medium")]),
   WordRotate: () => frame({ name: "word rotate", dir: "row", gap: 6 }, [text("Built for", 24, "color.text.default"), text("teams", 24, "color.action.primary", "Semi Bold")]),

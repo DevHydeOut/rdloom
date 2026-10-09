@@ -1,0 +1,39 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "BentoGrid",
+  "version": "0.1.0",
+  "category": "motion",
+  "status": "experimental",
+  "description": "A responsive grid of feature cards of different sizes. It is a real list: each BentoCard is a list item with its own heading, icon, description, optional background and optional link or action. Cards lift a little on hover.",
+  "props": {
+    "children": { "type": "node", "description": "The BentoCard items.", "required": true },
+    "label": { "type": "string", "description": "Accessible name of the list. Leave it out when a nearby heading already names the section and pass aria-labelledby instead." },
+    "isStill": { "type": "boolean", "description": "Turns off the hover lift and its transition.", "default": false }
+  },
+  "variants": ["isStill"],
+  "states": ["default", "hover", "focus"],
+  "slots": ["root", "card", "icon", "title", "description", "background", "action"],
+  "tokens": ["color.surface.default", "color.border.default", "color.text.default", "color.text.muted", "color.focus.ring", "radius.overlay"],
+  "a11y": {
+    "role": "list",
+    "keyboard": ["Tab: moves to the link or button of each card in reading order", "Enter: follows the link; Enter or Space presses the button"],
+    "requirements": [
+      "The grid is a ul and each BentoCard an li, so the number of cards is announced",
+      "Each card title is a real heading; set headingLevel on the cards to fit the page outline",
+      "The icon and the background slot are decoration and are hidden from assistive technology",
+      "A card with a link or action is operated by that one control, whose area covers the whole card; the card never has two tab stops",
+      "The hover lift is off for prefers-reduced-motion, inside rdm-still and with isStill, and only runs where there is a real pointer",
+      "On phones the cards stack in one column; from the medium breakpoint they use three columns, and column and row spans apply there",
+      "Real text in the server HTML; readable with no JavaScript"
+    ],
+    "screenReader": ["List with the number of items, then each card: heading, description, then the link or button name"],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["A feature overview with a few cards that deserve different emphasis", "A landing page section of capabilities"],
+    "avoid_when": ["Data that must be compared row by row (use a table)", "Long lists of equal items (use a plain list or cards in a regular grid)"],
+    "anti_patterns": ["Putting several links inside one card", "Using spans so large that the grid leaves holes"]
+  },
+  "examples": ["basic", "with-links", "with-background"],
+  "figma": { "componentKey": null, "variantMap": {} }
+}

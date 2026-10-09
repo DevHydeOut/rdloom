@@ -91,7 +91,7 @@ export const EagerExamples = createContext<Record<string, ComponentType> | null>
  * "More", and a test fails so it gets a home.
  */
 export const componentGroupDefs: Array<{ id: string; label: string; ids: string[] }> = [
-  { id: "buttons", label: "Buttons", ids: ["button", "action-button", "shimmer-button", "ripple-button", "pulse-button", "interactive-hover-button", "gradient-button", "reveal-button", "button-group"] },
+  { id: "buttons", label: "Buttons", ids: ["button", "action-button", "shimmer-button", "ripple-button", "pulse-button", "interactive-hover-button", "rainbow-button", "shiny-button", "gradient-button", "reveal-button", "button-group"] },
   { id: "search", label: "Search and commands", ids: ["command-palette", "combobox"] },
   { id: "text-inputs", label: "Text and number inputs", ids: ["text-field", "input-group", "input-otp", "number-field", "tag-input", "file-upload"] },
   { id: "choice", label: "Choices and toggles", ids: ["select", "checkbox", "radio-group", "switch", "slider", "segmented-control", "toggle-button", "toggle-group", "color-picker", "rating", "native-select"] },
@@ -104,7 +104,7 @@ export const componentGroupDefs: Array<{ id: string; label: string; ids: string[
   { id: "feedback", label: "Feedback and status", ids: ["alert", "toast", "progress", "skeleton", "empty-state", "error-state", "badge", "spinner"] },
   { id: "display", label: "Content and layout", ids: ["card", "accordion", "avatar", "kbd", "collapsible", "scroll-area", "separator", "avatar-group", "carousel", "resizable-panels", "aspect-ratio", "direction", "item", "typography"] },
   { id: "ai", label: "AI chat and agents", ids: ["chat", "message", "prompt-input", "response", "tool-call", "agent-activity", "approval-box", "citation", "sources", "generated-table", "generated-chart", "attachment", "bubble", "marker", "message-scroller", "questionnaire"] },
-  { id: "motion", label: "Motion and effects", ids: ["text-shimmer", "animated-circular-progress", "number-ticker", "marquee","typing-animation", "word-rotate", "text-reveal", "text-animate", "gradient-text", "blur-fade", "shine-border", "shuttle-border", "ripple", "animated-list"] },
+  { id: "motion", label: "Motion and effects", ids: ["text-shimmer", "animated-circular-progress", "number-ticker", "marquee","typing-animation", "word-rotate", "text-reveal", "text-animate", "gradient-text", "blur-fade", "shine-border", "shuttle-border", "ripple", "animated-list", "bento-grid", "terminal", "code-comparison", "dock", "grid-pattern", "dot-pattern", "striped-pattern", "hexagon-pattern", "interactive-grid-pattern"] },
   { id: "blocks", label: "Blocks", ids: ["dashboard-shell", "dashboard-page", "page-header", "section-header", "app-footer", "auth-card", "sidebar", "customer-table", "data-table", "invite-dialog", "user-form", "settings-section", "plan-card", "usage-meter", "event-calendar", "time-slot-picker", "payment-method-card", "api-key-list", "user-menu", "app-header", "top-nav"] },
 ];
 

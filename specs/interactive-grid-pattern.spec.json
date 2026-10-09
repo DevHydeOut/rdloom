@@ -1,0 +1,105 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "InteractiveGridPattern",
+  "version": "0.1.0",
+  "category": "motion",
+  "status": "experimental",
+  "description": "A grid whose cells light up under the mouse or pen. Decoration only: it does nothing on touch or for reduced motion and never takes focus.",
+  "props": {
+    "size": {
+      "type": "number",
+      "description": "Cell size in pixels.",
+      "default": 40
+    },
+    "strokeWidth": {
+      "type": "number",
+      "description": "Line thickness in pixels.",
+      "default": 1
+    },
+    "color": {
+      "type": "string",
+      "description": "Colour of the grid lines.",
+      "default": "var(--rd-color-border-default)"
+    },
+    "activeColor": {
+      "type": "string",
+      "description": "Colour of the lit cells.",
+      "default": "var(--rd-color-action-primary)"
+    },
+    "variant": {
+      "type": "enum",
+      "values": [
+        "fill",
+        "trail"
+      ],
+      "default": "fill",
+      "description": "fill lights the cell under the pointer; trail leaves a short fading trail of cells."
+    },
+    "fade": {
+      "type": "boolean",
+      "description": "Fades the grid out toward its edges.",
+      "default": true
+    },
+    "isStill": {
+      "type": "boolean",
+      "description": "Turns the lighting off.",
+      "default": false
+    }
+  },
+  "variants": [
+    "variant",
+    "fade",
+    "isStill"
+  ],
+  "states": [
+    "default"
+  ],
+  "slots": [
+    "root",
+    "layer"
+  ],
+  "tokens": [
+    "color.border.default"
+  ],
+  "a11y": {
+    "role": "presentation",
+    "keyboard": [],
+    "requirements": [
+      "Pure decoration: aria-hidden, never focusable, and pointer-events none so content on top stays usable",
+      "It is drawn with CSS only, so it needs no JavaScript and is safe in server HTML",
+      "Stands still for visitors who ask for less motion (prefers-reduced-motion), with isStill, and inside an rdm-still container",
+      "Drift is slow and never flashes (WCAG 2.2.2, 2.3.1)",
+      "Hidden in forced-colors (high contrast) mode so it never fights system colours",
+      "Keep text on top at 4.5:1 against the lines: use a low-contrast token for the pattern",
+      "The pointer is read from the parent element only for mouse and pen; touch does nothing",
+      "It never takes the pointer or focus and never replaces a focus ring"
+    ],
+    "screenReader": [
+      "Ignored: it is not announced"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "A hero or empty state where a little pointer feedback adds life"
+    ],
+    "avoid_when": [
+      "Anything people must click: the effect is never a control",
+      "Touch-first screens, where it does nothing"
+    ],
+    "anti_patterns": [
+      "Using it as the only hover feedback",
+      "Putting several on one screen"
+    ]
+  },
+  "examples": [
+    "basic",
+    "trail"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {
+      "variant": "Variant"
+    }
+  }
+}

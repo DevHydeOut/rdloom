@@ -655,6 +655,23 @@
       ]
     },
     {
+      "name": "BentoGrid",
+      "id": "bento-grid",
+      "version": "0.1.0",
+      "description": "A responsive grid of feature cards of different sizes. It is a real list: each BentoCard is a list item with its own heading, icon, description, optional background and optional link or action. Cards lift a little on hover.",
+      "properties": [
+        {
+          "prop": "isStill",
+          "name": "isStill",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
       "name": "BlurFade",
       "id": "blur-fade",
       "version": "0.1.0",
@@ -950,6 +967,13 @@
       "properties": []
     },
     {
+      "name": "CodeComparison",
+      "id": "code-comparison",
+      "version": "0.1.0",
+      "description": "Two code panels, before and after, side by side on wider screens and stacked on phones. Each has a label, line numbers and optional highlighted lines. It does no syntax colouring and has no dependency.",
+      "properties": []
+    },
+    {
       "name": "Collapsible",
       "id": "collapsible",
       "version": "0.1.0",
@@ -1234,6 +1258,58 @@
       ]
     },
     {
+      "name": "Dock",
+      "id": "dock",
+      "version": "0.1.0",
+      "description": "A row of icon buttons that grow toward the pointer, like an app launcher. Every item is a real button or link with a visible label (a tooltip) that is also its accessible name. Magnification is off on touch and for reduced motion.",
+      "properties": [
+        {
+          "prop": "orientation",
+          "name": "Orientation",
+          "values": [
+            "horizontal",
+            "vertical"
+          ],
+          "default": "horizontal"
+        }
+      ]
+    },
+    {
+      "name": "DotPattern",
+      "id": "dot-pattern",
+      "version": "0.1.0",
+      "description": "A field of evenly spaced dots that fills its parent, with an optional edge fade and a slow drift.",
+      "properties": [
+        {
+          "prop": "fade",
+          "name": "fade",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "true"
+        },
+        {
+          "prop": "animated",
+          "name": "Animated",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        },
+        {
+          "prop": "isStill",
+          "name": "isStill",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
       "name": "Drawer",
       "id": "drawer",
       "version": "0.1.0",
@@ -1428,6 +1504,76 @@
       ]
     },
     {
+      "name": "GridPattern",
+      "id": "grid-pattern",
+      "version": "0.1.0",
+      "description": "A grid of thin lines that fills its parent, with an optional edge fade and a slow drift.",
+      "properties": [
+        {
+          "prop": "fade",
+          "name": "fade",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "true"
+        },
+        {
+          "prop": "animated",
+          "name": "Animated",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        },
+        {
+          "prop": "isStill",
+          "name": "isStill",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
+      "name": "HexagonPattern",
+      "id": "hexagon-pattern",
+      "version": "0.1.0",
+      "description": "A honeycomb of hexagon outlines that fills its parent, with an optional edge fade and a slow drift.",
+      "properties": [
+        {
+          "prop": "fade",
+          "name": "fade",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "true"
+        },
+        {
+          "prop": "animated",
+          "name": "Animated",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        },
+        {
+          "prop": "isStill",
+          "name": "isStill",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
       "name": "HoverCard",
       "id": "hover-card",
       "version": "0.1.0",
@@ -1527,6 +1673,41 @@
         {
           "prop": "isInvalid",
           "name": "Invalid",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
+      "name": "InteractiveGridPattern",
+      "id": "interactive-grid-pattern",
+      "version": "0.1.0",
+      "description": "A grid whose cells light up under the mouse or pen. Decoration only: it does nothing on touch or for reduced motion and never takes focus.",
+      "properties": [
+        {
+          "prop": "variant",
+          "name": "Variant",
+          "values": [
+            "fill",
+            "trail"
+          ],
+          "default": "fill"
+        },
+        {
+          "prop": "fade",
+          "name": "fade",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "true"
+        },
+        {
+          "prop": "isStill",
+          "name": "isStill",
           "values": [
             "false",
             "true"
@@ -2089,6 +2270,35 @@
       ]
     },
     {
+      "name": "RainbowButton",
+      "id": "rainbow-button",
+      "version": "0.1.0",
+      "description": "A button with a multicolour border and soft glow that slowly travels around it. The label sits on the normal button surface, so its contrast is the plain Button's. Builds on Button.",
+      "properties": [
+        {
+          "prop": "variant",
+          "name": "Variant",
+          "values": [
+            "primary",
+            "secondary",
+            "ghost",
+            "danger"
+          ],
+          "default": "primary"
+        },
+        {
+          "prop": "size",
+          "name": "Size",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "default": "md"
+        }
+      ]
+    },
+    {
       "name": "Rating",
       "id": "rating",
       "version": "0.1.0",
@@ -2446,6 +2656,35 @@
       ]
     },
     {
+      "name": "ShinyButton",
+      "id": "shiny-button",
+      "version": "0.1.0",
+      "description": "A button with a band of light that sweeps across its surface on hover and keyboard focus, and slowly now and then at rest. Builds on Button.",
+      "properties": [
+        {
+          "prop": "variant",
+          "name": "Variant",
+          "values": [
+            "primary",
+            "secondary",
+            "ghost",
+            "danger"
+          ],
+          "default": "primary"
+        },
+        {
+          "prop": "size",
+          "name": "Size",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "default": "md"
+        }
+      ]
+    },
+    {
       "name": "ShuttleBorder",
       "id": "shuttle-border",
       "version": "0.1.0",
@@ -2624,6 +2863,41 @@
       ]
     },
     {
+      "name": "StripedPattern",
+      "id": "striped-pattern",
+      "version": "0.1.0",
+      "description": "Diagonal stripes that fill their parent, with an optional edge fade and a slow drift along the stripes.",
+      "properties": [
+        {
+          "prop": "fade",
+          "name": "fade",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "true"
+        },
+        {
+          "prop": "animated",
+          "name": "Animated",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        },
+        {
+          "prop": "isStill",
+          "name": "isStill",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
       "name": "Switch",
       "id": "switch",
       "version": "0.1.0",
@@ -2726,6 +3000,32 @@
             "true"
           ],
           "default": "false"
+        }
+      ]
+    },
+    {
+      "name": "Terminal",
+      "id": "terminal",
+      "version": "0.1.0",
+      "description": "A command-line style panel that types its lines in once: a prompt, the commands, then the output. It has a copy button, and a still mode that shows every line at once. The lines are real text in the page from the start.",
+      "properties": [
+        {
+          "prop": "isPaused",
+          "name": "Still",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        },
+        {
+          "prop": "showCopy",
+          "name": "showCopy",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "true"
         }
       ]
     },

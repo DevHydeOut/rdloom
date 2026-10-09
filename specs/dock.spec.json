@@ -1,0 +1,112 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Dock",
+  "version": "0.1.0",
+  "category": "motion",
+  "status": "experimental",
+  "description": "A row of icon buttons that grow toward the pointer, like an app launcher. Every item is a real button or link with a visible label (a tooltip) that is also its accessible name. Magnification is off on touch and for reduced motion.",
+  "props": {
+    "children": {
+      "type": "node",
+      "description": "DockItem elements.",
+      "required": true
+    },
+    "label": {
+      "type": "string",
+      "description": "Accessible name of the toolbar, for example Applications.",
+      "required": true
+    },
+    "orientation": {
+      "type": "enum",
+      "values": [
+        "horizontal",
+        "vertical"
+      ],
+      "description": "Layout direction and which arrow keys move focus.",
+      "default": "horizontal"
+    },
+    "magnification": {
+      "type": "number",
+      "description": "Scale of the item directly under the pointer. 1 turns magnification off.",
+      "default": 1.6
+    },
+    "distance": {
+      "type": "number",
+      "description": "Pixels from the pointer within which items grow.",
+      "default": 120
+    },
+    "isPaused": {
+      "type": "boolean",
+      "description": "Turns magnification off. Items still enlarge slightly on focus.",
+      "default": false
+    }
+  },
+  "variants": [
+    "orientation"
+  ],
+  "states": [
+    "default",
+    "hover",
+    "focus",
+    "disabled"
+  ],
+  "slots": [
+    "root",
+    "item",
+    "tooltip"
+  ],
+  "tokens": [
+    "color.surface.raised",
+    "color.border.default",
+    "color.text.default",
+    "color.focus.ring",
+    "radius.overlay",
+    "radius.control",
+    "elevation.raised"
+  ],
+  "a11y": {
+    "role": "toolbar",
+    "keyboard": [
+      "Tab moves into the dock on one item and out again (roving focus)",
+      "Left and Right arrows (Up and Down when vertical) move between items, swapped in right-to-left layouts",
+      "Home and End jump to the first and last item",
+      "Enter or Space activates the focused item"
+    ],
+    "requirements": [
+      "Each item is a real button (or a link when it has an href) named by its label",
+      "The label also shows as a tooltip on hover and keyboard focus",
+      "Focus enlarges the focused item too, so keyboard users get the same feedback",
+      "Magnification does not run on touch, for prefers-reduced-motion, in a .rdm-still container or when isPaused is set",
+      "Scaling is visual only: layout does not shift and hit areas stay at least 24px",
+      "Forced colors: items keep a visible border and focus ring"
+    ],
+    "screenReader": [
+      "Announced as a toolbar with its label; each item as a button or link with its label"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "A small set of app-level shortcuts or tools"
+    ],
+    "avoid_when": [
+      "Primary site navigation: use NavigationMenu",
+      "More than about ten items"
+    ],
+    "anti_patterns": [
+      "Icon items without a label",
+      "Hiding essential actions only in the dock"
+    ]
+  },
+  "examples": [
+    "basic",
+    "vertical",
+    "links"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {
+      "orientation": "Orientation"
+    }
+  }
+}

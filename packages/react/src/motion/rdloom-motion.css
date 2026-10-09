@@ -549,12 +549,193 @@
   }
 }
 
+/* RainbowButton: a multicolour border and glow travel round the button. The label stays on the plain surface. */
+.rdm-rainbow {
+  position: relative;
+  isolation: isolate;
+  background-image: conic-gradient(from var(--rdm-angle), #ef4444, #f59e0b, #22c55e, #06b6d4, #6366f1, #d946ef, #ef4444);
+  animation: rdm-spin var(--rdm-d, 4s) linear infinite;
+}
+
+.rdm-rainbow-glow {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0.45;
+  filter: blur(10px);
+  background-image: conic-gradient(from var(--rdm-angle), #ef4444, #f59e0b, #22c55e, #06b6d4, #6366f1, #d946ef, #ef4444);
+  animation: rdm-spin var(--rdm-d, 4s) linear infinite;
+}
+
+.rdm-rainbow[data-rdm-paused],
+.rdm-rainbow[data-rdm-paused] .rdm-rainbow-glow {
+  animation-play-state: paused;
+}
+
+/* ShinyButton: a band of light sweeps across, slowly at rest and faster on hover or focus. */
+.rdm-shiny .rdm-shiny-sweep {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 38%;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, currentColor 34%, transparent), transparent);
+  animation: rdm-shimmer var(--rdm-d, 3.6s) ease-in-out infinite;
+}
+
+.rdm-shiny:hover .rdm-shiny-sweep,
+.rdm-shiny[data-focus-visible] .rdm-shiny-sweep {
+  animation-duration: 1.2s;
+}
+
+[data-rdm-paused].rdm-shiny .rdm-shiny-sweep {
+  animation-play-state: paused;
+}
+
+/* Dock: items grow toward the pointer (--rdm-dock-s, set by script) and when focused (--rdm-dock-f). */
+.rdm-dock-item {
+  transform: scale(max(var(--rdm-dock-s, 1), var(--rdm-dock-f, 1)));
+  transition: transform 120ms ease-out;
+  will-change: transform;
+}
+
+.rdm-dock-item:focus-visible,
+.rdm-dock-item[data-focus-visible] {
+  --rdm-dock-f: 1.3;
+}
+
+[data-rdm-paused] > .rdm-dock-item {
+  transform: scale(var(--rdm-dock-f, 1));
+}
+
+@media (forced-colors: active) {
+  .rdm-rainbow {
+    background: ButtonText;
+    animation: none;
+  }
+
+  .rdm-rainbow-glow,
+  .rdm-shiny .rdm-shiny-sweep {
+    display: none;
+  }
+}
+
+/* BentoGrid: a card lifts a little under a real pointer. */
+.rdm-bento-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+@media (hover: hover) {
+  .rdm-bento-card:hover,
+  .rdm-bento-card:focus-within {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px -12px color-mix(in srgb, var(--rd-color-text-default) 35%, transparent);
+  }
+}
+
+.rdm-bento[data-rdm-still] .rdm-bento-card {
+  transition: none;
+  transform: none !important;
+}
+
+/* Terminal: the typed lines use the blinking caret; the panel itself never moves. */
+.rdm-terminal {
+  font-variant-ligatures: none;
+}
+
+.rdm-terminal-line {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* Background patterns: a decoration layer that fills its parent. It drifts by exactly one tile, so the loop has no jump. */
+@keyframes rdm-pattern-drift {
+  to {
+    transform: translate3d(var(--rdm-tx, 0), var(--rdm-ty, 0), 0);
+  }
+}
+
+@keyframes rdm-igrid-fade {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.rdm-pattern {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.rdm-pattern[data-fade="edge"] {
+  -webkit-mask-image: radial-gradient(ellipse at center, #000 35%, transparent 80%);
+  mask-image: radial-gradient(ellipse at center, #000 35%, transparent 80%);
+}
+
+.rdm-pattern-fill {
+  position: absolute;
+  inset: calc(var(--rdm-p, 0px) * -1);
+}
+
+.rdm-pattern[data-animated]:not([data-rdm-still]) .rdm-pattern-fill {
+  animation: rdm-pattern-drift var(--rdm-d, 10s) linear infinite;
+}
+
+.rdm-igrid {
+  contain: paint;
+}
+
+.rdm-igrid-lines {
+  position: absolute;
+  inset: 0;
+}
+
+.rdm-igrid-cell {
+  position: absolute;
+  background: color-mix(in srgb, var(--rdm-ac, currentColor) 22%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--rdm-ac, currentColor) 45%, transparent);
+}
+
+.rdm-igrid-cell[data-cell="fill"] {
+  transition: opacity 200ms ease-out;
+}
+
+.rdm-igrid-cell[data-cell="trail"] {
+  animation: rdm-igrid-fade var(--rdm-d, 900ms) ease-out forwards;
+}
+
+@media (forced-colors: active) {
+  .rdm-pattern {
+    display: none;
+  }
+}
+
 /*
  * Still: the same rules for every effect, once for visitors who prefer reduced motion
  * and once for anything inside .rdm-still (the docs use it for their Still switch).
  * Keep the two lists identical.
  */
 @media (prefers-reduced-motion: reduce) {
+  .rdm-rainbow,
+  .rdm-rainbow-glow {
+    animation: none;
+  }
+
+  .rdm-shiny .rdm-shiny-sweep {
+    display: none;
+  }
+
+  .rdm-dock-item,
+  [data-rdm-paused] > .rdm-dock-item {
+    transform: scale(var(--rdm-dock-f, 1));
+    transition: none;
+  }
+
   .rdm-shimmer,
   .rdm-ripple {
     display: none;
@@ -632,6 +813,19 @@
 
   .rdm-ihb-label {
     transition: none;
+  }
+
+  .rdm-bento-card {
+    transition: none;
+    transform: none !important;
+  }
+
+  .rdm-pattern-fill {
+    animation: none !important;
+  }
+
+  .rdm-igrid-cell {
+    display: none;
   }
 }
 
@@ -711,5 +905,32 @@
 }
 
 .rdm-still .rdm-ihb-label {
+  transition: none;
+}
+
+.rdm-still .rdm-bento-card {
+  transition: none;
+  transform: none !important;
+}
+
+.rdm-still .rdm-pattern-fill {
+  animation: none !important;
+}
+
+.rdm-still .rdm-igrid-cell {
+  display: none;
+}
+
+.rdm-still .rdm-rainbow,
+.rdm-still .rdm-rainbow-glow {
+  animation: none;
+}
+
+.rdm-still .rdm-shiny .rdm-shiny-sweep {
+  display: none;
+}
+
+.rdm-still .rdm-dock-item {
+  transform: scale(var(--rdm-dock-f, 1));
   transition: none;
 }
