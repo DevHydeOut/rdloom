@@ -346,6 +346,47 @@ setMessages((m) => [...m.slice(0, -1), finishMessage(m[m.length - 1])]);
   );
 }
 
+export function AccessibilityGuide() {
+  return (
+    <article>
+      <PageTitle lead="What rdloom does for keyboards, screen readers, touch and reduced motion, how it is checked, and what is still left for people to check.">Accessibility</PageTitle>
+      <Prose>
+        <H2 id="target">The target</H2>
+        <p>
+          Every component aims at WCAG 2.2 level AA. Components are built on React Aria, which handles keyboard behaviour, focus and screen reader
+          roles for the hard cases such as comboboxes, date pickers, menus and dialogs. Each component page lists the keys it responds to, what a
+          screen reader announces, and the rules to follow when you use it.
+        </p>
+        <H2 id="checks">What is checked automatically</H2>
+        <ul>
+          <li>Every example on this site runs through axe, an automated accessibility checker, in tests that must pass before a release.</li>
+          <li>Keyboard behaviour is tested per component: Tab order, arrow keys, Enter, Space and Escape, and where focus goes after a dialog or menu closes.</li>
+          <li>Every example is opened at phone and tablet width, and the page must not scroll sideways.</li>
+          <li>Tap targets on a phone are scanned: links and buttons must be at least 24 by 24 pixels.</li>
+          <li>Docs pages must not take focus or scroll by themselves when they open.</li>
+          <li>Animations stop for visitors who prefer reduced motion, and each motion example has a Still switch.</li>
+          <li>Colour is never the only way to say something: errors, warnings and statuses also use text or an icon.</li>
+        </ul>
+        <H2 id="forms">Forms and permissions</H2>
+        <p>
+          Form fields have visible labels, errors are announced and linked to their field, and a form with several errors lists them in a summary
+          that takes focus. A control you are not allowed to use stays focusable, says why, and is not just hidden.
+        </p>
+        <H2 id="limits">What is not done yet</H2>
+        <p>
+          Automated tests find a share of the problems, not all of them. A full pass by people using NVDA, VoiceOver and a keyboard alone has not
+          been done yet. The checklist for it is in the repository, and results will be published here when it is finished. If you find a barrier,
+          please{" "}
+          <a href={`${repoUrl}/issues`} className="underline">
+            open an issue
+          </a>
+          .
+        </p>
+      </Prose>
+    </article>
+  );
+}
+
 export function TokensGuide() {
   const [density, setDensity] = useState<"comfortable" | "compact">("comfortable");
   return (

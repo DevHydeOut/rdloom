@@ -2,9 +2,10 @@ import { StrictMode, type ComponentType } from "react";
 import { renderToString } from "react-dom/server";
 import { App } from "./app";
 import { EagerExamples } from "./data";
+import { faq } from "./faq";
 import { allPaths, previewPaths, routeFor, siteUrl } from "./routes";
 
-export { allPaths, previewPaths, siteUrl };
+export { allPaths, faq, previewPaths, siteUrl };
 
 // Server-only: every example imported up front, keyed "<component>/<example>".
 const modules = import.meta.glob<ComponentType>("../../../examples/components/*/*.tsx", { eager: true, import: "default" });

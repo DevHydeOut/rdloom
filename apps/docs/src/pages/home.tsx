@@ -1,5 +1,6 @@
 import { Suspense, useContext } from "react";
-import { components, EagerExamples } from "../data";
+import { components, EagerExamples, hrefOf } from "../data";
+import { faq } from "../faq";
 import { Link } from "../router";
 import { CodeBlock } from "../ui";
 
@@ -20,6 +21,18 @@ const pillars = [
     title: "Made for AI coding agents",
     body: "An MCP server gives Claude Code, Cursor and others the props, usage rules, accessibility requirements and tested examples, so they write correct code.",
   },
+];
+
+// What people come here to build, written the way they would search for it, each linking to the real block.
+const uses = [
+  { href: "/blocks/dashboard-shell", title: "Admin dashboards", body: "A sidebar, a top bar, stat cards, charts and tables that fold down to a phone." },
+  { href: "/blocks/data-table", title: "Data tables with search and filters", body: "Sorting, filters, pages, bulk actions and row menus, with permissions per action." },
+  { href: "/components/form", title: "Forms that validate", body: "Fields, error summaries and repeating rows that work with a keyboard and a screen reader." },
+  { href: "/blocks/settings-section", title: "Settings and billing pages", body: "Settings sections, plan pickers, usage meters, payment methods and API keys." },
+  { href: "/blocks/auth-card", title: "Sign-in and sign-up screens", body: "Sign in, sign up, forgot password and one-time code screens in several layouts." },
+  { href: "/blocks/invite-dialog", title: "User management and invites", body: "Invite people by email, search a directory, pick from a list and assign roles." },
+  { href: "/blocks/event-calendar", title: "Calendars and booking", body: "A month calendar with events, and a time slot picker for appointments." },
+  { href: "/docs/ai", title: "AI chat and agent screens", body: "Chat, streaming replies, tool steps, approvals, sources, tables and charts." },
 ];
 
 const showcase = [
@@ -51,10 +64,10 @@ export function Home() {
           New: DataGrid search matches formatted values →
         </Link>
         <h1 id="page-title" tabIndex={-1} className="font-display max-w-4xl text-[40px] leading-[1.05] tracking-[-0.045em] text-balance outline-none sm:text-[68px]">
-          Accessible React components you own, that keep getting better.
+          Production-ready React blocks you copy and own.
         </h1>
         <p className="max-w-2xl text-[19px] leading-8 text-balance text-[var(--site-muted)]">
-          rdloom is a spec-driven component library. Copy the code into your project, change anything, and still take upgrades.
+          For ERP, SaaS and B2B apps: data tables, forms, settings, billing, sign-in and dashboards. Accessible, tested, and yours to change, with upgrades that merge into your edits.
         </p>
         <div className="flex flex-wrap justify-center gap-3">
           <Link href="/docs/getting-started" className="rounded-lg bg-[var(--site-accent)] px-5 py-2.5 font-medium text-[var(--site-on-accent)] transition-opacity hover:opacity-90">
@@ -91,6 +104,24 @@ export function Home() {
         </ul>
       </section>
 
+      <section aria-labelledby="build" className="flex flex-col gap-4">
+        <h2 id="build" className="font-display text-[26px] leading-9 tracking-[-0.03em]">
+          What you can build with it
+        </h2>
+        <ul className="grid gap-4 sm:grid-cols-2">
+          {uses.map((u) => (
+            <li key={u.href} className="rounded-[var(--site-radius-lg)] border border-[var(--site-border)] p-5">
+              <h3 className="pb-2 font-medium">
+                <Link href={u.href} className="hover:underline">
+                  {u.title}
+                </Link>
+              </h3>
+              <p className="text-sm text-[var(--site-muted)]">{u.body}</p>
+            </li>
+          ))}
+        </ul>
+      </section>
+
       <section aria-labelledby="why" className="flex flex-col gap-4">
         <h2 id="why" className="font-display text-[26px] leading-9 tracking-[-0.03em]">
           Why rdloom
@@ -105,6 +136,25 @@ export function Home() {
         </ul>
       </section>
 
+      <section aria-labelledby="faq" className="flex flex-col gap-4">
+        <h2 id="faq" className="font-display text-[26px] leading-9 tracking-[-0.03em]">
+          Questions
+        </h2>
+        <div className="flex flex-col divide-y divide-[var(--site-border)] rounded-[var(--site-radius-lg)] border border-[var(--site-border)]">
+          {faq.map((item) => (
+            <details key={item.q} className="group px-5 py-4">
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 rounded font-medium outline-none focus-visible:ring-2 focus-visible:ring-[var(--rd-color-focus-ring)] [&::-webkit-details-marker]:hidden">
+                {item.q}
+                <span aria-hidden="true" className="text-[var(--site-muted)] transition-transform group-open:rotate-45">
+                  +
+                </span>
+              </summary>
+              <p className="pt-3 text-[var(--site-muted)]">{item.a}</p>
+            </details>
+          ))}
+        </div>
+      </section>
+
       <section aria-labelledby="all" className="flex flex-col gap-4">
         <h2 id="all" className="font-display text-[26px] leading-9 tracking-[-0.03em]">
           {components.length} components
@@ -113,7 +163,7 @@ export function Home() {
           {components.map((c) => (
             <li key={c.id}>
               <Link
-                href={`/components/${c.id}`}
+                href={hrefOf(c)}
                 className="flex h-full flex-col gap-1 rounded-[var(--site-radius)] border border-[var(--site-border)] p-4 hover:border-[var(--site-border-strong)]"
               >
                 <span className="font-medium">{c.spec.name}</span>

@@ -7,6 +7,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { build } from "vite";
+import { neutralizeDemoLinks } from "./seo-regions.mjs";
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 const dist = path.join(root, "dist");
@@ -15,7 +16,7 @@ const serverOut = path.join(root, "dist-server");
 await build({ root, logLevel: "warn" });
 await build({ root, logLevel: "warn", build: { ssr: "src/entry-server.tsx", outDir: serverOut } });
 
-const { render, allPaths, previewPaths, siteUrl } = await import(pathToFileURL(path.join(serverOut, "entry-server.js")).href);
+const { render, allPaths, previewPaths, siteUrl, faq } = await import(pathToFileURL(path.join(serverOut, "entry-server.js")).href);
 const template = fs.readFileSync(path.join(dist, "index.html"), "utf8");
 
 const esc = (s) => s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
@@ -29,7 +30,18 @@ function page(html, { title, description }, url, extraHead = "", renderedPath = 
     `<meta property="og:site_name" content="rdloom" />`,
     `<meta property="og:title" content="${esc(title)}" />`,
     `<meta property="og:description" content="${esc(description)}" />`,
-    `<meta name="twitter:card" content="summary" />`,
+    `<meta property="og:locale" content="en_US" />`,
+    // The share picture needs an absolute address, so it is only named once the site has one.
+    ...(siteUrl
+      ? [
+          `<meta property="og:image" content="${siteUrl}/og.png" />`,
+          `<meta property="og:image:width" content="1200" />`,
+          `<meta property="og:image:height" content="630" />`,
+          `<meta property="og:image:alt" content="rdloom: production-ready React blocks you copy and own" />`,
+          `<meta name="twitter:card" content="summary_large_image" />`,
+          `<meta name="twitter:image" content="${siteUrl}/og.png" />`,
+        ]
+      : [`<meta name="twitter:card" content="summary" />`]),
     extraHead,
   ].join("\n    ");
   return template
@@ -37,19 +49,45 @@ function page(html, { title, description }, url, extraHead = "", renderedPath = 
     .replace(/<meta name="description" content=".*?" \/>/, `<meta name="description" content="${esc(description)}" />`)
     .replace("<!--head-->", head)
     .replace('<div id="root">', `<div id="root" data-path="${esc(renderedPath)}">`)
-    .replace("<!--app-->", html);
+    .replace("<!--app-->", () => neutralizeDemoLinks(html));
 }
 
-const jsonLd = (description) =>
-  `<script type="application/ld+json">${JSON.stringify({
-    "@context": "https://schema.org",
-    "@type": "SoftwareSourceCode",
-    name: "rdloom",
-    description,
-    ...(siteUrl ? { url: siteUrl } : {}),
-    codeRepository: "https://github.com/DevHydeOut/rdloom",
-    programmingLanguage: ["TypeScript", "React"],
-  })}</script>`;
+const ld = (data) => `<script type="application/ld+json">${JSON.stringify({ "@context": "https://schema.org", ...data }).replace(/</g, "\\u003c")}</script>`;
+
+// The home page: what the site is, the project, and the questions it answers (the same text as the page shows).
+const homeLd = (description) =>
+  [
+    ld({ "@type": "WebSite", name: "rdloom", description, ...(siteUrl ? { url: siteUrl } : {}) }),
+    ld({
+      "@type": "SoftwareSourceCode",
+      name: "rdloom",
+      description,
+      ...(siteUrl ? { url: siteUrl } : {}),
+      codeRepository: "https://github.com/DevHydeOut/rdloom",
+      programmingLanguage: ["TypeScript", "React"],
+      license: "https://opensource.org/licenses/MIT",
+      author: { "@type": "Person", name: "Vimal Bhatt" },
+    }),
+    ld({
+      "@type": "FAQPage",
+      mainEntity: faq.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
+    }),
+  ].join("\n    ");
+
+// Inner pages: where the page sits (Home > Components > Button), which search results can show as a trail.
+const crumbsLd = (p, title) => {
+  const parts = p.split("/").filter(Boolean);
+  const label = (seg) => seg.replace(/-/g, " ").replace(/^./, (c) => c.toUpperCase());
+  const trail = [{ name: "Home", url: siteUrl + "/" }];
+  if (parts[0] === "components" || parts[0] === "blocks") trail.push({ name: label(parts[0]), url: `${siteUrl}/${parts[0]}` });
+  if (parts[0] === "docs") trail.push({ name: "Docs", url: `${siteUrl}/docs/getting-started` });
+  if (parts.length > 1) trail.push({ name: title.replace(/[:·].*$/, "").trim(), url: siteUrl + p });
+  else if (parts.length === 1) trail.push({ name: title.replace(/[:·].*$/, "").trim(), url: siteUrl + p });
+  return ld({
+    "@type": "BreadcrumbList",
+    itemListElement: trail.map((t, i) => ({ "@type": "ListItem", position: i + 1, name: t.name, item: t.url })),
+  });
+};
 
 const pages = [];
 for (const p of allPaths) {
@@ -59,7 +97,7 @@ for (const p of allPaths) {
   // URL without .html (Cloudflare Pages, Netlify, GitHub Pages, vite preview).
   const file = p === "/" ? path.join(dist, "index.html") : path.join(dist, `${p.slice(1)}.html`);
   fs.mkdirSync(path.dirname(file), { recursive: true });
-  fs.writeFileSync(file, page(result.html, result, url, p === "/" ? jsonLd(result.description) : "", p));
+  fs.writeFileSync(file, page(result.html, result, url, p === "/" ? homeLd(result.description) : siteUrl ? crumbsLd(p, result.title) : "", p));
   pages.push({ path: p, url, ...result });
 }
 
@@ -93,7 +131,7 @@ Disallow: /preview/\n${siteUrl ? `\nSitemap: ${siteUrl}/sitemap.xml\n` : ""}`,
 );
 
 // llms.txt (llmstxt.org): a plain index of the docs for AI tools.
-const section = (title, list) => `## ${title}\n\n${list.map((p) => `- [${p.title.replace(/ Â· rdloom$/, "")}](${p.url}): ${p.description}`).join("\n")}\n`;
+const section = (title, list) => `## ${title}\n\n${list.map((p) => `- [${p.title.replace(/ · rdloom$/, "")}](${p.url}): ${p.description}`).join("\n")}\n`;
 fs.writeFileSync(
   path.join(dist, "llms.txt"),
   `# rdloom\n\n> ${pages[0].description}\n\nFor AI coding agents, the MCP server (npx rdloom-mcp) serves the same specs with tested example code.\n\n${section(
@@ -102,6 +140,9 @@ fs.writeFileSync(
   )}\n${section(
     "Components",
     pages.filter((p) => p.path.startsWith("/components/")),
+  )}\n${section(
+    "Blocks",
+    pages.filter((p) => p.path.startsWith("/blocks/")),
   )}`,
 );
 

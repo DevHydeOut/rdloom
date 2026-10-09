@@ -182,7 +182,7 @@ export function Preview({ children, code, label, tall = false, motion = false, f
   const [still, setStill] = useState(false);
   const id = useId();
   return (
-    <div className="overflow-hidden rounded-xl border border-[var(--site-border)]">
+    <div data-docs-preview className="overflow-hidden rounded-xl border border-[var(--site-border)]">
       <div className={`relative flex ${tall ? "min-h-[22rem]" : "min-h-48"} min-w-0 items-center justify-center overflow-x-auto bg-[var(--rd-color-surface-default)] ${flush ? "p-3" : "p-8"} ${still ? "rdm-still" : ""}`}>
         {motion && (
           // The same switch the components honour for visitors who prefer reduced motion.

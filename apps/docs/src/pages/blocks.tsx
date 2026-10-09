@@ -60,7 +60,7 @@ function Thumb({ component, example }: { component: DocComponent; example?: Exam
     };
   }, []);
   return (
-    <div ref={box} aria-hidden="true" className="relative h-56 overflow-hidden border-b border-[var(--site-border)] bg-[var(--site-subtle)]">
+    <div ref={box} aria-hidden="true" data-docs-preview className="relative h-56 overflow-hidden border-b border-[var(--site-border)] bg-[var(--site-subtle)]">
       {example && (
         <div
           ref={inner}

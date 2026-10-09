@@ -462,7 +462,7 @@ function BlockExample({ component, example }: { component: DocComponent; example
           </a>
         </div>
         {view === "preview" ? (
-          <div data-block-preview className={`${tall ? "min-h-0 flex-1 bg-[var(--site-subtle)]" : "bg-[var(--rd-color-surface-default)]"} ${tall && size === "desktop" ? "p-0" : "p-3 sm:p-6"}`}>
+          <div data-block-preview data-docs-preview className={`${tall ? "min-h-0 flex-1 bg-[var(--site-subtle)]" : "bg-[var(--rd-color-surface-default)]"} ${tall && size === "desktop" ? "p-0" : "p-3 sm:p-6"}`}>
             <div
               className={`mx-auto w-full overflow-hidden transition-[max-width] duration-300 motion-reduce:transition-none ${widths[size]} ${
                 tall ? `h-full bg-[var(--rd-color-surface-default)] ${size === "desktop" ? "" : "rounded-xl border border-[var(--site-border)]"}` : ""

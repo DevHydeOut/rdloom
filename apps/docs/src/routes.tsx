@@ -3,7 +3,7 @@ import { blocks, components, displayName, hrefOf, parts } from "./data";
 import { BlocksIndex } from "./pages/blocks";
 import { ComponentPage } from "./pages/component-page";
 import { ComponentsIndex } from "./pages/components-index";
-import { AiGuide, CliGuide, FigmaGuide, GettingStarted, McpGuide, TokensGuide } from "./pages/guides";
+import { AccessibilityGuide, AiGuide, CliGuide, FigmaGuide, GettingStarted, McpGuide, TokensGuide } from "./pages/guides";
 import { Home } from "./pages/home";
 import { Link } from "./router";
 import { PageTitle } from "./ui";
@@ -13,10 +13,11 @@ import { PageTitle } from "./ui";
 
 /**
  * Where the built docs site will be served from, e.g. https://docs.example.com.
- * Set SITE_URL when building; empty means "not hosted yet", which skips the
- * sitemap, robots.txt and canonical links rather than inventing a domain.
+ * The default is the planned address. Set VITE_SITE_URL when building to use another one; set it to an empty
+ * string to build without an address, which skips the sitemap, canonical links and share image links.
  */
-export const siteUrl = (import.meta.env?.VITE_SITE_URL ?? "").replace(/\/$/, "");
+const DEFAULT_SITE_URL = "https://rdloom.vimalbhatt.com";
+export const siteUrl = (import.meta.env?.VITE_SITE_URL ?? DEFAULT_SITE_URL).replace(/\/$/, "");
 
 /** What to show in install commands: the real address, or a clear stand-in. */
 export const registryBase = siteUrl || "<your-docs-url>";
@@ -27,8 +28,28 @@ export const guides = [
   { href: "/docs/mcp", title: "AI agents (MCP)", description: "An MCP server that gives Claude Code, Cursor and other AI agents rdloom's props, usage rules and tested examples.", Page: McpGuide },
   { href: "/docs/ai", title: "AI interfaces", description: "Chat, streaming replies, tool steps, approvals, sources, tables and charts: components built around one message shape and for screen readers.", Page: AiGuide },
   { href: "/docs/figma", title: "Figma plugin", description: "Sync rdloom's design tokens and component variants into Figma, with Light and Dark modes.", Page: FigmaGuide },
+  { href: "/docs/accessibility", title: "Accessibility", description: "How rdloom components are built and tested for keyboards, screen readers, touch and reduced motion, and what is still to be checked by people.", Page: AccessibilityGuide },
   { href: "/docs/tokens", title: "Design tokens", description: "rdloom's semantic design tokens as CSS variables, with light and dark values.", Page: TokensGuide },
 ];
+
+/**
+ * A search-result description: whole sentences up to about 158 characters (search engines cut at around 160).
+ * If even the first sentence is longer, it is cut at a word with an ellipsis.
+ */
+export function brief(text: string, max = 158): string {
+  const clean = text.replace(/\s+/g, " ").trim();
+  if (clean.length <= max) return clean;
+  const sentences = clean.match(/[^.!?]+[.!?]+(?=\s|$)/g) ?? [clean];
+  let out = "";
+  for (const s of sentences) {
+    const next = (out ? out + " " : "") + s.trim();
+    if (next.length > max) break;
+    out = next;
+  }
+  if (out) return out;
+  const cut = clean.slice(0, max - 1);
+  return cut.slice(0, cut.lastIndexOf(" ")).replace(/[,;:\s]+$/, "") + "…";
+}
 
 export interface Route {
   path: string;
@@ -46,9 +67,9 @@ export interface Route {
 
 const home: Omit<Route, "page"> = {
   path: "/",
-  title: "rdloom: accessible React components you own",
+  title: "rdloom: production-ready React blocks you copy and own",
   description:
-    "Spec-driven, accessible React components: DateRangePicker, Combobox and a 100,000-row DataGrid. Copy the code, edit it, and still take upgrades. Works with AI agents and Figma.",
+    "Accessible React blocks for ERP, SaaS and B2B apps: data tables, forms, settings, billing, sign-in and dashboards. Copy the source into your project, change anything, and still take upgrades.",
 };
 
 export function routeFor(rawPath: string): Route {
@@ -65,7 +86,7 @@ export function routeFor(rawPath: string): Route {
   }
 
   const guide = guides.find((g) => g.href === path);
-  if (guide) return { path, title: `${guide.title} · rdloom`, description: guide.description, page: <guide.Page /> };
+  if (guide) return { path, title: `${guide.title} · rdloom`, description: brief(guide.description), page: <guide.Page /> };
 
   if (path === "/blocks") {
     return {
@@ -83,7 +104,7 @@ export function routeFor(rawPath: string): Route {
     return {
       path,
       title: `${displayName(block.spec.name)}: a React block · rdloom`,
-      description: `${block.spec.description} See it at full width and on a phone, then copy it into your project.`,
+      description: brief(`${block.spec.description} See it at full width and on a phone, then copy it into your project.`),
       wide: true,
       full: true,
       page: <ComponentPage key={block.id} component={block} layout="block" />,
@@ -103,7 +124,7 @@ export function routeFor(rawPath: string): Route {
     return {
       path,
       title: `${displayName(spec.name)}: accessible React ${spec.name === "DataGrid" ? "data grid" : "component"} · rdloom`,
-      description: `${spec.description} Keyboard and screen reader support, ${component.examples.length} tested examples, and source you own.`,
+      description: brief(`${spec.description} Keyboard and screen reader support, ${component.examples.length} tested examples, and source you own.`),
       page: <ComponentPage key={component.id} component={component} />,
     };
   }
