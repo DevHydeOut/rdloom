@@ -1,0 +1,82 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Particles",
+  "version": "0.1.0",
+  "category": "motion",
+  "status": "experimental",
+  "description": "A canvas of small dots that drift and lean toward the pointer, for a background. They pause when off-screen and stop for reduced motion, leaving a still scatter.",
+  "props": {
+    "quantity": {
+      "type": "number",
+      "description": "How many dots.",
+      "default": 60
+    },
+    "size": {
+      "type": "number",
+      "description": "Dot radius in pixels.",
+      "default": 1.5
+    },
+    "color": {
+      "type": "string",
+      "description": "Colour of the dots, any CSS colour. Defaults to the muted text colour."
+    },
+    "isPaused": {
+      "type": "boolean",
+      "description": "Stops the effect and shows it still.",
+      "default": false
+    }
+  },
+  "variants": [
+    "isPaused"
+  ],
+  "states": [
+    "default"
+  ],
+  "slots": [
+    "root"
+  ],
+  "tokens": [
+    "color.text.muted"
+  ],
+  "a11y": {
+    "role": "presentation",
+    "keyboard": [],
+    "requirements": [
+      "Decoration only: the effect is aria-hidden, never takes focus and never blocks the pointer",
+      "Stands still for visitors who ask for less motion (prefers-reduced-motion) and inside an rdm-still container, and isPaused stops it too",
+      "Does not flash: nothing changes more than three times in a second (WCAG 2.3.1)",
+      "Paused while off-screen, and its animation frame is cancelled when it unmounts",
+      "A still scatter is drawn for reduced motion, inside rdm-still and with isPaused",
+      "Hidden in forced-colors (high contrast) mode",
+      "Follows the pointer through the container, so it never needs pointer events of its own"
+    ],
+    "screenReader": [
+      "Not announced: the canvas is hidden from assistive technology"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "A hero background",
+      "Giving a quiet section some depth"
+    ],
+    "avoid_when": [
+      "Behind small text or dense forms",
+      "Low-power or small screens with very high counts"
+    ],
+    "anti_patterns": [
+      "Counts in the hundreds",
+      "Dots in strong colours that fight with the text"
+    ]
+  },
+  "examples": [
+    "basic",
+    "sparse"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {
+      "isPaused": "Paused"
+    }
+  }
+}

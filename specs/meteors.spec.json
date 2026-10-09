@@ -1,0 +1,87 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Meteors",
+  "version": "0.1.0",
+  "category": "motion",
+  "status": "experimental",
+  "description": "Streaks that fall across a container, for a hero or an empty background. They are real DOM positioned from the index, so the server and the browser agree.",
+  "props": {
+    "count": {
+      "type": "number",
+      "description": "How many streaks.",
+      "default": 16
+    },
+    "angle": {
+      "type": "number",
+      "description": "Direction of travel in degrees. 215 falls toward the lower right.",
+      "default": 215
+    },
+    "color": {
+      "type": "string",
+      "description": "Colour of the streaks, any CSS colour. Defaults to the muted text colour."
+    },
+    "duration": {
+      "type": "number",
+      "description": "Average seconds for a streak to cross.",
+      "default": 6
+    },
+    "isPaused": {
+      "type": "boolean",
+      "description": "Stops the effect and shows it still.",
+      "default": false
+    }
+  },
+  "variants": [
+    "isPaused"
+  ],
+  "states": [
+    "default"
+  ],
+  "slots": [
+    "root",
+    "meteor"
+  ],
+  "tokens": [
+    "color.text.muted"
+  ],
+  "a11y": {
+    "role": "presentation",
+    "keyboard": [],
+    "requirements": [
+      "Decoration only: the effect is aria-hidden, never takes focus and never blocks the pointer",
+      "Stands still for visitors who ask for less motion (prefers-reduced-motion) and inside an rdm-still container, and isPaused stops it too",
+      "Does not flash: nothing changes more than three times in a second (WCAG 2.3.1)",
+      "Streaks use slow, soft motion and the amount is capped, and isPaused or a Still switch stops them (WCAG 2.2.2)",
+      "Hidden entirely for reduced motion and in forced-colors mode",
+      "Place it behind content: it fills its container, which needs position: relative and overflow hidden"
+    ],
+    "screenReader": [
+      "Not announced: the whole layer is hidden from assistive technology"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "A hero or banner background",
+      "A quiet empty state"
+    ],
+    "avoid_when": [
+      "Behind long text",
+      "Any place that must stay calm"
+    ],
+    "anti_patterns": [
+      "Too many streaks, which reads as noise",
+      "Putting it above the content"
+    ]
+  },
+  "examples": [
+    "basic",
+    "dense"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {
+      "isPaused": "Paused"
+    }
+  }
+}

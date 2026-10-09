@@ -1,0 +1,86 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "AuroraText",
+  "version": "0.1.0",
+  "category": "motion",
+  "status": "experimental",
+  "states": [
+    "default"
+  ],
+  "slots": [
+    "root"
+  ],
+  "a11y": {
+    "role": "text",
+    "keyboard": [],
+    "requirements": [
+      "The text is ordinary text in the page from the server render, readable with no JavaScript, and read once by screen readers",
+      "Decoration only: the animated layers are hidden from assistive technology and never take focus",
+      "Stands still for visitors who ask for less motion (prefers-reduced-motion), and can also be shown still with the rdm-still class or isPaused",
+      "In forced-colors (high contrast) mode the text is drawn in the system colours with no effect",
+      "Does not flash: nothing changes more than three times in a second (WCAG 2.3.1)",
+      "Optional: it is a separate component, so projects that do not add it carry none of its code",
+      "The gradient fill is only used where the colours you give keep at least 4.5:1 contrast (3:1 for large text); otherwise the text falls back to the default text colour in reduced motion, high contrast and browsers without background-clip"
+    ],
+    "screenReader": [
+      "Read as ordinary text: the effect is purely visual"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "figma": {
+    "componentKey": null,
+    "variantMap": {
+      "isPaused": "Paused"
+    }
+  },
+  "description": "Text filled with a slow, drifting aurora gradient. Falls back to plain text colour for reduced motion and high contrast.",
+  "props": {
+    "children": {
+      "type": "string",
+      "description": "The text.",
+      "required": true
+    },
+    "colors": {
+      "type": "custom",
+      "tsType": "readonly string[]",
+      "description": "Gradient colours, any CSS colours. Defaults to three theme colours."
+    },
+    "speed": {
+      "type": "number",
+      "default": 1,
+      "description": "Speed multiplier. 1 takes about ten seconds for one pass."
+    },
+    "isPaused": {
+      "type": "boolean",
+      "default": false,
+      "description": "Stops the animation and shows the text plainly. Moving content that lasts more than five seconds should be stoppable."
+    }
+  },
+  "variants": [
+    "isPaused"
+  ],
+  "tokens": [
+    "color.text.default",
+    "color.action.primary",
+    "color.feedback.info",
+    "color.feedback.success"
+  ],
+  "usage": {
+    "use_when": [
+      "A large heading that carries a brand colour"
+    ],
+    "avoid_when": [
+      "Small text",
+      "Colours with low contrast against the surface"
+    ],
+    "anti_patterns": [
+      "Fast speeds",
+      "Pale colours on a light surface"
+    ]
+  },
+  "examples": [
+    "basic",
+    "custom-colors",
+    "paused"
+  ]
+}
