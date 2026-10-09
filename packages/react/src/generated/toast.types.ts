@@ -23,11 +23,17 @@ export interface ToastSpecProps {
    * @default 10000
    */
   timeout?: number;
+  /**
+   * Opt in to a fuller slide: the toast glides in from the edge and slides back out when dismissed. Off by default, which keeps the existing small rise and fade. Visitors who ask for less motion get no movement either way.
+   * @default false
+   */
+  animated?: boolean;
 }
 
 export const toastDefaults = {
   variant: "neutral",
   timeout: 10000,
+  animated: false,
 } as const;
 
 export const toastMeta = {

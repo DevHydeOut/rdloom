@@ -15,15 +15,15 @@ import { CloseIcon, ErrorIcon, InfoIcon, SuccessIcon } from "../utils/icons";
 // React Aria's toast API is still marked UNSTABLE_. Everything that touches
 // it lives in this file, so an upstream rename is a one-file fix.
 
-type ToastContent = Pick<ToastSpecProps, "title" | "description" | "variant">;
+type ToastContent = Pick<ToastSpecProps, "title" | "description" | "variant" | "animated">;
 
 /** One queue per app. Render <ToastRegion /> once, near the root. */
 export const toastQueue = new AriaToastQueue<ToastContent>({ maxVisibleToasts: 5 });
 
 /** Shows a toast. Returns its key, which can be passed to toastQueue.close(). */
-export function toast({ timeout = toastDefaults.timeout, ...content }: ToastSpecProps): string {
+export function toast({ timeout = toastDefaults.timeout, animated = toastDefaults.animated, ...content }: ToastSpecProps): string {
   return toastQueue.add(
-    { variant: toastDefaults.variant, ...content },
+    { variant: toastDefaults.variant, animated, ...content },
     { timeout: timeout > 0 ? timeout : undefined },
   );
 }
@@ -51,9 +51,14 @@ export function ToastRegion({ className }: { className?: string }) {
                 "bg-[var(--rd-color-surface-raised)] text-[var(--rd-color-text-default)] " +
                 "border border-[var(--rd-color-border-default)] rounded-2xl " +
                 // Slide up and fade in; slide out and fade on dismiss. A reduced-motion visitor gets no movement.
-                "transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-none " +
-                "data-[animation=queued]:translate-y-3 data-[animation=queued]:opacity-0 " +
-                "data-[animation=exiting]:translate-x-6 data-[animation=exiting]:opacity-0 " +
+                // animated: opt-in fuller slide from the inline-end edge (mirrored in right-to-left), none when reduced.
+                (item.content.animated
+                  ? "transition-[opacity,transform] duration-300 ease-out motion-reduce:transition-none motion-reduce:data-[animation=queued]:translate-x-0 motion-reduce:data-[animation=exiting]:translate-x-0 " +
+                    "data-[animation=queued]:translate-x-[calc(100%+1rem)] data-[animation=queued]:opacity-0 rtl:data-[animation=queued]:-translate-x-[calc(100%+1rem)] " +
+                    "data-[animation=exiting]:translate-x-[calc(100%+1rem)] data-[animation=exiting]:opacity-0 rtl:data-[animation=exiting]:-translate-x-[calc(100%+1rem)] "
+                  : "transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-none " +
+                    "data-[animation=queued]:translate-y-3 data-[animation=queued]:opacity-0 " +
+                    "data-[animation=exiting]:translate-x-6 data-[animation=exiting]:opacity-0 ") +
                 "data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)]",
             )}
           >

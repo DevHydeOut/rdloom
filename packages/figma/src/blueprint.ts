@@ -1387,7 +1387,27 @@ const blueprints: Record<string, Blueprint> = {
       text("Shared workspaces and single sign-on.", 14, "color.text.muted"),
     ]),
 
+  AnimatedList: () =>
+    frame({ name: "animated list", dir: "col", gap: 8, w: 280 }, ["Payment received", "Invoice sent", "Stock reserved"].map((t) =>
+      frame({ name: "item", dir: "row", pad: [12, 16], cross: "center", radius: "radius.control", fill: "color.surface.raised", stroke: "color.border.default" }, [text(t, 14, "color.text.default")]),
+    )),
+  InteractiveHoverButton: (c) => buttonBlueprint(c, "Get started"),
   TextShimmer: () => frame({ name: "text shimmer", dir: "row" }, [text("Thinking…", 18, "color.text.muted", "Medium")]),
+  AnimatedCircularProgress: () =>
+    frame({ name: "circular progress", dir: "col", gap: 4, pad: 16, w: 96, fill: "color.surface.default", stroke: "color.action.primary", radius: "radius.overlay" }, [
+      text("72%", 16, "color.text.default", "Medium"),
+    ]),
+  NumberTicker: () => frame({ name: "number ticker", dir: "row" }, [text("12,840", 36, "color.text.default", "Semi Bold")]),
+  Marquee: () =>
+    frame({ name: "marquee", dir: "row", gap: 16, pad: 8, w: 360 }, [
+      text("Northwind", 14, "color.text.default"),
+      text("Harbor Labs", 14, "color.text.default"),
+      text("Lumen", 14, "color.text.default"),
+    ]),
+  TypingAnimation: () => frame({ name: "typing animation", dir: "row" }, [text("Ship it with care", 18, "color.text.default", "Medium")]),
+  WordRotate: () => frame({ name: "word rotate", dir: "row", gap: 6 }, [text("Built for", 24, "color.text.default"), text("teams", 24, "color.action.primary", "Semi Bold")]),
+  TextReveal: () => frame({ name: "text reveal", dir: "col", w: 320 }, [text("Words arrive as you scroll, one after another.", 20, "color.text.default", "Medium")]),
+  TextAnimate: () => frame({ name: "text animate", dir: "row" }, [text("Hello, world", 24, "color.text.default", "Semi Bold")]),
   GradientText: () => frame({ name: "gradient text", dir: "row" }, [text("Build faster", 28, "color.action.primary", "Semi Bold")]),
 
   BlurFade: () =>

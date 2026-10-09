@@ -140,6 +140,15 @@ export { ShimmerButton, type ShimmerButtonProps } from "./shimmer-button/shimmer
 export { ShineBorder, type ShineBorderProps } from "./shine-border/shine-border";
 export { ShuttleBorder, type ShuttleBorderProps } from "./shuttle-border/shuttle-border";
 export { TextShimmer, type TextShimmerProps } from "./text-shimmer/text-shimmer";
+export { AnimatedCircularProgress, type AnimatedCircularProgressProps } from "./animated-circular-progress/animated-circular-progress";
+export { NumberTicker, type NumberTickerProps } from "./number-ticker/number-ticker";
+export { Marquee, type MarqueeProps } from "./marquee/marquee";
+export { TypingAnimation, type TypingAnimationProps } from "./typing-animation/typing-animation";
+export { WordRotate, type WordRotateProps } from "./word-rotate/word-rotate";
+export { TextReveal, type TextRevealProps } from "./text-reveal/text-reveal";
+export { TextAnimate, type TextAnimateProps } from "./text-animate/text-animate";
+export { AnimatedList, type AnimatedListProps } from "./animated-list/animated-list";
+export { InteractiveHoverButton, type InteractiveHoverButtonProps } from "./interactive-hover-button/interactive-hover-button";
 export { useReducedMotion } from "./utils/motion";
 export { AgentActivity, type AgentActivityProps } from "./agent-activity/agent-activity";
 export { ApprovalBox, type ApprovalBoxProps } from "./approval-box/approval-box";

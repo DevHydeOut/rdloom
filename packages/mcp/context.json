@@ -820,6 +820,290 @@
       ]
     },
     {
+      "id": "animated-circular-progress",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "AnimatedCircularProgress",
+        "version": "0.1.0",
+        "category": "motion",
+        "status": "experimental",
+        "description": "A ring that fills to its value after it appears, with the value in the middle. It can also spin when the amount of work is not known.",
+        "props": {
+          "value": {
+            "type": "number",
+            "description": "Current value between minValue and maxValue. Ignored while indeterminate.",
+            "default": 0
+          },
+          "minValue": {
+            "type": "number",
+            "description": "Value at which the ring is empty.",
+            "default": 0
+          },
+          "maxValue": {
+            "type": "number",
+            "description": "Value at which the ring is full.",
+            "default": 100
+          },
+          "label": {
+            "type": "string",
+            "description": "Accessible name of the progress bar, for example \"Upload progress\". Required unless aria-labelledby is given."
+          },
+          "size": {
+            "type": "number",
+            "description": "Width and height of the ring in pixels.",
+            "default": 96
+          },
+          "thickness": {
+            "type": "number",
+            "description": "Width of the ring stroke in pixels.",
+            "default": 8
+          },
+          "showValue": {
+            "type": "boolean",
+            "description": "Shows the value as text in the middle of the ring.",
+            "default": true
+          },
+          "isIndeterminate": {
+            "type": "boolean",
+            "description": "Spins a short arc for work of unknown length. No value is announced.",
+            "default": false
+          },
+          "duration": {
+            "type": "number",
+            "description": "Seconds the fill takes, or for one turn while indeterminate. Defaults to 0.9 for the fill and 1.2 for the spin."
+          },
+          "isPaused": {
+            "type": "boolean",
+            "description": "Stops the spinning. The fill still moves to new values, only once.",
+            "default": false
+          },
+          "children": {
+            "type": "node",
+            "description": "Replaces the value text in the middle of the ring."
+          }
+        },
+        "variants": [
+          "isIndeterminate",
+          "isPaused",
+          "showValue"
+        ],
+        "states": [
+          "default",
+          "loading"
+        ],
+        "slots": [
+          "root",
+          "ring",
+          "value"
+        ],
+        "tokens": [
+          "color.action.primary",
+          "color.border.default",
+          "color.text.default"
+        ],
+        "a11y": {
+          "role": "progressbar",
+          "keyboard": [],
+          "requirements": [
+            "Exposes role=progressbar with aria-valuenow, aria-valuemin and aria-valuemax; while indeterminate aria-valuenow is omitted",
+            "Needs an accessible name from the label prop or aria-labelledby",
+            "The value text is real text in the server HTML, so the final value is readable with no JavaScript and no animation",
+            "The fill animates after mount only; visitors who ask for less motion (prefers-reduced-motion), and anything inside rdm-still, see the final ring at once",
+            "The spin can be stopped with isPaused (WCAG 2.2.2) and stops for reduced motion",
+            "In forced-colors (high contrast) mode the ring uses the system highlight and text colours",
+            "Does not flash: nothing changes more than three times in a second (WCAG 2.3.1)"
+          ],
+          "screenReader": [
+            "Announced as a progress bar with its name and its percentage",
+            "The animation is not announced: only the final value is exposed"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "A single measurable task such as an upload, a score or a quota",
+            "A compact progress display where a bar would not fit"
+          ],
+          "avoid_when": [
+            "Several steps with names, where a stepper tells more",
+            "Work that finishes in under a second"
+          ],
+          "anti_patterns": [
+            "Leaving the label off, which gives screen readers an unnamed progress bar",
+            "Showing a spinning ring for work that has a known amount"
+          ]
+        },
+        "examples": [
+          "basic",
+          "indeterminate",
+          "custom-center"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {
+            "isIndeterminate": "Indeterminate"
+          }
+        }
+      },
+      "install": {
+        "command": "npx rdloom add animated-circular-progress",
+        "dependencies": [
+          "react-aria-components@^1.21.1"
+        ],
+        "registryDependencies": [
+          "tokens",
+          "motion-css",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import { AnimatedCircularProgress } from \"@rdloom/react\";\n\nexport default function AnimatedCircularProgressBasicExample() {\n  return (\n    <div className=\"flex w-full justify-center\">\n      <AnimatedCircularProgress value={72} label=\"Storage used\" />\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "indeterminate",
+          "code": "import { AnimatedCircularProgress } from \"@rdloom/react\";\n\nexport default function AnimatedCircularProgressIndeterminateExample() {\n  return (\n    <div className=\"flex w-full justify-center\">\n      <AnimatedCircularProgress isIndeterminate size={56} thickness={6} label=\"Importing contacts\" />\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "custom-center",
+          "code": "import { AnimatedCircularProgress } from \"@rdloom/react\";\n\nexport default function AnimatedCircularProgressCustomCenterExample() {\n  return (\n    <div className=\"flex w-full justify-center\">\n      <AnimatedCircularProgress value={18} maxValue={20} size={112} thickness={10} label=\"Tasks done\">\n        <span className=\"relative text-center text-sm leading-tight\">\n          <span className=\"block text-lg font-semibold\">18</span>\n          of 20\n        </span>\n      </AnimatedCircularProgress>\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "animated-circular-progress/animated-circular-progress.tsx",
+          "content": "\"use client\";\n\nimport { forwardRef, useEffect, useState, type CSSProperties } from \"react\";\nimport { ProgressBar } from \"react-aria-components\";\nimport {\n  animatedCircularProgressDefaults,\n  type AnimatedCircularProgressSpecProps,\n} from \"../generated/animated-circular-progress.types\";\nimport { cx } from \"../utils/cx\";\nimport { prefersReducedMotion, useIsomorphicLayoutEffect } from \"../utils/motion\";\n\nexport interface AnimatedCircularProgressProps\n  extends AnimatedCircularProgressSpecProps {\n  className?: string;\n  style?: CSSProperties;\n  \"aria-label\"?: string;\n  \"aria-labelledby\"?: string;\n}\n\ntype Phase = \"final\" | \"empty\" | \"filling\";\n\n/**\n * A ring that fills to its value once it is on screen. The value is real text and the ring is\n * already at its final size in the server HTML; only in the browser (and when the visitor has not\n * asked for less motion) is it emptied before the first paint and then filled.\n */\nexport const AnimatedCircularProgress = forwardRef<HTMLDivElement, AnimatedCircularProgressProps>(\n  function AnimatedCircularProgress(\n    {\n      value = animatedCircularProgressDefaults.value,\n      minValue = animatedCircularProgressDefaults.minValue,\n      maxValue = animatedCircularProgressDefaults.maxValue,\n      label,\n      size = animatedCircularProgressDefaults.size,\n      thickness = animatedCircularProgressDefaults.thickness,\n      showValue = animatedCircularProgressDefaults.showValue,\n      isIndeterminate = animatedCircularProgressDefaults.isIndeterminate,\n      duration,\n      isPaused = animatedCircularProgressDefaults.isPaused,\n      children,\n      className,\n      style,\n      ...rest\n    },\n    ref,\n  ) {\n    const [phase, setPhase] = useState<Phase>(\"final\");\n\n    useIsomorphicLayoutEffect(() => {\n      if (prefersReducedMotion() || isIndeterminate) return;\n      setPhase(\"empty\");\n    }, []);\n\n    useEffect(() => {\n      if (phase !== \"empty\") return;\n      const frame = requestAnimationFrame(() => setPhase(\"filling\"));\n      return () => cancelAnimationFrame(frame);\n    }, [phase]);\n\n    const span = maxValue - minValue;\n    const clamped = Math.min(Math.max(value, minValue), maxValue);\n    const percent = span > 0 ? ((clamped - minValue) / span) * 100 : 0;\n    const shown = isIndeterminate ? 25 : phase === \"empty\" ? 0 : percent;\n\n    const vars = {\n      width: size,\n      height: size,\n      \"--rdm-w\": `${thickness}px`,\n      \"--rdm-pct\": shown,\n      ...(duration !== undefined ? { \"--rdm-d\": `${duration}s` } : {}),\n    } as CSSProperties;\n\n    return (\n      <ProgressBar\n        {...rest}\n        ref={ref}\n        value={clamped}\n        minValue={minValue}\n        maxValue={maxValue}\n        isIndeterminate={isIndeterminate}\n        aria-label={label ?? rest[\"aria-label\"]}\n        data-rdm-paused={isPaused || undefined}\n        className={cx(\"relative inline-flex items-center justify-center text-[var(--rd-color-text-default)]\", className)}\n        style={{ ...style, ...vars }}\n      >\n        {({ valueText }) => (\n          <>\n            <span\n              aria-hidden=\"true\"\n              className={cx(\"rdm-cprogress-ring\", isIndeterminate && \"rdm-cprogress-spin\")}\n              style={phase === \"empty\" ? { transition: \"none\" } : undefined}\n            />\n            {children ?? (showValue && !isIndeterminate ? (\n              <span className=\"relative text-sm font-medium tabular-nums\">{valueText}</span>\n            ) : null)}\n          </>\n        )}\n      </ProgressBar>\n    );\n  },\n);\n"
+        },
+        {
+          "path": "generated/animated-circular-progress.types.ts",
+          "content": "// Generated by rdloom codegen from specs/animated-circular-progress.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nimport type { ReactNode } from \"react\";\n\n/** A ring that fills to its value after it appears, with the value in the middle. It can also spin when the amount of work is not known. */\nexport interface AnimatedCircularProgressSpecProps {\n  /**\n   * Current value between minValue and maxValue. Ignored while indeterminate.\n   * @default 0\n   */\n  value?: number;\n  /**\n   * Value at which the ring is empty.\n   * @default 0\n   */\n  minValue?: number;\n  /**\n   * Value at which the ring is full.\n   * @default 100\n   */\n  maxValue?: number;\n  /**\n   * Accessible name of the progress bar, for example \"Upload progress\". Required unless aria-labelledby is given.\n   */\n  label?: string;\n  /**\n   * Width and height of the ring in pixels.\n   * @default 96\n   */\n  size?: number;\n  /**\n   * Width of the ring stroke in pixels.\n   * @default 8\n   */\n  thickness?: number;\n  /**\n   * Shows the value as text in the middle of the ring.\n   * @default true\n   */\n  showValue?: boolean;\n  /**\n   * Spins a short arc for work of unknown length. No value is announced.\n   * @default false\n   */\n  isIndeterminate?: boolean;\n  /**\n   * Seconds the fill takes, or for one turn while indeterminate. Defaults to 0.9 for the fill and 1.2 for the spin.\n   */\n  duration?: number;\n  /**\n   * Stops the spinning. The fill still moves to new values, only once.\n   * @default false\n   */\n  isPaused?: boolean;\n  /**\n   * Replaces the value text in the middle of the ring.\n   */\n  children?: ReactNode;\n}\n\nexport const animatedCircularProgressDefaults = {\n  value: 0,\n  minValue: 0,\n  maxValue: 100,\n  size: 96,\n  thickness: 8,\n  showValue: true,\n  isIndeterminate: false,\n  isPaused: false,\n} as const;\n\nexport const animatedCircularProgressMeta = {\n  \"name\": \"AnimatedCircularProgress\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"progressbar\"\n} as const;\n"
+        }
+      ]
+    },
+    {
+      "id": "animated-list",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "AnimatedList",
+        "version": "0.1.0",
+        "category": "motion",
+        "status": "experimental",
+        "description": "A list whose items slide and fade in one after another, and stack as new ones are added. It is a real list (ul with li items), and every item is in the page from the start.",
+        "props": {
+          "children": {
+            "type": "node",
+            "description": "The items. Each child becomes one list item; give each a stable key so only genuinely new items animate.",
+            "required": true
+          },
+          "delay": {
+            "type": "number",
+            "description": "Seconds between one item appearing and the next, for items that arrive together.",
+            "default": 0.15
+          },
+          "duration": {
+            "type": "number",
+            "description": "Seconds each item takes to slide in.",
+            "default": 0.4
+          },
+          "announce": {
+            "type": "boolean",
+            "description": "Marks the list as a polite live region so screen readers announce items that are added later. Leave it off for a static list.",
+            "default": false
+          },
+          "isStill": {
+            "type": "boolean",
+            "description": "Shows every item at once with no movement. Moving content should be stoppable.",
+            "default": false
+          }
+        },
+        "variants": [
+          "isStill",
+          "announce"
+        ],
+        "states": [
+          "default"
+        ],
+        "slots": [
+          "root",
+          "item"
+        ],
+        "tokens": [
+          "color.text.default"
+        ],
+        "a11y": {
+          "role": "list",
+          "keyboard": [],
+          "requirements": [
+            "A real list: ul with one li per item, so the item count is announced",
+            "Every item is real DOM in the server HTML and visible without JavaScript or CSS animation",
+            "Stands still for visitors who ask for less motion (prefers-reduced-motion), and with isStill or inside an rdm-still container",
+            "Each item moves once and stops, so nothing keeps moving and nothing flashes (WCAG 2.2.2, 2.3.1)",
+            "Items keep their own focus order and content; the animation never moves focus",
+            "Optional: it is a separate component, so projects that do not add it carry none of its code"
+          ],
+          "screenReader": [
+            "Read as a list with its number of items",
+            "With announce on, items added later are read out politely, once, without interrupting"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "A feed or activity log where new entries arrive",
+            "A short list that should feel built up rather than dropped in"
+          ],
+          "avoid_when": [
+            "Long lists: staggered delays make the last items wait",
+            "Lists people scan quickly or sort and filter often"
+          ],
+          "anti_patterns": [
+            "A delay so long that content is hidden for several seconds",
+            "Turning on announce for a list that changes every second"
+          ]
+        },
+        "examples": [
+          "basic",
+          "live-feed"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {
+            "isStill": "Still"
+          }
+        }
+      },
+      "install": {
+        "command": "npx rdloom add animated-list",
+        "dependencies": [],
+        "registryDependencies": [
+          "tokens",
+          "motion-css",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import { AnimatedList } from \"@rdloom/react\";\n\nconst steps = [\"Payment received\", \"Invoice sent to Dana\", \"Stock reserved\", \"Courier booked\"];\n\nexport default function AnimatedListBasicExample() {\n  return (\n    <div className=\"flex w-full justify-center\">\n      <AnimatedList className=\"w-full max-w-sm\">\n        {steps.map((step) => (\n          <div\n            key={step}\n            className=\"rounded-[var(--rd-radius-control)] border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-raised)] px-4 py-3 text-sm text-[var(--rd-color-text-default)]\"\n          >\n            {step}\n          </div>\n        ))}\n      </AnimatedList>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "live-feed",
+          "code": "import { useState } from \"react\";\nimport { AnimatedList, Button } from \"@rdloom/react\";\n\nconst events = [\"New sign-up from Lisbon\", \"Order 1042 shipped\", \"Refund issued for order 1037\", \"Comment on the roadmap page\", \"Backup finished\"];\n\nexport default function AnimatedListLiveFeedExample() {\n  const [count, setCount] = useState(2);\n  const shown = events.slice(0, count).reverse();\n  return (\n    <div className=\"flex w-full flex-col items-center gap-4\">\n      <Button variant=\"secondary\" isDisabled={count >= events.length} onPress={() => setCount((n) => n + 1)}>\n        Add an event\n      </Button>\n      <AnimatedList announce className=\"w-full max-w-sm\" aria-label=\"Recent events\">\n        {shown.map((text) => (\n          <div\n            key={text}\n            className=\"rounded-[var(--rd-radius-control)] border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-raised)] px-4 py-3 text-sm text-[var(--rd-color-text-default)]\"\n          >\n            {text}\n          </div>\n        ))}\n      </AnimatedList>\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "animated-list/animated-list.tsx",
+          "content": "\"use client\";\n\nimport { Children, forwardRef, isValidElement, useEffect, useRef, type CSSProperties, type HTMLAttributes, type Key } from \"react\";\nimport { animatedListDefaults, type AnimatedListSpecProps } from \"../generated/animated-list.types\";\nimport { cx } from \"../utils/cx\";\n\nexport interface AnimatedListProps\n  extends AnimatedListSpecProps,\n    Omit<HTMLAttributes<HTMLUListElement>, keyof AnimatedListSpecProps | \"className\"> {\n  className?: string;\n}\n\n/**\n * A list whose items slide and fade in one after another, and stack as new ones arrive.\n *\n * It is a real ul with one li per child, all present in the server HTML. The movement is a one-shot\n * CSS animation, so nothing is hidden without it, and nothing keeps moving afterwards. Items that\n * were already on screen never replay; a batch added later staggers from its own first item.\n */\nexport const AnimatedList = forwardRef<HTMLUListElement, AnimatedListProps>(function AnimatedList(\n  {\n    children,\n    delay = animatedListDefaults.delay,\n    duration = animatedListDefaults.duration,\n    announce = animatedListDefaults.announce,\n    isStill = animatedListDefaults.isStill,\n    className,\n    style,\n    ...rest\n  },\n  ref,\n) {\n  // The stagger slot each item was given when it first appeared. It is written after commit, so a\n  // repeated render (strict mode) hands out the same slots, and later renders keep them.\n  const slots = useRef(new Map<Key, number>());\n  const items = Children.toArray(children).map((child, index) => ({\n    child,\n    key: isValidElement(child) && child.key != null ? child.key : `index-${index}`,\n  }));\n  const pending = new Map<Key, number>();\n  for (const { key } of items) if (!slots.current.has(key)) pending.set(key, pending.size);\n  useEffect(() => {\n    pending.forEach((slot, key) => slots.current.set(key, slot));\n  });\n\n  return (\n    <ul\n      {...rest}\n      ref={ref}\n      aria-live={announce ? \"polite\" : undefined}\n      aria-relevant={announce ? \"additions\" : undefined}\n      data-rdm-still={isStill || undefined}\n      className={cx(\"rdm-list m-0 flex list-none flex-col gap-2 p-0\", className)}\n      style={{ \"--rdm-d\": `${duration}s`, ...style } as CSSProperties}\n    >\n      {items.map(({ child, key }) => (\n        <li\n          key={key}\n          className=\"rdm-list-item\"\n          style={{ \"--rdm-delay\": `${(slots.current.get(key) ?? pending.get(key) ?? 0) * delay}s` } as CSSProperties}\n        >\n          {child}\n        </li>\n      ))}\n    </ul>\n  );\n});\n"
+        },
+        {
+          "path": "generated/animated-list.types.ts",
+          "content": "// Generated by rdloom codegen from specs/animated-list.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nimport type { ReactNode } from \"react\";\n\n/** A list whose items slide and fade in one after another, and stack as new ones are added. It is a real list (ul with li items), and every item is in the page from the start. */\nexport interface AnimatedListSpecProps {\n  /**\n   * The items. Each child becomes one list item; give each a stable key so only genuinely new items animate.\n   */\n  children: ReactNode;\n  /**\n   * Seconds between one item appearing and the next, for items that arrive together.\n   * @default 0.15\n   */\n  delay?: number;\n  /**\n   * Seconds each item takes to slide in.\n   * @default 0.4\n   */\n  duration?: number;\n  /**\n   * Marks the list as a polite live region so screen readers announce items that are added later. Leave it off for a static list.\n   * @default false\n   */\n  announce?: boolean;\n  /**\n   * Shows every item at once with no movement. Moving content should be stoppable.\n   * @default false\n   */\n  isStill?: boolean;\n}\n\nexport const animatedListDefaults = {\n  delay: 0.15,\n  duration: 0.4,\n  announce: false,\n  isStill: false,\n} as const;\n\nexport const animatedListMeta = {\n  \"name\": \"AnimatedList\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"list\"\n} as const;\n"
+        }
+      ]
+    },
+    {
       "id": "api-key-list",
       "spec": {
         "$schema": "./schema/component.schema.json",
@@ -10504,6 +10788,165 @@
       ]
     },
     {
+      "id": "interactive-hover-button",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "InteractiveHoverButton",
+        "version": "0.1.0",
+        "category": "motion",
+        "status": "experimental",
+        "description": "A button whose label slides away to an arrow, or to a second label with an arrow, on hover and keyboard focus. Builds on Button.",
+        "props": {
+          "children": {
+            "type": "node",
+            "description": "Button label. This is the accessible name.",
+            "required": true
+          },
+          "hoverLabel": {
+            "type": "string",
+            "description": "Optional wording shown on hover and focus, next to the arrow. It is visual only and should say the same thing as the label. Without it only the arrow appears."
+          },
+          "variant": {
+            "type": "enum",
+            "values": [
+              "primary",
+              "secondary",
+              "ghost",
+              "danger"
+            ],
+            "description": "Visual emphasis, as on Button.",
+            "default": "primary"
+          },
+          "size": {
+            "type": "enum",
+            "values": [
+              "sm",
+              "md",
+              "lg"
+            ],
+            "description": "Height, padding and font size, as on Button.",
+            "default": "md"
+          },
+          "isDisabled": {
+            "type": "boolean",
+            "description": "Prevents interaction, dims the button and turns the effect off.",
+            "default": false
+          },
+          "isLoading": {
+            "type": "boolean",
+            "description": "Shows a spinner and blocks presses; the pending state is announced.",
+            "default": false
+          },
+          "onPress": {
+            "type": "callback",
+            "tsType": "() => void",
+            "description": "Called when the button is pressed by mouse, touch or keyboard."
+          }
+        },
+        "variants": [
+          "variant",
+          "size"
+        ],
+        "states": [
+          "default",
+          "hover",
+          "focus",
+          "disabled"
+        ],
+        "slots": [
+          "root",
+          "label",
+          "hover-label",
+          "arrow"
+        ],
+        "tokens": [
+          "color.action.primary",
+          "color.action.on-primary",
+          "color.action.danger",
+          "color.surface.default",
+          "color.text.default",
+          "color.border.default",
+          "color.focus.ring",
+          "radius.control"
+        ],
+        "a11y": {
+          "role": "button",
+          "keyboard": [
+            "Tab focuses it and shows the same effect as hover",
+            "Enter or Space presses it"
+          ],
+          "requirements": [
+            "The effect is the same for mouse hover and keyboard focus (focus-visible), so keyboard users see it too",
+            "The alternate label and arrow are decoration, hidden from assistive technology; the accessible name is always the main label",
+            "On touch screens there is no hover, so the button stays still",
+            "Stands still for visitors who ask for less motion (prefers-reduced-motion), and inside an rdm-still container",
+            "A disabled or loading button does not animate",
+            "The arrow flips in right-to-left layouts",
+            "Optional: it is a separate component, so projects that do not add it carry none of its code"
+          ],
+          "screenReader": [
+            "Announced exactly as a Button: its label, as a button; the effect adds nothing to what is read"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "A call to action on a landing page that should feel responsive",
+            "A link-like action that leads somewhere, where the arrow adds meaning"
+          ],
+          "avoid_when": [
+            "Dense toolbars or forms, where plain Button is calmer",
+            "Destructive actions, where a changing label could confuse"
+          ],
+          "anti_patterns": [
+            "A hover label that says something different from the main label",
+            "A hover label much longer than the main label: it is clipped to the button's width"
+          ]
+        },
+        "examples": [
+          "basic",
+          "with-hover-label"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {
+            "variant": "Variant",
+            "size": "Size"
+          }
+        }
+      },
+      "install": {
+        "command": "npx rdloom add interactive-hover-button",
+        "dependencies": [],
+        "registryDependencies": [
+          "tokens",
+          "motion-css",
+          "button",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import { InteractiveHoverButton } from \"@rdloom/react\";\n\nexport default function InteractiveHoverButtonBasicExample() {\n  return (\n    <div className=\"flex w-full justify-center\">\n      <InteractiveHoverButton>Get started</InteractiveHoverButton>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "with-hover-label",
+          "code": "import { InteractiveHoverButton } from \"@rdloom/react\";\n\nexport default function InteractiveHoverButtonWithHoverLabelExample() {\n  return (\n    <div className=\"flex w-full flex-wrap items-center justify-center gap-4\">\n      <InteractiveHoverButton hoverLabel=\"Read it\" variant=\"secondary\" size=\"lg\">\n        Read the guide\n      </InteractiveHoverButton>\n      <InteractiveHoverButton hoverLabel=\"Open\" variant=\"ghost\">\n        Open the docs\n      </InteractiveHoverButton>\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "interactive-hover-button/interactive-hover-button.tsx",
+          "content": "\"use client\";\n\nimport { forwardRef } from \"react\";\nimport { Button, type ButtonProps } from \"../button/button\";\nimport { interactiveHoverButtonDefaults, type InteractiveHoverButtonSpecProps } from \"../generated/interactive-hover-button.types\";\nimport { cx } from \"../utils/cx\";\nimport { ArrowRightIcon } from \"../utils/icons\";\n\nexport interface InteractiveHoverButtonProps\n  extends InteractiveHoverButtonSpecProps,\n    Omit<ButtonProps, keyof InteractiveHoverButtonSpecProps> {}\n\n/**\n * A button whose label slides away to an arrow (and an optional second label) on hover and keyboard focus.\n * Builds on Button. The second layer is decoration: the accessible name is always the main label.\n */\nexport const InteractiveHoverButton = forwardRef<HTMLButtonElement, InteractiveHoverButtonProps>(function InteractiveHoverButton(\n  {\n    children,\n    hoverLabel,\n    variant = interactiveHoverButtonDefaults.variant,\n    size = interactiveHoverButtonDefaults.size,\n    className,\n    ...rest\n  },\n  ref,\n) {\n  return (\n    <Button {...rest} ref={ref} variant={variant} size={size} className={cx(\"rdm-ihb relative overflow-hidden\", className)}>\n      <span className=\"rdm-ihb-label\">{children}</span>\n      <span aria-hidden=\"true\" className=\"rdm-ihb-hover\">\n        {hoverLabel}\n        <ArrowRightIcon className=\"size-4 shrink-0 rtl:-scale-x-100\" />\n      </span>\n    </Button>\n  );\n});\n"
+        },
+        {
+          "path": "generated/interactive-hover-button.types.ts",
+          "content": "// Generated by rdloom codegen from specs/interactive-hover-button.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nimport type { ReactNode } from \"react\";\n\nexport const interactiveHoverButtonVariantValues = [\"primary\", \"secondary\", \"ghost\", \"danger\"] as const;\nexport const interactiveHoverButtonSizeValues = [\"sm\", \"md\", \"lg\"] as const;\n\n/** A button whose label slides away to an arrow, or to a second label with an arrow, on hover and keyboard focus. Builds on Button. */\nexport interface InteractiveHoverButtonSpecProps {\n  /**\n   * Button label. This is the accessible name.\n   */\n  children: ReactNode;\n  /**\n   * Optional wording shown on hover and focus, next to the arrow. It is visual only and should say the same thing as the label. Without it only the arrow appears.\n   */\n  hoverLabel?: string;\n  /**\n   * Visual emphasis, as on Button.\n   * @default \"primary\"\n   */\n  variant?: \"primary\" | \"secondary\" | \"ghost\" | \"danger\";\n  /**\n   * Height, padding and font size, as on Button.\n   * @default \"md\"\n   */\n  size?: \"sm\" | \"md\" | \"lg\";\n  /**\n   * Prevents interaction, dims the button and turns the effect off.\n   * @default false\n   */\n  isDisabled?: boolean;\n  /**\n   * Shows a spinner and blocks presses; the pending state is announced.\n   * @default false\n   */\n  isLoading?: boolean;\n  /**\n   * Called when the button is pressed by mouse, touch or keyboard.\n   */\n  onPress?: () => void;\n}\n\nexport const interactiveHoverButtonDefaults = {\n  variant: \"primary\",\n  size: \"md\",\n  isDisabled: false,\n  isLoading: false,\n} as const;\n\nexport const interactiveHoverButtonMeta = {\n  \"name\": \"InteractiveHoverButton\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"button\"\n} as const;\n"
+        }
+      ]
+    },
+    {
       "id": "invite-dialog",
       "spec": {
         "$schema": "./schema/component.schema.json",
@@ -11236,6 +11679,183 @@
         {
           "path": "generated/marker.types.ts",
           "content": "// Generated by rdloom codegen from specs/marker.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nexport const markerVariantValues = [\"date\", \"unread\", \"event\"] as const;\n\n/** A divider that labels a moment inside a conversation or feed: a centered label between two lines. Use date for a new day, unread for where new messages start, and event for something that happened, like someone joining. */\nexport interface MarkerSpecProps {\n  /**\n   * The text, e.g. \"Today\", \"New messages\" or \"Alex joined\".\n   */\n  label: string;\n  /**\n   * date is neutral. unread uses the action colour for the label and lines. event is a smaller, muted note.\n   * @default \"date\"\n   */\n  variant?: \"date\" | \"unread\" | \"event\";\n  /**\n   * A machine readable date for a date marker, e.g. \"2026-10-08\". The label becomes a time element.\n   */\n  dateTime?: string;\n  /**\n   * Turns the label of an unread marker into a button, e.g. to scroll to the first new message.\n   */\n  onJump?: () => void;\n  /**\n   * Accessible name of the jump button when it needs more than the label, e.g. \"Jump to first new message\".\n   */\n  jumpLabel?: string;\n}\n\nexport const markerDefaults = {\n  variant: \"date\",\n} as const;\n\nexport const markerMeta = {\n  \"name\": \"Marker\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"separator\"\n} as const;\n"
+        }
+      ]
+    },
+    {
+      "id": "marquee",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "Marquee",
+        "version": "0.1.0",
+        "category": "motion",
+        "status": "experimental",
+        "description": "An endless scrolling row (or column) of content, such as logos or short quotes. It pauses on hover and focus, and can show a visible Pause button.",
+        "props": {
+          "children": {
+            "type": "node",
+            "description": "The items that scroll.",
+            "required": true
+          },
+          "direction": {
+            "type": "enum",
+            "values": [
+              "horizontal",
+              "vertical"
+            ],
+            "default": "horizontal",
+            "description": "Axis the content scrolls along. A vertical marquee needs a parent or className that gives it a height."
+          },
+          "reverse": {
+            "type": "boolean",
+            "description": "Scrolls the other way.",
+            "default": false
+          },
+          "speed": {
+            "type": "number",
+            "description": "Scroll speed in pixels per second.",
+            "default": 40
+          },
+          "gap": {
+            "type": "string",
+            "description": "Space between items and between repeats, any CSS length.",
+            "default": "1rem"
+          },
+          "pauseOnHover": {
+            "type": "boolean",
+            "description": "Pauses while the pointer is over it or focus is inside it.",
+            "default": true
+          },
+          "showPauseButton": {
+            "type": "boolean",
+            "description": "Shows a visible Pause and Play button, so people can stop the motion (WCAG 2.2.2).",
+            "default": false
+          },
+          "pauseLabel": {
+            "type": "string",
+            "description": "Text of the button while moving.",
+            "default": "Pause"
+          },
+          "playLabel": {
+            "type": "string",
+            "description": "Text of the button while paused.",
+            "default": "Play"
+          },
+          "fade": {
+            "type": "boolean",
+            "description": "Fades the content out at both edges.",
+            "default": true
+          },
+          "isPaused": {
+            "type": "boolean",
+            "description": "Stops the scrolling.",
+            "default": false
+          }
+        },
+        "variants": [
+          "direction",
+          "reverse",
+          "fade",
+          "isPaused",
+          "showPauseButton"
+        ],
+        "states": [
+          "default",
+          "hover",
+          "focus"
+        ],
+        "slots": [
+          "root",
+          "viewport",
+          "track",
+          "item",
+          "button"
+        ],
+        "tokens": [
+          "color.text.default",
+          "color.border.default",
+          "color.surface.default",
+          "radius.control"
+        ],
+        "a11y": {
+          "role": "group",
+          "keyboard": [
+            "Tab: moves to the Pause button and to anything focusable in the items",
+            "Enter or Space: pauses or resumes when the button is focused"
+          ],
+          "requirements": [
+            "Moving content longer than five seconds can be paused: by the Pause button, by hover and focus-within, and by isPaused (WCAG 2.2.2)",
+            "Only the first copy of the items is in the accessibility tree; the repeats are aria-hidden and inert, so nothing is read or focused twice",
+            "The items are real DOM in the server HTML and are readable with no JavaScript",
+            "Visitors who ask for less motion (prefers-reduced-motion), and anything inside rdm-still, get a still row that can be scrolled by hand, with the repeats removed",
+            "In forced-colors (high contrast) mode the edge fade is removed",
+            "Scrolls the right way in right-to-left layouts"
+          ],
+          "screenReader": [
+            "The items are read once, in order, as ordinary content"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "A row of customer logos",
+            "Short, non-essential quotes or tags"
+          ],
+          "avoid_when": [
+            "Content people must read closely or act on, since moving targets are hard to use",
+            "Navigation"
+          ],
+          "anti_patterns": [
+            "Putting essential links in a moving row without a Pause button",
+            "Very fast speeds"
+          ]
+        },
+        "examples": [
+          "basic",
+          "with-pause-button",
+          "vertical"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {
+            "direction": "Direction",
+            "isPaused": "Paused"
+          }
+        }
+      },
+      "install": {
+        "command": "npx rdloom add marquee",
+        "dependencies": [
+          "react-aria-components@^1.21.1"
+        ],
+        "registryDependencies": [
+          "tokens",
+          "motion-css",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import { Marquee } from \"@rdloom/react\";\n\nconst names = [\"Northwind\", \"Harbor Labs\", \"Lumen\", \"Fieldnote\", \"Orchard\", \"Tessera\"];\n\nexport default function MarqueeBasicExample() {\n  return (\n    <div className=\"flex w-full justify-center\">\n      <Marquee className=\"w-full max-w-md\">\n        {names.map((name) => (\n          <span key={name} className=\"rounded-full border border-[var(--rd-color-border-default)] px-4 py-1.5 text-sm\">\n            {name}\n          </span>\n        ))}\n      </Marquee>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "with-pause-button",
+          "code": "import { Marquee } from \"@rdloom/react\";\n\nconst quotes = [\"Setup took ten minutes.\", \"Our forms finally pass audits.\", \"Support answered the same day.\", \"The keyboard flow just works.\"];\n\nexport default function MarqueeWithPauseButtonExample() {\n  return (\n    <div className=\"flex w-full justify-center\">\n      <Marquee showPauseButton reverse speed={30} className=\"w-full max-w-md\">\n        {quotes.map((quote) => (\n          <span key={quote} className=\"whitespace-nowrap rounded-lg bg-[var(--rd-color-surface-subtle)] px-4 py-2 text-sm\">\n            {quote}\n          </span>\n        ))}\n      </Marquee>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "vertical",
+          "code": "import { Marquee } from \"@rdloom/react\";\n\nconst steps = [\"Draft\", \"Review\", \"Approve\", \"Publish\", \"Archive\"];\n\nexport default function MarqueeVerticalExample() {\n  return (\n    <div className=\"flex w-full justify-center\">\n      <Marquee direction=\"vertical\" speed={24} className=\"h-44 w-48\">\n        {steps.map((step) => (\n          <span key={step} className=\"rounded-lg border border-[var(--rd-color-border-default)] px-4 py-2 text-center text-sm\">\n            {step}\n          </span>\n        ))}\n      </Marquee>\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "marquee/marquee.tsx",
+          "content": "\"use client\";\n\nimport { Children, forwardRef, useRef, useState, version, type CSSProperties, type HTMLAttributes } from \"react\";\nimport { Button } from \"react-aria-components\";\nimport { marqueeDefaults, type MarqueeSpecProps } from \"../generated/marquee.types\";\nimport { cx } from \"../utils/cx\";\nimport { useIsomorphicLayoutEffect } from \"../utils/motion\";\n\nexport interface MarqueeProps\n  extends MarqueeSpecProps,\n    Omit<HTMLAttributes<HTMLDivElement>, keyof MarqueeSpecProps | \"className\"> {\n  className?: string;\n}\n\n// React 19 takes inert as a boolean, React 18 only as an attribute string.\nconst inertProps = (Number(version.split(\".\")[0]) >= 19 ? { inert: true } : { inert: \"\" }) as Record<string, unknown>;\n\n/**\n * An endless scrolling row or column. The items are real DOM and the first copy is the only one\n * assistive technology sees: repeats are aria-hidden and inert. It pauses on hover and focus, from\n * isPaused, and from an optional visible Pause button, and it stands still for reduced motion.\n */\nexport const Marquee = forwardRef<HTMLDivElement, MarqueeProps>(function Marquee(\n  {\n    children,\n    direction = marqueeDefaults.direction,\n    reverse = marqueeDefaults.reverse,\n    speed = marqueeDefaults.speed,\n    gap = marqueeDefaults.gap,\n    pauseOnHover = marqueeDefaults.pauseOnHover,\n    showPauseButton = marqueeDefaults.showPauseButton,\n    pauseLabel = marqueeDefaults.pauseLabel,\n    playLabel = marqueeDefaults.playLabel,\n    fade = marqueeDefaults.fade,\n    isPaused = marqueeDefaults.isPaused,\n    className,\n    style,\n    ...rest\n  },\n  ref,\n) {\n  const vertical = direction === \"vertical\";\n  const view = useRef<HTMLDivElement | null>(null);\n  const firstCopy = useRef<HTMLDivElement | null>(null);\n  const [copies, setCopies] = useState(2);\n  const [seconds, setSeconds] = useState<number | undefined>(undefined);\n  const [stopped, setStopped] = useState(false);\n  const paused = isPaused || stopped;\n\n  // Measure one copy: its length sets the speed, and the viewport decides how many copies fill the row.\n  useIsomorphicLayoutEffect(() => {\n    const copy = firstCopy.current;\n    const frame = view.current;\n    if (!copy || !frame || typeof ResizeObserver === \"undefined\") return;\n    const measure = () => {\n      const one = vertical ? copy.offsetHeight : copy.offsetWidth;\n      const room = vertical ? frame.offsetHeight : frame.offsetWidth;\n      if (!one) return;\n      setSeconds(one / Math.max(speed, 1));\n      setCopies(Math.min(12, Math.max(2, Math.ceil(room / one) + 1)));\n    };\n    measure();\n    const watcher = new ResizeObserver(measure);\n    watcher.observe(copy);\n    watcher.observe(frame);\n    return () => watcher.disconnect();\n  }, [vertical, speed, gap, children]);\n\n  const vars = {\n    \"--rdm-g\": gap,\n    \"--rdm-n\": copies,\n    ...(seconds ? { \"--rdm-d\": `${seconds}s` } : {}),\n  } as CSSProperties;\n\n  const items = Children.toArray(children);\n\n  return (\n    <div\n      {...rest}\n      ref={ref}\n      data-rdm-paused={paused || undefined}\n      data-pause-hover={pauseOnHover || undefined}\n      className={cx(\"rdm-marquee flex flex-col gap-2\", className)}\n      style={{ ...style, ...vars }}\n    >\n      <div ref={view} className=\"rdm-marquee-view min-h-0 flex-1\" data-fade={fade ? direction : undefined}>\n        <div className=\"rdm-marquee-track\" data-vertical={vertical || undefined} data-reverse={reverse || undefined}>\n          {Array.from({ length: copies }, (_, i) =>\n            i === 0 ? (\n              <div key={i} ref={firstCopy} className=\"rdm-marquee-copy\" data-vertical={vertical || undefined}>\n                {items}\n              </div>\n            ) : (\n              <div\n                key={i}\n                aria-hidden=\"true\"\n                {...inertProps}\n                className=\"rdm-marquee-copy rdm-marquee-dup\"\n                data-vertical={vertical || undefined}\n              >\n                {items}\n              </div>\n            ),\n          )}\n        </div>\n      </div>\n      {showPauseButton ? (\n        <Button\n          onPress={() => setStopped((s) => !s)}\n          className=\"rdm-marquee-toggle self-center rounded-[var(--rd-radius-control)] border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-default)] px-3 py-1 text-sm text-[var(--rd-color-text-default)] outline-none data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)]\"\n        >\n          {paused ? playLabel : pauseLabel}\n        </Button>\n      ) : null}\n    </div>\n  );\n});\n"
+        },
+        {
+          "path": "generated/marquee.types.ts",
+          "content": "// Generated by rdloom codegen from specs/marquee.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nimport type { ReactNode } from \"react\";\n\nexport const marqueeDirectionValues = [\"horizontal\", \"vertical\"] as const;\n\n/** An endless scrolling row (or column) of content, such as logos or short quotes. It pauses on hover and focus, and can show a visible Pause button. */\nexport interface MarqueeSpecProps {\n  /**\n   * The items that scroll.\n   */\n  children: ReactNode;\n  /**\n   * Axis the content scrolls along. A vertical marquee needs a parent or className that gives it a height.\n   * @default \"horizontal\"\n   */\n  direction?: \"horizontal\" | \"vertical\";\n  /**\n   * Scrolls the other way.\n   * @default false\n   */\n  reverse?: boolean;\n  /**\n   * Scroll speed in pixels per second.\n   * @default 40\n   */\n  speed?: number;\n  /**\n   * Space between items and between repeats, any CSS length.\n   * @default \"1rem\"\n   */\n  gap?: string;\n  /**\n   * Pauses while the pointer is over it or focus is inside it.\n   * @default true\n   */\n  pauseOnHover?: boolean;\n  /**\n   * Shows a visible Pause and Play button, so people can stop the motion (WCAG 2.2.2).\n   * @default false\n   */\n  showPauseButton?: boolean;\n  /**\n   * Text of the button while moving.\n   * @default \"Pause\"\n   */\n  pauseLabel?: string;\n  /**\n   * Text of the button while paused.\n   * @default \"Play\"\n   */\n  playLabel?: string;\n  /**\n   * Fades the content out at both edges.\n   * @default true\n   */\n  fade?: boolean;\n  /**\n   * Stops the scrolling.\n   * @default false\n   */\n  isPaused?: boolean;\n}\n\nexport const marqueeDefaults = {\n  direction: \"horizontal\",\n  reverse: false,\n  speed: 40,\n  gap: \"1rem\",\n  pauseOnHover: true,\n  showPauseButton: false,\n  pauseLabel: \"Pause\",\n  playLabel: \"Play\",\n  fade: true,\n  isPaused: false,\n} as const;\n\nexport const marqueeMeta = {\n  \"name\": \"Marquee\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"group\"\n} as const;\n"
         }
       ]
     },
@@ -12397,6 +13017,141 @@
         {
           "path": "generated/number-field.types.ts",
           "content": "// Generated by rdloom codegen from specs/number-field.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nexport const numberFieldSizeValues = [\"sm\", \"md\", \"lg\"] as const;\n\n/** A text field for numbers, with increment and decrement buttons, keyboard stepping, and locale-aware formatting for decimals, currency, units and percentages. */\nexport interface NumberFieldSpecProps {\n  /**\n   * Visible label, also the accessible name.\n   */\n  label: string;\n  /**\n   * Help text under the field.\n   */\n  description?: string;\n  /**\n   * Shown when the value is invalid. Leave out to use the browser's built-in message.\n   */\n  errorMessage?: string;\n  /**\n   * Controlled value. An empty field has no number.\n   */\n  value?: number;\n  /**\n   * Initial value when uncontrolled.\n   */\n  defaultValue?: number;\n  /**\n   * Called with the number, or with a value that is not a number when the field is emptied (test it with Number.isNaN).\n   */\n  onChange?: (value: number) => void;\n  /**\n   * Smallest allowed value. Typing below it is corrected on blur.\n   */\n  minValue?: number;\n  /**\n   * Largest allowed value.\n   */\n  maxValue?: number;\n  /**\n   * How much the buttons and the arrow keys change the value. Values snap to multiples of the step, counted from minValue (or from 0 when there is none).\n   * @default 1\n   */\n  step?: number;\n  /**\n   * How the number is shown and parsed, e.g. { style: 'currency', currency: 'USD' } or { style: 'percent' }. Follows the user's locale.\n   */\n  formatOptions?: Intl.NumberFormatOptions;\n  /**\n   * Shows the − and + buttons. Arrow keys and the mouse wheel stay available.\n   * @default true\n   */\n  showStepper?: boolean;\n  /**\n   * Field height and text size.\n   * @default \"md\"\n   */\n  size?: \"sm\" | \"md\" | \"lg\";\n  /**\n   * Prevents interaction and dims the field.\n   * @default false\n   */\n  isDisabled?: boolean;\n  /**\n   * Marks the field invalid. Leave it unset to let validation decide.\n   */\n  isInvalid?: boolean;\n  /**\n   * Marks the field required and adds an asterisk.\n   * @default false\n   */\n  isRequired?: boolean;\n}\n\nexport const numberFieldDefaults = {\n  step: 1,\n  showStepper: true,\n  size: \"md\",\n  isDisabled: false,\n  isRequired: false,\n} as const;\n\nexport const numberFieldMeta = {\n  \"name\": \"NumberField\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"spinbutton\"\n} as const;\n"
+        }
+      ]
+    },
+    {
+      "id": "number-ticker",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "NumberTicker",
+        "version": "0.1.0",
+        "category": "motion",
+        "status": "experimental",
+        "description": "A number that counts up (or down) to its value once after it appears. The final number is always the text that is read and that is in the server HTML.",
+        "props": {
+          "value": {
+            "type": "number",
+            "description": "The number to count to.",
+            "required": true
+          },
+          "from": {
+            "type": "number",
+            "description": "The number the count starts from.",
+            "default": 0
+          },
+          "decimals": {
+            "type": "number",
+            "description": "Digits after the decimal point, always shown.",
+            "default": 0
+          },
+          "duration": {
+            "type": "number",
+            "description": "Seconds the count takes.",
+            "default": 1.6
+          },
+          "startWhenInView": {
+            "type": "boolean",
+            "description": "Waits until the number scrolls into view before counting.",
+            "default": false
+          },
+          "locale": {
+            "type": "string",
+            "description": "BCP 47 locale for the digits and separators. Defaults to the locale of the visitor."
+          },
+          "isPaused": {
+            "type": "boolean",
+            "description": "Skips the count and shows the final value.",
+            "default": false
+          }
+        },
+        "variants": [
+          "startWhenInView",
+          "isPaused"
+        ],
+        "states": [
+          "default"
+        ],
+        "slots": [
+          "root"
+        ],
+        "tokens": [
+          "color.text.default"
+        ],
+        "a11y": {
+          "role": "text",
+          "keyboard": [],
+          "requirements": [
+            "The final formatted value is always in the accessible text; the counting digits are hidden from assistive technology so nothing is read number by number",
+            "The server HTML contains the final value, so it is correct with no JavaScript",
+            "The count starts after mount only and runs once, for under two seconds by default",
+            "Visitors who ask for less motion (prefers-reduced-motion), and anything inside rdm-still, see the final value at once",
+            "Digits use tabular figures so the number does not jitter while it counts",
+            "Formats with the locale of the visitor through useDefaultLocale, so server and browser agree on first render"
+          ],
+          "screenReader": [
+            "Read once as the final number, never as a stream of changing values"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "A headline figure on a landing page or dashboard that should feel alive",
+            "A statistic that appears as the section scrolls into view"
+          ],
+          "avoid_when": [
+            "Figures people compare closely or copy, where a static number is calmer",
+            "Values that update often"
+          ],
+          "anti_patterns": [
+            "Counting every number in a table",
+            "Running the count for many seconds"
+          ]
+        },
+        "examples": [
+          "basic",
+          "decimals",
+          "in-view"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {
+            "isPaused": "Paused"
+          }
+        }
+      },
+      "install": {
+        "command": "npx rdloom add number-ticker",
+        "dependencies": [
+          "react-aria-components@^1.21.1"
+        ],
+        "registryDependencies": [
+          "tokens",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import { NumberTicker } from \"@rdloom/react\";\n\nexport default function NumberTickerBasicExample() {\n  return (\n    <div className=\"flex w-full justify-center\">\n      <NumberTicker value={12840} className=\"text-4xl font-semibold\" />\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "decimals",
+          "code": "import { NumberTicker } from \"@rdloom/react\";\n\nexport default function NumberTickerDecimalsExample() {\n  return (\n    <div className=\"flex w-full justify-center\">\n      <NumberTicker value={99.95} from={80} decimals={2} className=\"text-4xl font-semibold\" />\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "in-view",
+          "code": "import { NumberTicker } from \"@rdloom/react\";\n\n// Scroll the box: the count starts when the number comes into view.\nexport default function NumberTickerInViewExample() {\n  return (\n    <div className=\"flex w-full justify-center\">\n      <div className=\"h-40 w-64 overflow-y-auto rounded-lg border border-[var(--rd-color-border-default)] p-3\">\n        <div className=\"flex flex-col items-center gap-3 pt-48 pb-8\">\n          <NumberTicker value={4500} startWhenInView className=\"text-3xl font-semibold\" />\n          <span className=\"text-sm text-[var(--rd-color-text-muted)]\">teams on the plan</span>\n        </div>\n      </div>\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "number-ticker/number-ticker.tsx",
+          "content": "\"use client\";\n\nimport { forwardRef, useEffect, useMemo, useRef, useState, type HTMLAttributes } from \"react\";\nimport { VisuallyHidden } from \"react-aria-components\";\nimport { numberTickerDefaults, type NumberTickerSpecProps } from \"../generated/number-ticker.types\";\nimport { cx } from \"../utils/cx\";\nimport { prefersReducedMotion, useIsomorphicLayoutEffect } from \"../utils/motion\";\nimport { useDefaultLocale } from \"../utils/use-default-locale\";\n\nexport interface NumberTickerProps\n  extends NumberTickerSpecProps,\n    Omit<HTMLAttributes<HTMLSpanElement>, keyof NumberTickerSpecProps | \"className\" | \"children\"> {\n  className?: string;\n}\n\nconst easeOut = (t: number) => 1 - Math.pow(1 - t, 3);\n\n/**\n * A number that counts to its value once after mount. The final number is the text in the server\n * HTML and the only text assistive technology reads; the counting digits are a hidden copy.\n */\nexport const NumberTicker = forwardRef<HTMLSpanElement, NumberTickerProps>(function NumberTicker(\n  {\n    value,\n    from = numberTickerDefaults.from,\n    decimals = numberTickerDefaults.decimals,\n    duration = numberTickerDefaults.duration,\n    startWhenInView = numberTickerDefaults.startWhenInView,\n    locale,\n    isPaused = numberTickerDefaults.isPaused,\n    className,\n    ...rest\n  },\n  forwarded,\n) {\n  const resolved = useDefaultLocale(locale);\n  const format = useMemo(\n    () => new Intl.NumberFormat(resolved, { minimumFractionDigits: decimals, maximumFractionDigits: decimals }),\n    [resolved, decimals],\n  );\n  const inner = useRef<HTMLSpanElement | null>(null);\n  const current = useRef(value);\n  const [shown, setShown] = useState(value);\n  const [armed, setArmed] = useState(false);\n  const first = useRef(true);\n\n  // Before the first paint, step back to the start number so the count never flashes the end first.\n  useIsomorphicLayoutEffect(() => {\n    if (!first.current) return;\n    first.current = false;\n    if (isPaused || prefersReducedMotion() || from === value) return;\n    current.current = from;\n    setShown(from);\n    setArmed(true);\n  }, []);\n\n  useEffect(() => {\n    if (isPaused || prefersReducedMotion()) {\n      current.current = value;\n      setShown(value);\n      return;\n    }\n    if (!armed && current.current === value) return;\n    if (!armed) setArmed(true);\n  }, [value, isPaused, armed]);\n\n  useEffect(() => {\n    if (!armed) return;\n    let frame = 0;\n    let watcher: IntersectionObserver | undefined;\n    const run = () => {\n      const start = current.current;\n      const began = performance.now();\n      const length = Math.max(duration, 0.01) * 1000;\n      const tick = (now: number) => {\n        const t = Math.min((now - began) / length, 1);\n        const next = t >= 1 ? value : start + (value - start) * easeOut(t);\n        current.current = next;\n        setShown(next);\n        if (t < 1) frame = requestAnimationFrame(tick);\n      };\n      frame = requestAnimationFrame(tick);\n    };\n    const el = inner.current;\n    if (startWhenInView && el && typeof IntersectionObserver !== \"undefined\") {\n      watcher = new IntersectionObserver(([entry]) => {\n        if (!entry.isIntersecting) return;\n        watcher?.disconnect();\n        run();\n      });\n      watcher.observe(el);\n    } else {\n      run();\n    }\n    return () => {\n      watcher?.disconnect();\n      cancelAnimationFrame(frame);\n    };\n  }, [armed, value, duration, startWhenInView]);\n\n  return (\n    <span\n      {...rest}\n      ref={(node) => {\n        inner.current = node;\n        if (typeof forwarded === \"function\") forwarded(node);\n        else if (forwarded) forwarded.current = node;\n      }}\n      className={cx(\"tabular-nums\", className)}\n    >\n      <VisuallyHidden>{format.format(value)}</VisuallyHidden>\n      <span aria-hidden=\"true\">{format.format(shown)}</span>\n    </span>\n  );\n});\n"
+        },
+        {
+          "path": "generated/number-ticker.types.ts",
+          "content": "// Generated by rdloom codegen from specs/number-ticker.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\n/** A number that counts up (or down) to its value once after it appears. The final number is always the text that is read and that is in the server HTML. */\nexport interface NumberTickerSpecProps {\n  /**\n   * The number to count to.\n   */\n  value: number;\n  /**\n   * The number the count starts from.\n   * @default 0\n   */\n  from?: number;\n  /**\n   * Digits after the decimal point, always shown.\n   * @default 0\n   */\n  decimals?: number;\n  /**\n   * Seconds the count takes.\n   * @default 1.6\n   */\n  duration?: number;\n  /**\n   * Waits until the number scrolls into view before counting.\n   * @default false\n   */\n  startWhenInView?: boolean;\n  /**\n   * BCP 47 locale for the digits and separators. Defaults to the locale of the visitor.\n   */\n  locale?: string;\n  /**\n   * Skips the count and shows the final value.\n   * @default false\n   */\n  isPaused?: boolean;\n}\n\nexport const numberTickerDefaults = {\n  from: 0,\n  decimals: 0,\n  duration: 1.6,\n  startWhenInView: false,\n  isPaused: false,\n} as const;\n\nexport const numberTickerMeta = {\n  \"name\": \"NumberTicker\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"text\"\n} as const;\n"
         }
       ]
     },
@@ -18788,6 +19543,165 @@
       ]
     },
     {
+      "id": "text-animate",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "TextAnimate",
+        "version": "0.1.0",
+        "category": "motion",
+        "status": "experimental",
+        "description": "Text that animates in by character, word or line using a preset: fade in, blur in, slide up or scale up. The words are real text in the page from the start.",
+        "props": {
+          "children": {
+            "type": "string",
+            "description": "The text. In line mode, each new line (a newline character) is one unit.",
+            "required": true
+          },
+          "by": {
+            "type": "enum",
+            "values": [
+              "character",
+              "word",
+              "line"
+            ],
+            "default": "word",
+            "description": "What is animated one after another."
+          },
+          "animation": {
+            "type": "enum",
+            "values": [
+              "fadeIn",
+              "blurIn",
+              "slideUp",
+              "scaleUp"
+            ],
+            "default": "fadeIn",
+            "description": "The preset each unit plays."
+          },
+          "delay": {
+            "type": "number",
+            "default": 0,
+            "description": "Seconds before the first unit starts."
+          },
+          "duration": {
+            "type": "number",
+            "default": 0.5,
+            "description": "Seconds each unit takes."
+          },
+          "stagger": {
+            "type": "number",
+            "default": 0.05,
+            "description": "Seconds between one unit starting and the next."
+          },
+          "whenInView": {
+            "type": "boolean",
+            "default": false,
+            "description": "Waits until the text scrolls into view before playing."
+          },
+          "isPaused": {
+            "type": "boolean",
+            "default": false,
+            "description": "Stops the animation and shows the finished text. Moving content that lasts more than five seconds should be stoppable."
+          }
+        },
+        "variants": [
+          "by",
+          "animation",
+          "whenInView",
+          "isPaused"
+        ],
+        "states": [
+          "default"
+        ],
+        "slots": [
+          "root"
+        ],
+        "tokens": [
+          "color.text.default",
+          "color.text.muted"
+        ],
+        "a11y": {
+          "role": "text",
+          "keyboard": [],
+          "requirements": [
+            "The full text is present as visually hidden text, so assistive technology reads it once and never character by character",
+            "The animated copy is hidden from assistive technology",
+            "With no JavaScript, or with reduced motion, the text is shown at once",
+            "Decoration only: the animated layers are hidden from assistive technology and never take focus",
+            "Stands still for visitors who ask for less motion (prefers-reduced-motion), and can also be shown still with the rdm-still class or isPaused",
+            "In forced-colors (high contrast) mode the text is drawn in the system colours",
+            "Does not flash: nothing changes more than three times in a second (WCAG 2.3.1)",
+            "Optional: it is a separate component, so projects that do not add it carry none of its code"
+          ],
+          "screenReader": [
+            "The full text is read once; the animation is not announced"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "A heading or short intro that should arrive with some life",
+            "Staggering a short list of words"
+          ],
+          "avoid_when": [
+            "Long passages, especially by character",
+            "Text that changes often"
+          ],
+          "anti_patterns": [
+            "Animating by character on text that will be read aloud",
+            "A very long total time: delay plus stagger times the number of units should stay short"
+          ]
+        },
+        "examples": [
+          "basic",
+          "presets",
+          "by-character"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {
+            "by": "By",
+            "animation": "Animation",
+            "whenInView": "When in view",
+            "isPaused": "Paused"
+          }
+        }
+      },
+      "install": {
+        "command": "npx rdloom add text-animate",
+        "dependencies": [],
+        "registryDependencies": [
+          "tokens",
+          "motion-css",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import { TextAnimate } from \"@rdloom/react\";\n\nexport default function TextAnimateBasicExample() {\n  return (\n    <div className=\"flex w-full justify-center\">\n      <TextAnimate className=\"text-2xl font-semibold\">Words that arrive one at a time</TextAnimate>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "presets",
+          "code": "import { TextAnimate } from \"@rdloom/react\";\n\nexport default function TextAnimatePresetsExample() {\n  return (\n    <div className=\"flex w-full flex-col items-center gap-3 text-lg font-medium\">\n      <TextAnimate animation=\"fadeIn\">Fade in</TextAnimate>\n      <TextAnimate animation=\"blurIn\" delay={0.2}>\n        Blur in\n      </TextAnimate>\n      <TextAnimate animation=\"slideUp\" delay={0.4}>\n        Slide up\n      </TextAnimate>\n      <TextAnimate animation=\"scaleUp\" delay={0.6}>\n        Scale up\n      </TextAnimate>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "by-character",
+          "code": "import { TextAnimate } from \"@rdloom/react\";\n\n// Keep character animation to a few words: the total time grows with every letter.\nexport default function TextAnimateByCharacterExample() {\n  return (\n    <div className=\"flex w-full justify-center\">\n      <TextAnimate by=\"character\" animation=\"slideUp\" stagger={0.04} className=\"text-3xl font-bold\">\n        Hello there\n      </TextAnimate>\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "text-animate/text-animate.tsx",
+          "content": "\"use client\";\n\nimport { forwardRef, useEffect, useRef, useState, type CSSProperties, type HTMLAttributes, type ReactNode } from \"react\";\nimport { textAnimateDefaults, type TextAnimateSpecProps } from \"../generated/text-animate.types\";\nimport { cx } from \"../utils/cx\";\nimport { motionVars, prefersReducedMotion, useIsomorphicLayoutEffect, useReducedMotion } from \"../utils/motion\";\nimport { splitLines, splitWords } from \"../utils/split-text\";\n\nexport interface TextAnimateProps\n  extends TextAnimateSpecProps,\n    Omit<HTMLAttributes<HTMLSpanElement>, keyof TextAnimateSpecProps | \"className\" | \"children\"> {\n  className?: string;\n}\n\ntype Phase = \"idle\" | \"wait\" | \"run\";\n\n/**\n * Text that animates in by character, word or line with a preset. The full text is in the server HTML\n * and is also given to screen readers as visually hidden text; the animated copy is hidden from them.\n * Animation starts after mount; reduced motion and isPaused show the text as it is.\n */\nexport const TextAnimate = forwardRef<HTMLSpanElement, TextAnimateProps>(function TextAnimate(\n  {\n    children,\n    by = textAnimateDefaults.by,\n    animation = textAnimateDefaults.animation,\n    delay = textAnimateDefaults.delay,\n    duration = textAnimateDefaults.duration,\n    stagger = textAnimateDefaults.stagger,\n    whenInView = textAnimateDefaults.whenInView,\n    isPaused = textAnimateDefaults.isPaused,\n    className,\n    style,\n    ...rest\n  },\n  forwarded,\n) {\n  const node = useRef<HTMLSpanElement | null>(null);\n  const reduced = useReducedMotion();\n  const still = isPaused || reduced;\n  const [phase, setPhase] = useState<Phase>(\"idle\");\n\n  useIsomorphicLayoutEffect(() => {\n    setPhase(still || prefersReducedMotion() ? \"idle\" : \"wait\");\n  }, [still, children, by, animation]);\n\n  useEffect(() => {\n    if (phase !== \"wait\") return;\n    const el = node.current;\n    if (!whenInView || !el || typeof IntersectionObserver === \"undefined\") {\n      setPhase(\"run\");\n      return;\n    }\n    const watcher = new IntersectionObserver(\n      ([entry]) => {\n        if (!entry.isIntersecting) return;\n        watcher.disconnect();\n        setPhase(\"run\");\n      },\n      { rootMargin: \"0px 0px -8% 0px\" },\n    );\n    watcher.observe(el);\n    return () => watcher.disconnect();\n  }, [phase, whenInView]);\n\n  let n = 0;\n  const unit = (content: string) => {\n    const i = n++;\n    return (\n      <span key={i} className=\"rdm-unit\" style={{ \"--rdm-i\": i } as CSSProperties}>\n        {content}\n      </span>\n    );\n  };\n\n  let visual: ReactNode;\n  if (by === \"line\") {\n    visual = splitLines(children).map((line, i, all) => (\n      <span key={i}>\n        {unit(line)}\n        {i < all.length - 1 ? <br /> : null}\n      </span>\n    ));\n  } else if (by === \"word\") {\n    visual = splitWords(children).map((word, i, all) => (\n      <span key={i}>\n        {unit(word)}\n        {i < all.length - 1 ? \" \" : null}\n      </span>\n    ));\n  } else {\n    visual = splitWords(children).map((word, i, all) => (\n      <span key={i}>\n        <span className=\"rdm-word-nowrap\">{Array.from(word).map((ch) => unit(ch))}</span>\n        {i < all.length - 1 ? \" \" : null}\n      </span>\n    ));\n  }\n\n  return (\n    <span\n      {...rest}\n      ref={(el) => {\n        node.current = el;\n        if (typeof forwarded === \"function\") forwarded(el);\n        else if (forwarded) forwarded.current = el;\n      }}\n      data-rdm-paused={isPaused || undefined}\n      data-rdm-anim={phase}\n      className={cx(\"rdm-text-animate\", `rdm-ta-${animation}`, className)}\n      style={{ ...motionVars({ \"--rdm-d\": `${duration}s`, \"--rdm-s\": `${stagger}s`, \"--rdm-delay\": `${delay}s` }), ...style }}\n    >\n      <span className=\"sr-only\">{children}</span>\n      <span aria-hidden=\"true\">{visual}</span>\n    </span>\n  );\n});\n"
+        },
+        {
+          "path": "generated/text-animate.types.ts",
+          "content": "// Generated by rdloom codegen from specs/text-animate.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nexport const textAnimateByValues = [\"character\", \"word\", \"line\"] as const;\nexport const textAnimateAnimationValues = [\"fadeIn\", \"blurIn\", \"slideUp\", \"scaleUp\"] as const;\n\n/** Text that animates in by character, word or line using a preset: fade in, blur in, slide up or scale up. The words are real text in the page from the start. */\nexport interface TextAnimateSpecProps {\n  /**\n   * The text. In line mode, each new line (a newline character) is one unit.\n   */\n  children: string;\n  /**\n   * What is animated one after another.\n   * @default \"word\"\n   */\n  by?: \"character\" | \"word\" | \"line\";\n  /**\n   * The preset each unit plays.\n   * @default \"fadeIn\"\n   */\n  animation?: \"fadeIn\" | \"blurIn\" | \"slideUp\" | \"scaleUp\";\n  /**\n   * Seconds before the first unit starts.\n   * @default 0\n   */\n  delay?: number;\n  /**\n   * Seconds each unit takes.\n   * @default 0.5\n   */\n  duration?: number;\n  /**\n   * Seconds between one unit starting and the next.\n   * @default 0.05\n   */\n  stagger?: number;\n  /**\n   * Waits until the text scrolls into view before playing.\n   * @default false\n   */\n  whenInView?: boolean;\n  /**\n   * Stops the animation and shows the finished text. Moving content that lasts more than five seconds should be stoppable.\n   * @default false\n   */\n  isPaused?: boolean;\n}\n\nexport const textAnimateDefaults = {\n  by: \"word\",\n  animation: \"fadeIn\",\n  delay: 0,\n  duration: 0.5,\n  stagger: 0.05,\n  whenInView: false,\n  isPaused: false,\n} as const;\n\nexport const textAnimateMeta = {\n  \"name\": \"TextAnimate\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"text\"\n} as const;\n"
+        }
+      ]
+    },
+    {
       "id": "text-field",
       "spec": {
         "$schema": "./schema/component.schema.json",
@@ -18977,6 +19891,139 @@
         {
           "path": "generated/text-field.types.ts",
           "content": "// Generated by rdloom codegen from specs/text-field.spec.json (v0.1.1).\n// Do not edit. Change the spec and run `npm run gen`.\n\nexport const textFieldSizeValues = [\"sm\", \"md\", \"lg\"] as const;\n\n/** Single-line or multi-line text input with a label, help text and error message. */\nexport interface TextFieldSpecProps {\n  /**\n   * Visible label. Required so the field is always named.\n   */\n  label: string;\n  /**\n   * Help text shown under the input.\n   */\n  description?: string;\n  /**\n   * Shown when the field is invalid.\n   */\n  errorMessage?: string;\n  /**\n   * Example value. Never a replacement for the label.\n   */\n  placeholder?: string;\n  /**\n   * Height and font size.\n   * @default \"md\"\n   */\n  size?: \"sm\" | \"md\" | \"lg\";\n  /**\n   * Renders a textarea instead of an input.\n   * @default false\n   */\n  multiline?: boolean;\n  /**\n   * Prevents editing and dims the field.\n   * @default false\n   */\n  isDisabled?: boolean;\n  /**\n   * Marks the value as invalid and shows errorMessage.\n   * @default false\n   */\n  isInvalid?: boolean;\n  /**\n   * Marks the field as required for form submission.\n   * @default false\n   */\n  isRequired?: boolean;\n  /**\n   * Controlled value.\n   */\n  value?: string;\n  /**\n   * Initial value when uncontrolled.\n   */\n  defaultValue?: string;\n  /**\n   * Called with the new value on every edit.\n   */\n  onChange?: (value: string) => void;\n}\n\nexport const textFieldDefaults = {\n  size: \"md\",\n  multiline: false,\n  isDisabled: false,\n  isInvalid: false,\n  isRequired: false,\n} as const;\n\nexport const textFieldMeta = {\n  \"name\": \"TextField\",\n  \"version\": \"0.1.1\",\n  \"status\": \"experimental\",\n  \"role\": \"textbox\"\n} as const;\n"
+        }
+      ]
+    },
+    {
+      "id": "text-reveal",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "TextReveal",
+        "version": "0.1.0",
+        "category": "motion",
+        "status": "experimental",
+        "description": "A passage whose words come into full strength as you scroll it into view, or all together when it appears. The real text is always in the page.",
+        "props": {
+          "children": {
+            "type": "string",
+            "description": "The text. In line mode, each new line (a newline character) is one unit.",
+            "required": true
+          },
+          "by": {
+            "type": "enum",
+            "values": [
+              "word",
+              "line"
+            ],
+            "default": "word",
+            "description": "What is revealed one after another."
+          },
+          "mode": {
+            "type": "enum",
+            "values": [
+              "scroll",
+              "view"
+            ],
+            "default": "scroll",
+            "description": "scroll follows the scroll position; view plays once when the text comes into view."
+          },
+          "minOpacity": {
+            "type": "number",
+            "default": 0.2,
+            "description": "How faint a unit is before it is revealed, from 0 to 1."
+          },
+          "isPaused": {
+            "type": "boolean",
+            "default": false,
+            "description": "Stops the animation and shows the finished text. Moving content that lasts more than five seconds should be stoppable."
+          }
+        },
+        "variants": [
+          "by",
+          "mode",
+          "isPaused"
+        ],
+        "states": [
+          "default"
+        ],
+        "slots": [
+          "root"
+        ],
+        "tokens": [
+          "color.text.default",
+          "color.text.muted"
+        ],
+        "a11y": {
+          "role": "text",
+          "keyboard": [],
+          "requirements": [
+            "The text is ordinary text in the page from the server render, readable with no JavaScript and read once by screen readers",
+            "Unrevealed text is faint but present; choose a minOpacity that keeps it legible if people may read ahead",
+            "Decoration only: the animated layers are hidden from assistive technology and never take focus",
+            "Stands still for visitors who ask for less motion (prefers-reduced-motion), and can also be shown still with the rdm-still class or isPaused",
+            "In forced-colors (high contrast) mode the text is drawn in the system colours",
+            "Does not flash: nothing changes more than three times in a second (WCAG 2.3.1)",
+            "Optional: it is a separate component, so projects that do not add it carry none of its code"
+          ],
+          "screenReader": [
+            "Read as ordinary text: the reveal is purely visual"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "A short statement or mission passage that builds as the page is scrolled",
+            "A quote that appears when it comes into view"
+          ],
+          "avoid_when": [
+            "Body text people must scan quickly",
+            "Content inside a region that never scrolls, with mode scroll"
+          ],
+          "anti_patterns": [
+            "A minOpacity of 0 for text people may need before it is revealed",
+            "Long articles"
+          ]
+        },
+        "examples": [
+          "on-scroll",
+          "on-view"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {
+            "by": "By",
+            "mode": "Mode",
+            "isPaused": "Paused"
+          }
+        }
+      },
+      "install": {
+        "command": "npx rdloom add text-reveal",
+        "dependencies": [],
+        "registryDependencies": [
+          "tokens",
+          "motion-css",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "on-scroll",
+          "code": "import { TextReveal } from \"@rdloom/react\";\n\n// Scroll the box: each word comes to full strength as the passage moves up.\nexport default function TextRevealOnScrollExample() {\n  return (\n    <div className=\"flex w-full justify-center\">\n      <div className=\"h-56 w-80 overflow-y-auto rounded-lg border border-[var(--rd-color-border-default)] p-4\">\n        <div className=\"h-40\" aria-hidden=\"true\" />\n        <TextReveal className=\"text-xl font-medium leading-snug\">\n          Good software feels like it was made for you. Every word here arrives as you scroll to it.\n        </TextReveal>\n        <div className=\"h-48\" aria-hidden=\"true\" />\n      </div>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "on-view",
+          "code": "import { TextReveal } from \"@rdloom/react\";\n\nexport default function TextRevealOnViewExample() {\n  return (\n    <div className=\"flex w-full justify-center\">\n      <TextReveal mode=\"view\" by=\"line\" className=\"text-center text-lg font-medium\">\n        {\"Simple to start.\\nEasy to keep.\\nHard to outgrow.\"}\n      </TextReveal>\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "text-reveal/text-reveal.tsx",
+          "content": "\"use client\";\n\nimport { forwardRef, useCallback, useEffect, useRef, useState, type CSSProperties, type HTMLAttributes } from \"react\";\nimport { textRevealDefaults, type TextRevealSpecProps } from \"../generated/text-reveal.types\";\nimport { cx } from \"../utils/cx\";\nimport { prefersReducedMotion, useIsomorphicLayoutEffect, useReducedMotion } from \"../utils/motion\";\nimport { splitLines, splitWords } from \"../utils/split-text\";\n\nexport interface TextRevealProps\n  extends TextRevealSpecProps,\n    Omit<HTMLAttributes<HTMLParagraphElement>, keyof TextRevealSpecProps | \"className\" | \"children\"> {\n  className?: string;\n}\n\nconst clamp = (n: number) => Math.min(1, Math.max(0, n));\n\n/**\n * A passage whose words come to full strength by scroll position (mode \"scroll\") or together when it\n * comes into view (mode \"view\"). The words are ordinary text in the DOM and in the server HTML; only\n * their opacity changes, after mount. Reduced motion and isPaused show everything at full strength.\n */\nexport const TextReveal = forwardRef<HTMLParagraphElement, TextRevealProps>(function TextReveal(\n  {\n    children,\n    by = textRevealDefaults.by,\n    mode = textRevealDefaults.mode,\n    minOpacity = textRevealDefaults.minOpacity,\n    isPaused = textRevealDefaults.isPaused,\n    className,\n    style,\n    ...rest\n  },\n  forwarded,\n) {\n  const node = useRef<HTMLParagraphElement | null>(null);\n  const units = by === \"line\" ? splitLines(children) : splitWords(children);\n  const reduced = useReducedMotion();\n  const still = isPaused || reduced;\n  // null: show everything (server render, no JavaScript, still). Otherwise 0..1 progress.\n  const [progress, setProgress] = useState<number | null>(null);\n\n  useIsomorphicLayoutEffect(() => {\n    setProgress(still || prefersReducedMotion() ? null : 0);\n  }, [still, mode]);\n\n  const measure = useCallback(() => {\n    const el = node.current;\n    if (!el) return;\n    const rect = el.getBoundingClientRect();\n    const vh = window.innerHeight || 1;\n    const next = clamp((vh * 0.9 - rect.top) / (rect.height + vh * 0.4));\n    setProgress(Math.round(next * 100) / 100);\n  }, []);\n\n  const active = progress !== null;\n  useEffect(() => {\n    if (!active) return;\n    if (mode === \"scroll\") {\n      measure();\n      let frame = 0;\n      const onScroll = () => {\n        cancelAnimationFrame(frame);\n        frame = requestAnimationFrame(measure);\n      };\n      // Capture, so scrolling inside a nested container counts too.\n      document.addEventListener(\"scroll\", onScroll, true);\n      window.addEventListener(\"resize\", onScroll);\n      return () => {\n        cancelAnimationFrame(frame);\n        document.removeEventListener(\"scroll\", onScroll, true);\n        window.removeEventListener(\"resize\", onScroll);\n      };\n    }\n    const el = node.current;\n    if (!el || typeof IntersectionObserver === \"undefined\") {\n      setProgress(1);\n      return;\n    }\n    const watcher = new IntersectionObserver(\n      ([entry]) => {\n        if (!entry.isIntersecting) return;\n        watcher.disconnect();\n        setProgress(1);\n      },\n      { rootMargin: \"0px 0px -10% 0px\" },\n    );\n    watcher.observe(el);\n    return () => watcher.disconnect();\n    // eslint-disable-next-line react-hooks/exhaustive-deps\n  }, [active, mode, measure]);\n\n  const opacityOf = (i: number): CSSProperties => {\n    if (progress === null) return {};\n    if (mode === \"view\") {\n      return { opacity: progress >= 1 ? 1 : minOpacity, transition: `opacity 0.5s ease-out ${i * 0.06}s` };\n    }\n    const local = clamp(progress * units.length - i);\n    return { opacity: minOpacity + (1 - minOpacity) * local };\n  };\n\n  return (\n    <p\n      {...rest}\n      ref={(el) => {\n        node.current = el;\n        if (typeof forwarded === \"function\") forwarded(el);\n        else if (forwarded) forwarded.current = el;\n      }}\n      data-rdm-paused={isPaused || undefined}\n      className={cx(\"rdm-text-reveal\", className)}\n      style={style}\n    >\n      {units.map((unit, i) => (\n        <span key={i} className=\"rdm-reveal-unit\" style={opacityOf(i)}>\n          {unit}\n          {i < units.length - 1 ? (by === \"line\" ? <br /> : \" \") : null}\n        </span>\n      ))}\n    </p>\n  );\n});\n"
+        },
+        {
+          "path": "generated/text-reveal.types.ts",
+          "content": "// Generated by rdloom codegen from specs/text-reveal.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nexport const textRevealByValues = [\"word\", \"line\"] as const;\nexport const textRevealModeValues = [\"scroll\", \"view\"] as const;\n\n/** A passage whose words come into full strength as you scroll it into view, or all together when it appears. The real text is always in the page. */\nexport interface TextRevealSpecProps {\n  /**\n   * The text. In line mode, each new line (a newline character) is one unit.\n   */\n  children: string;\n  /**\n   * What is revealed one after another.\n   * @default \"word\"\n   */\n  by?: \"word\" | \"line\";\n  /**\n   * scroll follows the scroll position; view plays once when the text comes into view.\n   * @default \"scroll\"\n   */\n  mode?: \"scroll\" | \"view\";\n  /**\n   * How faint a unit is before it is revealed, from 0 to 1.\n   * @default 0.2\n   */\n  minOpacity?: number;\n  /**\n   * Stops the animation and shows the finished text. Moving content that lasts more than five seconds should be stoppable.\n   * @default false\n   */\n  isPaused?: boolean;\n}\n\nexport const textRevealDefaults = {\n  by: \"word\",\n  mode: \"scroll\",\n  minOpacity: 0.2,\n  isPaused: false,\n} as const;\n\nexport const textRevealMeta = {\n  \"name\": \"TextReveal\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"text\"\n} as const;\n"
         }
       ]
     },
@@ -19543,6 +20590,11 @@
             "type": "number",
             "default": 10000,
             "description": "Auto-dismiss after this many ms (10 seconds by default). 0 keeps it open until the person closes it. Timers pause while the pointer is over the toast or it has keyboard focus, so nobody loses a message they are reading."
+          },
+          "animated": {
+            "type": "boolean",
+            "default": false,
+            "description": "Opt in to a fuller slide: the toast glides in from the edge and slides back out when dismissed. Off by default, which keeps the existing small rise and fade. Visitors who ask for less motion get no movement either way."
           }
         },
         "variants": [
@@ -19579,7 +20631,8 @@
           "requirements": [
             "New toasts are announced by screen readers",
             "Auto-dismiss pauses on hover and focus",
-            "Messages with actions should not auto-dismiss"
+            "Messages with actions should not auto-dismiss",
+            "The optional animated slide is skipped for visitors who prefer reduced motion, and never delays the message"
           ],
           "screenReader": [
             "A new toast is announced without moving focus",
@@ -19606,7 +20659,8 @@
         "examples": [
           "success",
           "danger",
-          "persistent"
+          "persistent",
+          "animated"
         ],
         "figma": {
           "componentKey": null,
@@ -19637,16 +20691,20 @@
         {
           "name": "persistent",
           "code": "import { Button, toast } from \"@rdloom/react\";\n\nexport default function ToastPersistentExample() {\n  return (\n    <Button\n      variant=\"secondary\"\n      // timeout 0 keeps it until the user closes it.\n      onPress={() => toast({ title: \"New version available\", description: \"Reload to update.\", timeout: 0 })}\n    >\n      Check for updates\n    </Button>\n  );\n}\n"
+        },
+        {
+          "name": "animated",
+          "code": "import { Button, toast } from \"@rdloom/react\";\n\nexport default function ToastAnimatedExample() {\n  return (\n    <div className=\"flex w-full justify-center\">\n      <Button onPress={() => toast({ title: \"Report exported\", description: \"It slides in from the edge.\", variant: \"success\", animated: true })}>\n        Export report\n      </Button>\n    </div>\n  );\n}\n"
         }
       ],
       "files": [
         {
           "path": "toast/toast.tsx",
-          "content": "\"use client\";\n\nimport {\n  Button,\n  Text,\n  UNSTABLE_Toast as AriaToast,\n  UNSTABLE_ToastContent as AriaToastContent,\n  UNSTABLE_ToastQueue as AriaToastQueue,\n  UNSTABLE_ToastRegion as AriaToastRegion,\n} from \"react-aria-components\";\nimport { toastDefaults, type ToastSpecProps } from \"../generated/toast.types\";\nimport { cx } from \"../utils/cx\";\nimport { CloseIcon, ErrorIcon, InfoIcon, SuccessIcon } from \"../utils/icons\";\n\n// React Aria's toast API is still marked UNSTABLE_. Everything that touches\n// it lives in this file, so an upstream rename is a one-file fix.\n\ntype ToastContent = Pick<ToastSpecProps, \"title\" | \"description\" | \"variant\">;\n\n/** One queue per app. Render <ToastRegion /> once, near the root. */\nexport const toastQueue = new AriaToastQueue<ToastContent>({ maxVisibleToasts: 5 });\n\n/** Shows a toast. Returns its key, which can be passed to toastQueue.close(). */\nexport function toast({ timeout = toastDefaults.timeout, ...content }: ToastSpecProps): string {\n  return toastQueue.add(\n    { variant: toastDefaults.variant, ...content },\n    { timeout: timeout > 0 ? timeout : undefined },\n  );\n}\n\n// Each tone has its own icon shape and tinted badge, so it never depends on color alone.\nconst tones: Record<NonNullable<ToastSpecProps[\"variant\"]>, { badge: string; Icon: typeof InfoIcon }> = {\n  neutral: { badge: \"bg-[var(--rd-color-feedback-info-subtle)] text-[var(--rd-color-feedback-info)]\", Icon: InfoIcon },\n  success: { badge: \"bg-[var(--rd-color-feedback-success-subtle)] text-[var(--rd-color-feedback-success)]\", Icon: SuccessIcon },\n  danger: { badge: \"bg-[var(--rd-color-feedback-danger-subtle)] text-[var(--rd-color-feedback-danger)]\", Icon: ErrorIcon },\n};\n\nexport function ToastRegion({ className }: { className?: string }) {\n  return (\n    <AriaToastRegion\n      queue={toastQueue}\n      className={cx(\"fixed right-4 bottom-4 z-50 flex w-[min(24rem,calc(100vw-2rem))] flex-col-reverse gap-3 outline-none\", className)}\n    >\n      {({ toast: item }) => {\n        const { badge, Icon } = tones[item.content.variant ?? toastDefaults.variant];\n        return (\n          <AriaToast\n            toast={item}\n            className={cx(\n              \"flex items-start gap-3 p-4 outline-none [box-shadow:var(--rd-elevation-floating)] \" +\n                \"bg-[var(--rd-color-surface-raised)] text-[var(--rd-color-text-default)] \" +\n                \"border border-[var(--rd-color-border-default)] rounded-2xl \" +\n                // Slide up and fade in; slide out and fade on dismiss. A reduced-motion visitor gets no movement.\n                \"transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-none \" +\n                \"data-[animation=queued]:translate-y-3 data-[animation=queued]:opacity-0 \" +\n                \"data-[animation=exiting]:translate-x-6 data-[animation=exiting]:opacity-0 \" +\n                \"data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)]\",\n            )}\n          >\n            <span aria-hidden=\"true\" className={cx(\"flex size-8 shrink-0 items-center justify-center rounded-full\", badge)}>\n              <Icon className=\"size-4\" />\n            </span>\n            <AriaToastContent className=\"flex min-w-0 flex-1 flex-col gap-0.5 pt-0.5\">\n              <Text slot=\"title\" className=\"text-sm leading-5 font-semibold\">\n                {item.content.title}\n              </Text>\n              {item.content.description && (\n                <Text slot=\"description\" className=\"text-[13px] leading-5 text-[var(--rd-color-text-muted)]\">\n                  {item.content.description}\n                </Text>\n              )}\n            </AriaToastContent>\n            <Button\n              slot=\"close\"\n              aria-label=\"Dismiss\"\n              className={\n                \"-me-1 -mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-[var(--rd-radius-control)] text-[var(--rd-color-text-muted)] outline-none data-[hovered]:bg-[var(--rd-color-surface-subtle)] data-[hovered]:text-[var(--rd-color-text-default)] \" +\n                \"data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)]\"\n              }\n            >\n              <CloseIcon className=\"size-4\" />\n            </Button>\n          </AriaToast>\n        );\n      }}\n    </AriaToastRegion>\n  );\n}\n"
+          "content": "\"use client\";\n\nimport {\n  Button,\n  Text,\n  UNSTABLE_Toast as AriaToast,\n  UNSTABLE_ToastContent as AriaToastContent,\n  UNSTABLE_ToastQueue as AriaToastQueue,\n  UNSTABLE_ToastRegion as AriaToastRegion,\n} from \"react-aria-components\";\nimport { toastDefaults, type ToastSpecProps } from \"../generated/toast.types\";\nimport { cx } from \"../utils/cx\";\nimport { CloseIcon, ErrorIcon, InfoIcon, SuccessIcon } from \"../utils/icons\";\n\n// React Aria's toast API is still marked UNSTABLE_. Everything that touches\n// it lives in this file, so an upstream rename is a one-file fix.\n\ntype ToastContent = Pick<ToastSpecProps, \"title\" | \"description\" | \"variant\" | \"animated\">;\n\n/** One queue per app. Render <ToastRegion /> once, near the root. */\nexport const toastQueue = new AriaToastQueue<ToastContent>({ maxVisibleToasts: 5 });\n\n/** Shows a toast. Returns its key, which can be passed to toastQueue.close(). */\nexport function toast({ timeout = toastDefaults.timeout, animated = toastDefaults.animated, ...content }: ToastSpecProps): string {\n  return toastQueue.add(\n    { variant: toastDefaults.variant, animated, ...content },\n    { timeout: timeout > 0 ? timeout : undefined },\n  );\n}\n\n// Each tone has its own icon shape and tinted badge, so it never depends on color alone.\nconst tones: Record<NonNullable<ToastSpecProps[\"variant\"]>, { badge: string; Icon: typeof InfoIcon }> = {\n  neutral: { badge: \"bg-[var(--rd-color-feedback-info-subtle)] text-[var(--rd-color-feedback-info)]\", Icon: InfoIcon },\n  success: { badge: \"bg-[var(--rd-color-feedback-success-subtle)] text-[var(--rd-color-feedback-success)]\", Icon: SuccessIcon },\n  danger: { badge: \"bg-[var(--rd-color-feedback-danger-subtle)] text-[var(--rd-color-feedback-danger)]\", Icon: ErrorIcon },\n};\n\nexport function ToastRegion({ className }: { className?: string }) {\n  return (\n    <AriaToastRegion\n      queue={toastQueue}\n      className={cx(\"fixed right-4 bottom-4 z-50 flex w-[min(24rem,calc(100vw-2rem))] flex-col-reverse gap-3 outline-none\", className)}\n    >\n      {({ toast: item }) => {\n        const { badge, Icon } = tones[item.content.variant ?? toastDefaults.variant];\n        return (\n          <AriaToast\n            toast={item}\n            className={cx(\n              \"flex items-start gap-3 p-4 outline-none [box-shadow:var(--rd-elevation-floating)] \" +\n                \"bg-[var(--rd-color-surface-raised)] text-[var(--rd-color-text-default)] \" +\n                \"border border-[var(--rd-color-border-default)] rounded-2xl \" +\n                // Slide up and fade in; slide out and fade on dismiss. A reduced-motion visitor gets no movement.\n                // animated: opt-in fuller slide from the inline-end edge (mirrored in right-to-left), none when reduced.\n                (item.content.animated\n                  ? \"transition-[opacity,transform] duration-300 ease-out motion-reduce:transition-none motion-reduce:data-[animation=queued]:translate-x-0 motion-reduce:data-[animation=exiting]:translate-x-0 \" +\n                    \"data-[animation=queued]:translate-x-[calc(100%+1rem)] data-[animation=queued]:opacity-0 rtl:data-[animation=queued]:-translate-x-[calc(100%+1rem)] \" +\n                    \"data-[animation=exiting]:translate-x-[calc(100%+1rem)] data-[animation=exiting]:opacity-0 rtl:data-[animation=exiting]:-translate-x-[calc(100%+1rem)] \"\n                  : \"transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-none \" +\n                    \"data-[animation=queued]:translate-y-3 data-[animation=queued]:opacity-0 \" +\n                    \"data-[animation=exiting]:translate-x-6 data-[animation=exiting]:opacity-0 \") +\n                \"data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)]\",\n            )}\n          >\n            <span aria-hidden=\"true\" className={cx(\"flex size-8 shrink-0 items-center justify-center rounded-full\", badge)}>\n              <Icon className=\"size-4\" />\n            </span>\n            <AriaToastContent className=\"flex min-w-0 flex-1 flex-col gap-0.5 pt-0.5\">\n              <Text slot=\"title\" className=\"text-sm leading-5 font-semibold\">\n                {item.content.title}\n              </Text>\n              {item.content.description && (\n                <Text slot=\"description\" className=\"text-[13px] leading-5 text-[var(--rd-color-text-muted)]\">\n                  {item.content.description}\n                </Text>\n              )}\n            </AriaToastContent>\n            <Button\n              slot=\"close\"\n              aria-label=\"Dismiss\"\n              className={\n                \"-me-1 -mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-[var(--rd-radius-control)] text-[var(--rd-color-text-muted)] outline-none data-[hovered]:bg-[var(--rd-color-surface-subtle)] data-[hovered]:text-[var(--rd-color-text-default)] \" +\n                \"data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)]\"\n              }\n            >\n              <CloseIcon className=\"size-4\" />\n            </Button>\n          </AriaToast>\n        );\n      }}\n    </AriaToastRegion>\n  );\n}\n"
         },
         {
           "path": "generated/toast.types.ts",
-          "content": "// Generated by rdloom codegen from specs/toast.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nexport const toastVariantValues = [\"neutral\", \"success\", \"danger\"] as const;\n\n/** Brief, non-blocking message about the result of an action. Render ToastRegion once and call toast(). */\nexport interface ToastSpecProps {\n  /**\n   * Main message.\n   */\n  title: string;\n  /**\n   * Optional extra detail.\n   */\n  description?: string;\n  /**\n   * Tone of the message.\n   * @default \"neutral\"\n   */\n  variant?: \"neutral\" | \"success\" | \"danger\";\n  /**\n   * Auto-dismiss after this many ms (10 seconds by default). 0 keeps it open until the person closes it. Timers pause while the pointer is over the toast or it has keyboard focus, so nobody loses a message they are reading.\n   * @default 10000\n   */\n  timeout?: number;\n}\n\nexport const toastDefaults = {\n  variant: \"neutral\",\n  timeout: 10000,\n} as const;\n\nexport const toastMeta = {\n  \"name\": \"Toast\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"alertdialog\"\n} as const;\n"
+          "content": "// Generated by rdloom codegen from specs/toast.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nexport const toastVariantValues = [\"neutral\", \"success\", \"danger\"] as const;\n\n/** Brief, non-blocking message about the result of an action. Render ToastRegion once and call toast(). */\nexport interface ToastSpecProps {\n  /**\n   * Main message.\n   */\n  title: string;\n  /**\n   * Optional extra detail.\n   */\n  description?: string;\n  /**\n   * Tone of the message.\n   * @default \"neutral\"\n   */\n  variant?: \"neutral\" | \"success\" | \"danger\";\n  /**\n   * Auto-dismiss after this many ms (10 seconds by default). 0 keeps it open until the person closes it. Timers pause while the pointer is over the toast or it has keyboard focus, so nobody loses a message they are reading.\n   * @default 10000\n   */\n  timeout?: number;\n  /**\n   * Opt in to a fuller slide: the toast glides in from the edge and slides back out when dismissed. Off by default, which keeps the existing small rise and fade. Visitors who ask for less motion get no movement either way.\n   * @default false\n   */\n  animated?: boolean;\n}\n\nexport const toastDefaults = {\n  variant: \"neutral\",\n  timeout: 10000,\n  animated: false,\n} as const;\n\nexport const toastMeta = {\n  \"name\": \"Toast\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"alertdialog\"\n} as const;\n"
         }
       ]
     },
@@ -20668,6 +21726,136 @@
       ]
     },
     {
+      "id": "typing-animation",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "TypingAnimation",
+        "version": "0.1.0",
+        "category": "motion",
+        "status": "experimental",
+        "description": "Text that types itself out one character at a time, with an optional blinking cursor and an optional loop. The full text is in the page from the start.",
+        "props": {
+          "children": {
+            "type": "string",
+            "description": "The text to type.",
+            "required": true
+          },
+          "speed": {
+            "type": "number",
+            "default": 70,
+            "description": "Milliseconds per character."
+          },
+          "delay": {
+            "type": "number",
+            "default": 0,
+            "description": "Seconds to wait before typing starts."
+          },
+          "cursor": {
+            "type": "boolean",
+            "default": true,
+            "description": "Shows a blinking cursor after the text."
+          },
+          "loop": {
+            "type": "boolean",
+            "default": false,
+            "description": "Types the text again after a short pause, once it has finished."
+          },
+          "isPaused": {
+            "type": "boolean",
+            "default": false,
+            "description": "Stops the animation and shows the finished text. Moving content that lasts more than five seconds should be stoppable."
+          }
+        },
+        "variants": [
+          "cursor",
+          "loop",
+          "isPaused"
+        ],
+        "states": [
+          "default"
+        ],
+        "slots": [
+          "root"
+        ],
+        "tokens": [
+          "color.text.default",
+          "color.text.muted"
+        ],
+        "a11y": {
+          "role": "text",
+          "keyboard": [],
+          "requirements": [
+            "The full text is present as visually hidden text from the first render, so assistive technology reads it once, never letter by letter",
+            "With no JavaScript, or with reduced motion, the finished text is shown at once",
+            "Decoration only: the animated layers are hidden from assistive technology and never take focus",
+            "Stands still for visitors who ask for less motion (prefers-reduced-motion), and can also be shown still with the rdm-still class or isPaused",
+            "In forced-colors (high contrast) mode the text is drawn in the system colours",
+            "Does not flash: nothing changes more than three times in a second (WCAG 2.3.1)",
+            "Optional: it is a separate component, so projects that do not add it carry none of its code"
+          ],
+          "screenReader": [
+            "The full text is read once, immediately; the typing is not announced"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "A short tagline or terminal-style line in a hero",
+            "Showing a command being typed"
+          ],
+          "avoid_when": [
+            "Text people must read the moment the page loads",
+            "Long paragraphs"
+          ],
+          "anti_patterns": [
+            "Looping text that is also the only place a message appears",
+            "Typing speeds so slow the text takes many seconds to finish"
+          ]
+        },
+        "examples": [
+          "basic",
+          "looping"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {
+            "cursor": "Cursor",
+            "loop": "Loop",
+            "isPaused": "Paused"
+          }
+        }
+      },
+      "install": {
+        "command": "npx rdloom add typing-animation",
+        "dependencies": [],
+        "registryDependencies": [
+          "tokens",
+          "motion-css",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import { TypingAnimation } from \"@rdloom/react\";\n\nexport default function TypingAnimationBasicExample() {\n  return (\n    <div className=\"flex w-full justify-center\">\n      <TypingAnimation className=\"text-xl font-medium\">Ship the interface your users can actually use.</TypingAnimation>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "looping",
+          "code": "import { TypingAnimation } from \"@rdloom/react\";\n\n// Loops after a short pause. Use the Still switch, or isPaused, to stop it.\nexport default function TypingAnimationLoopingExample() {\n  return (\n    <div className=\"flex w-full justify-center\">\n      <code className=\"rounded-md bg-[var(--rd-color-surface-subtle)] px-3 py-2 text-sm\">\n        <TypingAnimation loop speed={90}>\n          npx rdloom add typing-animation\n        </TypingAnimation>\n      </code>\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "typing-animation/typing-animation.tsx",
+          "content": "\"use client\";\n\nimport { forwardRef, useEffect, useState, type HTMLAttributes } from \"react\";\nimport { typingAnimationDefaults, type TypingAnimationSpecProps } from \"../generated/typing-animation.types\";\nimport { cx } from \"../utils/cx\";\nimport { prefersReducedMotion, useIsomorphicLayoutEffect, useReducedMotion } from \"../utils/motion\";\n\nexport interface TypingAnimationProps\n  extends TypingAnimationSpecProps,\n    Omit<HTMLAttributes<HTMLSpanElement>, keyof TypingAnimationSpecProps | \"className\" | \"children\"> {\n  className?: string;\n}\n\nconst HOLD_BEFORE_LOOP = 1600;\n\n/**\n * Text that types itself out. The full text is in the server HTML and is always available to screen\n * readers as visually hidden text; only the visible copy is typed, after mount. Reduced motion and\n * isPaused show the finished text.\n */\nexport const TypingAnimation = forwardRef<HTMLSpanElement, TypingAnimationProps>(function TypingAnimation(\n  {\n    children,\n    speed = typingAnimationDefaults.speed,\n    delay = typingAnimationDefaults.delay,\n    cursor = typingAnimationDefaults.cursor,\n    loop = typingAnimationDefaults.loop,\n    isPaused = typingAnimationDefaults.isPaused,\n    className,\n    style,\n    ...rest\n  },\n  ref,\n) {\n  const chars = Array.from(children);\n  const total = chars.length;\n  const reduced = useReducedMotion();\n  const still = isPaused || reduced;\n  // null means \"show everything\": the server render, no JavaScript, reduced motion and isPaused.\n  const [count, setCount] = useState<number | null>(null);\n\n  useIsomorphicLayoutEffect(() => {\n    setCount(still || prefersReducedMotion() ? null : 0);\n  }, [still, children]);\n\n  useEffect(() => {\n    if (count === null) return;\n    let timer: ReturnType<typeof setTimeout>;\n    if (count < total) {\n      timer = setTimeout(() => setCount(count + 1), count === 0 ? delay * 1000 + speed : speed);\n    } else if (loop) {\n      timer = setTimeout(() => setCount(0), HOLD_BEFORE_LOOP);\n    }\n    return () => clearTimeout(timer);\n  }, [count, total, speed, delay, loop]);\n\n  const shown = count === null ? children : chars.slice(0, count).join(\"\");\n  return (\n    <span\n      {...rest}\n      ref={ref}\n      data-rdm-paused={isPaused || undefined}\n      className={cx(\"rdm-typing\", className)}\n      style={style}\n    >\n      <span className=\"sr-only\">{children}</span>\n      <span aria-hidden=\"true\">\n        {shown}\n        {cursor && <span className=\"rdm-caret\" />}\n      </span>\n    </span>\n  );\n});\n"
+        },
+        {
+          "path": "generated/typing-animation.types.ts",
+          "content": "// Generated by rdloom codegen from specs/typing-animation.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\n/** Text that types itself out one character at a time, with an optional blinking cursor and an optional loop. The full text is in the page from the start. */\nexport interface TypingAnimationSpecProps {\n  /**\n   * The text to type.\n   */\n  children: string;\n  /**\n   * Milliseconds per character.\n   * @default 70\n   */\n  speed?: number;\n  /**\n   * Seconds to wait before typing starts.\n   * @default 0\n   */\n  delay?: number;\n  /**\n   * Shows a blinking cursor after the text.\n   * @default true\n   */\n  cursor?: boolean;\n  /**\n   * Types the text again after a short pause, once it has finished.\n   * @default false\n   */\n  loop?: boolean;\n  /**\n   * Stops the animation and shows the finished text. Moving content that lasts more than five seconds should be stoppable.\n   * @default false\n   */\n  isPaused?: boolean;\n}\n\nexport const typingAnimationDefaults = {\n  speed: 70,\n  delay: 0,\n  cursor: true,\n  loop: false,\n  isPaused: false,\n} as const;\n\nexport const typingAnimationMeta = {\n  \"name\": \"TypingAnimation\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"text\"\n} as const;\n"
+        }
+      ]
+    },
+    {
       "id": "typography",
       "spec": {
         "$schema": "./schema/component.schema.json",
@@ -21609,6 +22797,131 @@
           "content": "// Generated by rdloom codegen from specs/user-menu.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nimport type { ReactNode } from \"react\";\n\nexport const userMenuSizeValues = [\"sm\", \"md\"] as const;\nexport const userMenuAlignValues = [\"start\", \"end\"] as const;\n\n/** The avatar button that opens the account menu: the person's name and email at the top, your own entries (settings, billing, help) in groups, a row for the theme, and a Sign out entry that can ask first, shows that it is working, and tells screen readers how it went. */\nexport interface UserMenuSpecProps {\n  /**\n   * The signed-in person: name (also the accessible name), email and the picture. Without a picture the initials are shown.\n   */\n  user: { name: string; email?: string; avatarUrl?: string };\n  /**\n   * Entries above Sign out: { id, label, icon?, href?, onSelect?, permission?, variant? }. An entry with an href is a link; without one it is a button that calls onSelect. permission is \"allow\", \"disabled\", \"hidden\" or { state, reason }: hidden entries are not drawn, disabled ones are shown dimmed with the reason beside them.\n   */\n  items?: import(\"../user-menu/user-menu\").UserMenuItem[];\n  /**\n   * More entries in groups, each with an optional heading. A separator is drawn between groups, and before Sign out.\n   */\n  groups?: import(\"../user-menu/user-menu\").UserMenuGroup[];\n  /**\n   * A row under the entries for choosing the theme, for example your segmented control. It sits below the menu inside the same popover and is reached with Tab.\n   */\n  themeRow?: ReactNode;\n  /**\n   * Adds the Sign out entry and does the work. May be async. While it runs the entry shows it is pending; a throw or rejection is an error. Call your own sign-out API here; the library does not.\n   */\n  onSignOut?: () => void | Promise<unknown>;\n  /**\n   * Ask before signing out. Opens an alert dialog, for example { title: \"Sign out of Loomworks?\" }; its confirm button runs onSignOut.\n   */\n  confirm?: { title: string; description?: string; confirmLabel?: string };\n  /**\n   * Text of the Sign out entry.\n   * @default \"Sign out\"\n   */\n  signOutLabel?: string;\n  /**\n   * Text of the entry while the sign-out is running.\n   * @default \"Signing out...\"\n   */\n  signingOutLabel?: string;\n  /**\n   * Announced politely when the sign-out succeeds. It is spoken from a status region that stays on the page after the menu closes.\n   * @default \"You have signed out\"\n   */\n  signedOutMessage?: string;\n  /**\n   * Announced politely when the sign-out fails.\n   * @default \"Could not sign out. Try again.\"\n   */\n  errorMessage?: string;\n  /**\n   * Called after a successful sign-out, with what onSignOut returned. Usually where you go to the sign-in page.\n   */\n  onSignedOut?: (result: unknown) => void;\n  /**\n   * Called with the error when onSignOut throws or rejects.\n   */\n  onError?: (error: unknown) => void;\n  /**\n   * What the person may do: { signOut } as \"allow\" (default), \"disabled\" or \"hidden\", or { state, reason }. The server must check again.\n   */\n  permissions?: import(\"../utils/permissions\").Permissions<\"signOut\">;\n  /**\n   * Size of the avatar button.\n   * @default \"sm\"\n   */\n  size?: \"sm\" | \"md\";\n  /**\n   * Which edge of the button the menu lines up with.\n   * @default \"end\"\n   */\n  align?: \"start\" | \"end\";\n  /**\n   * Show the name and email beside the picture in the button. Use it where there is room, such as a sidebar.\n   * @default false\n   */\n  showName?: boolean;\n  /**\n   * Start of the button's accessible name. The person's name is added: \"Account menu, Ada Lovelace\".\n   * @default \"Account menu\"\n   */\n  label?: string;\n  /**\n   * Class names for the parts, by slot name, added after the built-in ones. Slots: root, trigger, avatar, name, popover, header, list, item, separator, theme, status.\n   */\n  classNames?: Partial<Record<\"root\" | \"trigger\" | \"avatar\" | \"name\" | \"popover\" | \"header\" | \"list\" | \"item\" | \"separator\" | \"theme\" | \"status\", string>>;\n}\n\nexport const userMenuDefaults = {\n  signOutLabel: \"Sign out\",\n  signingOutLabel: \"Signing out...\",\n  signedOutMessage: \"You have signed out\",\n  errorMessage: \"Could not sign out. Try again.\",\n  size: \"sm\",\n  align: \"end\",\n  showName: false,\n  label: \"Account menu\",\n} as const;\n\nexport const userMenuMeta = {\n  \"name\": \"UserMenu\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"button\"\n} as const;\n"
         }
       ]
+    },
+    {
+      "id": "word-rotate",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "WordRotate",
+        "version": "0.1.0",
+        "category": "motion",
+        "status": "experimental",
+        "description": "A phrase where one word swaps for the next in the same spot, cycling through a list. The slot is as wide as the longest word, so nothing around it jumps.",
+        "props": {
+          "words": {
+            "type": "custom",
+            "tsType": "string[]",
+            "description": "The words to cycle through, in order.",
+            "required": true
+          },
+          "duration": {
+            "type": "number",
+            "default": 2500,
+            "description": "Milliseconds each word stays before the next replaces it."
+          },
+          "announce": {
+            "type": "boolean",
+            "default": false,
+            "description": "Announces each new word politely to screen readers. Off by default: most rotating words are decoration."
+          },
+          "label": {
+            "type": "string",
+            "description": "Accessible name for the whole slot when announce is off. Defaults to all the words, joined with commas."
+          },
+          "isPaused": {
+            "type": "boolean",
+            "default": false,
+            "description": "Stops the animation and shows the finished text. Moving content that lasts more than five seconds should be stoppable."
+          }
+        },
+        "variants": [
+          "announce",
+          "isPaused"
+        ],
+        "states": [
+          "default"
+        ],
+        "slots": [
+          "root"
+        ],
+        "tokens": [
+          "color.text.default",
+          "color.text.muted"
+        ],
+        "a11y": {
+          "role": "group",
+          "keyboard": [],
+          "requirements": [
+            "Without announce, the slot has an accessible name listing all the words, and the visible word is hidden from assistive technology",
+            "With announce, the visible word sits in a polite live region and is read when it changes",
+            "Hidden sizing copies of the other words are invisible to everyone, so they are never read twice",
+            "Decoration only: the animated layers are hidden from assistive technology and never take focus",
+            "Stands still for visitors who ask for less motion (prefers-reduced-motion), and can also be shown still with the rdm-still class or isPaused",
+            "In forced-colors (high contrast) mode the text is drawn in the system colours",
+            "Does not flash: nothing changes more than three times in a second (WCAG 2.3.1)",
+            "Optional: it is a separate component, so projects that do not add it carry none of its code"
+          ],
+          "screenReader": [
+            "Without announce: the list of all words, once",
+            "With announce: each new word, politely"
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "A headline such as Built for teams, makers, studios where one word changes",
+            "Showing the range of things a product handles"
+          ],
+          "avoid_when": [
+            "Words that carry information people must not miss",
+            "Lists longer than six words"
+          ],
+          "anti_patterns": [
+            "Turning announce on for a purely decorative swap, which interrupts reading",
+            "Putting a different meaning in each word and expecting every one to be noticed"
+          ]
+        },
+        "examples": [
+          "basic",
+          "in-a-heading"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {
+            "announce": "Announce",
+            "isPaused": "Paused"
+          }
+        }
+      },
+      "install": {
+        "command": "npx rdloom add word-rotate",
+        "dependencies": [],
+        "registryDependencies": [
+          "tokens",
+          "motion-css",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import { WordRotate } from \"@rdloom/react\";\n\nexport default function WordRotateBasicExample() {\n  return (\n    <div className=\"flex w-full justify-center text-2xl font-semibold\">\n      <p>\n        Built for <WordRotate className=\"text-[var(--rd-color-action-primary)]\" words={[\"teams\", \"makers\", \"studios\", \"everyone\"]} />\n      </p>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "in-a-heading",
+          "code": "import { WordRotate } from \"@rdloom/react\";\n\n// announce reads each new word out politely, for when the word is part of the message.\nexport default function WordRotateInAHeadingExample() {\n  return (\n    <div className=\"flex w-full justify-center\">\n      <h3 className=\"text-xl font-semibold\">\n        Your data, <WordRotate announce duration={3000} words={[\"secure\", \"portable\", \"yours\"]} />\n      </h3>\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "word-rotate/word-rotate.tsx",
+          "content": "\"use client\";\n\nimport { forwardRef, useEffect, useState, type HTMLAttributes } from \"react\";\nimport { wordRotateDefaults, type WordRotateSpecProps } from \"../generated/word-rotate.types\";\nimport { cx } from \"../utils/cx\";\nimport { motionVars, useReducedMotion } from \"../utils/motion\";\n\nexport interface WordRotateProps\n  extends WordRotateSpecProps,\n    Omit<HTMLAttributes<HTMLSpanElement>, keyof WordRotateSpecProps | \"className\"> {\n  className?: string;\n}\n\n/**\n * One slot that cycles through a list of words. Every word is laid over the same cell (the others are\n * invisible) so the slot is as wide as the longest word and nothing around it moves. The first word is\n * in the server HTML. Reduced motion and isPaused hold the current word.\n */\nexport const WordRotate = forwardRef<HTMLSpanElement, WordRotateProps>(function WordRotate(\n  {\n    words,\n    duration = wordRotateDefaults.duration,\n    announce = wordRotateDefaults.announce,\n    label,\n    isPaused = wordRotateDefaults.isPaused,\n    className,\n    style,\n    ...rest\n  },\n  ref,\n) {\n  const [index, setIndex] = useState(0);\n  const reduced = useReducedMotion();\n  const still = isPaused || reduced || words.length < 2;\n  const current = words.length ? index % words.length : 0;\n\n  useEffect(() => {\n    if (still) return;\n    const timer = setTimeout(() => setIndex((i) => i + 1), duration);\n    return () => clearTimeout(timer);\n  }, [still, duration, words.length, index]);\n\n  const live = announce ? ({ role: \"status\", \"aria-live\": \"polite\", \"aria-atomic\": true } as const) : ({ role: \"group\", \"aria-label\": label ?? words.join(\", \") } as const);\n\n  return (\n    <span\n      {...rest}\n      {...live}\n      ref={ref}\n      data-rdm-paused={isPaused || undefined}\n      data-rdm-run={index > 0 || undefined}\n      className={cx(\"rdm-word-rotate\", className)}\n      style={{ ...motionVars({ \"--rdm-d\": `${Math.min(duration, 500)}ms` }), ...style }}\n    >\n      {words.map((word, i) => {\n        const isCurrent = i === current;\n        return (\n          <span\n            key={isCurrent ? `${word}-${index}` : `${word}-${i}`}\n            className=\"rdm-word-item\"\n            data-current={isCurrent || undefined}\n            aria-hidden={announce && isCurrent ? undefined : true}\n          >\n            {word}\n          </span>\n        );\n      })}\n    </span>\n  );\n});\n"
+        },
+        {
+          "path": "generated/word-rotate.types.ts",
+          "content": "// Generated by rdloom codegen from specs/word-rotate.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\n/** A phrase where one word swaps for the next in the same spot, cycling through a list. The slot is as wide as the longest word, so nothing around it jumps. */\nexport interface WordRotateSpecProps {\n  /**\n   * The words to cycle through, in order.\n   */\n  words: string[];\n  /**\n   * Milliseconds each word stays before the next replaces it.\n   * @default 2500\n   */\n  duration?: number;\n  /**\n   * Announces each new word politely to screen readers. Off by default: most rotating words are decoration.\n   * @default false\n   */\n  announce?: boolean;\n  /**\n   * Accessible name for the whole slot when announce is off. Defaults to all the words, joined with commas.\n   */\n  label?: string;\n  /**\n   * Stops the animation and shows the finished text. Moving content that lasts more than five seconds should be stoppable.\n   * @default false\n   */\n  isPaused?: boolean;\n}\n\nexport const wordRotateDefaults = {\n  duration: 2500,\n  announce: false,\n  isPaused: false,\n} as const;\n\nexport const wordRotateMeta = {\n  \"name\": \"WordRotate\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"group\"\n} as const;\n"
+        }
+      ]
     }
   ],
   "tokens": [
@@ -21955,6 +23268,10 @@
         {
           "path": "utils/scroll-hint.ts",
           "content": "\"use client\";\n\nimport { useEffect, useState, type RefObject } from \"react\";\n\n/**\n * Tells you which edges of a sideways-scrolling box still have hidden content, so a fade can say \"this scrolls\".\n * Put the result on the box as `data-hint` and add `scrollHintClass`.\n */\nexport function useScrollHint(ref: RefObject<HTMLElement | null>): \"left\" | \"right\" | \"both\" | undefined {\n  const [hint, setHint] = useState<\"left\" | \"right\" | \"both\" | undefined>();\n  useEffect(() => {\n    const el = ref.current;\n    if (!el) return;\n    const rtl = getComputedStyle(el).direction === \"rtl\";\n    const update = () => {\n      const max = el.scrollWidth - el.clientWidth;\n      if (max <= 1) return setHint(undefined);\n      const pos = Math.abs(el.scrollLeft);\n      const before = pos > 1;\n      const after = pos < max - 1;\n      const left = rtl ? after : before;\n      const right = rtl ? before : after;\n      setHint(left && right ? \"both\" : right ? \"right\" : left ? \"left\" : undefined);\n    };\n    update();\n    el.addEventListener(\"scroll\", update, { passive: true });\n    const observer = typeof ResizeObserver === \"undefined\" ? null : new ResizeObserver(update);\n    observer?.observe(el);\n    if (el.firstElementChild) observer?.observe(el.firstElementChild);\n    return () => {\n      el.removeEventListener(\"scroll\", update);\n      observer?.disconnect();\n    };\n  }, [ref]);\n  return hint;\n}\n\n/** The fade at the edge that still has content. The sides are physical (left and right). */\nexport const scrollHintClass =\n  \"data-[hint=right]:[mask-image:linear-gradient(to_right,#000_calc(100%-2rem),transparent)] \" +\n  \"data-[hint=left]:[mask-image:linear-gradient(to_left,#000_calc(100%-2rem),transparent)] \" +\n  \"data-[hint=both]:[mask-image:linear-gradient(to_right,transparent,#000_2rem,#000_calc(100%-2rem),transparent)]\";\n\n/** The same for a box that scrolls up and down: which edge still has hidden content. Use `data-vhint` and `scrollHintYClass`. */\nexport function useVerticalScrollHint(ref: RefObject<HTMLElement | null>, watch?: unknown): \"top\" | \"bottom\" | \"both\" | undefined {\n  const [hint, setHint] = useState<\"top\" | \"bottom\" | \"both\" | undefined>();\n  useEffect(() => {\n    const el = ref.current;\n    if (!el) return;\n    const update = () => {\n      const max = el.scrollHeight - el.clientHeight;\n      if (max <= 1) return setHint(undefined);\n      const before = el.scrollTop > 1;\n      const after = el.scrollTop < max - 1;\n      setHint(before && after ? \"both\" : after ? \"bottom\" : before ? \"top\" : undefined);\n    };\n    update();\n    el.addEventListener(\"scroll\", update, { passive: true });\n    const observer = typeof ResizeObserver === \"undefined\" ? null : new ResizeObserver(update);\n    observer?.observe(el);\n    if (el.firstElementChild) observer?.observe(el.firstElementChild);\n    return () => {\n      el.removeEventListener(\"scroll\", update);\n      observer?.disconnect();\n    };\n  }, [ref, watch]);\n  return hint;\n}\n\nexport const scrollHintYClass =\n  \"data-[vhint=bottom]:[mask-image:linear-gradient(to_bottom,#000_calc(100%-1.5rem),transparent)] \" +\n  \"data-[vhint=top]:[mask-image:linear-gradient(to_top,#000_calc(100%-1.5rem),transparent)] \" +\n  \"data-[vhint=both]:[mask-image:linear-gradient(to_bottom,transparent,#000_1.5rem,#000_calc(100%-1.5rem),transparent)]\";\n"
+        },
+        {
+          "path": "utils/split-text.ts",
+          "content": "/** Splits text into the units a text effect animates one after another. */\nexport function splitWords(text: string): string[] {\n  return text.split(/\\s+/).filter(Boolean);\n}\n\nexport function splitLines(text: string): string[] {\n  return text.split(/\\r?\\n/).filter((line) => line.trim() !== \"\");\n}\n"
         },
         {
           "path": "utils/state-boundary.tsx",

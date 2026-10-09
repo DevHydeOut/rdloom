@@ -397,6 +397,67 @@
       ]
     },
     {
+      "name": "AnimatedCircularProgress",
+      "id": "animated-circular-progress",
+      "version": "0.1.0",
+      "description": "A ring that fills to its value after it appears, with the value in the middle. It can also spin when the amount of work is not known.",
+      "properties": [
+        {
+          "prop": "isIndeterminate",
+          "name": "Indeterminate",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        },
+        {
+          "prop": "isPaused",
+          "name": "isPaused",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        },
+        {
+          "prop": "showValue",
+          "name": "showValue",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "true"
+        }
+      ]
+    },
+    {
+      "name": "AnimatedList",
+      "id": "animated-list",
+      "version": "0.1.0",
+      "description": "A list whose items slide and fade in one after another, and stack as new ones are added. It is a real list (ul with li items), and every item is in the page from the start.",
+      "properties": [
+        {
+          "prop": "isStill",
+          "name": "Still",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        },
+        {
+          "prop": "announce",
+          "name": "announce",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
       "name": "ApiKeyList",
       "id": "api-key-list",
       "version": "0.1.0",
@@ -1475,6 +1536,35 @@
       ]
     },
     {
+      "name": "InteractiveHoverButton",
+      "id": "interactive-hover-button",
+      "version": "0.1.0",
+      "description": "A button whose label slides away to an arrow, or to a second label with an arrow, on hover and keyboard focus. Builds on Button.",
+      "properties": [
+        {
+          "prop": "variant",
+          "name": "Variant",
+          "values": [
+            "primary",
+            "secondary",
+            "ghost",
+            "danger"
+          ],
+          "default": "primary"
+        },
+        {
+          "prop": "size",
+          "name": "Size",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "default": "md"
+        }
+      ]
+    },
+    {
       "name": "InviteDialog",
       "id": "invite-dialog",
       "version": "0.1.0",
@@ -1560,6 +1650,59 @@
             "event"
           ],
           "default": "date"
+        }
+      ]
+    },
+    {
+      "name": "Marquee",
+      "id": "marquee",
+      "version": "0.1.0",
+      "description": "An endless scrolling row (or column) of content, such as logos or short quotes. It pauses on hover and focus, and can show a visible Pause button.",
+      "properties": [
+        {
+          "prop": "direction",
+          "name": "Direction",
+          "values": [
+            "horizontal",
+            "vertical"
+          ],
+          "default": "horizontal"
+        },
+        {
+          "prop": "reverse",
+          "name": "reverse",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        },
+        {
+          "prop": "fade",
+          "name": "fade",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "true"
+        },
+        {
+          "prop": "isPaused",
+          "name": "Paused",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        },
+        {
+          "prop": "showPauseButton",
+          "name": "showPauseButton",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
         }
       ]
     },
@@ -1683,6 +1826,32 @@
         {
           "prop": "isInvalid",
           "name": "Invalid",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
+      "name": "NumberTicker",
+      "id": "number-ticker",
+      "version": "0.1.0",
+      "description": "A number that counts up (or down) to its value once after it appears. The final number is always the text that is read and that is in the server HTML.",
+      "properties": [
+        {
+          "prop": "startWhenInView",
+          "name": "startWhenInView",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        },
+        {
+          "prop": "isPaused",
+          "name": "Paused",
           "values": [
             "false",
             "true"
@@ -2561,6 +2730,53 @@
       ]
     },
     {
+      "name": "TextAnimate",
+      "id": "text-animate",
+      "version": "0.1.0",
+      "description": "Text that animates in by character, word or line using a preset: fade in, blur in, slide up or scale up. The words are real text in the page from the start.",
+      "properties": [
+        {
+          "prop": "by",
+          "name": "By",
+          "values": [
+            "character",
+            "word",
+            "line"
+          ],
+          "default": "word"
+        },
+        {
+          "prop": "animation",
+          "name": "Animation",
+          "values": [
+            "fadeIn",
+            "blurIn",
+            "slideUp",
+            "scaleUp"
+          ],
+          "default": "fadeIn"
+        },
+        {
+          "prop": "whenInView",
+          "name": "When in view",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        },
+        {
+          "prop": "isPaused",
+          "name": "Paused",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
       "name": "TextField",
       "id": "text-field",
       "version": "0.1.1",
@@ -2597,6 +2813,41 @@
         {
           "prop": "isInvalid",
           "name": "Invalid",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
+      "name": "TextReveal",
+      "id": "text-reveal",
+      "version": "0.1.0",
+      "description": "A passage whose words come into full strength as you scroll it into view, or all together when it appears. The real text is always in the page.",
+      "properties": [
+        {
+          "prop": "by",
+          "name": "By",
+          "values": [
+            "word",
+            "line"
+          ],
+          "default": "word"
+        },
+        {
+          "prop": "mode",
+          "name": "Mode",
+          "values": [
+            "scroll",
+            "view"
+          ],
+          "default": "scroll"
+        },
+        {
+          "prop": "isPaused",
+          "name": "Paused",
           "values": [
             "false",
             "true"
@@ -2827,6 +3078,41 @@
       ]
     },
     {
+      "name": "TypingAnimation",
+      "id": "typing-animation",
+      "version": "0.1.0",
+      "description": "Text that types itself out one character at a time, with an optional blinking cursor and an optional loop. The full text is in the page from the start.",
+      "properties": [
+        {
+          "prop": "cursor",
+          "name": "Cursor",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "true"
+        },
+        {
+          "prop": "loop",
+          "name": "Loop",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        },
+        {
+          "prop": "isPaused",
+          "name": "Paused",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        }
+      ]
+    },
+    {
       "name": "Typography",
       "id": "typography",
       "version": "0.1.0",
@@ -2893,6 +3179,32 @@
             "end"
           ],
           "default": "end"
+        }
+      ]
+    },
+    {
+      "name": "WordRotate",
+      "id": "word-rotate",
+      "version": "0.1.0",
+      "description": "A phrase where one word swaps for the next in the same spot, cycling through a list. The slot is as wide as the longest word, so nothing around it jumps.",
+      "properties": [
+        {
+          "prop": "announce",
+          "name": "Announce",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        },
+        {
+          "prop": "isPaused",
+          "name": "Paused",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
         }
       ]
     }
