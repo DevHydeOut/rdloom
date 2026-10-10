@@ -1,0 +1,16 @@
+name: Feature request
+description: Suggest a component, a block or an improvement
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: need
+    attributes:
+      label: What do you need to build?
+      description: Describe the screen or task, not only the component.
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would help
+      description: What should it do? Mention keyboard use and states such as loading, empty or error if they matter.

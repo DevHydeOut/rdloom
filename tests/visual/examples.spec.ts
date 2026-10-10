@@ -4,7 +4,7 @@ import { expect, test, type Page } from "@playwright/test";
 
 // One screenshot per spec example and theme, taken from the docs site's
 // /visual/<component>/<example> page. Update baselines with
-// `npm run test:visual:update` (see README: Visual regression tests).
+// `npm run test:visual:update` (see docs/developer-guide.md: Visual regression tests).
 
 const examplesDir = path.resolve(__dirname, "../../examples/components");
 const examples = fs

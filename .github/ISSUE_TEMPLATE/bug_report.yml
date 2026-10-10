@@ -1,0 +1,39 @@
+name: Bug report
+description: Something does not work as the docs say
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. For a security problem, please do not use this form: use private reporting from the Security tab instead.
+  - type: input
+    id: component
+    attributes:
+      label: Component or command
+      description: For example Button, DataGrid or `rdloom upgrade`
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What did you expect, and what did you see instead?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: How to repeat it
+      description: Short steps or a small code sample.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: rdloom version
+      placeholder: "0.1.0"
+  - type: input
+    id: environment
+    attributes:
+      label: Your setup
+      description: React, Tailwind, framework, browser and operating system
