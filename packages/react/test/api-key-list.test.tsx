@@ -153,7 +153,7 @@ describe("ApiKeyList", () => {
       await openCreate(u);
       await u.keyboard("{Escape}");
       await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
-      expect(screen.getByRole("button", { name: "Create key" })).toHaveFocus();
+      await waitFor(() => expect(screen.getByRole("button", { name: "Create key" })).toHaveFocus());
       expect(onCreate).not.toHaveBeenCalled();
     });
   });
