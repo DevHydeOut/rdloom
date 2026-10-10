@@ -69,7 +69,7 @@ const homeLd = (description) =>
       codeRepository: "https://github.com/DevHydeOut/rdloom",
       programmingLanguage: ["TypeScript", "React"],
       license: "https://opensource.org/licenses/MIT",
-      author: { "@type": "Person", name: "Vimal Bhatt" },
+      author: { "@type": "Organization", name: "rdloom" },
     }),
     ld({
       "@type": "FAQPage",

@@ -248,7 +248,7 @@ function Installation({ component }: { component: DocComponent }) {
                 <div className="flex flex-col gap-2 pt-3">
                   <CodeBlock lang="text" code={`npx shadcn@latest add ${registryBase}/r/${id}.json`} label="Registry command" />
                   <Muted>
-                    Works, but <Link href="/docs/cli#shadcn" className="underline underline-offset-4">without upgrade tracking</Link>
+                    Works, but <Link href="/docs/cli#registry" className="underline underline-offset-4">without upgrade tracking</Link>
                     {needsMotionCss && ", and you import the motion CSS yourself"}.
                   </Muted>
                 </div>

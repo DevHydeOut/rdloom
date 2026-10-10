@@ -20,8 +20,8 @@ const banned: Array<[RegExp, string]> = [
   [/—/, "an em dash (the docs avoid them)"],
   [/\b(shadcn|MUI|Material UI|Ant Design|Chakra|Radix UI|Mantine)\b/i, "another library's name"],
 ];
-// Where a banned word is allowed (the technical note about the registry format names the format it writes).
-const allowedBanned = new Set<string>(["/docs/cli"]);
+// Where a banned word is allowed (none today: the registry command sits in a code block, which this check skips).
+const allowedBanned = new Set<string>();
 
 async function collect(page: Page) {
   return page.evaluate(() => {

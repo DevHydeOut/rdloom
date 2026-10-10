@@ -157,17 +157,15 @@ With the shared layout there is a single `rdloom.lock.json` at the root, so one 
 
 Run a command at a root that has no config and rdloom names the workspaces that do: `rdloom is set up in: apps/web, packages/ui`.
 
-### With the shadcn CLI
+### Other registry clients
 
-`npm run gen` also writes every item in the shadcn registry format to `apps/docs/public/r/` (gitignored), which the docs site serves:
+`npm run gen` also writes every item in the common registry format to `apps/docs/public/r/` (gitignored), which the docs site serves, so other registry clients can read them:
 
 ```bash
 npx shadcn@latest add $SITE_URL/r/data-grid.json
-# or with "registries": { "@rdloom": "$SITE_URL/r/{name}.json" } in components.json
-npx shadcn@latest add @rdloom/data-grid
 ```
 
-Files land in `<components alias>/rdloom/` with our folder layout (so relative imports keep working), dependencies on our own items are full URLs, and the tokens become shadcn `cssVars`: colours on `:root` and `.dark` (each also a Tailwind colour such as `bg-rd-color-action-primary`), everything else as plain CSS. shadcn doesn't track installs, so `rdloom upgrade` only works for components added with `rdloom add`. Set `RDLOOM_SITE_URL` when running `gen` to point the URLs at another host, such as a local docs server for testing.
+Files land in `<components alias>/rdloom/` with our folder layout (so relative imports keep working), dependencies on our own items are full URLs, and the tokens become `cssVars`: colours on `:root` and `.dark` (each also a Tailwind colour such as `bg-rd-color-action-primary`), everything else as plain CSS. Those clients don't track installs, so `rdloom upgrade` only works for components added with `rdloom add`. Set `RDLOOM_SITE_URL` when running `gen` to point the URLs at another host, such as a local docs server for testing.
 
 ### Upgrading components you've edited
 
@@ -189,7 +187,7 @@ For each file, `upgrade` compares three versions (as shipped, yours, and the new
 
 It also adds new files and newly required components, prints only newly needed npm packages, keeps files the new version dropped, doesn't restore files you deleted, and keeps your line endings. Projects set up before `.rdloom/base/` existed still upgrade untouched files; for files you changed there, it writes `<file>.upstream` next to yours to merge by hand.
 
-Registry items (`packages/cli/registry/*.json`) use the shadcn registry-item shape, so the shadcn CLI can read them too.
+Registry items (`packages/cli/registry/*.json`) use the common registry-item shape, so other registry clients can read them too.
 
 ### GitHub registries
 Components can also come from any GitHub repository that publishes an rdloom registry, public or private:
@@ -264,7 +262,7 @@ To run it: `npm run gen && npm run build:figma`, then in the Figma desktop app c
 
 For search engines, every page is prerendered to its own HTML file (`apps/docs/prerender.mjs`), with the full content, including the examples, plus its own title, description, canonical URL and Open Graph tags. The build also writes `sitemap.xml`, `robots.txt`, `llms.txt` (an index for AI tools) and a `404.html`. In the browser the page hydrates into the app, so navigation stays instant.
 
-To host it, point any static host at `apps/docs/dist`: Cloudflare Pages, Netlify and GitHub Pages all serve `/components/data-grid` from `components/data-grid.html` and use `404.html` for unknown paths, with no configuration. Build with `SITE_URL` set to the public address (`SITE_URL=https://example.com npm run build:docs`) so the canonical links, `sitemap.xml`, `robots.txt` and the shadcn registry URLs point at it. Without it those are left out rather than guessed.
+To host it, point any static host at `apps/docs/dist`: Cloudflare Pages, Netlify and GitHub Pages all serve `/components/data-grid` from `components/data-grid.html` and use `404.html` for unknown paths, with no configuration. Build with `SITE_URL` set to the public address (`SITE_URL=https://example.com npm run build:docs`) so the canonical links, `sitemap.xml`, `robots.txt` and the registry URLs point at it. Without it those are left out rather than guessed.
 
 ### Examples
 Every name in a spec's `examples` list is a file: `examples/components/<id>/<name>.tsx`, default-exporting a small component. The validator fails if one is missing or unlisted. They're shown on the docs site, served by the MCP server's `get_example`, and `packages/react/test/examples.test.tsx` renders each one with axe.

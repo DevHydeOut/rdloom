@@ -68,13 +68,13 @@ npx rdloom init --components-dir packages/ui/src/rdloom --tokens-css packages/ui
 
 With the shared layout a single `rdloom upgrade` updates every app at once.
 
-## Also works with the shadcn CLI
+## Also works with other registry clients
 
 ```bash
 npx shadcn@latest add <your-docs-url>/r/data-grid.json
 ```
 
-Upgrades need `rdloom add`, since the shadcn CLI doesn't track what it installed.
+Upgrades need `rdloom add`, since other clients don't track what they installed.
 
 ---
 

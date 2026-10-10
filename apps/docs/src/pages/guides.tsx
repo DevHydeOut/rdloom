@@ -101,22 +101,18 @@ npx rdloom init --components-dir packages/ui/src/rdloom --tokens-css packages/ui
           import each other with relative paths, so they work unchanged inside a workspace package. Each app imports the tokens CSS once and
           adds <code>@source</code> for the shared folder so Tailwind scans it.
         </p>
-        <H2 id="shadcn">With the shadcn CLI</H2>
+        <H2 id="registry">With other registry clients</H2>
         <p>
-          Every component is also published in the shadcn registry format, so you can add rdloom components with that CLI instead of this one.
+          Every component is also published in the common registry format, so a registry client can add rdloom components instead of this CLI.
           Files land in <code>components/rdloom/</code> under your components alias, the npm packages are installed, and the colour tokens are
           added to your global CSS, with dark values on the <code>.dark</code> class.
         </p>
         <CodeBlock
-          label="shadcn commands"
-          code={`npx shadcn@latest add ${registryBase}/r/data-grid.json
-
-# or add a namespace to components.json once:
-#   "registries": { "@rdloom": "${registryBase}/r/{name}.json" }
-npx shadcn@latest add @rdloom/data-grid`}
+          label="Registry command"
+          code={`npx shadcn@latest add ${registryBase}/r/data-grid.json`}
         />
         <p>
-          The shadcn CLI doesn't track what it installed, so <code>rdloom diff</code> and <code>rdloom upgrade</code> can't merge later changes into
+          Those clients don't track what they installed, so <code>rdloom diff</code> and <code>rdloom upgrade</code> can't merge later changes into
           your edits. For upgrades, use <code>npx rdloom add</code> instead.
         </p>
         <H2 id="merge">How upgrades merge</H2>
