@@ -62,7 +62,7 @@ echo "--- upgrade: merge a local edit with a new upstream version"
 cp "$APP/.rdloom/base/button/button.tsx" "$edited"
 node -e '
   const fs = require("fs"); const f = process.argv[1];
-  fs.writeFileSync(f, fs.readFileSync(f, "utf8").replace("sm: \"h-8 px-3 text-sm\"", "sm: \"h-7 px-2 text-xs\" /* ours */"));
+  fs.writeFileSync(f, fs.readFileSync(f, "utf8").replace("sm: \"h-[var(--rd-size-control-sm)] px-[var(--rd-space-control-x-sm)] text-sm\"", "sm: \"h-7 px-2 text-xs\" /* ours */"));
 ' "$edited"
 # Publish a "next version" of the registry where Button changed elsewhere.
 NEXT="$APP/next-registry"
@@ -71,7 +71,7 @@ node -e '
   const fs = require("fs"); const f = process.argv[1]; const item = JSON.parse(fs.readFileSync(f, "utf8"));
   item.version = "9.9.9";
   const file = item.files.find((x) => x.path === "button/button.tsx");
-  file.content = file.content.replace("lg: \"h-12 px-5 text-base\"", "lg: \"h-12 px-6 text-base\" /* upstream */");
+  file.content = file.content.replace("lg: \"h-[var(--rd-size-control-lg)] px-[var(--rd-space-control-x-lg)] text-base\"", "lg: \"h-12 px-6 text-base\" /* upstream */");
   fs.writeFileSync(f, JSON.stringify(item));
 ' "$NEXT/button.json"
 
