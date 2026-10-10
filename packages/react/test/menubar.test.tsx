@@ -79,11 +79,12 @@ describe("Menubar", () => {
     await user.tab();
     await user.keyboard("{ArrowDown}");
     expect(trigger("File")).toHaveAttribute("aria-expanded", "true");
-    expect(await screen.findByRole("menuitem", { name: /New file/ })).toHaveFocus();
+    const firstItem = await screen.findByRole("menuitem", { name: /New file/ });
+    await waitFor(() => expect(firstItem).toHaveFocus());
     expect(document.querySelectorAll("kbd")).toHaveLength(2);
     await user.keyboard("{Escape}");
     await waitFor(() => expect(trigger("File")).toHaveAttribute("aria-expanded", "false"));
-    expect(trigger("File")).toHaveFocus();
+    await waitFor(() => expect(trigger("File")).toHaveFocus());
   });
 
   it("moves to the neighbouring menu with Right while one is open", async () => {
