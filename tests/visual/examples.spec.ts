@@ -17,6 +17,8 @@ const examples = fs
       .map((f) => ({ id: d.name, name: f.slice(0, -4) })),
   );
 
+const SLOW_TO_LOAD = new Set(["customer-table/server-side", "time-slot-picker/async-slots"]);
+
 // A fixed "today", so calendars and date presets look the same every day.
 const NOW = new Date("2026-03-15T10:00:00Z");
 
@@ -29,6 +31,9 @@ async function open(page: Page, id: string, name: string, theme: string) {
   await page.waitForFunction(() => [...document.images].every((img) => img.complete));
   // The streaming example types its text out on a timer: wait until the whole reply is there.
   if (id === "response" && name === "streaming") await expect(page.getByText("GROUP BY month")).toBeVisible({ timeout: 10_000 });
+  // These examples stand in for a server that answers after about 0.6 to 0.7 seconds, and they show no spinner while they wait.
+  // A slow runner could photograph the waiting state, so give them time to finish loading.
+  if (SLOW_TO_LOAD.has(`${id}/${name}`)) await page.waitForTimeout(2000);
   // Examples that fetch (combobox/async) show a spinner first; wait it out.
   // The Spinner examples are the spinner, so they keep it.
   if (id !== "spinner") await expect(page.getByRole("status", { name: "Loading" })).toHaveCount(0);
