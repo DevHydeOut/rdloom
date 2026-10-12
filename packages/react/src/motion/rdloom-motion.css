@@ -1684,6 +1684,16 @@
   }
 }
 
+@keyframes rdm-cloud-depth {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.28;
+  }
+}
+
 .rdm-cloud {
   position: relative;
   display: inline-block;
@@ -1719,7 +1729,11 @@
   align-items: center;
   justify-content: center;
   transform: rotateY(0deg) rotateX(calc(var(--rdm-tilt, -14deg) * -1));
-  animation: rdm-cloud-face var(--rdm-d, 48s) linear infinite;
+  animation:
+    rdm-cloud-face var(--rdm-d, 48s) linear infinite,
+    rdm-cloud-depth var(--rdm-d, 48s) linear infinite;
+  /* Each icon starts partway round, so the ones on the far side of the sphere are the faint ones. */
+  animation-delay: 0s, calc(var(--rdm-d, 48s) * var(--rdm-lt, 0) * -1);
 }
 
 .rdm-cloud-icon {
