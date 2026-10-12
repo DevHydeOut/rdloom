@@ -39,13 +39,15 @@ export const OrbitingCircles = forwardRef<HTMLDivElement, OrbitingCirclesProps>(
   const items = Children.toArray(children);
   const count = Math.max(1, Math.min(6, Math.round(rings)));
   const side = round(radius * 2 + iconSize);
-  const ringRadius = (k: number) => round((radius * (k + 1)) / count);
+  // Each ring is a fraction of the room left after the icon; the stylesheet turns it into a length so the orbit can shrink.
+  const ringShare = (k: number) => round((k + 1) / count);
+  const ringLength = (k: number) => `calc((100cqw - var(--rdm-s)) * ${ringShare(k)})`;
   const ringSeconds = (k: number) => round((duration * (k + 1)) / count);
   const reversed = (k: number) => ((count - 1 - k) % 2 === 1) !== reverse;
   const perRing = Array.from({ length: count }, (_, k) => items.filter((_, i) => i % count === k).length);
   const placed = new Array<number>(count).fill(0);
 
-  const vars = { "--rdm-s": `${iconSize}px`, width: side, height: side } as CSSProperties;
+  const vars = { "--rdm-s": `${iconSize}px`, width: side } as CSSProperties;
 
   return (
     <div
@@ -62,7 +64,7 @@ export const OrbitingCircles = forwardRef<HTMLDivElement, OrbitingCirclesProps>(
               key={k}
               aria-hidden="true"
               className="rdm-orbit-path"
-              style={{ width: ringRadius(k) * 2, height: ringRadius(k) * 2 }}
+              style={{ width: ringLength(k), height: ringLength(k) }}
             />
           ))
         : null}
@@ -80,7 +82,7 @@ export const OrbitingCircles = forwardRef<HTMLDivElement, OrbitingCirclesProps>(
               style={
                 {
                   "--rdm-a": `${angle}deg`,
-                  "--rdm-r": `${ringRadius(k)}px`,
+                  "--rdm-r": `calc((100cqw - var(--rdm-s)) * ${ringShare(k) / 2})`,
                   "--rdm-d": `${ringSeconds(k)}s`,
                 } as CSSProperties
               }

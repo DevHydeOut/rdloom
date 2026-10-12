@@ -47,8 +47,8 @@ describe("OrbitingCircles", () => {
     const items = container.querySelectorAll(".rdm-orbit-item");
     expect(items[0]).toHaveAttribute("data-reverse");
     expect(items[1]).not.toHaveAttribute("data-reverse");
-    expect(items[0].getAttribute("style")).toContain("--rdm-r: 60px");
-    expect(items[1].getAttribute("style")).toContain("--rdm-r: 120px");
+    expect(items[0].getAttribute("style")).toContain("* 0.25)");
+    expect(items[1].getAttribute("style")).toContain("* 0.5)");
   });
 
   it("hides paths with showPaths=false and reverses with reverse", () => {
@@ -204,5 +204,33 @@ describe("Backlight", () => {
       </>,
     );
     expect(await axeViolations(container)).toEqual([]);
+  });
+});
+
+describe("rough edges", () => {
+  it("Backlight copy mode never repeats an id", () => {
+    const { container } = render(
+      <Backlight>
+        <div id="card">
+          <span id="title">Hello</span>
+        </div>
+      </Backlight>,
+    );
+    expect(container.querySelectorAll("#card")).toHaveLength(1);
+    expect(container.querySelectorAll("#title")).toHaveLength(1);
+    expect(container.querySelector(".rdm-backlight-glow")?.textContent).toBe("Hello");
+  });
+
+  it("OrbitingCircles sizes its rings as fractions of its own width so it can shrink", () => {
+    const { container } = render(
+      <OrbitingCircles radius={100} rings={2}>
+        <span>a</span>
+        <span>b</span>
+      </OrbitingCircles>,
+    );
+    const root = container.firstElementChild as HTMLElement;
+    expect(root.style.width).toBe("236px");
+    expect(root.style.height).toBe("");
+    expect(container.querySelector<HTMLElement>(".rdm-orbit-path")?.style.width).toContain("100cqw");
   });
 });

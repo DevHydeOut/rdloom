@@ -8,9 +8,19 @@ export interface DeviceMockProps
   className?: string;
 }
 
+// A device is hardware, so its bezel colours are fixed per tone rather than following the theme. Each one is a
+// custom property you can override (for example --rdm-bezel-dark-edge) without touching the component.
 const tones = {
-  dark: { bezel: "border-neutral-700 bg-neutral-900", detail: "bg-neutral-700", chrome: "bg-neutral-800 text-neutral-300" },
-  light: { bezel: "border-neutral-300 bg-neutral-100", detail: "bg-neutral-300", chrome: "bg-neutral-200 text-neutral-600" },
+  dark: {
+    bezel: "border-[var(--rdm-bezel-dark-edge,#404040)] bg-[var(--rdm-bezel-dark,#171717)]",
+    detail: "bg-[var(--rdm-bezel-dark-edge,#404040)]",
+    chrome: "bg-[var(--rdm-bezel-dark-bar,#262626)] text-[var(--rdm-bezel-dark-text,#d4d4d4)]",
+  },
+  light: {
+    bezel: "border-[var(--rdm-bezel-light-edge,#d4d4d4)] bg-[var(--rdm-bezel-light,#f5f5f5)]",
+    detail: "bg-[var(--rdm-bezel-light-edge,#d4d4d4)]",
+    chrome: "bg-[var(--rdm-bezel-light-bar,#e5e5e5)] text-[var(--rdm-bezel-light-text,#525252)]",
+  },
 } as const;
 
 const dot = "pointer-events-none absolute rounded-full";
