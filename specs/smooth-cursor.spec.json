@@ -1,0 +1,93 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "SmoothCursor",
+  "version": "0.1.0",
+  "category": "motion",
+  "status": "experimental",
+  "description": "A soft dot or ring that trails the real pointer with easing, inside a container or across the page. The system cursor stays unless you ask to hide it.",
+  "props": {
+    "children": {
+      "type": "node",
+      "description": "Content of the container. With scope \"page\" the children are rendered as they are and the follower covers the whole window."
+    },
+    "scope": {
+      "type": "enum",
+      "values": ["container", "page"],
+      "description": "Where the follower lives: inside the wrapper around the children, or over the whole window.",
+      "default": "container"
+    },
+    "shape": {
+      "type": "enum",
+      "values": ["dot", "ring"],
+      "description": "A filled dot or an open ring.",
+      "default": "dot"
+    },
+    "size": {
+      "type": "number",
+      "description": "Diameter in pixels.",
+      "default": 20
+    },
+    "color": {
+      "type": "string",
+      "description": "Any CSS colour. Defaults to the primary action colour."
+    },
+    "smoothing": {
+      "type": "number",
+      "description": "How quickly the follower catches up, from 0.02 (lazy) to 1 (no lag).",
+      "default": 0.15
+    },
+    "hideNativeCursor": {
+      "type": "boolean",
+      "description": "Hides the system pointer over the container once a mouse is in use. Off by default: keep it off unless the follower is clearly visible everywhere.",
+      "default": false
+    },
+    "isStill": {
+      "type": "boolean",
+      "description": "Switches the follower off and leaves the system pointer alone.",
+      "default": false
+    }
+  },
+  "variants": ["scope", "shape", "isStill"],
+  "states": ["default"],
+  "slots": ["root", "follower"],
+  "tokens": ["color.action.primary"],
+  "a11y": {
+    "role": "presentation",
+    "keyboard": [],
+    "requirements": [
+      "Decoration for mouse users: the follower is aria-hidden, ignores the pointer (pointer-events none) and never takes focus",
+      "It never replaces keyboard focus: focus rings are untouched and nothing depends on where the follower is",
+      "Not shown for touch or pen input, for prefers-reduced-motion, with isStill, or inside rdm-still",
+      "The system pointer is only hidden when hideNativeCursor is set, and only after a mouse has moved over the container",
+      "The frame loop runs only while the follower is catching up and stops when it arrives; listeners are removed on unmount",
+      "Forced-colors: the follower keeps its own colour (forced-color-adjust none) so it stays visible"
+    ],
+    "screenReader": [
+      "Not announced: the follower is purely visual"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "A playful hero or showcase area for mouse users",
+      "A soft highlight that follows the pointer over a canvas or gallery"
+    ],
+    "avoid_when": [
+      "Forms, dashboards and anywhere precise pointing matters",
+      "Anything that would be unusable without the follower"
+    ],
+    "anti_patterns": [
+      "Hiding the system pointer over text fields and small controls",
+      "Using it as the only hover feedback",
+      "Very large or fully opaque followers that cover what is being pointed at"
+    ]
+  },
+  "examples": ["basic", "ring-in-a-card", "page-wide"],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {
+      "shape": "Shape",
+      "isStill": "Still"
+    }
+  }
+}

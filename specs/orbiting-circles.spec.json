@@ -1,0 +1,62 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "OrbitingCircles",
+  "version": "0.1.0",
+  "category": "motion",
+  "status": "experimental",
+  "description": "Items that travel around a centre on one or more circular paths, such as the tools a product works with. The items are your own children and the orbit is plain CSS.",
+  "props": {
+    "children": { "type": "node", "description": "The items that orbit. Each child becomes one list item on a path.", "required": true },
+    "center": { "type": "node", "description": "Content placed in the middle of the paths, such as a logo or a heading." },
+    "radius": { "type": "number", "description": "Radius of the outer path in pixels.", "default": 120 },
+    "rings": { "type": "number", "description": "How many paths. The children are shared out between them, and neighbouring paths turn in opposite directions.", "default": 1 },
+    "duration": { "type": "number", "description": "Seconds for one full turn of the outer path. Inner paths turn faster.", "default": 24 },
+    "iconSize": { "type": "number", "description": "Width and height of each item in pixels.", "default": 36 },
+    "reverse": { "type": "boolean", "description": "Turns the outer path the other way.", "default": false },
+    "showPaths": { "type": "boolean", "description": "Draws each path as a thin circle.", "default": true },
+    "pauseOnHover": { "type": "boolean", "description": "Pauses while the pointer is over the orbit or focus is inside it.", "default": false },
+    "label": { "type": "string", "description": "Accessible name of the list of items.", "default": "Orbiting items" },
+    "isPaused": { "type": "boolean", "description": "Stops the orbit. Moving content that lasts more than five seconds should be stoppable.", "default": false }
+  },
+  "variants": ["reverse", "showPaths", "isPaused"],
+  "states": ["default", "hover", "focus"],
+  "slots": ["root", "path", "center", "list", "item"],
+  "tokens": ["color.border.default"],
+  "a11y": {
+    "role": "list",
+    "keyboard": ["Tab: moves through any focusable item, in the order the children were given"],
+    "requirements": [
+      "The items are real children in a list, in a fixed DOM order, so the order never changes with the motion",
+      "The drawn paths are decoration: hidden from assistive technology and never take pointer events",
+      "The orbit is CSS only and starts after the page paints; the server HTML already shows the items spaced evenly",
+      "It can be stopped: isPaused, an optional pause on hover and focus, and the rdm-still class (WCAG 2.2.2)",
+      "Visitors who ask for less motion (prefers-reduced-motion) get the items evenly spaced and still",
+      "Items stay upright while they travel, so text and icons stay readable",
+      "In forced-colors (high contrast) mode the paths use a system colour",
+      "Does not flash: nothing changes more than three times in a second (WCAG 2.3.1)"
+    ],
+    "screenReader": [
+      "Announced as a list with the given label; each item is read in order as ordinary content"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "A hero section that shows the tools or integrations a product connects to",
+      "A small decorative diagram with a logo in the middle"
+    ],
+    "avoid_when": [
+      "Essential links that people must be able to hit easily, because moving targets are hard to use",
+      "More than about eight items on one path"
+    ],
+    "anti_patterns": [
+      "Putting the only way to reach a page on an orbiting item without pause on hover",
+      "A very short duration, which makes the items hard to follow"
+    ]
+  },
+  "examples": ["basic", "two-rings", "with-pause-on-hover"],
+  "figma": {
+    "componentKey": null,
+    "variantMap": { "reverse": "Reverse", "showPaths": "Show paths", "isPaused": "Paused" }
+  }
+}

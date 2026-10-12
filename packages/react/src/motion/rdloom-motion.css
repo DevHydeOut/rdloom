@@ -1586,11 +1586,275 @@
 }
 
 /*
+ * OrbitingCircles: each item sits at a fixed angle on its path (a static transform, so the
+ * server HTML already shows it evenly spaced) and CSS turns it. The inner rotation keeps it upright.
+ */
+@keyframes rdm-orbit {
+  from {
+    transform: rotate(var(--rdm-a, 0deg)) translateX(var(--rdm-r, 100px)) rotate(calc(var(--rdm-a, 0deg) * -1));
+  }
+  to {
+    transform: rotate(calc(var(--rdm-a, 0deg) + 360deg)) translateX(var(--rdm-r, 100px)) rotate(calc(var(--rdm-a, 0deg) * -1 - 360deg));
+  }
+}
+
+.rdm-orbit {
+  position: relative;
+  display: inline-block;
+  flex: none;
+}
+
+.rdm-orbit-path {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  box-sizing: border-box;
+  border: 1px solid var(--rd-color-border-default);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.rdm-orbit-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.rdm-orbit-center > * {
+  pointer-events: auto;
+}
+
+.rdm-orbit-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.rdm-orbit-item {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: var(--rdm-s, 36px);
+  height: var(--rdm-s, 36px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: rotate(var(--rdm-a, 0deg)) translateX(var(--rdm-r, 100px)) rotate(calc(var(--rdm-a, 0deg) * -1));
+  animation: rdm-orbit var(--rdm-d, 24s) linear infinite;
+}
+
+.rdm-orbit-item[data-reverse] {
+  animation-direction: reverse;
+}
+
+[data-rdm-paused] .rdm-orbit-item,
+.rdm-orbit[data-pause-hover]:hover .rdm-orbit-item,
+.rdm-orbit[data-pause-hover]:focus-within .rdm-orbit-item {
+  animation-play-state: paused;
+}
+
+@media (forced-colors: active) {
+  .rdm-orbit-path {
+    border-color: GrayText;
+  }
+}
+
+/*
+ * IconCloud: items sit on a sphere (static 3D transforms) and the sphere turns. Each icon is turned
+ * back by the same amount, so it keeps facing the viewer. Both animations share one duration and pause together.
+ */
+@keyframes rdm-cloud-spin {
+  from {
+    transform: rotateX(var(--rdm-tilt, -14deg)) rotateY(0deg);
+  }
+  to {
+    transform: rotateX(var(--rdm-tilt, -14deg)) rotateY(360deg);
+  }
+}
+
+@keyframes rdm-cloud-face {
+  from {
+    transform: rotateY(0deg) rotateX(calc(var(--rdm-tilt, -14deg) * -1));
+  }
+  to {
+    transform: rotateY(-360deg) rotateX(calc(var(--rdm-tilt, -14deg) * -1));
+  }
+}
+
+.rdm-cloud {
+  position: relative;
+  display: inline-block;
+  flex: none;
+}
+
+.rdm-cloud-sphere {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  transform-style: preserve-3d;
+  transform: rotateX(var(--rdm-tilt, -14deg));
+  animation: rdm-cloud-spin var(--rdm-d, 48s) linear infinite;
+}
+
+.rdm-cloud-item {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: var(--rdm-s, 40px);
+  height: var(--rdm-s, 40px);
+  transform-style: preserve-3d;
+  transform: rotateY(var(--rdm-lon, 0deg)) rotateX(var(--rdm-lat, 0deg)) translateZ(var(--rdm-rad, 120px)) rotateX(calc(var(--rdm-lat, 0deg) * -1))
+    rotateY(calc(var(--rdm-lon, 0deg) * -1));
+}
+
+.rdm-cloud-face {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  transform: rotateY(0deg) rotateX(calc(var(--rdm-tilt, -14deg) * -1));
+  animation: rdm-cloud-face var(--rdm-d, 48s) linear infinite;
+}
+
+.rdm-cloud-icon {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: 0;
+  padding: 0;
+  color: inherit;
+}
+
+[data-rdm-paused] .rdm-cloud-sphere,
+[data-rdm-paused] .rdm-cloud-face,
+.rdm-cloud:hover .rdm-cloud-sphere,
+.rdm-cloud:hover .rdm-cloud-face,
+.rdm-cloud:focus-within .rdm-cloud-sphere,
+.rdm-cloud:focus-within .rdm-cloud-face {
+  animation-play-state: paused;
+}
+
+/*
+ * Backlight: a blurred glow behind the content. Either a conic gradient from the given colours or a
+ * blurred copy of the content. It drifts slowly (one cycle takes many seconds, nothing flashes).
+ */
+@keyframes rdm-backlight-spin {
+  from {
+    transform: scale(var(--rdm-sc, 1.1)) rotate(0deg);
+  }
+  to {
+    transform: scale(var(--rdm-sc, 1.1)) rotate(360deg);
+  }
+}
+
+@keyframes rdm-backlight-breathe {
+  from {
+    transform: scale(var(--rdm-sc, 1.1));
+  }
+  to {
+    transform: scale(calc(var(--rdm-sc, 1.1) * 1.06));
+  }
+}
+
+.rdm-backlight {
+  position: relative;
+  display: inline-block;
+  isolation: isolate;
+}
+
+.rdm-backlight-glow {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: var(--rdm-o, 0.6);
+  filter: blur(var(--rdm-blur, 40px));
+  transform: scale(var(--rdm-sc, 1.1));
+  user-select: none;
+}
+
+.rdm-backlight-glow[data-mode="colors"] {
+  background: var(--rdm-bg, none);
+  border-radius: 50%;
+  animation: rdm-backlight-spin var(--rdm-d, 14s) linear infinite;
+}
+
+.rdm-backlight-glow[data-mode="copy"] {
+  filter: blur(var(--rdm-blur, 40px)) saturate(1.5);
+  animation: rdm-backlight-breathe var(--rdm-d, 14s) ease-in-out infinite alternate;
+}
+
+.rdm-backlight-content {
+  position: relative;
+}
+
+[data-rdm-paused] .rdm-backlight-glow {
+  animation-play-state: paused;
+}
+
+@media (forced-colors: active) {
+  .rdm-backlight-glow {
+    display: none;
+  }
+}
+
+/* Globe and DottedMap: a sized box with a canvas that fills it. Drag turns the globe; vertical scrolling still works. */
+.rdm-globe,
+.rdm-dotted-map {
+  position: relative;
+  width: 100%;
+  will-change: transform;
+}
+
+.rdm-globe {
+  aspect-ratio: 1;
+  cursor: grab;
+  touch-action: pan-y;
+}
+
+.rdm-globe:active {
+  cursor: grabbing;
+}
+
+.rdm-dotted-map {
+  aspect-ratio: 2.535;
+}
+
+.rdm-globe-canvas,
+.rdm-dotted-map-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+@media (forced-colors: active) {
+  .rdm-globe-canvas,
+  .rdm-dotted-map-canvas {
+    display: none;
+  }
+}
+
+/*
  * Still: the same rules for every effect, once for visitors who prefer reduced motion
  * and once for anything inside .rdm-still (the docs use it for their Still switch).
  * Keep the two lists identical.
  */
 @media (prefers-reduced-motion: reduce) {
+  .rdm-globe-canvas,
+  .rdm-dotted-map-canvas {
+    will-change: auto;
+  }
+
   .rdm-sparkles-layer,
   .rdm-video-text-video,
   .rdm-sv-dup,
@@ -1741,6 +2005,13 @@
     animation: none;
   }
 
+  .rdm-orbit-item,
+  .rdm-cloud-sphere,
+  .rdm-cloud-face,
+  .rdm-backlight-glow {
+    animation: none;
+  }
+
   .rdm-ihb-hover {
     display: none;
   }
@@ -1794,6 +2065,18 @@
 .rdm-still .rdm-shimmer,
 .rdm-still .rdm-ripple {
   display: none;
+}
+
+.rdm-still .rdm-globe-canvas,
+.rdm-still .rdm-dotted-map-canvas {
+  will-change: auto;
+}
+
+.rdm-still .rdm-orbit-item,
+.rdm-still .rdm-cloud-sphere,
+.rdm-still .rdm-cloud-face,
+.rdm-still .rdm-backlight-glow {
+  animation: none;
 }
 
 .rdm-still .rdm-sparkles-layer,

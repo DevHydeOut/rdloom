@@ -1,0 +1,103 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "DottedMap",
+  "version": "0.1.0",
+  "category": "motion",
+  "status": "experimental",
+  "description": "A flat world map drawn as dots on a canvas, with optional markers and arcs that pulse between marker pairs. Still when off-screen, paused or for reduced motion.",
+  "props": {
+    "label": {
+      "type": "string",
+      "description": "Accessible name of the whole graphic.",
+      "default": "World map"
+    },
+    "description": {
+      "type": "string",
+      "description": "A sentence for screen readers that says what the graphic shows. It is visually hidden."
+    },
+    "markers": {
+      "type": "custom",
+      "description": "Places to mark as { lat, lng, label }. Each one is also listed, with its label, for screen readers.",
+      "tsType": "import(\"../utils/world-dots\").WorldMarker[]"
+    },
+    "dotColor": {
+      "type": "string",
+      "description": "Colour of the land dots, any CSS colour. Defaults to the muted text colour."
+    },
+    "markerColor": {
+      "type": "string",
+      "description": "Colour of the markers, any CSS colour. Defaults to the primary action colour."
+    },
+    "isPaused": {
+      "type": "boolean",
+      "description": "Stops the movement and shows one still frame.",
+      "default": false
+    },
+    "connections": {
+      "type": "custom",
+      "description": "Arcs drawn between two markers as { from, to }, each the label of a marker. A pulse travels along each arc. Pairs whose labels match no marker are skipped. They are also listed for screen readers.",
+      "tsType": "import(\"../utils/world-dots\").WorldConnection[]"
+    },
+    "dotSpacing": {
+      "type": "number",
+      "description": "Distance between dots in pixels. Larger is coarser and cheaper.",
+      "default": 8
+    }
+  },
+  "variants": [
+    "isPaused"
+  ],
+  "states": [
+    "default"
+  ],
+  "slots": [
+    "root"
+  ],
+  "tokens": [
+    "color.text.muted",
+    "color.action.primary"
+  ],
+  "a11y": {
+    "role": "group",
+    "keyboard": [],
+    "requirements": [
+      "The canvas is decoration and aria-hidden; the root is a labelled group with a visually hidden description and a real list of the places",
+      "Stands still for visitors who ask for less motion (prefers-reduced-motion), inside an rdm-still container and with isPaused; one still frame is drawn",
+      "Moving for more than five seconds, so it can be paused with isPaused or the rdm-still container (WCAG 2.2.2)",
+      "Does not flash: nothing changes more than three times in a second (WCAG 2.3.1)",
+      "Paused while off-screen, and its animation frame is cancelled when it unmounts",
+      "Hidden in forced-colors (high contrast) mode, where the place list is still there for assistive technology",
+      "Connections are listed as text, so the routes are not shown by the animation alone"
+    ],
+    "screenReader": [
+      "The canvas is hidden from assistive technology",
+      "The label, description, a list of the places and a list of the connections are read as text"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "Showing where offices, regions or routes are in a hero or section",
+      "A quiet decorative map with a few named places"
+    ],
+    "avoid_when": [
+      "Precise geography or street level detail",
+      "Many dozens of arcs at once"
+    ],
+    "anti_patterns": [
+      "Leaving out label and description",
+      "Arcs whose meaning is only in the animation"
+    ]
+  },
+  "examples": [
+    "basic",
+    "connections",
+    "still"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {
+      "isPaused": "Paused"
+    }
+  }
+}
