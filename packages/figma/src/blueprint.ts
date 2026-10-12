@@ -1347,6 +1347,22 @@ const blueprints: Record<string, Blueprint> = {
     ]);
   },
 
+  FileTree: () => {
+    const row = (label: string, depth: number, note?: string, parent?: boolean) =>
+      frame({ name: "item", dir: "row", gap: 4, pad: [0, 8], h: 32, w: "fill", cross: "center", radius: "radius.control" }, [
+        box(depth * 18, 1, { name: "indent" }),
+        text(parent ? "⌄" : " ", 14, "color.text.muted"),
+        text(label, 14),
+        ...(note ? [text(note, 12, "color.text.muted")] : []),
+      ]);
+    return frame({ name: "file tree", dir: "col", gap: 2, pad: 6, w: 280, fill: "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, [
+      row("src", 0, undefined, true),
+      row("button.tsx", 1, "2 KB"),
+      row("index.ts", 1, "1 KB"),
+      row("package.json", 0, "1 KB"),
+    ]);
+  },
+
   EmptyState: (c) => {
     const sm = c.size === "sm";
     return frame({ name: "empty state", dir: "col", gap: sm ? 8 : 12, pad: sm ? [24, 16] : [48, 24], w: sm ? 288 : 448, align: "center", cross: "center", stroke: "color.border.default", radius: "radius.overlay" }, [
@@ -1444,8 +1460,20 @@ const blueprints: Record<string, Blueprint> = {
     frame({ name: "glare hover", dir: "col", w: 240, h: 140, align: "center", cross: "center", fill: "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, [
       text("Hover me", 14, "color.text.default", "Medium"),
     ]),
+  SmoothCursor: (c) =>
+    frame({ name: "smooth cursor", dir: "col", w: 240, h: 120, align: "center", cross: "center", fill: "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, [
+      c.shape === "ring"
+        ? frame({ name: "ring", dir: "col", w: 20, h: 20, stroke: "color.action.primary", radius: "radius.overlay" }, [])
+        : frame({ name: "dot", dir: "col", w: 20, h: 20, fill: "color.action.primary", radius: "radius.overlay" }, []),
+    ]),
+  Pointer: () =>
+    frame({ name: "pointer", dir: "col", w: 240, h: 120, pad: 24, fill: "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, [
+      frame({ name: "tag", dir: "row", pad: [2, 8], fill: "color.action.primary", radius: "radius.overlay" }, [text("Maya", 12, "color.action.on-primary", "Medium")]),
+    ]),
   Meteors: () => frame({ name: "meteors", dir: "col", w: 280, h: 160, fill: "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, []),
   Confetti: () => frame({ name: "confetti", dir: "col", w: 280, h: 160, fill: "color.surface.default", stroke: "color.action.primary", radius: "radius.overlay" }, []),
+  Globe: () => frame({ name: "globe", dir: "col", w: 200, h: 200, fill: "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, []),
+  DottedMap: () => frame({ name: "dotted map", dir: "col", w: 320, h: 126, fill: "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, []),
   Particles: () => frame({ name: "particles", dir: "col", w: 280, h: 160, fill: "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, []),
   AnimatedCircularProgress: () =>
     frame({ name: "circular progress", dir: "col", gap: 4, pad: 16, w: 96, fill: "color.surface.default", stroke: "color.action.primary", radius: "radius.overlay" }, [
@@ -1458,6 +1486,22 @@ const blueprints: Record<string, Blueprint> = {
       text("Harbor Labs", 14, "color.text.default"),
       text("Lumen", 14, "color.text.default"),
     ]),
+  OrbitingCircles: () =>
+    frame({ name: "orbiting circles", dir: "col", gap: 8, pad: 24, w: 200, fill: "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, [
+      text("Centre", 14, "color.text.default", "Semi Bold"),
+      text("Items travel around it", 12, "color.text.muted"),
+    ]),
+  IconCloud: () =>
+    frame({ name: "icon cloud", dir: "row", gap: 12, pad: 16, w: 240, fill: "color.surface.subtle", stroke: "color.border.default", radius: "radius.overlay" }, [
+      text("Icon", 14, "color.text.default"),
+      text("Icon", 14, "color.text.default"),
+      text("Icon", 14, "color.text.default"),
+    ]),
+  Backlight: () =>
+    frame({ name: "backlight", dir: "col", gap: 6, pad: 20, w: 240, fill: "color.surface.default", stroke: "color.action.primary", radius: "radius.overlay" }, [
+      text("Content on top", 14, "color.text.default", "Semi Bold"),
+      text("A soft glow sits behind", 12, "color.text.muted"),
+    ]),
   BentoGrid: () =>
     frame({ name: "bento grid", dir: "row", gap: 12, w: 360 }, [
       frame({ name: "bento card", dir: "col", gap: 6, pad: 16, w: 174, fill: "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, [
@@ -1468,6 +1512,19 @@ const blueprints: Record<string, Blueprint> = {
         text("Accessible", 14, "color.text.default", "Semi Bold"),
         text("Keyboard ready.", 12, "color.text.muted"),
       ]),
+    ]),
+  DeviceMock: () =>
+    frame({ name: "device mock", dir: "col", gap: 0, pad: 10, w: 160, fill: "color.text.default", radius: "radius.overlay" }, [
+      frame({ name: "screen", dir: "col", gap: 4, pad: 12, w: 140, fill: "color.surface.default", radius: "radius.control" }, [
+        text("Screen content", 13, "color.text.default"),
+      ]),
+    ]),
+  SocialPostCard: () =>
+    frame({ name: "social post card", dir: "col", gap: 8, pad: 16, w: 320, fill: "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, [
+      text("Ada Example", 14, "color.text.default", "Semi Bold"),
+      text("@ada · 2h", 12, "color.text.muted"),
+      text("A short post body goes here.", 14, "color.text.default"),
+      text("Reply   Repost   Like", 12, "color.text.muted"),
     ]),
   Terminal: () =>
     frame({ name: "terminal", dir: "col", gap: 4, pad: 12, w: 320, fill: "color.surface.subtle", stroke: "color.border.default", radius: "radius.control" }, [

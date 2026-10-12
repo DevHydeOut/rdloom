@@ -564,3 +564,48 @@ export function MonitorIcon({ className = "size-4 shrink-0", strokeWidth }: Icon
     </Icon>
   );
 }
+
+// --- Files and folders
+
+export function FolderIcon({ className = "size-4 shrink-0", strokeWidth }: IconProps) {
+  return (
+    <Icon className={className} strokeWidth={strokeWidth}>
+      <P d="M2.5 3.5h3.75l1.5 1.75h6a.75.75 0 0 1 .75.75v6.5a.75.75 0 0 1-.75.75h-11.25a.75.75 0 0 1-.75-.75v-8.25a.75.75 0 0 1 .75-.75z" />
+    </Icon>
+  );
+}
+
+export function FolderOpenIcon({ className = "size-4 shrink-0", strokeWidth }: IconProps) {
+  return (
+    <Icon className={className} strokeWidth={strokeWidth}>
+      <P d="M2.5 12.75V3.5h3.75l1.5 1.75h5v2" />
+      <P d="M2.5 12.75l1.6-4.75h10.9l-1.6 4.75z" />
+    </Icon>
+  );
+}
+
+export function CodeFileIcon({ className = "size-4 shrink-0", strokeWidth }: IconProps) {
+  return (
+    <Icon className={className} strokeWidth={strokeWidth}>
+      <P d="M4.5 2h4.75L12.5 5.25v8a.75.75 0 0 1-.75.75h-7.5a.75.75 0 0 1-.75-.75v-10.5A.75.75 0 0 1 4.5 2z" />
+      <P d="M7 8.25L5.75 9.5 7 10.75M9 8.25l1.25 1.25L9 10.75" />
+    </Icon>
+  );
+}
+
+export function TextFileIcon({ className = "size-4 shrink-0", strokeWidth }: IconProps) {
+  return (
+    <Icon className={className} strokeWidth={strokeWidth}>
+      <P d="M4.5 2h4.75L12.5 5.25v8a.75.75 0 0 1-.75.75h-7.5a.75.75 0 0 1-.75-.75v-10.5A.75.75 0 0 1 4.5 2z" />
+      <P d="M5.75 8.25h4.5M5.75 10.5h4.5" />
+    </Icon>
+  );
+}
+
+export function RepeatIcon({ className = "size-4 shrink-0", strokeWidth }: IconProps) {
+  return (
+    <Icon className={className} strokeWidth={strokeWidth}>
+      <P d="M2.75 7.25v-1a2 2 0 0 1 2-2h8.5M11 2l2.25 2.25L11 6.5M13.25 8.75v1a2 2 0 0 1-2 2h-8.5M5 14l-2.25-2.25L5 9.5" />
+    </Icon>
+  );
+}

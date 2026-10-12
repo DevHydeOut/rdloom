@@ -76,7 +76,7 @@ export function TreeItem({ id, title, textValue, children, className }: TreeItem
             ) : (
               <span aria-hidden="true" className="size-6 shrink-0" />
             )}
-            <span className="truncate">{title}</span>
+            <span className="min-w-0 flex-1 truncate">{title}</span>
           </div>
         )}
       </TreeItemContent>

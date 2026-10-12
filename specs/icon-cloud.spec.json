@@ -1,0 +1,61 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "IconCloud",
+  "version": "0.1.0",
+  "category": "motion",
+  "status": "experimental",
+  "description": "Icons laid out on a slowly turning sphere, built with CSS 3D transforms and no canvas. Each icon can be a link, a button or a plain image, and the list keeps one fixed order for the keyboard.",
+  "props": {
+    "items": {
+      "type": "custom",
+      "tsType": "Array<{ id?: string; label: string; icon: import(\"react\").ReactNode; href?: string; onPress?: () => void }>",
+      "description": "The icons. label is the accessible name. An item with href is a link, one with onPress is a button, and any other is a plain icon.",
+      "required": true
+    },
+    "size": { "type": "number", "description": "Width and height of the sphere in pixels.", "default": 320 },
+    "iconSize": { "type": "number", "description": "Width and height of each icon in pixels.", "default": 40 },
+    "duration": { "type": "number", "description": "Seconds for one full turn.", "default": 48 },
+    "label": { "type": "string", "description": "Accessible name of the list of icons.", "default": "Icons" },
+    "isPaused": { "type": "boolean", "description": "Stops the turning. Moving content that lasts more than five seconds should be stoppable.", "default": false }
+  },
+  "variants": ["isPaused"],
+  "states": ["default", "hover", "focus"],
+  "slots": ["root", "list", "item", "icon"],
+  "tokens": ["color.focus.ring", "radius.control"],
+  "a11y": {
+    "role": "list",
+    "keyboard": ["Tab: moves to each link or button in the order of the items array", "Enter: follows a link or presses a button; Space presses a button"],
+    "requirements": [
+      "The icons are real list items in a fixed DOM order that never follows the rotation, so keyboard order is stable",
+      "Each link and button has an accessible name from label; plain icons are images with that label",
+      "The turning pauses while the pointer is over the cloud or focus is inside it, and with isPaused or the rdm-still class (WCAG 2.2.2)",
+      "Visitors who ask for less motion (prefers-reduced-motion) get a still sphere",
+      "Icons are kept facing the viewer while the sphere turns, so they are never mirrored or edge-on",
+      "Focus shows a visible ring on the icon in every colour mode",
+      "Does not flash: nothing changes more than three times in a second (WCAG 2.3.1)"
+    ],
+    "screenReader": [
+      "Announced as a list with the given label; each link, button or image is read in order with its label"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "Showing the range of tools or technologies a product supports",
+      "A decorative hero graphic whose icons may also link somewhere"
+    ],
+    "avoid_when": [
+      "Navigation, because moving targets are hard to use",
+      "Icons that need a visible text caption"
+    ],
+    "anti_patterns": [
+      "Icons that are only recognisable by colour",
+      "Dozens of items, which crowd the sphere and overlap"
+    ]
+  },
+  "examples": ["basic", "links", "still"],
+  "figma": {
+    "componentKey": null,
+    "variantMap": { "isPaused": "Paused" }
+  }
+}

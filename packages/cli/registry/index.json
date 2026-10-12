@@ -128,6 +128,12 @@
       "description": "A person's or account's picture, falling back to their initials when there is no image or it fails to load."
     },
     {
+      "name": "backlight",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A soft coloured glow behind an image or a card. It takes its colours from a list you give, or from a blurred, enlarged copy of the content itself."
+    },
+    {
       "name": "badge",
       "type": "registry:ui",
       "version": "0.1.0",
@@ -302,6 +308,12 @@
       "description": "Start and end date fields with a two-month calendar and optional presets like 'Last 7 days'."
     },
     {
+      "name": "device-mock",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A drawn device frame (phone, tablet, laptop, desktop, watch or browser window) around your content, which becomes the screen. The frame is plain CSS decoration with neutral bezels; the screen is a real container, so everything inside keeps its own semantics and focus order."
+    },
+    {
       "name": "dialog",
       "type": "registry:ui",
       "version": "0.1.0",
@@ -324,6 +336,12 @@
       "type": "registry:ui",
       "version": "0.1.0",
       "description": "A field of evenly spaced dots that fills its parent, with an optional edge fade and a slow drift."
+    },
+    {
+      "name": "dotted-map",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A flat world map drawn as dots on a canvas, with optional markers and arcs that pulse between marker pairs. Still when off-screen, paused or for reduced motion."
     },
     {
       "name": "drawer",
@@ -362,6 +380,12 @@
       "description": "Repeating rows of fields inside a Form, such as invoice lines or team members. Add, remove, move up or down and insert are all buttons, so the keyboard does everything; focus lands somewhere sensible and a polite message says what changed. The contents of the rows and any totals are yours."
     },
     {
+      "name": "file-tree",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A file and folder tree built on Tree, from a list of nodes. Folders show open and closed icons, files get an icon by extension, and each row can carry a size or a status badge."
+    },
+    {
       "name": "file-upload",
       "type": "registry:ui",
       "version": "0.1.0",
@@ -396,6 +420,12 @@
       "type": "registry:ui",
       "version": "0.1.0",
       "description": "A band of light that sweeps across a card or an image when the pointer or keyboard focus reaches it."
+    },
+    {
+      "name": "globe",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A canvas globe of land dots that turns slowly, can be dragged to rotate, and can mark places with glowing dots. Still when off-screen, paused or for reduced motion."
     },
     {
       "name": "gradient-button",
@@ -438,6 +468,12 @@
       "type": "registry:ui",
       "version": "0.1.0",
       "description": "Text whose letters scramble into random characters and then settle left to right on the real text, when it scrolls into view or when it is hovered. The final text is always in the page."
+    },
+    {
+      "name": "icon-cloud",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "Icons laid out on a slowly turning sphere, built with CSS 3D transforms and no canvas. Each icon can be a link, a button or a plain image, and the list keeps one fixed order for the keyboard."
     },
     {
       "name": "input-group",
@@ -584,6 +620,12 @@
       "description": "A number that counts up (or down) to its value once after it appears. The final number is always the text that is read and that is in the server HTML."
     },
     {
+      "name": "orbiting-circles",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "Items that travel around a centre on one or more circular paths, such as the tools a product works with. The items are your own children and the orbit is plain CSS."
+    },
+    {
       "name": "page-header",
       "type": "registry:ui",
       "version": "0.1.0",
@@ -618,6 +660,12 @@
       "type": "registry:ui",
       "version": "0.1.0",
       "description": "The current subscription plan: name, price and interval, status with the right text, renewal or end date, feature list, a usage hint, and the actions Change plan and Cancel subscription (confirmed, with the end date). A past due plan shows an alert. PlanPicker, exported beside it, lets people choose another plan. Your callbacks do the work. UI permission is not security: the server must check again."
+    },
+    {
+      "name": "pointer",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A named pointer that follows the mouse inside a container, like a collaborator cursor: an arrow drawn in CSS with a name tag. It hides when the mouse leaves."
     },
     {
       "name": "popover",
@@ -804,6 +852,18 @@
       "type": "registry:ui",
       "version": "0.1.0",
       "description": "Picks a number, or a range with two thumbs, by dragging along a track. Shows the formatted value."
+    },
+    {
+      "name": "smooth-cursor",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A soft dot or ring that trails the real pointer with easing, inside a container or across the page. The system cursor stays unless you ask to hide it."
+    },
+    {
+      "name": "social-post-card",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A generic social post: avatar, display name, handle, time text, body, an optional media slot and link preview slot, and a row of real buttons (reply, repost, like) with formatted counts. It is an article with no network branding."
     },
     {
       "name": "sources",
