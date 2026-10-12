@@ -1602,6 +1602,10 @@
   position: relative;
   display: inline-block;
   flex: none;
+  max-width: 100%;
+  aspect-ratio: 1;
+  /* The rings are drawn as fractions of this box, so on a narrow screen the whole orbit shrinks to fit. */
+  container-type: inline-size;
 }
 
 .rdm-orbit-path {

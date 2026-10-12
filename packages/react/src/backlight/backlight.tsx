@@ -1,4 +1,4 @@
-import { forwardRef, version, type CSSProperties, type HTMLAttributes } from "react";
+import { Children, cloneElement, forwardRef, isValidElement, version, type CSSProperties, type HTMLAttributes, type ReactNode } from "react";
 import { backlightDefaults, type BacklightSpecProps } from "../generated/backlight.types";
 import { cx } from "../utils/cx";
 
@@ -12,6 +12,16 @@ export interface BacklightProps
 
 // React 19 takes inert as a boolean, React 18 only as an attribute string.
 const inertProps = (Number(version.split(".")[0]) >= 19 ? { inert: true } : { inert: "" }) as Record<string, unknown>;
+
+// The glow in copy mode repeats the children, so ids inside the copy are removed: the page must never hold the same id twice.
+function withoutIds(node: ReactNode): ReactNode {
+  return Children.map(node, (child) => {
+    if (!isValidElement<{ id?: string; children?: ReactNode }>(child)) return child;
+    const { children } = child.props;
+    if (typeof children === "function") return cloneElement(child, { id: undefined });
+    return cloneElement(child, { id: undefined }, children === undefined ? undefined : withoutIds(children));
+  });
+}
 
 /**
  * A soft glow behind its children. With `colors` it is a blurred gradient; without, it is a blurred,
@@ -58,7 +68,7 @@ export const Backlight = forwardRef<HTMLDivElement, BacklightProps>(function Bac
         className="rdm-backlight-glow"
         data-mode={gradient ? "colors" : "copy"}
       >
-        {gradient ? null : children}
+        {gradient ? null : withoutIds(children)}
       </div>
       <div className="rdm-backlight-content">{children}</div>
     </div>
