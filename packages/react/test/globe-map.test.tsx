@@ -187,3 +187,11 @@ describe("DottedMap", () => {
     expect(renderToString(<DottedMap label="Map" markers={places} />)).toContain("Tokyo");
   });
 });
+
+describe("inland seas", () => {
+  it("leave the Black Sea and the Caspian empty while their shores stay land", () => {
+    expect(isLand(43.5, 34)).toBe(false); // Black Sea
+    expect(isLand(42, 51)).toBe(false); // Caspian
+    expect(isLand(50, 30)).toBe(true); // Ukraine
+  });
+});

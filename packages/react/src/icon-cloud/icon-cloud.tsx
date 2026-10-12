@@ -79,7 +79,7 @@ export const IconCloud = forwardRef<HTMLDivElement, IconCloudProps>(function Ico
             <li
               key={item.id ?? `${item.label}-${i}`}
               className="rdm-cloud-item"
-              style={{ "--rdm-lat": `${lat}deg`, "--rdm-lon": `${lon}deg` } as CSSProperties}
+              style={{ "--rdm-lat": `${lat}deg`, "--rdm-lon": `${lon}deg`, "--rdm-lt": round((((lon % 360) + 360) % 360) / 360) } as CSSProperties}
             >
               <span className="rdm-cloud-face">{icon}</span>
             </li>

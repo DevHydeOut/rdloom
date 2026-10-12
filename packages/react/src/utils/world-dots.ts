@@ -31,6 +31,16 @@ export const WORLD_OUTLINES: Record<string, Ring> = {
   antarctica: [[-180,-78],[-150,-76],[-120,-74],[-90,-72],[-65,-66],[-60,-72],[-30,-75],[0,-70],[40,-68],[70,-67],[100,-66],[130,-66],[160,-70],[180,-78],[180,-90],[-180,-90]],
 };
 
+/** Inland seas the continent outlines would otherwise fill in; their dots are left out. */
+const WORLD_WATER: ReadonlyArray<Ring> = [
+  [[28,41.5],[28,45],[31,46.5],[34,46],[36,45],[38,47],[41.5,42],[41,41],[35,42],[31,41]],
+  [[47,45],[50,46.5],[53,45],[53,41],[54,37],[50,37],[49,40],[47,43]],
+  [[69,46],[74,46.5],[74,44],[70,43.5]],
+  [[-90,48.5],[-85,48.5],[-84,46],[-88,46.5]],
+  [[-88,46],[-86,46],[-86,42],[-87.5,42]],
+  [[-84,46],[-81,45.5],[-80,43.5],[-83,43]],
+];
+
 function inside(ring: Ring, lng: number, lat: number): boolean {
   let hit = false;
   for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
@@ -53,7 +63,7 @@ function buildMask(): Uint8Array {
     const lat = 90 - (r + 0.5) * CELL;
     for (let c = 0; c < COLS; c++) {
       const lng = -180 + (c + 0.5) * CELL;
-      if (rings.some((ring) => inside(ring, lng, lat))) out[r * COLS + c] = 1;
+      if (rings.some((ring) => inside(ring, lng, lat)) && !WORLD_WATER.some((ring) => inside(ring, lng, lat))) out[r * COLS + c] = 1;
     }
   }
   return out;
