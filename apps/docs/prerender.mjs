@@ -40,7 +40,7 @@ function page(html, { title, description }, url, extraHead = "", renderedPath = 
           `<meta property="og:image" content="${siteUrl}/og.png" />`,
           `<meta property="og:image:width" content="1200" />`,
           `<meta property="og:image:height" content="630" />`,
-          `<meta property="og:image:alt" content="rdloom: production-ready React blocks you copy and own" />`,
+          `<meta property="og:image:alt" content="rdloom: accessible React blocks you copy and own" />`,
           `<meta name="twitter:card" content="summary_large_image" />`,
           `<meta name="twitter:image" content="${siteUrl}/og.png" />`,
         ]

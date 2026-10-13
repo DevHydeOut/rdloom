@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { componentGroups, components, displayName, hrefOf, parts } from "../data";
 import { Link } from "../router";
-import { H2, Muted, PageHeader } from "../ui";
+import { Badge, H2, Muted, PageHeader } from "../ui";
 
 /** Every component on one page: filter by name or purpose, grouped by what they're for. */
 export function ComponentsIndex() {
@@ -15,6 +15,10 @@ export function ComponentsIndex() {
         title="Components"
         lead={`${parts.length} accessible components and ${components.length - parts.length} ready-made blocks, each with live examples, the props, keyboard and screen reader behaviour, and source you own.`}
       />
+      <p className="pb-4 text-sm leading-6 text-[var(--site-muted)]">
+        <strong className="font-medium text-[var(--site-fg)]">Maturity:</strong> rdloom is below version 1.0, so every component is marked <em>experimental</em>. The look and the props can still change in a minor
+        release, and each change is listed in the release notes. Your copy only changes when you run <code>rdloom upgrade</code>.
+      </p>
       <div className="pb-2">
         <label htmlFor="filter" className="sr-only">
           Filter components
@@ -54,8 +58,9 @@ export function ComponentsIndex() {
                       </span>
                     </span>
                     <span className="line-clamp-2 text-[13px] leading-5 text-[var(--site-muted)]">{c.spec.description}</span>
-                    <span className="pt-1 text-xs text-[var(--site-muted)]">
+                    <span className="flex items-center gap-2 pt-1 text-xs text-[var(--site-muted)]">
                       {c.examples.length} {c.examples.length === 1 ? "example" : "examples"}
+                      <Badge>{c.spec.status ?? "experimental"}</Badge>
                     </span>
                   </Link>
                 </li>

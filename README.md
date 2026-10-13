@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/DevHydeOut/rdloom/actions/workflows/ci.yml/badge.svg)](https://github.com/DevHydeOut/rdloom/actions/workflows/ci.yml)
 
-**Production-ready React blocks and components that you copy into your app and own.**
+**Accessible React blocks and components that you copy into your app and own.**
 
 rdloom gives you the screens that business software needs every day: data tables, forms, dashboards, settings pages, sign-in screens, invite dialogs and more. You add what you need with one command. The code lands in your project, so you can read it, change it and keep it.
 
