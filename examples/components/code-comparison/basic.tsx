@@ -15,7 +15,7 @@ const after = `function total(items) {
 export default function CodeComparisonBasicExample() {
   return (
     <div className="flex w-full justify-center">
-      <CodeComparison className="max-w-3xl" before={before} after={after} language="javascript" />
+      <CodeComparison className="w-full max-w-5xl" before={before} after={after} language="javascript" />
     </div>
   );
 }

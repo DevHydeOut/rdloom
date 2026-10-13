@@ -5,7 +5,7 @@ export default function TerminalStillExample() {
     <div className="flex w-full justify-center">
       <Terminal
         isPaused
-        className="w-full max-w-md"
+        className="w-full max-w-2xl"
         label="Build output"
         lines={[
           { text: "npm run build" },

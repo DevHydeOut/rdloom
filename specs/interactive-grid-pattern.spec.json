@@ -19,7 +19,7 @@
     "color": {
       "type": "string",
       "description": "Colour of the grid lines.",
-      "default": "var(--rd-color-border-default)"
+      "default": "color-mix(in srgb, var(--rd-color-text-default) 16%, transparent)"
     },
     "activeColor": {
       "type": "string",

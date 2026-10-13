@@ -5,7 +5,7 @@
 export interface NoiseSpecProps {
   /**
    * Strength of the grain, from 0 to 1.
-   * @default 0.08
+   * @default 0.14
    */
   opacity?: number;
   /**
@@ -26,7 +26,7 @@ export interface NoiseSpecProps {
 }
 
 export const noiseDefaults = {
-  opacity: 0.08,
+  opacity: 0.14,
   size: 160,
   animated: false,
   isStill: false,

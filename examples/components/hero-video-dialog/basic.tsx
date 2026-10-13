@@ -1,15 +1,15 @@
 import { HeroVideoDialog } from "@rdloom/react";
 
-// No video ships with the library. The src below is a placeholder for your own file, and it is not
+// A public sample video (CC0) and a free Unsplash photo as the thumbnail. Use your own files. The video is not
 // requested until the dialog opens.
 export default function HeroVideoDialogBasicExample() {
   return (
     <div className="flex w-full justify-center">
-      <div className="w-full max-w-lg">
+      <div className="w-full max-w-3xl">
         <HeroVideoDialog
           title="Product tour"
-          videoSrc="/media/product-tour.mp4"
-          poster={<div className="size-full bg-gradient-to-br from-indigo-500 via-fuchsia-500 to-amber-400" />}
+          videoSrc="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
+          poster={<img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80" alt="" className="size-full object-cover" />}
         />
       </div>
     </div>

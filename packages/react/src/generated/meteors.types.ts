@@ -5,7 +5,7 @@
 export interface MeteorsSpecProps {
   /**
    * How many streaks.
-   * @default 16
+   * @default 28
    */
   count?: number;
   /**
@@ -30,7 +30,7 @@ export interface MeteorsSpecProps {
 }
 
 export const meteorsDefaults = {
-  count: 16,
+  count: 28,
   angle: 215,
   duration: 6,
   isPaused: false,

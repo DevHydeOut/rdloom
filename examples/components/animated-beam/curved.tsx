@@ -9,7 +9,7 @@ export default function AnimatedBeamCurvedExample() {
   const box = "relative z-10 rounded-[var(--rd-radius-control)] border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-default)] px-4 py-3 text-sm";
   return (
     <div className="flex w-full justify-center">
-      <div ref={container} className="relative flex w-full max-w-md items-center justify-between px-6 py-14">
+      <div ref={container} className="relative flex w-full max-w-2xl items-center justify-between px-6 py-14">
         <div ref={a} className={box}>Form</div>
         <div ref={b} className={box}>Queue</div>
         <div ref={c} className={box}>Report</div>

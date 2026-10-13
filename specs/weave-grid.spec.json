@@ -24,12 +24,12 @@
     "warpColor": {
       "type": "string",
       "description": "Colour of the vertical warp threads.",
-      "default": "var(--rd-color-border-default)"
+      "default": "color-mix(in srgb, var(--rd-color-text-default) 16%, transparent)"
     },
     "weftColor": {
       "type": "string",
       "description": "Colour of the horizontal weft threads.",
-      "default": "var(--rd-color-border-default)"
+      "default": "color-mix(in srgb, var(--rd-color-text-default) 16%, transparent)"
     },
     "accent": {
       "type": "string",

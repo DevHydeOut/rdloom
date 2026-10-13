@@ -4,7 +4,7 @@ export default function TerminalBasicExample() {
   return (
     <div className="flex w-full justify-center">
       <Terminal
-        className="w-full max-w-md"
+        className="w-full max-w-2xl"
         lines={[
           { text: "npx rdloom init" },
           { text: "Created rdloom.json", kind: "output" },

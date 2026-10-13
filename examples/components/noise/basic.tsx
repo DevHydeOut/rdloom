@@ -3,11 +3,11 @@ import { Noise } from "@rdloom/react";
 export default function NoiseBasic() {
   return (
     <div className="flex w-full justify-center">
-      <div className="relative flex h-48 w-full max-w-md items-center justify-center overflow-hidden rounded-xl border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-default)]">
+      <div className="relative flex h-96 w-full items-center justify-center overflow-hidden rounded-xl border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-default)]">
         <Noise />
         <div className="relative text-center">
-          <p className="text-lg font-medium text-[var(--rd-color-text-default)]">Fine grain</p>
-          <p className="text-sm text-[var(--rd-color-text-muted)]">Still, with no animation</p>
+          <p className="text-4xl font-semibold tracking-tight text-[var(--rd-color-text-default)]">Fine grain</p>
+          <p className="text-base text-[var(--rd-color-text-muted)]">Still, with no animation</p>
         </div>
       </div>
     </div>

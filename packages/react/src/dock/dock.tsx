@@ -30,6 +30,7 @@ export const Dock = forwardRef<HTMLDivElement, DockProps>(function Dock(
     onPointerMove,
     onPointerLeave,
     onFocus,
+    style,
     ...rest
   },
   ref,
@@ -104,6 +105,7 @@ export const Dock = forwardRef<HTMLDivElement, DockProps>(function Dock(
         aria-orientation={orientation}
         data-orientation={orientation}
         data-rdm-paused={isPaused || undefined}
+        style={{ ...({ "--rdm-dock-m": Math.max(1, magnification) } as React.CSSProperties), ...style }}
         onKeyDown={handleKey}
         onPointerMove={handleMove}
         onPointerLeave={(e) => {
@@ -116,8 +118,8 @@ export const Dock = forwardRef<HTMLDivElement, DockProps>(function Dock(
           if (target) setTab(target);
         }}
         className={cx(
-          "inline-flex items-center gap-2 p-2 border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-raised)] [box-shadow:var(--rd-elevation-raised)] rounded-[var(--rd-radius-overlay)]",
-          vertical ? "flex-col" : "flex-row",
+          "rdm-dock inline-flex gap-2 p-2 border border-[var(--rd-color-border-default)] bg-[color-mix(in_srgb,var(--rd-color-surface-raised)_82%,transparent)] backdrop-blur-md [box-shadow:var(--rd-elevation-raised)] rounded-[1.5rem]",
+          vertical ? "flex-col items-start" : "flex-row items-end",
           className,
         )}
       >
@@ -140,8 +142,8 @@ export interface DockItemProps {
 }
 
 const itemClass =
-  "rdm-dock-item inline-flex size-11 items-center justify-center rounded-[var(--rd-radius-control)] border border-[var(--rd-color-border-default)] " +
-  "bg-[var(--rd-color-surface-default)] text-[var(--rd-color-text-default)] outline-none cursor-pointer " +
+  "rdm-dock-item inline-flex items-center justify-center rounded-full " +
+  "bg-[var(--rd-color-surface-subtle)] text-[var(--rd-color-text-default)] hover:bg-[var(--rd-color-surface-default)] outline-none cursor-pointer " +
   "data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)] data-[disabled]:opacity-50 data-[disabled]:cursor-not-allowed";
 
 /** One icon button (or link) in a Dock. */

@@ -19,7 +19,7 @@
     "color": {
       "type": "string",
       "description": "Colour of the pattern: any CSS colour or a token such as var(--rd-color-border-default).",
-      "default": "var(--rd-color-border-default)"
+      "default": "color-mix(in srgb, var(--rd-color-text-default) 16%, transparent)"
     },
     "fade": {
       "type": "boolean",
