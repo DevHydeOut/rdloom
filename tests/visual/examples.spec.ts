@@ -17,11 +17,42 @@ const examples = fs
       .map((f) => ({ id: d.name, name: f.slice(0, -4) })),
   );
 
+// Motion components move on their own (canvas, timers), so a photograph is never the same twice. For these the page asks
+// for reduced motion, which every one of them honours by showing one still frame: that is the picture we compare.
+const specsDir = path.resolve(__dirname, "../../specs");
+const moving = new Set(
+  fs
+    .readdirSync(specsDir)
+    .filter((f) => f.endsWith(".spec.json"))
+    .map((f) => JSON.parse(fs.readFileSync(path.join(specsDir, f), "utf8")) as { name: string; category: string })
+    .filter((s) => s.category === "motion")
+    .map((s) => s.name.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase()),
+);
+
+// The cells of a flickering grid are redrawn from random numbers each time the box is measured, and how often that happens
+// depends on the machine, so no fixed picture exists. These examples are only checked for rendering without errors.
+const NO_PICTURE = new Set(["flickering-grid"]);
+
+const SLOW_TO_LOAD = new Set(["customer-table/server-side", "time-slot-picker/async-slots"]);
+
 // A fixed "today", so calendars and date presets look the same every day.
 const NOW = new Date("2026-03-15T10:00:00Z");
 
 async function open(page: Page, id: string, name: string, theme: string) {
   await page.clock.setFixedTime(NOW);
+  if (moving.has(id)) {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    // Scattered particles, sparkles and flickering cells use Math.random: a fixed sequence makes the still frame repeatable.
+    await page.addInitScript(() => {
+      let a = 0x9e3779b9;
+      Math.random = () => {
+        a = (a + 0x6d2b79f5) | 0;
+        let t = Math.imul(a ^ (a >>> 15), 1 | a);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      };
+    });
+  }
   await page.goto(`/visual/${id}/${name}?theme=${theme}`);
   await page.locator("[data-visual-ready]").waitFor({ state: "attached" });
   await page.evaluate(() => document.fonts.ready);
@@ -29,6 +60,9 @@ async function open(page: Page, id: string, name: string, theme: string) {
   await page.waitForFunction(() => [...document.images].every((img) => img.complete));
   // The streaming example types its text out on a timer: wait until the whole reply is there.
   if (id === "response" && name === "streaming") await expect(page.getByText("GROUP BY month")).toBeVisible({ timeout: 10_000 });
+  // These examples stand in for a server that answers after about 0.6 to 0.7 seconds, and they show no spinner while they wait.
+  // A slow runner could photograph the waiting state, so give them time to finish loading.
+  if (SLOW_TO_LOAD.has(`${id}/${name}`)) await page.waitForTimeout(2000);
   // Examples that fetch (combobox/async) show a spinner first; wait it out.
   // The Spinner examples are the spinner, so they keep it.
   if (id !== "spinner") await expect(page.getByRole("status", { name: "Loading" })).toHaveCount(0);
@@ -39,6 +73,7 @@ for (const theme of ["light", "dark"]) {
     for (const { id, name } of examples) {
       test(`${id}/${name}`, async ({ page }) => {
         await open(page, id, name, theme);
+        if (NO_PICTURE.has(id)) return void (await expect(page.locator("[data-visual]")).toBeVisible());
         await expect(page.locator("[data-visual]")).toHaveScreenshot(`${id}--${name}--${theme}.png`);
       });
     }
