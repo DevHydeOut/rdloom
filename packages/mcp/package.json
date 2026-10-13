@@ -1,6 +1,6 @@
 {
   "name": "@rdloom/mcp",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "license": "MIT",
   "type": "module",
   "description": "MCP server that gives AI coding agents the rdloom specs: props, usage rules, accessibility requirements, tokens and source.",
