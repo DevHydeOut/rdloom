@@ -162,7 +162,7 @@ export const previewPaths = blocks.flatMap((c) => c.examples.map((e) => `/previe
 export const searchEntries = [
   ...guides.map((g) => ({ id: g.href, name: g.title, group: "Guides" })),
   { id: "/components", name: "All components", group: "Components" },
-  ...parts.map((c) => ({ id: `/components/${c.id}`, name: displayName(c.spec.name), group: "Components", category: c.spec.category })),
+  ...parts.map((c) => ({ id: `/components/${c.id}`, name: displayName(c.spec.name), group: "Components", category: c.spec.category, alias: `${c.spec.category} ${c.spec.name} ${c.id}` })),
   { id: "/blocks", name: "All blocks", group: "Blocks" },
-  ...blocks.map((c) => ({ id: hrefOf(c), name: displayName(c.spec.name), group: "Blocks", category: c.spec.category })),
+  ...blocks.map((c) => ({ id: hrefOf(c), name: displayName(c.spec.name), group: "Blocks", category: c.spec.category, alias: `${c.spec.category} ${c.spec.name} ${c.id}` })),
 ];
