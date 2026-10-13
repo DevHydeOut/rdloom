@@ -67,7 +67,7 @@ export interface Route {
 
 const home: Omit<Route, "page"> = {
   path: "/",
-  title: "rdloom: production-ready React blocks you copy and own",
+  title: "rdloom: accessible React blocks you copy and own",
   description:
     "Accessible React blocks for ERP, SaaS and B2B apps: data tables, forms, settings, billing, sign-in and dashboards. Copy the source into your project, change anything, and still take upgrades.",
 };

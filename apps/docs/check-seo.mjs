@@ -103,6 +103,24 @@ else {
   }
 }
 
+// Honest maturity: while any component is below stable, no page and no README may call the library production-ready,
+// and the components page must say what the experimental label means.
+{
+  const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
+  const specDir = path.join(root, "specs");
+  const unstable = fs.existsSync(specDir)
+    ? fs.readdirSync(specDir).filter((n) => n.endsWith(".spec.json")).filter((n) => JSON.parse(fs.readFileSync(path.join(specDir, n), "utf8")).status !== "stable")
+    : [];
+  if (unstable.length) {
+    const claim = /production[- ]ready/i;
+    for (const f of files) if (claim.test(fs.readFileSync(f, "utf8"))) problems.push(`${routeOf(f)}: says "production-ready" while ${unstable.length} components are not stable`);
+    const readme = path.join(root, "README.md");
+    if (fs.existsSync(readme) && claim.test(fs.readFileSync(readme, "utf8"))) problems.push(`README.md says "production-ready" while ${unstable.length} components are not stable`);
+    const index = path.join(dist, "components.html");
+    if (fs.existsSync(index) && !fs.readFileSync(index, "utf8").includes("Maturity:")) problems.push("/components does not explain what the experimental label means");
+  }
+}
+
 const sitemapFile = path.join(dist, "sitemap.xml");
 if (!fs.existsSync(sitemapFile)) problems.push("no sitemap.xml");
 else {
