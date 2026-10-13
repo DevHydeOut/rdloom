@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --port 5180 --strictPort",
+    "prebuild": "node -e \"require('fs').existsSync('src/components/rdloom')||(console.error('The rdloom components are not installed yet. Run: npx rdloom init && npx rdloom add button text-field select combobox date-picker date-range-picker dialog toast data-grid --install  (or bash scripts/sample-app.sh from the repo root)'),process.exit(1))\"",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview --port 5181 --strictPort"
   },

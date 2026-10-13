@@ -72,3 +72,64 @@ test.describe("DataGrid on a phone", () => {
     await expect(page.getByRole("textbox")).toHaveCount(0);
   });
 });
+
+// Things a tester hit on the live site, kept here so they cannot come back.
+test.describe("docs site basics", () => {
+  for (const [typed, shown] of [
+    ["DataGrid", "Data Grid"],
+    ["datagrid", "Data Grid"],
+    ["TextField", "Text Field"],
+    ["data grid", "Data Grid"],
+  ] as const) {
+    test(`search for "${typed}" finds ${shown}`, async ({ page }) => {
+      await page.goto("/", { waitUntil: "networkidle" });
+      await page.getByRole("button", { name: /Search the docs/ }).first().click();
+      await page.keyboard.type(typed);
+      await expect(page.getByRole("dialog", { name: "Search the docs" }).getByText(shown, { exact: true }).first()).toBeVisible();
+    });
+  }
+
+  test("a copy button always says what happened, even when the clipboard is blocked", async ({ page }) => {
+    await page.addInitScript(() => {
+      Object.defineProperty(navigator, "clipboard", { value: { writeText: () => Promise.reject(new Error("blocked")) }, configurable: true });
+      document.execCommand = () => false;
+    });
+    await page.goto("/docs/getting-started", { waitUntil: "networkidle" });
+    const button = page.getByRole("button", { name: "Copy init command" });
+    await button.click();
+    await expect(page.getByText(/Copy failed/).first()).toBeVisible();
+  });
+
+  test("a copy button confirms a successful copy", async ({ page, context }) => {
+    await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+    await page.goto("/docs/getting-started", { waitUntil: "networkidle" });
+    await page.getByRole("button", { name: "Copy init command" }).click();
+    await expect(page.getByText("Copied").first()).toBeVisible();
+  });
+
+  test("the invite example names the problem with a wrong email address", async ({ page }) => {
+    await page.goto("/components/dialog", { waitUntil: "networkidle" });
+    await page.getByRole("button", { name: "Invite member" }).first().click();
+    await page.getByLabel(/Email/).fill("not-an-email");
+    await page.getByRole("button", { name: "Send invite" }).click();
+    await expect(page.locator("[slot=errorMessage]").getByText("Enter a valid email address, like name@example.com.")).toBeVisible();
+  });
+});
+
+test("the simulated chat goes through failure, Try again, approval and a finished reply", async ({ page }) => {
+  await page.goto("/visual/chat/simulated-run");
+  await page.locator("[data-visual-ready]").waitFor({ state: "attached" });
+  await page.getByRole("button", { name: /this one breaks once/ }).click();
+  await expect(page.getByRole("button", { name: /Try again/ })).toBeVisible({ timeout: 8000 });
+  await page.getByRole("button", { name: /Try again/ }).click();
+  await expect(page.getByText(/refunds stayed under 2%/)).toBeVisible({ timeout: 8000 });
+  await expect(page.getByRole("button", { name: /Try again/ })).toHaveCount(0);
+});
+
+test("the simulated chat asks before it sends", async ({ page }) => {
+  await page.goto("/visual/chat/simulated-run");
+  await page.locator("[data-visual-ready]").waitFor({ state: "attached" });
+  await page.getByRole("button", { name: /send the report/ }).click();
+  await page.getByRole("button", { name: /Approve|Allow/ }).first().click({ timeout: 10000 });
+  await expect(page.getByText("Sent to finance.")).toBeVisible({ timeout: 8000 });
+});

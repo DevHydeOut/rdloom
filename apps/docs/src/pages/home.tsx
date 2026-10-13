@@ -64,10 +64,10 @@ export function Home() {
           New: DataGrid search matches formatted values →
         </Link>
         <h1 id="page-title" tabIndex={-1} className="font-display max-w-4xl text-[40px] leading-[1.05] tracking-[-0.045em] text-balance outline-none sm:text-[68px]">
-          Production-ready React blocks you copy and own.
+          Accessible React blocks you copy and own.
         </h1>
         <p className="max-w-2xl text-[19px] leading-8 text-balance text-[var(--site-muted)]">
-          For ERP, SaaS and B2B apps: data tables, forms, settings, billing, sign-in and dashboards. Accessible, tested, and yours to change, with upgrades that merge into your edits.
+          For ERP, SaaS and B2B apps: data tables, forms, settings, billing, sign-in and dashboards. Checked automatically for accessibility, and yours to change, with upgrades that merge into your edits.
         </p>
         <div className="flex flex-wrap justify-center gap-3">
           <Link href="/docs/getting-started" className="rounded-lg bg-[var(--site-accent)] px-5 py-2.5 font-medium text-[var(--site-on-accent)] transition-opacity hover:opacity-90">
