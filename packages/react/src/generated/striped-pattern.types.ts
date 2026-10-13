@@ -20,7 +20,7 @@ export interface StripedPatternSpecProps {
   angle?: number;
   /**
    * Colour of the pattern: any CSS colour or a token such as var(--rd-color-border-default).
-   * @default "var(--rd-color-border-default)"
+   * @default "color-mix(in srgb, var(--rd-color-text-default) 16%, transparent)"
    */
   color?: string;
   /**
@@ -49,7 +49,7 @@ export const stripedPatternDefaults = {
   size: 2,
   gap: 10,
   angle: 45,
-  color: "var(--rd-color-border-default)",
+  color: "color-mix(in srgb, var(--rd-color-text-default) 16%, transparent)",
   fade: true,
   animated: false,
   isStill: false,

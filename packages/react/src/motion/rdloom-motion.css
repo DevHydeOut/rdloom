@@ -47,11 +47,11 @@
 /* RippleButton: a ripple spreads from where the button was pressed. */
 @keyframes rdm-ripple {
   from {
-    transform: translate(-50%, -50%) scale(0);
+    transform: scale(0);
     opacity: 0.34;
   }
   to {
-    transform: translate(-50%, -50%) scale(1);
+    transform: scale(1);
     opacity: 0;
   }
 }
@@ -61,7 +61,8 @@
   border-radius: 9999px;
   background: currentColor;
   pointer-events: none;
-  transform: translate(-50%, -50%) scale(0);
+  translate: -50% -50%;
+  transform: scale(0);
   animation: rdm-ripple var(--rdm-d, 600ms) ease-out forwards;
 }
 
@@ -192,15 +193,15 @@
 /* Ripple: concentric rings swell outward behind content. */
 @keyframes rdm-ring {
   0% {
-    transform: translate(-50%, -50%) scale(0.86);
+    transform: scale(0.86);
     opacity: 0.9;
   }
   50% {
-    transform: translate(-50%, -50%) scale(1);
+    transform: scale(1);
     opacity: 0.45;
   }
   100% {
-    transform: translate(-50%, -50%) scale(0.86);
+    transform: scale(0.86);
     opacity: 0.9;
   }
 }
@@ -209,10 +210,15 @@
   position: absolute;
   left: 50%;
   top: 50%;
+  /* Centred with its own property, so the ring stays centred whether or not the animation is running. */
+  translate: -50% -50%;
   border-radius: 9999px;
   pointer-events: none;
   border: 1px solid color-mix(in srgb, var(--rdm-c, var(--rd-color-border-strong)) 70%, transparent);
-  background: color-mix(in srgb, var(--rdm-c, var(--rd-color-border-strong)) 7%, transparent);
+  background: color-mix(in srgb, var(--rdm-c, var(--rd-color-border-strong)) 6%, transparent);
+  /* The rings fade out toward the bottom, so the backdrop melts into the page. */
+  mask-image: linear-gradient(to bottom, #000 35%, transparent 98%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 35%, transparent 98%);
   animation: rdm-ring var(--rdm-d, 4s) ease-in-out infinite;
 }
 
@@ -593,11 +599,32 @@
   animation-play-state: paused;
 }
 
-/* Dock: items grow toward the pointer (--rdm-dock-s, set by script) and when focused (--rdm-dock-f). */
+/*
+ * Dock: items grow toward the pointer (--rdm-dock-s, set by script) and when focused (--rdm-dock-f). The item takes up
+ * the room it grows into, so its neighbours move aside instead of being covered. The dock keeps the height of its
+ * largest state (--rdm-dock-m), so nothing around it jumps.
+ */
 .rdm-dock-item {
-  transform: scale(max(var(--rdm-dock-s, 1), var(--rdm-dock-f, 1)));
-  transition: transform 120ms ease-out;
-  will-change: transform;
+  --rdm-dock-now: max(var(--rdm-dock-s, 1), var(--rdm-dock-f, 1));
+  flex: none;
+  width: calc(2.75rem * var(--rdm-dock-now));
+  height: calc(2.75rem * var(--rdm-dock-now));
+  transition:
+    width 110ms ease-out,
+    height 110ms ease-out;
+}
+
+.rdm-dock-item > span {
+  transform: scale(var(--rdm-dock-now));
+  transition: transform 110ms ease-out;
+}
+
+.rdm-dock[data-orientation="horizontal"] {
+  min-height: calc(2.75rem * var(--rdm-dock-m, 1.6) + 1rem + 2px);
+}
+
+.rdm-dock[data-orientation="vertical"] {
+  min-width: calc(2.75rem * var(--rdm-dock-m, 1.6) + 1rem + 2px);
 }
 
 .rdm-dock-item:focus-visible,
@@ -606,7 +633,7 @@
 }
 
 [data-rdm-paused] > .rdm-dock-item {
-  transform: scale(var(--rdm-dock-f, 1));
+  --rdm-dock-now: var(--rdm-dock-f, 1);
 }
 
 @media (forced-colors: active) {
@@ -673,8 +700,8 @@
 }
 
 .rdm-pattern[data-fade="edge"] {
-  -webkit-mask-image: radial-gradient(ellipse at center, #000 35%, transparent 80%);
-  mask-image: radial-gradient(ellipse at center, #000 35%, transparent 80%);
+  -webkit-mask-image: radial-gradient(ellipse at center, #000 30%, transparent 78%);
+  mask-image: radial-gradient(ellipse at center, #000 30%, transparent 78%);
 }
 
 .rdm-pattern-fill {
@@ -1126,7 +1153,7 @@
   inset-inline-start: 0;
   width: 40%;
   pointer-events: none;
-  background: linear-gradient(90deg, transparent, var(--rdm-c, color-mix(in srgb, white 32%, transparent)), transparent);
+  background: linear-gradient(90deg, transparent, var(--rdm-c, color-mix(in srgb, var(--rd-color-action-primary) 20%, transparent)), transparent);
   transform: translateX(calc(-160% * var(--rdm-flip))) skewX(calc(var(--rdm-a, -20deg) * var(--rdm-flip)));
 }
 
@@ -1157,7 +1184,7 @@
     opacity: 1;
   }
   100% {
-    transform: rotate(var(--rdm-a, 215deg)) translateX(-40rem);
+    transform: rotate(var(--rdm-a, 215deg)) translateX(-52rem);
     opacity: 0;
   }
 }
@@ -1171,11 +1198,12 @@
 
 .rdm-meteor {
   position: absolute;
-  width: 2px;
-  height: 2px;
+  width: 3px;
+  height: 3px;
   border-radius: 9999px;
   opacity: 0;
-  background: var(--rdm-c, var(--rd-color-text-muted));
+  background: var(--rdm-c, color-mix(in srgb, var(--rd-color-text-default) 70%, transparent));
+  box-shadow: 0 0 8px 1px color-mix(in srgb, var(--rdm-c, var(--rd-color-text-default)) 45%, transparent);
   animation: rdm-meteor var(--rdm-d, 6s) linear var(--rdm-delay, 0s) infinite;
 }
 
@@ -1184,10 +1212,10 @@
   position: absolute;
   top: 50%;
   left: 100%;
-  width: 4rem;
-  height: 1px;
+  width: 7rem;
+  height: 2px;
   transform: translateY(-50%);
-  background: linear-gradient(90deg, var(--rdm-c, var(--rd-color-text-muted)), transparent);
+  background: linear-gradient(90deg, var(--rdm-c, color-mix(in srgb, var(--rd-color-text-default) 60%, transparent)), transparent);
 }
 
 [data-rdm-paused] > .rdm-meteor {
@@ -1248,6 +1276,8 @@
   inset: 0;
   overflow: hidden;
   pointer-events: none;
+  /* Opaque, so the enlarged copy replaces what is underneath instead of lying over it. */
+  background: var(--rdm-lens-bg, var(--rd-color-surface-default));
 }
 
 .rdm-lens-ring {
@@ -1929,7 +1959,11 @@
 
   .rdm-dock-item,
   [data-rdm-paused] > .rdm-dock-item {
-    transform: scale(var(--rdm-dock-f, 1));
+    --rdm-dock-now: var(--rdm-dock-f, 1);
+    transition: none;
+  }
+
+  .rdm-dock-item > span {
     transition: none;
   }
 
@@ -2286,6 +2320,10 @@
 }
 
 .rdm-still .rdm-dock-item {
-  transform: scale(var(--rdm-dock-f, 1));
+  --rdm-dock-now: var(--rdm-dock-f, 1);
+  transition: none;
+}
+
+.rdm-still .rdm-dock-item > span {
   transition: none;
 }

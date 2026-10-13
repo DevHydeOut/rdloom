@@ -12,7 +12,7 @@ export default function CodeComparisonWithHighlightsExample() {
   return (
     <div className="flex w-full justify-center">
       <CodeComparison
-        className="max-w-3xl"
+        className="w-full max-w-5xl"
         label="Button migration"
         beforeLabel="Plain element"
         afterLabel="Library button"

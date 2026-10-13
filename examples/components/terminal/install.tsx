@@ -4,7 +4,7 @@ export default function TerminalInstallExample() {
   return (
     <div className="flex w-full justify-center">
       <Terminal
-        className="w-full max-w-md"
+        className="w-full max-w-2xl"
         label="Install steps"
         prompt=">"
         speed={25}

@@ -10,12 +10,12 @@ export interface WeaveGridSpecProps {
   size?: number;
   /**
    * Colour of the vertical warp threads.
-   * @default "var(--rd-color-border-default)"
+   * @default "color-mix(in srgb, var(--rd-color-text-default) 16%, transparent)"
    */
   warpColor?: string;
   /**
    * Colour of the horizontal weft threads.
-   * @default "var(--rd-color-border-default)"
+   * @default "color-mix(in srgb, var(--rd-color-text-default) 16%, transparent)"
    */
   weftColor?: string;
   /**
@@ -42,8 +42,8 @@ export interface WeaveGridSpecProps {
 
 export const weaveGridDefaults = {
   size: 24,
-  warpColor: "var(--rd-color-border-default)",
-  weftColor: "var(--rd-color-border-default)",
+  warpColor: "color-mix(in srgb, var(--rd-color-text-default) 16%, transparent)",
+  weftColor: "color-mix(in srgb, var(--rd-color-text-default) 16%, transparent)",
   accent: "var(--rd-color-ember-500)",
   fade: true,
   duration: 9,

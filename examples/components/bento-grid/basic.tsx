@@ -3,7 +3,7 @@ import { BentoCard, BentoGrid, ChartIcon, SettingsIcon, SparkleIcon, UsersIcon }
 export default function BentoGridBasicExample() {
   return (
     <div className="flex w-full justify-center">
-      <BentoGrid label="Features" className="max-w-2xl">
+      <BentoGrid label="Features" className="w-full max-w-4xl">
         <BentoCard
           colSpan={2}
           icon={<SparkleIcon />}

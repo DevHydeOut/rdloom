@@ -3,7 +3,7 @@ import { BentoCard, BentoGrid, ChartIcon, SparkleIcon, UsersIcon } from "@rdloom
 export default function BentoGridWithLinksExample() {
   return (
     <div className="flex w-full justify-center">
-      <BentoGrid label="Guides" className="max-w-2xl">
+      <BentoGrid label="Guides" className="w-full max-w-4xl">
         <BentoCard
           rowSpan={2}
           icon={<SparkleIcon />}

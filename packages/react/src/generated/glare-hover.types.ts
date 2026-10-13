@@ -20,7 +20,7 @@ export interface GlareHoverSpecProps {
    */
   duration?: number;
   /**
-   * Colour of the glare, any CSS colour. Defaults to white at low strength.
+   * Colour of the glare, any CSS colour. Defaults to a soft tint of the action colour, which shows on light and dark surfaces. Use white at low strength on a dark card.
    */
   color?: string;
   /**

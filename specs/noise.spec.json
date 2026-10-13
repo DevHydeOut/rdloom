@@ -19,7 +19,7 @@
     "opacity": {
       "type": "number",
       "description": "Strength of the grain, from 0 to 1.",
-      "default": 0.08
+      "default": 0.14
     },
     "size": {
       "type": "number",

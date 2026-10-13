@@ -9,7 +9,7 @@
     "count": {
       "type": "number",
       "description": "How many streaks.",
-      "default": 16
+      "default": 28
     },
     "angle": {
       "type": "number",
