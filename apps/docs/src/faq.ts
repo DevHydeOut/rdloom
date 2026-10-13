@@ -3,7 +3,7 @@
 export const faq = [
   {
     q: "What is rdloom?",
-    a: "A collection of production-ready React blocks and components that you copy into your project and own. It covers the screens around an API call: tables, forms, settings, billing, sign-in and dashboards. It never fetches data itself, so it works with any backend.",
+    a: "A collection of accessible React blocks and components that you copy into your project and own. It covers the screens around an API call: tables, forms, settings, billing, sign-in and dashboards. It never fetches data itself, so it works with any backend.",
   },
   {
     q: "How is it different from a UI library installed from npm?",
@@ -16,6 +16,10 @@ export const faq = [
   {
     q: "Is it accessible?",
     a: "Every component is built on React Aria and every example is checked with automated accessibility tests. Each component page lists its keyboard and screen reader behaviour. A full audit by people using screen readers is still planned.",
+  },
+  {
+    q: "Is it stable enough to use?",
+    a: "rdloom is below version 1.0, so every component is marked experimental: a prop or a name can still change in a minor release, and each change is listed in the release notes. Because you copy the source into your project and upgrades merge into your edits, a change never breaks your app unless you choose to upgrade. A component becomes stable (and is marked so) once it has been used in real projects and has had a manual screen reader pass.",
   },
   {
     q: "Is it free?",

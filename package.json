@@ -19,7 +19,7 @@
     "build:figma": "npm run build -w @rdloom/figma",
     "check:generated": "node scripts/check-generated.mjs",
     "smoke:cli": "bash scripts/smoke-cli.sh",
-    "smoke:mcp": "node scripts/smoke-mcp.mjs",
+    "smoke:mcp": "node scripts/build-bins.mjs && node scripts/smoke-mcp.mjs",
     "mcp": "node packages/mcp/src/index.ts",
     "test:unit": "vitest run --root packages/react && vitest run --root packages/cli && vitest run --root packages/mcp && vitest run --root packages/figma",
     "build:bins": "node scripts/build-bins.mjs",

@@ -190,7 +190,7 @@ function Search({ open, onOpenChange }: { open: boolean; onOpenChange: (open: bo
         {searchEntries
           .filter((e) => e.group === "Components")
           .map((e) => (
-            <CommandItem key={e.id} id={e.id} keywords={"category" in e ? String(e.category) : undefined}>
+            <CommandItem key={e.id} id={e.id} keywords={"alias" in e ? String(e.alias) : undefined}>
               {e.name}
             </CommandItem>
           ))}
@@ -199,7 +199,7 @@ function Search({ open, onOpenChange }: { open: boolean; onOpenChange: (open: bo
         {searchEntries
           .filter((e) => e.group === "Blocks")
           .map((e) => (
-            <CommandItem key={e.id} id={e.id}>
+            <CommandItem key={e.id} id={e.id} keywords={"alias" in e ? String(e.alias) : undefined}>
               {e.name}
             </CommandItem>
           ))}
