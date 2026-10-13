@@ -1,5 +1,5 @@
 // Starts the MCP server the way an agent does (a child process on stdio) and
-// calls one tool. Run: npm run build -w @rdloom/mcp && node scripts/smoke-mcp.mjs
+// calls one tool. Run: node scripts/build-bins.mjs && node scripts/smoke-mcp.mjs
 import { existsSync } from "node:fs";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
@@ -7,7 +7,7 @@ import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js"
 // The built file runs on any Node version; the TypeScript source only runs on the newest ones.
 const entry = "packages/mcp/dist/index.js";
 if (!existsSync(entry)) {
-  console.error(`✗ ${entry} is missing. Build it first: npm run build -w @rdloom/mcp`);
+  console.error(`✗ ${entry} is missing. Build it first: node scripts/build-bins.mjs`);
   process.exit(1);
 }
 
