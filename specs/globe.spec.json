@@ -1,0 +1,98 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Globe",
+  "version": "0.1.0",
+  "category": "motion",
+  "status": "experimental",
+  "description": "A canvas globe of land dots that turns slowly, can be dragged to rotate, and can mark places with glowing dots. Still when off-screen, paused or for reduced motion.",
+  "props": {
+    "label": {
+      "type": "string",
+      "description": "Accessible name of the whole graphic.",
+      "default": "Globe"
+    },
+    "description": {
+      "type": "string",
+      "description": "A sentence for screen readers that says what the graphic shows. It is visually hidden."
+    },
+    "markers": {
+      "type": "custom",
+      "description": "Places to mark as { lat, lng, label }. Each one is also listed, with its label, for screen readers.",
+      "tsType": "import(\"../utils/world-dots\").WorldMarker[]"
+    },
+    "speed": {
+      "type": "number",
+      "description": "Rotation speed as a multiplier: 1 is one turn a minute, 0 does not turn.",
+      "default": 1
+    },
+    "dotColor": {
+      "type": "string",
+      "description": "Colour of the land dots, any CSS colour. Defaults to the muted text colour."
+    },
+    "markerColor": {
+      "type": "string",
+      "description": "Colour of the markers, any CSS colour. Defaults to the primary action colour."
+    },
+    "isPaused": {
+      "type": "boolean",
+      "description": "Stops the movement and shows one still frame.",
+      "default": false
+    }
+  },
+  "variants": [
+    "isPaused"
+  ],
+  "states": [
+    "default"
+  ],
+  "slots": [
+    "root"
+  ],
+  "tokens": [
+    "color.text.muted",
+    "color.action.primary"
+  ],
+  "a11y": {
+    "role": "group",
+    "keyboard": [],
+    "requirements": [
+      "The canvas is decoration and aria-hidden; the root is a labelled group with a visually hidden description and a real list of the places",
+      "Stands still for visitors who ask for less motion (prefers-reduced-motion), inside an rdm-still container and with isPaused; one still frame is drawn",
+      "Moving for more than five seconds, so it can be paused with isPaused or the rdm-still container (WCAG 2.2.2)",
+      "Does not flash: nothing changes more than three times in a second (WCAG 2.3.1)",
+      "Paused while off-screen, and its animation frame is cancelled when it unmounts",
+      "Hidden in forced-colors (high contrast) mode, where the place list is still there for assistive technology",
+      "Drag with a pointer turns the globe; nothing depends on it, because the places are in the list"
+    ],
+    "screenReader": [
+      "The canvas is hidden from assistive technology",
+      "The label, description and a list of the markers are read as text"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "A hero or about section showing where a team or customers are",
+      "A decorative graphic that carries a few named places"
+    ],
+    "avoid_when": [
+      "Showing exact geography or navigation",
+      "Data that must be read from the map alone"
+    ],
+    "anti_patterns": [
+      "Putting the only copy of important information on the globe without the list",
+      "Dozens of glowing markers"
+    ]
+  },
+  "examples": [
+    "basic",
+    "markers",
+    "still"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {
+      "isPaused": "Paused"
+    }
+  }
+}

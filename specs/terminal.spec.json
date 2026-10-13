@@ -1,0 +1,45 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Terminal",
+  "version": "0.1.0",
+  "category": "motion",
+  "status": "experimental",
+  "description": "A command-line style panel that types its lines in once: a prompt, the commands, then the output. It has a copy button, and a still mode that shows every line at once. The lines are real text in the page from the start.",
+  "props": {
+    "lines": { "type": "custom", "tsType": "{ text: string; kind?: \"command\" | \"output\" }[]", "description": "The lines, each { text, kind }. kind is \"command\" (typed, with a prompt) or \"output\" (appears whole after a short pause). Default kind is command.", "required": true },
+    "label": { "type": "string", "description": "Accessible name of the panel.", "default": "Terminal" },
+    "prompt": { "type": "string", "description": "Text shown before each command.", "default": "$" },
+    "speed": { "type": "number", "description": "Milliseconds per typed character.", "default": 35 },
+    "lineDelay": { "type": "number", "description": "Milliseconds to wait between lines.", "default": 450 },
+    "showCopy": { "type": "boolean", "description": "Shows a Copy button that copies the commands (without prompts or output).", "default": true },
+    "copyLabel": { "type": "string", "description": "Text of the button.", "default": "Copy" },
+    "copiedLabel": { "type": "string", "description": "Text of the button after copying.", "default": "Copied" },
+    "isPaused": { "type": "boolean", "description": "Still mode: shows every line at once and does not type.", "default": false }
+  },
+  "variants": ["isPaused", "showCopy"],
+  "states": ["default", "focus"],
+  "slots": ["root", "header", "line", "prompt", "output", "button"],
+  "tokens": ["color.surface.subtle", "color.border.default", "color.text.default", "color.text.muted", "color.focus.ring", "radius.control"],
+  "a11y": {
+    "role": "group",
+    "keyboard": ["Tab: moves to the Copy button and to the scrollable text area", "Enter or Space: copies the commands"],
+    "requirements": [
+      "The panel is a group named by label",
+      "Every line is real text in the server HTML and is readable with no JavaScript",
+      "While a line is being typed, the full text of the line is available to screen readers at once and the typed copy is hidden; nothing is read letter by letter",
+      "Typing runs once and stops; it never loops, so there is no moving content to stop after the lines are in",
+      "Reduced motion, isPaused and anything inside rdm-still show every line at once",
+      "The Copy button confirms with a polite status message",
+      "The text area scrolls and takes keyboard focus, so long lines are reachable without a mouse"
+    ],
+    "screenReader": ["Group named by label, then the lines as plain text, then the Copy button"],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["Showing an install or setup command", "A short scripted demo of a command-line tool"],
+    "avoid_when": ["A real interactive shell", "Long logs (use a log viewer)"],
+    "anti_patterns": ["Putting secrets in the lines", "Typing very long scripts that delay the reader"]
+  },
+  "examples": ["basic", "install", "still"],
+  "figma": { "componentKey": null, "variantMap": { "isPaused": "Still" } }
+}

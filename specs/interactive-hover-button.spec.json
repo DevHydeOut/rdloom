@@ -1,0 +1,126 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "InteractiveHoverButton",
+  "version": "0.1.0",
+  "category": "motion",
+  "status": "experimental",
+  "description": "A button whose label slides away to an arrow, or to a second label with an arrow, on hover and keyboard focus. Builds on Button.",
+  "props": {
+    "children": {
+      "type": "node",
+      "description": "Button label. This is the accessible name.",
+      "required": true
+    },
+    "hoverLabel": {
+      "type": "string",
+      "description": "Optional wording shown on hover and focus, next to the arrow. It is visual only and should say the same thing as the label. Without it only the arrow appears."
+    },
+    "variant": {
+      "type": "enum",
+      "values": [
+        "primary",
+        "secondary",
+        "ghost",
+        "danger"
+      ],
+      "description": "Visual emphasis, as on Button.",
+      "default": "primary"
+    },
+    "size": {
+      "type": "enum",
+      "values": [
+        "sm",
+        "md",
+        "lg"
+      ],
+      "description": "Height, padding and font size, as on Button.",
+      "default": "md"
+    },
+    "isDisabled": {
+      "type": "boolean",
+      "description": "Prevents interaction, dims the button and turns the effect off.",
+      "default": false
+    },
+    "isLoading": {
+      "type": "boolean",
+      "description": "Shows a spinner and blocks presses; the pending state is announced.",
+      "default": false
+    },
+    "onPress": {
+      "type": "callback",
+      "tsType": "() => void",
+      "description": "Called when the button is pressed by mouse, touch or keyboard."
+    }
+  },
+  "variants": [
+    "variant",
+    "size"
+  ],
+  "states": [
+    "default",
+    "hover",
+    "focus",
+    "disabled"
+  ],
+  "slots": [
+    "root",
+    "label",
+    "hover-label",
+    "arrow"
+  ],
+  "tokens": [
+    "color.action.primary",
+    "color.action.on-primary",
+    "color.action.danger",
+    "color.surface.default",
+    "color.text.default",
+    "color.border.default",
+    "color.focus.ring",
+    "radius.control"
+  ],
+  "a11y": {
+    "role": "button",
+    "keyboard": [
+      "Tab focuses it and shows the same effect as hover",
+      "Enter or Space presses it"
+    ],
+    "requirements": [
+      "The effect is the same for mouse hover and keyboard focus (focus-visible), so keyboard users see it too",
+      "The alternate label and arrow are decoration, hidden from assistive technology; the accessible name is always the main label",
+      "On touch screens there is no hover, so the button stays still",
+      "Stands still for visitors who ask for less motion (prefers-reduced-motion), and inside an rdm-still container",
+      "A disabled or loading button does not animate",
+      "The arrow flips in right-to-left layouts",
+      "Optional: it is a separate component, so projects that do not add it carry none of its code"
+    ],
+    "screenReader": [
+      "Announced exactly as a Button: its label, as a button; the effect adds nothing to what is read"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "A call to action on a landing page that should feel responsive",
+      "A link-like action that leads somewhere, where the arrow adds meaning"
+    ],
+    "avoid_when": [
+      "Dense toolbars or forms, where plain Button is calmer",
+      "Destructive actions, where a changing label could confuse"
+    ],
+    "anti_patterns": [
+      "A hover label that says something different from the main label",
+      "A hover label much longer than the main label: it is clipped to the button's width"
+    ]
+  },
+  "examples": [
+    "basic",
+    "with-hover-label"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {
+      "variant": "Variant",
+      "size": "Size"
+    }
+  }
+}

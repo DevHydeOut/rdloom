@@ -47,11 +47,11 @@
 /* RippleButton: a ripple spreads from where the button was pressed. */
 @keyframes rdm-ripple {
   from {
-    transform: translate(-50%, -50%) scale(0);
+    transform: scale(0);
     opacity: 0.34;
   }
   to {
-    transform: translate(-50%, -50%) scale(1);
+    transform: scale(1);
     opacity: 0;
   }
 }
@@ -61,7 +61,8 @@
   border-radius: 9999px;
   background: currentColor;
   pointer-events: none;
-  transform: translate(-50%, -50%) scale(0);
+  translate: -50% -50%;
+  transform: scale(0);
   animation: rdm-ripple var(--rdm-d, 600ms) ease-out forwards;
 }
 
@@ -192,15 +193,15 @@
 /* Ripple: concentric rings swell outward behind content. */
 @keyframes rdm-ring {
   0% {
-    transform: translate(-50%, -50%) scale(0.86);
+    transform: scale(0.86);
     opacity: 0.9;
   }
   50% {
-    transform: translate(-50%, -50%) scale(1);
+    transform: scale(1);
     opacity: 0.45;
   }
   100% {
-    transform: translate(-50%, -50%) scale(0.86);
+    transform: scale(0.86);
     opacity: 0.9;
   }
 }
@@ -209,15 +210,339 @@
   position: absolute;
   left: 50%;
   top: 50%;
+  /* Centred with its own property, so the ring stays centred whether or not the animation is running. */
+  translate: -50% -50%;
   border-radius: 9999px;
   pointer-events: none;
   border: 1px solid color-mix(in srgb, var(--rdm-c, var(--rd-color-border-strong)) 70%, transparent);
-  background: color-mix(in srgb, var(--rdm-c, var(--rd-color-border-strong)) 7%, transparent);
+  background: color-mix(in srgb, var(--rdm-c, var(--rd-color-border-strong)) 6%, transparent);
+  /* The rings fade out toward the bottom, so the backdrop melts into the page. */
+  mask-image: linear-gradient(to bottom, #000 35%, transparent 98%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 35%, transparent 98%);
   animation: rdm-ring var(--rdm-d, 4s) ease-in-out infinite;
 }
 
 [data-rdm-paused] .rdm-ring {
   animation-play-state: paused;
+}
+
+/* AnimatedList: each item slides down into place and fades in, one after another. It plays once. */
+@keyframes rdm-list-in {
+  from {
+    opacity: 0;
+    transform: translateY(-0.75rem) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.rdm-list-item {
+  animation: rdm-list-in var(--rdm-d, 0.4s) cubic-bezier(0.22, 1, 0.36, 1) var(--rdm-delay, 0s) backwards;
+}
+
+/* isStill on the list itself: every item shows at once. */
+.rdm-list[data-rdm-still] .rdm-list-item {
+  animation: none;
+}
+
+/* InteractiveHoverButton: the label slides away and a second layer (arrow, optional words) slides in. */
+.rdm-ihb {
+  --rdm-dir: 1;
+}
+
+[dir="rtl"] .rdm-ihb {
+  --rdm-dir: -1;
+}
+
+.rdm-ihb-label {
+  display: inline-block;
+  transition: transform var(--rdm-d, 300ms) ease, opacity var(--rdm-d, 300ms) ease;
+}
+
+.rdm-ihb-hover {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateX(calc(var(--rdm-dir) * 60%));
+  transition: transform var(--rdm-d, 300ms) ease, opacity var(--rdm-d, 300ms) ease;
+}
+
+.rdm-ihb[data-focus-visible]:not([data-disabled], [data-pending]) .rdm-ihb-label {
+  opacity: 0;
+  transform: translateX(calc(var(--rdm-dir) * -60%));
+}
+
+.rdm-ihb[data-focus-visible]:not([data-disabled], [data-pending]) .rdm-ihb-hover {
+  opacity: 1;
+  transform: none;
+}
+
+/* Hover only where there is a real pointer; a touch screen keeps the button still. */
+@media (hover: hover) {
+  .rdm-ihb[data-hovered]:not([data-disabled], [data-pending]) .rdm-ihb-label {
+    opacity: 0;
+    transform: translateX(calc(var(--rdm-dir) * -60%));
+  }
+
+  .rdm-ihb[data-hovered]:not([data-disabled], [data-pending]) .rdm-ihb-hover {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* AnimatedCircularProgress: a ring that fills to its value, or spins when the work is open-ended. */
+@property --rdm-pct {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+@keyframes rdm-turn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.rdm-cprogress-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  pointer-events: none;
+  background: conic-gradient(
+    var(--rdm-c, var(--rd-color-action-primary)) calc(var(--rdm-pct) * 1%),
+    var(--rdm-t, var(--rd-color-border-default)) 0
+  );
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - var(--rdm-w, 8px) - 0.5px), #000 calc(100% - var(--rdm-w, 8px)));
+  mask: radial-gradient(farthest-side, transparent calc(100% - var(--rdm-w, 8px) - 0.5px), #000 calc(100% - var(--rdm-w, 8px)));
+  transition: --rdm-pct var(--rdm-d, 0.9s) ease-out;
+}
+
+.rdm-cprogress-spin {
+  animation: rdm-turn var(--rdm-d, 1.2s) linear infinite;
+}
+
+[data-rdm-paused] > .rdm-cprogress-spin {
+  animation-play-state: paused;
+}
+
+/* Marquee: content scrolls endlessly. One copy is real, the repeats are hidden from assistive technology. */
+@keyframes rdm-marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(calc(var(--rdm-sign, 1) * -100% / var(--rdm-n, 2)), 0, 0);
+  }
+}
+
+@keyframes rdm-marquee-y {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(0, calc(-100% / var(--rdm-n, 2)), 0);
+  }
+}
+
+.rdm-marquee-view {
+  overflow: hidden;
+}
+
+.rdm-marquee-view[data-fade="horizontal"] {
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 10%, #000 90%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 10%, #000 90%, transparent);
+}
+
+.rdm-marquee-view[data-fade="vertical"] {
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent);
+}
+
+.rdm-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: rdm-marquee var(--rdm-d, 30s) linear infinite;
+}
+
+.rdm-marquee-track[data-vertical] {
+  flex-direction: column;
+  width: auto;
+  animation-name: rdm-marquee-y;
+}
+
+.rdm-marquee-track[data-reverse] {
+  animation-direction: reverse;
+}
+
+[dir="rtl"] .rdm-marquee-track:not([data-vertical]) {
+  --rdm-sign: -1;
+}
+
+.rdm-marquee-copy {
+  display: flex;
+  flex-shrink: 0;
+  gap: var(--rdm-g, 1rem);
+  padding-inline-end: var(--rdm-g, 1rem);
+}
+
+.rdm-marquee-copy[data-vertical] {
+  flex-direction: column;
+  padding-inline-end: 0;
+  padding-block-end: var(--rdm-g, 1rem);
+}
+
+[data-rdm-paused] .rdm-marquee-track,
+.rdm-marquee[data-pause-hover]:hover .rdm-marquee-track,
+.rdm-marquee[data-pause-hover]:focus-within .rdm-marquee-track {
+  animation-play-state: paused;
+}
+
+/* High-contrast mode: the ring uses system colours and the edge fade is removed. */
+@media (forced-colors: active) {
+  .rdm-cprogress-ring {
+    forced-color-adjust: none;
+    --rdm-c: Highlight !important;
+    --rdm-t: GrayText !important;
+  }
+
+  .rdm-marquee-view {
+    -webkit-mask-image: none !important;
+    mask-image: none !important;
+  }
+}
+
+/* TypingAnimation: a blinking cursor (one blink a second, so nothing flashes). */
+@keyframes rdm-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.rdm-caret {
+  display: inline-block;
+  width: 0.08em;
+  height: 1em;
+  margin-inline-start: 0.06em;
+  vertical-align: text-bottom;
+  background: currentColor;
+  animation: rdm-blink var(--rdm-d, 1.1s) steps(1) infinite;
+}
+
+.rdm-typing {
+  white-space: pre-wrap;
+}
+
+[data-rdm-paused] .rdm-caret {
+  animation: none;
+}
+
+/* WordRotate: every word shares one cell, so the slot is as wide as the longest. */
+@keyframes rdm-word-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.4em);
+  }
+}
+
+.rdm-word-rotate {
+  display: inline-grid;
+  justify-items: start;
+  vertical-align: bottom;
+}
+
+.rdm-word-item {
+  grid-area: 1 / 1;
+  visibility: hidden;
+  white-space: nowrap;
+}
+
+.rdm-word-item[data-current] {
+  visibility: visible;
+}
+
+[data-rdm-run] > .rdm-word-item[data-current] {
+  animation: rdm-word-in var(--rdm-d, 300ms) ease-out;
+}
+
+/* TextReveal: words come to full strength; the opacity is set per word from the script. */
+.rdm-text-reveal {
+  text-wrap: pretty;
+}
+
+.rdm-reveal-unit {
+  display: inline;
+}
+
+/* TextAnimate: each unit plays a preset, staggered by its index. */
+@keyframes rdm-ta-fadeIn {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes rdm-ta-blurIn {
+  from {
+    opacity: 0;
+    filter: blur(8px);
+  }
+}
+
+@keyframes rdm-ta-slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(0.6em);
+  }
+}
+
+@keyframes rdm-ta-scaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
+
+.rdm-text-animate .rdm-unit {
+  display: inline-block;
+  white-space: pre;
+}
+
+.rdm-word-nowrap {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+[data-rdm-anim="wait"] .rdm-unit {
+  opacity: 0;
+}
+
+[data-rdm-anim="run"] .rdm-unit {
+  animation-duration: var(--rdm-d, 0.5s);
+  animation-timing-function: cubic-bezier(0.2, 0.7, 0.2, 1);
+  animation-fill-mode: both;
+  animation-delay: calc(var(--rdm-delay, 0s) + var(--rdm-i, 0) * var(--rdm-s, 0.05s));
+}
+
+.rdm-ta-fadeIn[data-rdm-anim="run"] .rdm-unit {
+  animation-name: rdm-ta-fadeIn;
+}
+
+.rdm-ta-blurIn[data-rdm-anim="run"] .rdm-unit {
+  animation-name: rdm-ta-blurIn;
+}
+
+.rdm-ta-slideUp[data-rdm-anim="run"] .rdm-unit {
+  animation-name: rdm-ta-slideUp;
+}
+
+.rdm-ta-scaleUp[data-rdm-anim="run"] .rdm-unit {
+  animation-name: rdm-ta-scaleUp;
 }
 
 /* High-contrast mode: text effects are drawn in the system's text colour, with no effect. */
@@ -230,12 +555,1418 @@
   }
 }
 
+/* RainbowButton: a multicolour border and glow travel round the button. The label stays on the plain surface. */
+.rdm-rainbow {
+  position: relative;
+  isolation: isolate;
+  background-image: conic-gradient(from var(--rdm-angle), #ef4444, #f59e0b, #22c55e, #06b6d4, #6366f1, #d946ef, #ef4444);
+  animation: rdm-spin var(--rdm-d, 4s) linear infinite;
+}
+
+.rdm-rainbow-glow {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0.45;
+  filter: blur(10px);
+  background-image: conic-gradient(from var(--rdm-angle), #ef4444, #f59e0b, #22c55e, #06b6d4, #6366f1, #d946ef, #ef4444);
+  animation: rdm-spin var(--rdm-d, 4s) linear infinite;
+}
+
+.rdm-rainbow[data-rdm-paused],
+.rdm-rainbow[data-rdm-paused] .rdm-rainbow-glow {
+  animation-play-state: paused;
+}
+
+/* ShinyButton: a band of light sweeps across, slowly at rest and faster on hover or focus. */
+.rdm-shiny .rdm-shiny-sweep {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 38%;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, currentColor 34%, transparent), transparent);
+  animation: rdm-shimmer var(--rdm-d, 3.6s) ease-in-out infinite;
+}
+
+.rdm-shiny:hover .rdm-shiny-sweep,
+.rdm-shiny[data-focus-visible] .rdm-shiny-sweep {
+  animation-duration: 1.2s;
+}
+
+[data-rdm-paused].rdm-shiny .rdm-shiny-sweep {
+  animation-play-state: paused;
+}
+
+/*
+ * Dock: items grow toward the pointer (--rdm-dock-s, set by script) and when focused (--rdm-dock-f). The item takes up
+ * the room it grows into, so its neighbours move aside instead of being covered. The dock keeps the height of its
+ * largest state (--rdm-dock-m), so nothing around it jumps.
+ */
+.rdm-dock-item {
+  --rdm-dock-now: max(var(--rdm-dock-s, 1), var(--rdm-dock-f, 1));
+  flex: none;
+  width: calc(2.75rem * var(--rdm-dock-now));
+  height: calc(2.75rem * var(--rdm-dock-now));
+  transition:
+    width 110ms ease-out,
+    height 110ms ease-out;
+}
+
+.rdm-dock-item > span {
+  transform: scale(var(--rdm-dock-now));
+  transition: transform 110ms ease-out;
+}
+
+.rdm-dock[data-orientation="horizontal"] {
+  min-height: calc(2.75rem * var(--rdm-dock-m, 1.6) + 1rem + 2px);
+}
+
+.rdm-dock[data-orientation="vertical"] {
+  min-width: calc(2.75rem * var(--rdm-dock-m, 1.6) + 1rem + 2px);
+}
+
+.rdm-dock-item:focus-visible,
+.rdm-dock-item[data-focus-visible] {
+  --rdm-dock-f: 1.3;
+}
+
+[data-rdm-paused] > .rdm-dock-item {
+  --rdm-dock-now: var(--rdm-dock-f, 1);
+}
+
+@media (forced-colors: active) {
+  .rdm-rainbow {
+    background: ButtonText;
+    animation: none;
+  }
+
+  .rdm-rainbow-glow,
+  .rdm-shiny .rdm-shiny-sweep {
+    display: none;
+  }
+}
+
+/* BentoGrid: a card lifts a little under a real pointer. */
+.rdm-bento-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+@media (hover: hover) {
+  .rdm-bento-card:hover,
+  .rdm-bento-card:focus-within {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px -12px color-mix(in srgb, var(--rd-color-text-default) 35%, transparent);
+  }
+}
+
+.rdm-bento[data-rdm-still] .rdm-bento-card {
+  transition: none;
+  transform: none !important;
+}
+
+/* Terminal: the typed lines use the blinking caret; the panel itself never moves. */
+.rdm-terminal {
+  font-variant-ligatures: none;
+}
+
+.rdm-terminal-line {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* Background patterns: a decoration layer that fills its parent. It drifts by exactly one tile, so the loop has no jump. */
+@keyframes rdm-pattern-drift {
+  to {
+    transform: translate3d(var(--rdm-tx, 0), var(--rdm-ty, 0), 0);
+  }
+}
+
+@keyframes rdm-igrid-fade {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.rdm-pattern {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.rdm-pattern[data-fade="edge"] {
+  -webkit-mask-image: radial-gradient(ellipse at center, #000 30%, transparent 78%);
+  mask-image: radial-gradient(ellipse at center, #000 30%, transparent 78%);
+}
+
+.rdm-pattern-fill {
+  position: absolute;
+  inset: calc(var(--rdm-p, 0px) * -1);
+}
+
+.rdm-pattern[data-animated]:not([data-rdm-still]) .rdm-pattern-fill {
+  animation: rdm-pattern-drift var(--rdm-d, 10s) linear infinite;
+}
+
+.rdm-igrid {
+  contain: paint;
+}
+
+.rdm-igrid-lines {
+  position: absolute;
+  inset: 0;
+}
+
+.rdm-igrid-cell {
+  position: absolute;
+  background: color-mix(in srgb, var(--rdm-ac, currentColor) 22%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--rdm-ac, currentColor) 45%, transparent);
+}
+
+.rdm-igrid-cell[data-cell="fill"] {
+  transition: opacity 200ms ease-out;
+}
+
+.rdm-igrid-cell[data-cell="trail"] {
+  animation: rdm-igrid-fade var(--rdm-d, 900ms) ease-out forwards;
+}
+
+@media (forced-colors: active) {
+  .rdm-pattern {
+    display: none;
+  }
+}
+
+/* Backdrops (flickering grid, retro grid, light rays, noise, weave grid) share .rdm-pattern: absolute, no pointer, hidden in forced colors. */
+@keyframes rdm-retro-scroll {
+  from {
+    transform: translateY(calc(var(--rdm-p, 60px) * -1));
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes rdm-rays-sweep {
+  from {
+    transform: translateX(-6%) rotate(-1.5deg);
+    opacity: 0.65;
+  }
+  to {
+    transform: translateX(6%) rotate(1.5deg);
+    opacity: 1;
+  }
+}
+
+@keyframes rdm-noise-shift {
+  to {
+    background-position: calc(var(--rdm-p, 160px) * 0.5) calc(var(--rdm-p, 160px) * 0.25);
+  }
+}
+
+@keyframes rdm-weave-pass {
+  0% {
+    inset-inline-start: -30%;
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  62% {
+    opacity: 1;
+  }
+  74%,
+  100% {
+    inset-inline-start: 100%;
+    opacity: 0;
+  }
+}
+
+.rdm-retro {
+  perspective: 200px;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 45%);
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 45%);
+}
+
+.rdm-retro-floor {
+  position: absolute;
+  inset: 0;
+  transform: rotateX(var(--rdm-ang, 65deg));
+}
+
+.rdm-retro-grid {
+  position: absolute;
+  inset: 0;
+  margin-inline-start: -50%;
+  width: 200%;
+  height: 300%;
+  transform-origin: 100% 0 0;
+  background-image: linear-gradient(to right, var(--rdm-pc, currentColor) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--rdm-pc, currentColor) 1px, transparent 1px);
+  background-size: var(--rdm-p, 60px) var(--rdm-p, 60px);
+}
+
+.rdm-retro:not([data-rdm-still]) .rdm-retro-grid {
+  animation: rdm-retro-scroll var(--rdm-d, 15s) linear infinite;
+}
+
+.rdm-rays {
+  position: absolute;
+  inset: -40% -20%;
+  filter: blur(10px);
+  background-image: repeating-linear-gradient(
+      var(--rdm-ang, 20deg),
+      transparent 0,
+      color-mix(in srgb, var(--rdm-pc, currentColor) 38%, transparent) 36px,
+      transparent 84px
+    ),
+    repeating-linear-gradient(
+      calc(var(--rdm-ang, 20deg) + 8deg),
+      transparent 0,
+      color-mix(in srgb, var(--rdm-pc, currentColor) 24%, transparent) 60px,
+      transparent 150px
+    );
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, transparent 80%);
+  mask-image: linear-gradient(to bottom, #000 0%, transparent 80%);
+}
+
+.rdm-rays-root:not([data-rdm-still]) .rdm-rays {
+  animation: rdm-rays-sweep var(--rdm-d, 14s) ease-in-out infinite alternate;
+}
+
+.rdm-noise {
+  opacity: var(--rdm-op, 0.08);
+  background-size: var(--rdm-p, 160px) var(--rdm-p, 160px);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns=%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27 width=%27160%27 height=%27160%27%3E%3Cfilter id=%27n%27%3E%3CfeTurbulence type=%27fractalNoise%27 baseFrequency=%270.8%27 numOctaves=%272%27 stitchTiles=%27stitch%27/%3E%3CfeColorMatrix type=%27saturate%27 values=%270%27/%3E%3C/filter%3E%3Crect width=%27100%25%27 height=%27100%25%27 filter=%27url(%23n)%27/%3E%3C/svg%3E");
+}
+
+.rdm-noise[data-animated]:not([data-rdm-still]) {
+  animation: rdm-noise-shift var(--rdm-d, 4s) steps(4, jump-none) infinite;
+}
+
+.rdm-weave-warp,
+.rdm-weave-weft,
+.rdm-weave-shuttle {
+  position: absolute;
+}
+
+.rdm-weave-warp {
+  inset: 0;
+  background-image: linear-gradient(to right, var(--rdm-wc, currentColor) 1.5px, transparent 1.5px);
+  background-size: var(--rdm-p, 24px) 100%;
+}
+
+.rdm-weave-weft {
+  inset: 0;
+  background-image: linear-gradient(to bottom, var(--rdm-fc, currentColor) 1.5px, transparent 1.5px);
+  background-size: 100% var(--rdm-p, 24px);
+  -webkit-mask-image: repeating-linear-gradient(to right, transparent 0, transparent 4px, #000 4px, #000 var(--rdm-p, 24px));
+  mask-image: repeating-linear-gradient(to right, transparent 0, transparent 4px, #000 4px, #000 var(--rdm-p, 24px));
+}
+
+.rdm-weave-shuttle {
+  top: calc(var(--rdm-p, 24px) * 3);
+  width: 30%;
+  height: 3px;
+  inset-inline-start: -30%;
+  opacity: 0;
+  border-radius: 999px;
+  background: linear-gradient(to right, transparent, var(--rdm-ac, currentColor) 70%, transparent);
+  box-shadow: 0 0 10px 1px color-mix(in srgb, var(--rdm-ac, currentColor) 45%, transparent);
+}
+
+.rdm-weave:not([data-rdm-still]) .rdm-weave-shuttle {
+  animation: rdm-weave-pass var(--rdm-d, 9s) ease-in-out infinite;
+}
+
+/* Scroll progress: real content, so it stays visible in forced colors and reduced motion keeps it as an instant bar. */
+.rdm-sprogress {
+  position: fixed;
+  inset-inline: 0;
+  pointer-events: none;
+  z-index: 50;
+}
+
+.rdm-sprogress[data-contained] {
+  position: absolute;
+}
+
+.rdm-sprogress[data-position="top"] {
+  top: 0;
+}
+
+.rdm-sprogress[data-position="bottom"] {
+  bottom: 0;
+}
+
+.rdm-sprogress-bar {
+  height: 100%;
+  width: 0;
+  background: var(--rdm-pc, currentColor);
+  transition: width 100ms linear;
+}
+
+@media (forced-colors: active) {
+  .rdm-sprogress-bar {
+    forced-color-adjust: none;
+    background: Highlight;
+  }
+}
+
+/* MorphingText: phrases share one cell; the old one blurs out as the new one blurs in. */
+@keyframes rdm-morph-in {
+  from {
+    opacity: 0;
+    filter: blur(8px);
+  }
+}
+
+@keyframes rdm-morph-out {
+  to {
+    opacity: 0;
+    filter: blur(8px);
+  }
+}
+
+.rdm-morph {
+  display: inline-grid;
+  justify-items: start;
+  vertical-align: bottom;
+}
+
+.rdm-morph-item {
+  grid-area: 1 / 1;
+  visibility: hidden;
+  white-space: nowrap;
+}
+
+.rdm-morph-item[data-morph="in"] {
+  visibility: visible;
+}
+
+[data-rdm-run].rdm-morph .rdm-morph-item[data-morph="in"] {
+  animation: rdm-morph-in var(--rdm-d, 900ms) ease-in-out;
+}
+
+[data-rdm-run].rdm-morph .rdm-morph-item[data-morph="out"] {
+  visibility: visible;
+  animation: rdm-morph-out var(--rdm-d, 900ms) ease-in-out forwards;
+}
+
+/* SpinningText: letters sit on a circle (rotate by share of the turn, then out by the radius); the ring turns. */
+.rdm-spin {
+  position: relative;
+  display: inline-block;
+  width: calc(var(--rdm-r, 72px) * 2 + 1.5em);
+  height: calc(var(--rdm-r, 72px) * 2 + 1.5em);
+  vertical-align: middle;
+}
+
+.rdm-spin-ring {
+  position: absolute;
+  inset: 0;
+  animation: rdm-turn var(--rdm-d, 20s) linear infinite;
+}
+
+.rdm-spin-ring[data-reverse] {
+  animation-direction: reverse;
+}
+
+[data-rdm-paused] > .rdm-spin-ring {
+  animation: none;
+}
+
+.rdm-spin-letter {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  white-space: pre;
+  transform: translate(-50%, -50%) rotate(calc(var(--rdm-i, 0) * 360deg / var(--rdm-n, 1))) translateY(calc(var(--rdm-r, 72px) * -1));
+}
+
+/* KineticText: each letter loops through a small move, offset by its position. */
+@keyframes rdm-k-wave {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-0.3em);
+  }
+}
+
+@keyframes rdm-k-bounce {
+  0%,
+  55%,
+  100% {
+    transform: translateY(0);
+    animation-timing-function: ease-in;
+  }
+  25% {
+    transform: translateY(-0.45em);
+    animation-timing-function: ease-out;
+  }
+}
+
+@keyframes rdm-k-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.25);
+  }
+}
+
+.rdm-kinetic-unit {
+  display: inline-block;
+  animation: rdm-k-wave var(--rdm-d, 1.6s) ease-in-out infinite;
+  animation-delay: calc(var(--rdm-i, 0) * var(--rdm-s, 0.08s));
+}
+
+.rdm-kinetic[data-effect="bounce"] .rdm-kinetic-unit {
+  animation-name: rdm-k-bounce;
+}
+
+.rdm-kinetic[data-effect="pulse"] .rdm-kinetic-unit {
+  animation-name: rdm-k-pulse;
+}
+
+[data-rdm-paused].rdm-kinetic .rdm-kinetic-unit {
+  animation: none;
+}
+
+/* TextHighlighter: a marker background sweeps from the start edge. It is drawn in the server HTML and runs once. */
+@keyframes rdm-hl-sweep {
+  from {
+    background-size: 0% 100%;
+  }
+}
+
+.rdm-hl {
+  padding-inline: 0.15em;
+  border-radius: 0.2em;
+  background-image: linear-gradient(
+    var(--rdm-c, color-mix(in srgb, var(--rd-color-action-primary) 30%, transparent)),
+    var(--rdm-c, color-mix(in srgb, var(--rd-color-action-primary) 30%, transparent))
+  );
+  background-repeat: no-repeat;
+  background-position: 0 50%;
+  background-size: 100% 100%;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+[dir="rtl"] .rdm-hl {
+  background-position: 100% 50%;
+}
+
+.rdm-hl[data-rdm-anim="wait"] {
+  background-size: 0% 100%;
+}
+
+.rdm-hl[data-rdm-anim="run"] {
+  animation: rdm-hl-sweep var(--rdm-d, 0.8s) ease-out var(--rdm-delay, 0s) backwards;
+}
+
+[data-rdm-paused].rdm-hl {
+  animation: none;
+  background-size: 100% 100%;
+}
+
+/* HyperText: the scrambling copy keeps spaces and does not wrap mid-change. */
+.rdm-hyper {
+  white-space: pre-wrap;
+}
+
+@media (forced-colors: active) {
+  .rdm-morph-item {
+    filter: none;
+  }
+
+  .rdm-hl {
+    background-image: none;
+    text-decoration: underline;
+  }
+}
+
+/* AnimatedBeam and Particles: canvas layers that fill their container and never take the pointer. */
+.rdm-beam,
+.rdm-particles {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* Confetti: the canvas exists only while pieces fall. */
+.rdm-confetti {
+  display: contents;
+}
+
+.rdm-confetti-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 60;
+  pointer-events: none;
+}
+
+/* SpotlightCard: a soft light under the content that follows the pointer. */
+.rdm-spotlight-glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  background: radial-gradient(
+    var(--rdm-r, 240px) circle at var(--rdm-x, 50%) var(--rdm-y, 50%),
+    color-mix(in srgb, var(--rdm-c, var(--rd-color-action-primary)) 16%, transparent),
+    transparent 70%
+  );
+}
+
+.rdm-spotlight[data-rdm-on] .rdm-spotlight-glow {
+  opacity: 1;
+}
+
+/* GlareHover: a band of light crosses once on hover and once on focus. */
+.rdm-glare {
+  --rdm-flip: 1;
+}
+
+.rdm-glare[dir="rtl"],
+[dir="rtl"] .rdm-glare {
+  --rdm-flip: -1;
+}
+
+.rdm-glare-band {
+  position: absolute;
+  inset-block: -20%;
+  inset-inline-start: 0;
+  width: 40%;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, var(--rdm-c, color-mix(in srgb, var(--rd-color-action-primary) 20%, transparent)), transparent);
+  transform: translateX(calc(-160% * var(--rdm-flip))) skewX(calc(var(--rdm-a, -20deg) * var(--rdm-flip)));
+}
+
+@media (hover: hover) {
+  .rdm-glare:hover > .rdm-glare-band {
+    transform: translateX(calc(400% * var(--rdm-flip))) skewX(calc(var(--rdm-a, -20deg) * var(--rdm-flip)));
+    transition: transform var(--rdm-d, 0.7s) ease;
+  }
+}
+
+.rdm-glare:focus-within > .rdm-glare-band {
+  transform: translateX(calc(400% * var(--rdm-flip))) skewX(calc(var(--rdm-a, -20deg) * var(--rdm-flip)));
+  transition: transform var(--rdm-d, 0.7s) ease;
+}
+
+[data-rdm-paused] > .rdm-glare-band {
+  display: none;
+}
+
+/* Meteors: streaks fall along one direction and fade out. */
+@keyframes rdm-meteor {
+  0% {
+    transform: rotate(var(--rdm-a, 215deg)) translateX(0);
+    opacity: 0;
+  }
+  8%,
+  70% {
+    opacity: 1;
+  }
+  100% {
+    transform: rotate(var(--rdm-a, 215deg)) translateX(-52rem);
+    opacity: 0;
+  }
+}
+
+.rdm-meteors {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.rdm-meteor {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 9999px;
+  opacity: 0;
+  background: var(--rdm-c, color-mix(in srgb, var(--rd-color-text-default) 70%, transparent));
+  box-shadow: 0 0 8px 1px color-mix(in srgb, var(--rdm-c, var(--rd-color-text-default)) 45%, transparent);
+  animation: rdm-meteor var(--rdm-d, 6s) linear var(--rdm-delay, 0s) infinite;
+}
+
+.rdm-meteor::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  width: 7rem;
+  height: 2px;
+  transform: translateY(-50%);
+  background: linear-gradient(90deg, var(--rdm-c, color-mix(in srgb, var(--rd-color-text-default) 60%, transparent)), transparent);
+}
+
+[data-rdm-paused] > .rdm-meteor {
+  animation-play-state: paused;
+}
+
+@media (forced-colors: active) {
+  .rdm-beam,
+  .rdm-particles,
+  .rdm-confetti-canvas,
+  .rdm-spotlight-glow,
+  .rdm-glare-band,
+  .rdm-meteors {
+    display: none;
+  }
+}
+
+/* SelvedgeBlur: layered edge blur. The mask direction runs from the edge inward, and flips for right-to-left. */
+.rdm-selvedge {
+  --rdm-sdir: to top;
+  pointer-events: none;
+}
+
+.rdm-selvedge[data-position="top"] {
+  --rdm-sdir: to bottom;
+}
+
+.rdm-selvedge[data-position="start"] {
+  --rdm-sdir: to right;
+}
+
+.rdm-selvedge[data-position="end"] {
+  --rdm-sdir: to left;
+}
+
+.rdm-selvedge[data-position="start"]:dir(rtl) {
+  --rdm-sdir: to left;
+}
+
+.rdm-selvedge[data-position="end"]:dir(rtl) {
+  --rdm-sdir: to right;
+}
+
+.rdm-selvedge-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Lens: an enlarged, hidden copy clipped to a circle that follows the pointer. */
+.rdm-lens,
+.rdm-pixel {
+  position: relative;
+}
+
+.rdm-lens-layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  /* Opaque, so the enlarged copy replaces what is underneath instead of lying over it. */
+  background: var(--rdm-lens-bg, var(--rd-color-surface-default));
+}
+
+.rdm-lens-ring {
+  position: absolute;
+  box-sizing: border-box;
+  border: 2px solid var(--rd-color-border-strong);
+  border-radius: 9999px;
+  box-shadow: 0 6px 20px -8px color-mix(in srgb, var(--rd-color-text-default) 45%, transparent);
+  pointer-events: none;
+}
+
+/* PixelImage: the blocks are drawn on a canvas over the real image and removed when the image is sharp. */
+.rdm-pixel-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  pointer-events: none;
+}
+
+/* ThemeToggler: the icon turns in when the choice changes. It plays once. */
+@keyframes rdm-theme-pop {
+  from {
+    opacity: 0;
+    transform: rotate(-90deg) scale(0.5);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.rdm-theme-icon {
+  animation: rdm-theme-pop var(--rdm-d, 300ms) ease-out;
+}
+
+/* HeroVideoDialog: the poster grows a little under a real pointer. */
+.rdm-hvd-poster {
+  transition: transform 0.4s ease;
+}
+
+@media (hover: hover) {
+  .rdm-hvd:hover .rdm-hvd-poster {
+    transform: scale(1.04);
+  }
+}
+
+.rdm-hvd[data-rdm-still] .rdm-hvd-poster {
+  transition: none;
+  transform: none !important;
+}
+
+/* High-contrast mode: no blur or blocks over content, and the lens ring uses a system colour. */
+@media (forced-colors: active) {
+  .rdm-selvedge,
+  .rdm-pixel-canvas {
+    display: none;
+  }
+
+  .rdm-lens-ring {
+    border-color: CanvasText;
+    box-shadow: none;
+  }
+}
+
+/* SparklesText: small four-point stars twinkle around the text. They are CSS shapes, added after mount. */
+@keyframes rdm-sparkle {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) scale(0) rotate(0deg);
+    opacity: 0;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1) rotate(90deg);
+    opacity: 1;
+  }
+}
+
+.rdm-sparkles {
+  position: relative;
+  display: inline-block;
+}
+
+.rdm-sparkles-layer {
+  position: absolute;
+  inset: -0.25em;
+  pointer-events: none;
+}
+
+.rdm-sparkle {
+  position: absolute;
+  left: var(--rdm-x, 50%);
+  top: var(--rdm-y, 50%);
+  width: var(--rdm-sz, 0.4em);
+  height: var(--rdm-sz, 0.4em);
+  background: var(--rdm-c, var(--rd-color-action-primary));
+  clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+  transform: translate(-50%, -50%) scale(0);
+  animation: rdm-sparkle var(--rdm-d, 2s) ease-in-out var(--rdm-delay, 0s) infinite;
+}
+
+[data-rdm-paused] > .rdm-sparkles-layer .rdm-sparkle {
+  animation-play-state: paused;
+}
+
+/* AuroraText: a slow gradient drifts through the text. Without background-clip it stays the plain text colour. */
+@keyframes rdm-aurora {
+  to {
+    background-position: 300% 0;
+  }
+}
+
+.rdm-aurora {
+  color: var(--rd-color-text-default);
+}
+
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .rdm-aurora {
+    color: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+    background-image: var(--rdm-grad);
+    background-size: 300% 100%;
+    animation: rdm-aurora var(--rdm-d, 10s) linear infinite;
+  }
+}
+
+[data-rdm-paused].rdm-aurora {
+  animation-play-state: paused;
+}
+
+/* LineShadowText: a copy of the text, filled with diagonal lines, sits just behind it. */
+@keyframes rdm-line-shadow {
+  to {
+    background-position: 8px 0;
+  }
+}
+
+.rdm-line-shadow {
+  position: relative;
+  display: inline-block;
+  isolation: isolate;
+}
+
+.rdm-line-shadow-layer {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  user-select: none;
+  transform: translate(0.06em, 0.06em);
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  background-size: 8px 8px;
+  background-image: linear-gradient(
+    45deg,
+    var(--rdm-c, var(--rd-color-text-muted)) 25%,
+    transparent 25%,
+    transparent 50%,
+    var(--rdm-c, var(--rd-color-text-muted)) 50%,
+    var(--rdm-c, var(--rd-color-text-muted)) 75%,
+    transparent 75%
+  );
+  animation: rdm-line-shadow var(--rdm-d, 1.2s) linear infinite;
+}
+
+[data-rdm-paused] > .rdm-line-shadow-layer {
+  animation-play-state: paused;
+}
+
+/* Text3DFlip: each unit turns over once, staggered. Plays on hover or focus inside, or once when in view. */
+@keyframes rdm-flip {
+  from {
+    transform: perspective(400px) rotateX(0deg);
+  }
+  to {
+    transform: perspective(400px) rotateX(360deg);
+  }
+}
+
+.rdm-flip-unit {
+  display: inline-block;
+  white-space: pre;
+}
+
+.rdm-flip[data-trigger="hover"]:focus-within .rdm-flip-unit,
+.rdm-flip[data-rdm-run] .rdm-flip-unit {
+  animation: rdm-flip var(--rdm-d, 0.6s) ease-in-out calc(var(--rdm-i, 0) * var(--rdm-s, 0.04s)) both;
+}
+
+@media (hover: hover) {
+  .rdm-flip[data-trigger="hover"]:hover .rdm-flip-unit {
+    animation: rdm-flip var(--rdm-d, 0.6s) ease-in-out calc(var(--rdm-i, 0) * var(--rdm-s, 0.04s)) both;
+  }
+}
+
+[data-rdm-paused] .rdm-flip-unit {
+  animation: none !important;
+}
+
+/* ComicText: thick outline, hard offset shadow, optional pop-in that plays once. */
+@keyframes rdm-comic-pop {
+  0% {
+    transform: rotate(-2deg) scale(0.4);
+    opacity: 0;
+  }
+  70% {
+    transform: rotate(-2deg) scale(1.12);
+    opacity: 1;
+  }
+  100% {
+    transform: rotate(-2deg) scale(1);
+  }
+}
+
+.rdm-comic {
+  --rdm-dir: 1;
+  display: inline-block;
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: 0.02em;
+  color: var(--rdm-fill, var(--rd-color-surface-default));
+  -webkit-text-stroke: 0.07em var(--rdm-line, var(--rd-color-text-default));
+  paint-order: stroke fill;
+  text-shadow: calc(var(--rdm-dir) * 0.07em) 0.07em 0 var(--rdm-line, var(--rd-color-text-default));
+  transform: rotate(-2deg);
+}
+
+[dir="rtl"] .rdm-comic {
+  --rdm-dir: -1;
+}
+
+.rdm-comic[data-pop] {
+  animation: rdm-comic-pop var(--rdm-d, 0.5s) cubic-bezier(0.3, 1.4, 0.5, 1) both;
+}
+
+[data-rdm-paused].rdm-comic {
+  animation: none;
+}
+
+/* VideoText: the fallback gradient is clipped to the letters. Once a video has loaded, the label is a
+   knock-out layer blended over it, so the video shows only where the letters are. */
+.rdm-video-text {
+  position: relative;
+  display: inline-block;
+  isolation: isolate;
+  overflow: hidden;
+  font-weight: 900;
+  line-height: 1.05;
+  --rdm-bg: #fff;
+  --rdm-ink: #000;
+  --rdm-blend: screen;
+}
+
+.rdm-video-text[data-tone="dark"] {
+  --rdm-bg: #000;
+  --rdm-ink: #fff;
+  --rdm-blend: multiply;
+}
+
+.rdm-video-text-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.rdm-video-text-label {
+  position: relative;
+  display: block;
+  color: transparent;
+  background-image: var(--rdm-fb);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+.rdm-video-text[data-rdm-video="on"] .rdm-video-text-video {
+  visibility: visible;
+}
+
+.rdm-video-text[data-rdm-video="on"] .rdm-video-text-label {
+  color: var(--rdm-ink);
+  background: var(--rdm-bg);
+  mix-blend-mode: var(--rdm-blend);
+}
+
+/* ScrollVelocity: the script moves each track; this lays out the rows. */
+.rdm-sv {
+  overflow: hidden;
+}
+
+.rdm-sv-row {
+  margin: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.rdm-sv-track {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+}
+
+.rdm-sv-copy {
+  flex-shrink: 0;
+  padding-inline-end: 0.5em;
+}
+
+@media (forced-colors: active) {
+  .rdm-aurora,
+  .rdm-video-text-label {
+    forced-color-adjust: auto;
+    color: CanvasText !important;
+    background: none !important;
+    animation: none;
+  }
+
+  .rdm-comic {
+    color: CanvasText;
+    -webkit-text-stroke: 0;
+    text-shadow: none;
+    animation: none;
+  }
+
+  .rdm-sparkles-layer,
+  .rdm-line-shadow-layer,
+  .rdm-video-text-video {
+    display: none;
+  }
+}
+
+/*
+ * OrbitingCircles: each item sits at a fixed angle on its path (a static transform, so the
+ * server HTML already shows it evenly spaced) and CSS turns it. The inner rotation keeps it upright.
+ */
+@keyframes rdm-orbit {
+  from {
+    transform: rotate(var(--rdm-a, 0deg)) translateX(var(--rdm-r, 100px)) rotate(calc(var(--rdm-a, 0deg) * -1));
+  }
+  to {
+    transform: rotate(calc(var(--rdm-a, 0deg) + 360deg)) translateX(var(--rdm-r, 100px)) rotate(calc(var(--rdm-a, 0deg) * -1 - 360deg));
+  }
+}
+
+.rdm-orbit {
+  position: relative;
+  display: inline-block;
+  flex: none;
+  max-width: 100%;
+  aspect-ratio: 1;
+  /* The rings are drawn as fractions of this box, so on a narrow screen the whole orbit shrinks to fit. */
+  container-type: inline-size;
+}
+
+.rdm-orbit-path {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  box-sizing: border-box;
+  border: 1px solid var(--rd-color-border-default);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.rdm-orbit-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.rdm-orbit-center > * {
+  pointer-events: auto;
+}
+
+.rdm-orbit-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.rdm-orbit-item {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: var(--rdm-s, 36px);
+  height: var(--rdm-s, 36px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: rotate(var(--rdm-a, 0deg)) translateX(var(--rdm-r, 100px)) rotate(calc(var(--rdm-a, 0deg) * -1));
+  animation: rdm-orbit var(--rdm-d, 24s) linear infinite;
+}
+
+.rdm-orbit-item[data-reverse] {
+  animation-direction: reverse;
+}
+
+[data-rdm-paused] .rdm-orbit-item,
+.rdm-orbit[data-pause-hover]:hover .rdm-orbit-item,
+.rdm-orbit[data-pause-hover]:focus-within .rdm-orbit-item {
+  animation-play-state: paused;
+}
+
+@media (forced-colors: active) {
+  .rdm-orbit-path {
+    border-color: GrayText;
+  }
+}
+
+/*
+ * IconCloud: items sit on a sphere (static 3D transforms) and the sphere turns. Each icon is turned
+ * back by the same amount, so it keeps facing the viewer. Both animations share one duration and pause together.
+ */
+@keyframes rdm-cloud-spin {
+  from {
+    transform: rotateX(var(--rdm-tilt, -14deg)) rotateY(0deg);
+  }
+  to {
+    transform: rotateX(var(--rdm-tilt, -14deg)) rotateY(360deg);
+  }
+}
+
+@keyframes rdm-cloud-face {
+  from {
+    transform: rotateY(0deg) rotateX(calc(var(--rdm-tilt, -14deg) * -1));
+  }
+  to {
+    transform: rotateY(-360deg) rotateX(calc(var(--rdm-tilt, -14deg) * -1));
+  }
+}
+
+@keyframes rdm-cloud-depth {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.28;
+  }
+}
+
+.rdm-cloud {
+  position: relative;
+  display: inline-block;
+  flex: none;
+}
+
+.rdm-cloud-sphere {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  transform-style: preserve-3d;
+  transform: rotateX(var(--rdm-tilt, -14deg));
+  animation: rdm-cloud-spin var(--rdm-d, 48s) linear infinite;
+}
+
+.rdm-cloud-item {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: var(--rdm-s, 40px);
+  height: var(--rdm-s, 40px);
+  transform-style: preserve-3d;
+  transform: rotateY(var(--rdm-lon, 0deg)) rotateX(var(--rdm-lat, 0deg)) translateZ(var(--rdm-rad, 120px)) rotateX(calc(var(--rdm-lat, 0deg) * -1))
+    rotateY(calc(var(--rdm-lon, 0deg) * -1));
+}
+
+.rdm-cloud-face {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  transform: rotateY(0deg) rotateX(calc(var(--rdm-tilt, -14deg) * -1));
+  animation:
+    rdm-cloud-face var(--rdm-d, 48s) linear infinite,
+    rdm-cloud-depth var(--rdm-d, 48s) linear infinite;
+  /* Each icon starts partway round, so the ones on the far side of the sphere are the faint ones. */
+  animation-delay: 0s, calc(var(--rdm-d, 48s) * var(--rdm-lt, 0) * -1);
+}
+
+.rdm-cloud-icon {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: 0;
+  padding: 0;
+  color: inherit;
+}
+
+[data-rdm-paused] .rdm-cloud-sphere,
+[data-rdm-paused] .rdm-cloud-face,
+.rdm-cloud:hover .rdm-cloud-sphere,
+.rdm-cloud:hover .rdm-cloud-face,
+.rdm-cloud:focus-within .rdm-cloud-sphere,
+.rdm-cloud:focus-within .rdm-cloud-face {
+  animation-play-state: paused;
+}
+
+/*
+ * Backlight: a blurred glow behind the content. Either a conic gradient from the given colours or a
+ * blurred copy of the content. It drifts slowly (one cycle takes many seconds, nothing flashes).
+ */
+@keyframes rdm-backlight-spin {
+  from {
+    transform: scale(var(--rdm-sc, 1.1)) rotate(0deg);
+  }
+  to {
+    transform: scale(var(--rdm-sc, 1.1)) rotate(360deg);
+  }
+}
+
+@keyframes rdm-backlight-breathe {
+  from {
+    transform: scale(var(--rdm-sc, 1.1));
+  }
+  to {
+    transform: scale(calc(var(--rdm-sc, 1.1) * 1.06));
+  }
+}
+
+.rdm-backlight {
+  position: relative;
+  display: inline-block;
+  isolation: isolate;
+}
+
+.rdm-backlight-glow {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: var(--rdm-o, 0.6);
+  filter: blur(var(--rdm-blur, 40px));
+  transform: scale(var(--rdm-sc, 1.1));
+  user-select: none;
+}
+
+.rdm-backlight-glow[data-mode="colors"] {
+  background: var(--rdm-bg, none);
+  border-radius: 50%;
+  animation: rdm-backlight-spin var(--rdm-d, 14s) linear infinite;
+}
+
+.rdm-backlight-glow[data-mode="copy"] {
+  filter: blur(var(--rdm-blur, 40px)) saturate(1.5);
+  animation: rdm-backlight-breathe var(--rdm-d, 14s) ease-in-out infinite alternate;
+}
+
+.rdm-backlight-content {
+  position: relative;
+}
+
+[data-rdm-paused] .rdm-backlight-glow {
+  animation-play-state: paused;
+}
+
+@media (forced-colors: active) {
+  .rdm-backlight-glow {
+    display: none;
+  }
+}
+
+/* Globe and DottedMap: a sized box with a canvas that fills it. Drag turns the globe; vertical scrolling still works. */
+.rdm-globe,
+.rdm-dotted-map {
+  position: relative;
+  width: 100%;
+  will-change: transform;
+}
+
+.rdm-globe {
+  aspect-ratio: 1;
+  cursor: grab;
+  touch-action: pan-y;
+}
+
+.rdm-globe:active {
+  cursor: grabbing;
+}
+
+.rdm-dotted-map {
+  aspect-ratio: 2.535;
+}
+
+.rdm-globe-canvas,
+.rdm-dotted-map-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+@media (forced-colors: active) {
+  .rdm-globe-canvas,
+  .rdm-dotted-map-canvas {
+    display: none;
+  }
+}
+
 /*
  * Still: the same rules for every effect, once for visitors who prefer reduced motion
  * and once for anything inside .rdm-still (the docs use it for their Still switch).
  * Keep the two lists identical.
  */
 @media (prefers-reduced-motion: reduce) {
+  .rdm-globe-canvas,
+  .rdm-dotted-map-canvas {
+    will-change: auto;
+  }
+
+  .rdm-sparkles-layer,
+  .rdm-video-text-video,
+  .rdm-sv-dup,
+  .rdm-sv-toggle {
+    display: none;
+  }
+
+  .rdm-aurora {
+    animation: none;
+    background-image: none;
+    color: var(--rd-color-text-default);
+  }
+
+  .rdm-line-shadow-layer,
+  .rdm-comic {
+    animation: none;
+  }
+
+  .rdm-flip-unit {
+    animation: none !important;
+  }
+
+  .rdm-video-text-label {
+    color: transparent !important;
+    background: var(--rdm-fb) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    mix-blend-mode: normal !important;
+  }
+
+  .rdm-sv-track {
+    transform: none !important;
+  }
+
+  .rdm-sv-row {
+    overflow: auto;
+  }
+
+  .rdm-spotlight-glow,
+  .rdm-glare-band,
+  .rdm-meteors,
+  .rdm-confetti-canvas {
+    display: none;
+  }
+
+  .rdm-rainbow,
+  .rdm-rainbow-glow {
+    animation: none;
+  }
+
+  .rdm-shiny .rdm-shiny-sweep {
+    display: none;
+  }
+
+  .rdm-dock-item,
+  [data-rdm-paused] > .rdm-dock-item {
+    --rdm-dock-now: var(--rdm-dock-f, 1);
+    transition: none;
+  }
+
+  .rdm-dock-item > span {
+    transition: none;
+  }
+
   .rdm-shimmer,
   .rdm-ripple {
     display: none;
@@ -268,10 +1999,212 @@
     animation: none;
     opacity: 0.5;
   }
+
+  .rdm-caret,
+  [data-rdm-run] > .rdm-word-item[data-current],
+  .rdm-text-animate .rdm-unit {
+    animation: none;
+  }
+
+  .rdm-text-animate .rdm-unit,
+  .rdm-reveal-unit {
+    opacity: 1 !important;
+    transform: none;
+    filter: none;
+    transition: none !important;
+  }
+
+  .rdm-morph-item {
+    animation: none !important;
+    filter: none;
+  }
+
+  .rdm-morph-item[data-morph="out"] {
+    visibility: hidden !important;
+  }
+
+  .rdm-spin-ring,
+  .rdm-kinetic-unit {
+    animation: none !important;
+  }
+
+  .rdm-hl {
+    animation: none !important;
+    background-size: 100% 100% !important;
+  }
+
+  .rdm-cprogress-ring {
+    transition: none;
+  }
+
+  .rdm-cprogress-spin,
+  .rdm-marquee-track {
+    animation: none;
+  }
+
+  .rdm-marquee-dup,
+  .rdm-marquee-toggle {
+    display: none;
+  }
+
+  .rdm-marquee-view {
+    overflow: auto;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+
+  .rdm-list-item {
+    animation: none;
+  }
+
+  .rdm-orbit-item,
+  .rdm-cloud-sphere,
+  .rdm-cloud-face,
+  .rdm-backlight-glow {
+    animation: none;
+  }
+
+  .rdm-ihb-hover {
+    display: none;
+  }
+
+  .rdm-ihb-label {
+    transition: none;
+  }
+
+  .rdm-bento-card {
+    transition: none;
+    transform: none !important;
+  }
+
+  .rdm-pattern-fill {
+    animation: none !important;
+  }
+
+  .rdm-igrid-cell {
+    display: none;
+  }
+
+  .rdm-retro-grid,
+  .rdm-rays,
+  .rdm-noise,
+  .rdm-weave-shuttle {
+    animation: none !important;
+  }
+
+  .rdm-weave-shuttle {
+    display: none;
+  }
+
+  .rdm-sprogress-bar {
+    transition: none;
+  }
+
+  .rdm-theme-icon {
+    animation: none;
+  }
+
+  .rdm-pixel-canvas {
+    display: none;
+  }
+
+  .rdm-hvd-poster {
+    transition: none;
+    transform: none !important;
+  }
 }
 
 .rdm-still .rdm-shimmer,
 .rdm-still .rdm-ripple {
+  display: none;
+}
+
+.rdm-still .rdm-globe-canvas,
+.rdm-still .rdm-dotted-map-canvas {
+  will-change: auto;
+}
+
+.rdm-still .rdm-orbit-item,
+.rdm-still .rdm-cloud-sphere,
+.rdm-still .rdm-cloud-face,
+.rdm-still .rdm-backlight-glow {
+  animation: none;
+}
+
+.rdm-still .rdm-sparkles-layer,
+.rdm-still .rdm-video-text-video,
+.rdm-still .rdm-sv-dup,
+.rdm-still .rdm-sv-toggle {
+  display: none;
+}
+
+.rdm-still .rdm-aurora {
+  animation: none;
+  background-image: none;
+  color: var(--rd-color-text-default);
+}
+
+.rdm-still .rdm-line-shadow-layer,
+.rdm-still .rdm-comic {
+  animation: none;
+}
+
+.rdm-still .rdm-flip-unit {
+  animation: none !important;
+}
+
+.rdm-still .rdm-video-text-label {
+  color: transparent !important;
+  background: var(--rdm-fb) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  mix-blend-mode: normal !important;
+}
+
+.rdm-still .rdm-sv-track {
+  transform: none !important;
+}
+
+.rdm-still .rdm-sv-row {
+  overflow: auto;
+}
+
+.rdm-still .rdm-theme-icon {
+  animation: none;
+}
+
+.rdm-still .rdm-pixel-canvas {
+  display: none;
+}
+
+.rdm-still .rdm-hvd-poster {
+  transition: none;
+  transform: none !important;
+}
+
+.rdm-still .rdm-morph-item {
+  animation: none !important;
+  filter: none;
+}
+
+.rdm-still .rdm-morph-item[data-morph="out"] {
+  visibility: hidden !important;
+}
+
+.rdm-still .rdm-spin-ring,
+.rdm-still .rdm-kinetic-unit {
+  animation: none !important;
+}
+
+.rdm-still .rdm-hl {
+  animation: none !important;
+  background-size: 100% 100% !important;
+}
+
+.rdm-still .rdm-spotlight-glow,
+.rdm-still .rdm-glare-band,
+.rdm-still .rdm-meteors,
+.rdm-still .rdm-confetti-canvas {
   display: none;
 }
 
@@ -301,4 +2234,96 @@
 .rdm-still .rdm-ring {
   animation: none;
   opacity: 0.5;
+}
+
+.rdm-still .rdm-cprogress-ring {
+  transition: none;
+}
+
+.rdm-still .rdm-cprogress-spin,
+.rdm-still .rdm-marquee-track {
+  animation: none;
+}
+
+.rdm-still .rdm-marquee-dup,
+.rdm-still .rdm-marquee-toggle {
+  display: none;
+}
+
+.rdm-still .rdm-marquee-view {
+  overflow: auto;
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+
+.rdm-still .rdm-caret,
+.rdm-still [data-rdm-run] > .rdm-word-item[data-current],
+.rdm-still .rdm-text-animate .rdm-unit {
+  animation: none;
+}
+
+.rdm-still .rdm-text-animate .rdm-unit,
+.rdm-still .rdm-reveal-unit {
+  opacity: 1 !important;
+  transform: none;
+  filter: none;
+  transition: none !important;
+}
+
+.rdm-still .rdm-list-item {
+  animation: none;
+}
+
+.rdm-still .rdm-ihb-hover {
+  display: none;
+}
+
+.rdm-still .rdm-ihb-label {
+  transition: none;
+}
+
+.rdm-still .rdm-bento-card {
+  transition: none;
+  transform: none !important;
+}
+
+.rdm-still .rdm-pattern-fill {
+  animation: none !important;
+}
+
+.rdm-still .rdm-igrid-cell {
+  display: none;
+}
+
+.rdm-still .rdm-retro-grid,
+.rdm-still .rdm-rays,
+.rdm-still .rdm-noise,
+.rdm-still .rdm-weave-shuttle {
+  animation: none !important;
+}
+
+.rdm-still .rdm-weave-shuttle {
+  display: none;
+}
+
+.rdm-still .rdm-sprogress-bar {
+  transition: none;
+}
+
+.rdm-still .rdm-rainbow,
+.rdm-still .rdm-rainbow-glow {
+  animation: none;
+}
+
+.rdm-still .rdm-shiny .rdm-shiny-sweep {
+  display: none;
+}
+
+.rdm-still .rdm-dock-item {
+  --rdm-dock-now: var(--rdm-dock-f, 1);
+  transition: none;
+}
+
+.rdm-still .rdm-dock-item > span {
+  transition: none;
 }

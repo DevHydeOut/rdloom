@@ -1,0 +1,67 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Pointer",
+  "version": "0.1.0",
+  "category": "motion",
+  "status": "experimental",
+  "description": "A named pointer that follows the mouse inside a container, like a collaborator cursor: an arrow drawn in CSS with a name tag. It hides when the mouse leaves.",
+  "props": {
+    "children": {
+      "type": "node",
+      "description": "Content of the container the pointer lives in."
+    },
+    "name": {
+      "type": "string",
+      "description": "The text on the name tag.",
+      "required": true
+    },
+    "color": {
+      "type": "string",
+      "description": "Colour of the arrow and the tag, any CSS colour. Defaults to the primary action colour."
+    },
+    "isStill": {
+      "type": "boolean",
+      "description": "Switches the pointer off.",
+      "default": false
+    }
+  },
+  "variants": ["isStill"],
+  "states": ["default"],
+  "slots": ["root", "pointer", "tag"],
+  "tokens": ["color.action.primary", "color.action.on-primary"],
+  "a11y": {
+    "role": "presentation",
+    "keyboard": [],
+    "requirements": [
+      "Decoration for mouse users: the pointer is aria-hidden, ignores the pointer (pointer-events none) and never takes focus",
+      "It never replaces keyboard focus and no information may depend on it",
+      "Not shown for touch or pen input, for prefers-reduced-motion, with isStill, or inside rdm-still",
+      "Hidden as soon as the mouse leaves the container; listeners are removed on unmount",
+      "Forced-colors: the arrow keeps its own colour (forced-color-adjust none) so it stays visible, and the tag keeps a border"
+    ],
+    "screenReader": [
+      "Not announced: the pointer is purely visual"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "Showing how a shared canvas could look with several people on it",
+      "Product tours and landing page demos"
+    ],
+    "avoid_when": [
+      "Real presence information: send that as text a screen reader can read"
+    ],
+    "anti_patterns": [
+      "Long names that cover the content",
+      "Relying on the pointer to show who is doing something"
+    ]
+  },
+  "examples": ["basic", "custom-color", "on-a-canvas"],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {
+      "isStill": "Still"
+    }
+  }
+}

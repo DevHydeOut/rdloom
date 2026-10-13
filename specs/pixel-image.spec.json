@@ -1,0 +1,42 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "PixelImage",
+  "version": "0.1.0",
+  "category": "motion",
+  "status": "experimental",
+  "description": "An image that resolves from coarse pixel blocks to sharp when it scrolls into view. The real image is always in the page (server HTML, no JavaScript, print); the blocks are a hidden canvas drawn over it and removed when done.",
+  "props": {
+    "children": { "type": "node", "description": "Your own image element. Use this or src plus alt." },
+    "src": { "type": "string", "description": "Image URL, when not passing children." },
+    "alt": { "type": "string", "description": "Alternative text for src. Use an empty string for a decorative image." },
+    "blockSize": { "type": "number", "default": 32, "description": "Size in px of the first, coarsest blocks. The blocks halve each step until the image is sharp." },
+    "duration": { "type": "number", "default": 1.2, "description": "Seconds for the whole resolve." },
+    "whenInView": { "type": "boolean", "default": true, "description": "Wait until the image scrolls into view before resolving." },
+    "isStill": { "type": "boolean", "default": false, "description": "Shows the sharp image at once." }
+  },
+  "variants": ["whenInView", "isStill"],
+  "states": ["default", "loading"],
+  "slots": ["root", "image", "canvas"],
+  "tokens": [],
+  "a11y": {
+    "role": "img",
+    "keyboard": [],
+    "requirements": [
+      "The real image is always rendered first, with its alt text, so it is complete with no JavaScript and in print",
+      "The canvas of blocks is decoration: aria-hidden, pointer-events none, removed when the effect finishes",
+      "The effect runs once and lasts about a second; it never loops and never flashes",
+      "Skipped for prefers-reduced-motion, inside rdm-still and with isStill: the sharp image is shown",
+      "If the canvas cannot be used the image simply stays visible",
+      "Forced-colors: the canvas is hidden"
+    ],
+    "screenReader": ["Read as an ordinary image with its alt text; the effect is not announced"],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["A hero or feature picture that should arrive with a little character"],
+    "avoid_when": ["Images the reader must see immediately", "Many images in one view"],
+    "anti_patterns": ["Omitting alt text", "Using it on every image on a page"]
+  },
+  "examples": ["basic", "children", "block-size"],
+  "figma": { "componentKey": null, "variantMap": { "isStill": "Still" } }
+}

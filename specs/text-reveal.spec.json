@@ -1,0 +1,101 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "TextReveal",
+  "version": "0.1.0",
+  "category": "motion",
+  "status": "experimental",
+  "description": "A passage whose words come into full strength as you scroll it into view, or all together when it appears. The real text is always in the page.",
+  "props": {
+    "children": {
+      "type": "string",
+      "description": "The text. In line mode, each new line (a newline character) is one unit.",
+      "required": true
+    },
+    "by": {
+      "type": "enum",
+      "values": [
+        "word",
+        "line"
+      ],
+      "default": "word",
+      "description": "What is revealed one after another."
+    },
+    "mode": {
+      "type": "enum",
+      "values": [
+        "scroll",
+        "view"
+      ],
+      "default": "scroll",
+      "description": "scroll follows the scroll position; view plays once when the text comes into view."
+    },
+    "minOpacity": {
+      "type": "number",
+      "default": 0.2,
+      "description": "How faint a unit is before it is revealed, from 0 to 1."
+    },
+    "isPaused": {
+      "type": "boolean",
+      "default": false,
+      "description": "Stops the animation and shows the finished text. Moving content that lasts more than five seconds should be stoppable."
+    }
+  },
+  "variants": [
+    "by",
+    "mode",
+    "isPaused"
+  ],
+  "states": [
+    "default"
+  ],
+  "slots": [
+    "root"
+  ],
+  "tokens": [
+    "color.text.default",
+    "color.text.muted"
+  ],
+  "a11y": {
+    "role": "text",
+    "keyboard": [],
+    "requirements": [
+      "The text is ordinary text in the page from the server render, readable with no JavaScript and read once by screen readers",
+      "Unrevealed text is faint but present; choose a minOpacity that keeps it legible if people may read ahead",
+      "Decoration only: the animated layers are hidden from assistive technology and never take focus",
+      "Stands still for visitors who ask for less motion (prefers-reduced-motion), and can also be shown still with the rdm-still class or isPaused",
+      "In forced-colors (high contrast) mode the text is drawn in the system colours",
+      "Does not flash: nothing changes more than three times in a second (WCAG 2.3.1)",
+      "Optional: it is a separate component, so projects that do not add it carry none of its code"
+    ],
+    "screenReader": [
+      "Read as ordinary text: the reveal is purely visual"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "A short statement or mission passage that builds as the page is scrolled",
+      "A quote that appears when it comes into view"
+    ],
+    "avoid_when": [
+      "Body text people must scan quickly",
+      "Content inside a region that never scrolls, with mode scroll"
+    ],
+    "anti_patterns": [
+      "A minOpacity of 0 for text people may need before it is revealed",
+      "Long articles"
+    ]
+  },
+  "examples": [
+    "on-scroll",
+    "on-view"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {
+      "by": "By",
+      "mode": "Mode",
+      "isPaused": "Paused"
+    }
+  }
+}

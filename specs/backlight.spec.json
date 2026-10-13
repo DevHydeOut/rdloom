@@ -1,0 +1,56 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Backlight",
+  "version": "0.1.0",
+  "category": "motion",
+  "status": "experimental",
+  "description": "A soft coloured glow behind an image or a card. It takes its colours from a list you give, or from a blurred, enlarged copy of the content itself.",
+  "props": {
+    "children": { "type": "node", "description": "The image or card the glow sits behind.", "required": true },
+    "colors": { "type": "custom", "tsType": "string[]", "description": "Glow colours, any CSS colours. Leave out to use a blurred copy of the children instead." },
+    "intensity": { "type": "number", "description": "How strong the glow is, from 0 to 1.", "default": 0.6 },
+    "blur": { "type": "number", "description": "Blur radius of the glow in pixels.", "default": 40 },
+    "scale": { "type": "number", "description": "How much larger than the content the glow is.", "default": 1.1 },
+    "duration": { "type": "number", "description": "Seconds for one slow cycle of the glow.", "default": 14 },
+    "isStill": { "type": "boolean", "description": "Keeps the glow still instead of slowly moving.", "default": false }
+  },
+  "variants": ["isStill"],
+  "states": ["default"],
+  "slots": ["root", "glow", "content"],
+  "tokens": [],
+  "a11y": {
+    "role": "none",
+    "keyboard": [],
+    "requirements": [
+      "The glow is decoration: aria-hidden, pointer-events none, and it never takes focus",
+      "In copy mode the copy is inert as well as hidden, so it adds no focus stops and no duplicate content for assistive technology",
+      "The content on top is unchanged and keeps its own contrast; the glow never sits in front of text",
+      "The slow movement can be stopped with isStill or the rdm-still class, and stops for visitors who ask for less motion (prefers-reduced-motion)",
+      "In forced-colors (high contrast) mode the glow is removed",
+      "Does not flash: the glow changes slowly, never more than three times in a second (WCAG 2.3.1)"
+    ],
+    "screenReader": [
+      "The glow is not announced; the content is read as normal"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "Giving a product screenshot or a card some depth",
+      "A hero image that should feel lit from behind"
+    ],
+    "avoid_when": [
+      "Content with ids or form fields in copy mode, where the copy repeats them (give colors instead)",
+      "Dense layouts where the glow would colour the text next to it"
+    ],
+    "anti_patterns": [
+      "A very high intensity that lowers the contrast of nearby text",
+      "Using copy mode on a large video"
+    ]
+  },
+  "examples": ["with-colors", "from-content", "card"],
+  "figma": {
+    "componentKey": null,
+    "variantMap": { "isStill": "Still" }
+  }
+}

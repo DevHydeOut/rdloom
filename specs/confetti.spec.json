@@ -1,0 +1,98 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Confetti",
+  "version": "0.1.0",
+  "category": "motion",
+  "status": "experimental",
+  "description": "A short burst of paper pieces, launched from a fire() handle or when isActive turns true. The canvas appears for the burst, then removes itself.",
+  "props": {
+    "isActive": {
+      "type": "boolean",
+      "description": "Fires a burst each time it changes to true.",
+      "default": false
+    },
+    "particleCount": {
+      "type": "number",
+      "description": "Pieces per burst.",
+      "default": 80
+    },
+    "spread": {
+      "type": "number",
+      "description": "Spread of the burst in degrees.",
+      "default": 70
+    },
+    "origin": {
+      "type": "custom",
+      "description": "Where the burst starts, as fractions of the viewport.",
+      "tsType": "{ x: number; y: number }"
+    },
+    "colors": {
+      "type": "custom",
+      "description": "Colours of the pieces, any CSS colours. Defaults to the theme colours.",
+      "tsType": "string[]"
+    },
+    "onComplete": {
+      "type": "callback",
+      "description": "Called when the last piece has gone.",
+      "tsType": "() => void"
+    },
+    "isPaused": {
+      "type": "boolean",
+      "description": "Stops the effect: fire() then does nothing.",
+      "default": false
+    }
+  },
+  "variants": [
+    "isPaused"
+  ],
+  "states": [
+    "default"
+  ],
+  "slots": [
+    "root"
+  ],
+  "tokens": [
+    "color.action.primary",
+    "color.feedback.success",
+    "color.feedback.warning",
+    "color.feedback.danger"
+  ],
+  "a11y": {
+    "role": "presentation",
+    "keyboard": [],
+    "requirements": [
+      "Decoration only: the canvas is aria-hidden and pointer-events: none, so it never blocks a click or takes focus",
+      "Nothing at all is drawn for reduced motion, inside rdm-still or with isPaused",
+      "The burst lasts about three seconds and then the canvas is removed from the page",
+      "A celebration must also be stated in text: pair it with a status message (WCAG 4.1.3)",
+      "No flashing: pieces fall and fade, nothing blinks"
+    ],
+    "screenReader": [
+      "Silent: the canvas is hidden from assistive technology, so announce the success separately"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "After a completed task, a purchase or a milestone"
+    ],
+    "avoid_when": [
+      "Errors or routine saves",
+      "Anywhere the burst could hide controls the person still needs"
+    ],
+    "anti_patterns": [
+      "Using confetti as the only sign of success",
+      "Firing it repeatedly"
+    ]
+  },
+  "examples": [
+    "with-button",
+    "on-active"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {
+      "isPaused": "Paused"
+    }
+  }
+}

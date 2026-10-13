@@ -1,0 +1,94 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "SpinningText",
+  "version": "0.1.0",
+  "category": "motion",
+  "status": "experimental",
+  "description": "Text laid out round a circle that turns slowly. The layout is plain CSS (each letter is rotated about the centre), and the real text is in a visually hidden copy.",
+  "props": {
+    "children": {
+      "type": "string",
+      "description": "The text to set on the circle. A trailing separator such as a dot reads well when the text is shorter than the ring.",
+      "required": true
+    },
+    "radius": {
+      "type": "number",
+      "default": 72,
+      "description": "Radius of the circle in pixels, measured to the middle of the letters."
+    },
+    "duration": {
+      "type": "number",
+      "default": 20,
+      "description": "Seconds for one full turn."
+    },
+    "reverse": {
+      "type": "boolean",
+      "default": false,
+      "description": "Turns the other way."
+    },
+    "isPaused": {
+      "type": "boolean",
+      "default": false,
+      "description": "Stops the animation and shows the finished text. Moving content that lasts more than five seconds should be stoppable."
+    }
+  },
+  "variants": [
+    "reverse",
+    "isPaused"
+  ],
+  "states": [
+    "default"
+  ],
+  "slots": [
+    "root"
+  ],
+  "tokens": [
+    "color.text.default"
+  ],
+  "a11y": {
+    "role": "group",
+    "keyboard": [],
+    "requirements": [
+      "The full text is in a visually hidden copy; the letters on the ring are hidden from assistive technology so nothing is read letter by letter",
+      "The ring is a fixed square of 2 x radius plus the letter size, so the page does not shift as it turns",
+      "With isPaused the ring stays at its resting angle and the text is still fully readable",
+      "Decoration only: the animated layers are hidden from assistive technology and never take focus",
+      "Stands still for visitors who ask for less motion (prefers-reduced-motion), and can also be shown still with the rdm-still class or isPaused",
+      "In forced-colors (high contrast) mode the text is drawn in the system colours with no effect",
+      "Does not flash: nothing changes more than three times in a second (WCAG 2.3.1)",
+      "The text is real text in the server HTML, readable with no script",
+      "Optional: it is a separate component, so projects that do not add it carry none of its code"
+    ],
+    "screenReader": [
+      "The text, once"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "A badge or seal round an icon or logo",
+      "A decorative label that links to nothing"
+    ],
+    "avoid_when": [
+      "Long sentences: letters on a tight circle are hard to read",
+      "Any text people must read quickly or act on",
+      "Right-to-left or joined scripts, where cutting the text into letters breaks the shapes"
+    ],
+    "anti_patterns": [
+      "Using it as the only place a link or instruction appears",
+      "A radius so small that letters overlap"
+    ]
+  },
+  "examples": [
+    "basic",
+    "around-an-icon",
+    "reverse-and-slow"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {
+      "reverse": "Reverse",
+      "isPaused": "Paused"
+    }
+  }
+}

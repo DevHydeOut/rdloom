@@ -50,6 +50,24 @@
       "description": "An inline message about the state of the page or a task: a tip, a success, a warning or an error. For brief confirmations that disappear, use Toast."
     },
     {
+      "name": "animated-beam",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A light that travels along a curved line between two elements, such as two cards in a diagram. The line is drawn on a canvas that fills the container, so nothing is added to the accessibility tree."
+    },
+    {
+      "name": "animated-circular-progress",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A ring that fills to its value after it appears, with the value in the middle. It can also spin when the amount of work is not known."
+    },
+    {
+      "name": "animated-list",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A list whose items slide and fade in one after another, and stack as new ones are added. It is a real list (ul with li items), and every item is in the page from the start."
+    },
+    {
       "name": "api-key-list",
       "type": "registry:ui",
       "version": "0.1.0",
@@ -86,6 +104,12 @@
       "description": "A chip or card for a file attached to a message or a prompt: its name, size, a type icon, an upload progress bar or error, and an optional remove button. A preview variant shows a thumbnail for pictures. AttachmentList groups several as a list."
     },
     {
+      "name": "aurora-text",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "Text filled with a slow, drifting aurora gradient. Falls back to plain text colour for reduced motion and high contrast."
+    },
+    {
       "name": "auth-card",
       "type": "registry:ui",
       "version": "0.1.0",
@@ -104,10 +128,22 @@
       "description": "A person's or account's picture, falling back to their initials when there is no image or it fails to load."
     },
     {
+      "name": "backlight",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A soft coloured glow behind an image or a card. It takes its colours from a list you give, or from a blurred, enlarged copy of the content itself."
+    },
+    {
       "name": "badge",
       "type": "registry:ui",
       "version": "0.1.0",
       "description": "A small label that states a status or category, like Paid, Overdue or Beta. Not interactive."
+    },
+    {
+      "name": "bento-grid",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A responsive grid of feature cards of different sizes. It is a real list: each BentoCard is a list item with its own heading, icon, description, optional background and optional link or action. Cards lift a little on hover."
     },
     {
       "name": "blur-fade",
@@ -182,6 +218,12 @@
       "description": "A small numbered marker, like [1], inside a reply that jumps to the source it refers to."
     },
     {
+      "name": "code-comparison",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "Two code panels, before and after, side by side on wider screens and stacked on phones. Each has a label, line numbers and optional highlighted lines. It does no syntax colouring and has no dependency."
+    },
+    {
       "name": "collapsible",
       "type": "registry:ui",
       "version": "0.1.0",
@@ -200,10 +242,22 @@
       "description": "Text input that filters a list of options as you type. Supports multi-select tags, async loading and long, virtualized lists."
     },
     {
+      "name": "comic-text",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "Bold, outlined, comic-style text with a hard offset shadow and an optional pop-in when it first appears."
+    },
+    {
       "name": "command-palette",
       "type": "registry:ui",
       "version": "0.1.0",
       "description": "A search box in a dialog that finds and runs commands, jumps to pages and triggers actions from the keyboard. Opens with Ctrl or Cmd + K. Use CommandGroup and CommandItem for the results."
+    },
+    {
+      "name": "confetti",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A short burst of paper pieces, launched from a fire() handle or when isActive turns true. The canvas appears for the burst, then removes itself."
     },
     {
       "name": "context-menu",
@@ -254,6 +308,12 @@
       "description": "Start and end date fields with a two-month calendar and optional presets like 'Last 7 days'."
     },
     {
+      "name": "device-mock",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A drawn device frame (phone, tablet, laptop, desktop, watch or browser window) around your content, which becomes the screen. The frame is plain CSS decoration with neutral bezels; the screen is a real container, so everything inside keeps its own semantics and focus order."
+    },
+    {
       "name": "dialog",
       "type": "registry:ui",
       "version": "0.1.0",
@@ -264,6 +324,24 @@
       "type": "registry:ui",
       "version": "0.1.0",
       "description": "Sets the reading direction for everything inside it. It writes the dir attribute and gives React Aria the matching locale, so arrow keys and logical CSS flip together."
+    },
+    {
+      "name": "dock",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A row of icon buttons that grow toward the pointer, like an app launcher. Every item is a real button or link with a visible label (a tooltip) that is also its accessible name. Magnification is off on touch and for reduced motion."
+    },
+    {
+      "name": "dot-pattern",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A field of evenly spaced dots that fills its parent, with an optional edge fade and a slow drift."
+    },
+    {
+      "name": "dotted-map",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A flat world map drawn as dots on a canvas, with optional markers and arcs that pulse between marker pairs. Still when off-screen, paused or for reduced motion."
     },
     {
       "name": "drawer",
@@ -302,10 +380,22 @@
       "description": "Repeating rows of fields inside a Form, such as invoice lines or team members. Add, remove, move up or down and insert are all buttons, so the keyboard does everything; focus lands somewhere sensible and a polite message says what changed. The contents of the rows and any totals are yours."
     },
     {
+      "name": "file-tree",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A file and folder tree built on Tree, from a list of nodes. Folders show open and closed icons, files get an icon by extension, and each row can carry a size or a status badge."
+    },
+    {
       "name": "file-upload",
       "type": "registry:ui",
       "version": "0.1.0",
       "description": "A drop zone and button for choosing files, with type, size and count limits and a list of the chosen files you can remove from. The component picks the files; you upload them."
+    },
+    {
+      "name": "flickering-grid",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A grid of small squares that gently fade in and out, drawn on a canvas that fills its parent."
     },
     {
       "name": "form",
@@ -326,6 +416,18 @@
       "description": "A table an assistant produced, shown as a real sortable table with a title and summary, numbers aligned, long results cut to a few rows, and a CSV download."
     },
     {
+      "name": "glare-hover",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A band of light that sweeps across a card or an image when the pointer or keyboard focus reaches it."
+    },
+    {
+      "name": "globe",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A canvas globe of land dots that turns slowly, can be dragged to rotate, and can mark places with glowing dots. Still when off-screen, paused or for reduced motion."
+    },
+    {
       "name": "gradient-button",
       "type": "registry:ui",
       "version": "0.1.0",
@@ -338,10 +440,40 @@
       "description": "Text filled with a gradient that keeps flowing, for a short headline or a highlighted word. The words stay real text."
     },
     {
+      "name": "grid-pattern",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A grid of thin lines that fills its parent, with an optional edge fade and a slow drift."
+    },
+    {
+      "name": "hero-video-dialog",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A poster thumbnail with a play button that opens a dialog with your video. No video is bundled and none is fetched until the dialog opens. Focus moves into the dialog and returns to the thumbnail on close; Escape closes."
+    },
+    {
+      "name": "hexagon-pattern",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A honeycomb of hexagon outlines that fills its parent, with an optional edge fade and a slow drift."
+    },
+    {
       "name": "hover-card",
       "type": "registry:ui",
       "version": "0.1.0",
       "description": "A richer preview that opens when a link is hovered or reached with the keyboard, like a profile summary on a user name. It only repeats information that is available elsewhere."
+    },
+    {
+      "name": "hyper-text",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "Text whose letters scramble into random characters and then settle left to right on the real text, when it scrolls into view or when it is hovered. The final text is always in the page."
+    },
+    {
+      "name": "icon-cloud",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "Icons laid out on a slowly turning sphere, built with CSS 3D transforms and no canvas. Each icon can be a link, a button or a plain image, and the list keeps one fixed order for the keyboard."
     },
     {
       "name": "input-group",
@@ -354,6 +486,18 @@
       "type": "registry:ui",
       "version": "0.1.0",
       "description": "One-time code input for verification and two-factor sign in. One real input holds the code and drawn cells show it, so paste, autofill from SMS and screen readers all work."
+    },
+    {
+      "name": "interactive-grid-pattern",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A grid whose cells light up under the mouse or pen. Decoration only: it does nothing on touch or for reduced motion and never takes focus."
+    },
+    {
+      "name": "interactive-hover-button",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A button whose label slides away to an arrow, or to a second label with an arrow, on hover and keyboard focus. Builds on Button."
     },
     {
       "name": "invite-dialog",
@@ -374,10 +518,40 @@
       "description": "Shows a keyboard key or shortcut, like Ctrl or ⌘K, in a keycap style. Not interactive."
     },
     {
+      "name": "kinetic-text",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "Text whose letters move one after another in a loop: a wave, a bounce or a pulse. Plain CSS, staggered by letter position."
+    },
+    {
+      "name": "lens",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A magnifier that follows the mouse over an image or any content. The real content stays in place and fully accessible; the lens is a hidden, inert enlarged copy that appears only under a real pointer."
+    },
+    {
+      "name": "light-rays",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "Soft angled rays of light that sweep slowly across the parent, drawn with CSS only."
+    },
+    {
+      "name": "line-shadow-text",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "Text with a diagonal line-pattern shadow behind it that slowly slides. The shadow copy is hidden from assistive technology."
+    },
+    {
       "name": "marker",
       "type": "registry:ui",
       "version": "0.1.0",
       "description": "A divider that labels a moment inside a conversation or feed: a centered label between two lines. Use date for a new day, unread for where new messages start, and event for something that happened, like someone joining."
+    },
+    {
+      "name": "marquee",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "An endless scrolling row (or column) of content, such as logos or short quotes. It pauses on hover and focus, and can show a visible Pause button."
     },
     {
       "name": "menu",
@@ -404,6 +578,18 @@
       "description": "One message in a conversation, from you or the assistant. It renders each part in order with the right component: text as formatted markdown, tool calls as activity, tables and charts as real components, sources at the end."
     },
     {
+      "name": "meteors",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "Streaks that fall across a container, for a hero or an empty background. They are real DOM positioned from the index, so the server and the browser agree."
+    },
+    {
+      "name": "morphing-text",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A phrase that blurs and cross-fades into the next phrase in a list, in the same spot. The slot is as wide as the longest phrase, so nothing around it jumps."
+    },
+    {
       "name": "native-select",
       "type": "registry:ui",
       "version": "0.1.0",
@@ -416,10 +602,28 @@
       "description": "Site navigation along the top of a page: plain links, and triggers that open a shared panel of grouped links (a mega-menu). Built from NavigationMenuItem, NavigationMenuTrigger, NavigationMenuContent and NavigationMenuLink. It is a set of links, not a menu of actions."
     },
     {
+      "name": "noise",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A fine static grain laid over a surface with CSS, still by default."
+    },
+    {
       "name": "number-field",
       "type": "registry:ui",
       "version": "0.1.0",
       "description": "A text field for numbers, with increment and decrement buttons, keyboard stepping, and locale-aware formatting for decimals, currency, units and percentages."
+    },
+    {
+      "name": "number-ticker",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A number that counts up (or down) to its value once after it appears. The final number is always the text that is read and that is in the server HTML."
+    },
+    {
+      "name": "orbiting-circles",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "Items that travel around a centre on one or more circular paths, such as the tools a product works with. The items are your own children and the orbit is plain CSS."
     },
     {
       "name": "page-header",
@@ -434,16 +638,34 @@
       "description": "Page numbers with previous and next buttons, for content split across pages. Long ranges collapse to the first page, the last page, and the pages around the current one."
     },
     {
+      "name": "particles",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A canvas of small dots that drift and lean toward the pointer, for a background. They pause when off-screen and stop for reduced motion, leaving a still scatter."
+    },
+    {
       "name": "payment-method-card",
       "type": "registry:ui",
       "version": "0.1.0",
       "description": "One payment method: a generic card mark, the last four digits, the expiry with an expires soon notice, a default badge, and the actions Update, Remove (confirmed) and Make default. With no method it offers Add a payment method. It never holds a full card number; your callbacks do the work. UI permission is not security: the server must check again."
     },
     {
+      "name": "pixel-image",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "An image that resolves from coarse pixel blocks to sharp when it scrolls into view. The real image is always in the page (server HTML, no JavaScript, print); the blocks are a hidden canvas drawn over it and removed when done."
+    },
+    {
       "name": "plan-card",
       "type": "registry:ui",
       "version": "0.1.0",
       "description": "The current subscription plan: name, price and interval, status with the right text, renewal or end date, feature list, a usage hint, and the actions Change plan and Cancel subscription (confirmed, with the end date). A past due plan shows an alert. PlanPicker, exported beside it, lets people choose another plan. Your callbacks do the work. UI permission is not security: the server must check again."
+    },
+    {
+      "name": "pointer",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A named pointer that follows the mouse inside a container, like a collaborator cursor: an arrow drawn in CSS with a name tag. It hides when the mouse leaves."
     },
     {
       "name": "popover",
@@ -482,6 +704,12 @@
       "description": "Lets the user pick exactly one option from a small, visible set. Use with Radio children."
     },
     {
+      "name": "rainbow-button",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A button with a multicolour border and soft glow that slowly travels around it. The label sits on the normal button surface, so its contrast is the plain Button's. Builds on Button."
+    },
+    {
       "name": "rating",
       "type": "registry:ui",
       "version": "0.1.0",
@@ -498,6 +726,12 @@
       "type": "registry:ui",
       "version": "0.1.0",
       "description": "Shows an assistant's reply as formatted text: headings, lists, tables, code, links and source markers. It is safe for text you do not control and for text that is still arriving."
+    },
+    {
+      "name": "retro-grid",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A perspective floor grid that scrolls slowly toward the viewer, drawn with CSS only."
     },
     {
       "name": "reveal-button",
@@ -524,6 +758,18 @@
       "description": "A scrollable region with a thin themed scrollbar, reachable by keyboard, with optional fades at the edges that still have content."
     },
     {
+      "name": "scroll-progress",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A thin bar showing how far the page, or a scrolling container, has been read."
+    },
+    {
+      "name": "scroll-velocity",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "Rows of large text that drift sideways, speeding up and reversing with how fast the page is scrolled. Rows alternate direction."
+    },
+    {
       "name": "section-header",
       "type": "registry:ui",
       "version": "0.1.0",
@@ -540,6 +786,12 @@
       "type": "registry:ui",
       "version": "0.1.1",
       "description": "Picks one option from a list shown in a popover. Use with SelectItem children."
+    },
+    {
+      "name": "selvedge-blur",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A progressive blur along one edge of a scrolling area or image: stacked layers of backdrop blur that fade from sharp to blurred, so content softens as it nears the edge. Pure decoration: it ignores the pointer and is hidden from assistive technology."
     },
     {
       "name": "separator",
@@ -572,6 +824,12 @@
       "description": "A band of colour that slides steadily along a border, so the edge seems to catch the light. Wrap a card or a field."
     },
     {
+      "name": "shiny-button",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A button with a band of light that sweeps across its surface on hover and keyboard focus, and slowly now and then at rest. Builds on Button."
+    },
+    {
       "name": "shuttle-border",
       "type": "registry:ui",
       "version": "0.1.0",
@@ -596,10 +854,28 @@
       "description": "Picks a number, or a range with two thumbs, by dragging along a track. Shows the formatted value."
     },
     {
+      "name": "smooth-cursor",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A soft dot or ring that trails the real pointer with easing, inside a container or across the page. The system cursor stays unless you ask to hide it."
+    },
+    {
+      "name": "social-post-card",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A generic social post: avatar, display name, handle, time text, body, an optional media slot and link preview slot, and a row of real buttons (reply, repost, like) with formatted counts. It is an article with no network branding."
+    },
+    {
       "name": "sources",
       "type": "registry:ui",
       "version": "0.1.0",
       "description": "The numbered list of sources a reply drew on, with title, site and a short excerpt. Each entry is where a Citation marker lands."
+    },
+    {
+      "name": "sparkles-text",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "Text with small four-point sparkles that twinkle around it. The sparkles are drawn with CSS shapes and appear after the page loads."
     },
     {
       "name": "sparkline",
@@ -614,6 +890,18 @@
       "description": "A small loading indicator for work of unknown length: inline with text, inside a button, or over a whole area."
     },
     {
+      "name": "spinning-text",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "Text laid out round a circle that turns slowly. The layout is plain CSS (each letter is rotated about the centre), and the real text is in a visually hidden copy."
+    },
+    {
+      "name": "spotlight-card",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A card with a soft light that follows the pointer. The light is off for touch and for visitors who ask for less motion, and the card keeps its own focus ring."
+    },
+    {
       "name": "stat",
       "type": "registry:ui",
       "version": "0.1.0",
@@ -624,6 +912,12 @@
       "type": "registry:ui",
       "version": "0.1.0",
       "description": "Shows where someone is in a multi-step process, such as checkout or setup: done, current and upcoming steps. It displays progress; you control the steps and buttons."
+    },
+    {
+      "name": "striped-pattern",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "Diagonal stripes that fill their parent, with an optional edge fade and a slow drift along the stripes."
     },
     {
       "name": "switch",
@@ -650,16 +944,52 @@
       "description": "A text field that turns what you type into removable tags when you press Enter or comma: for keywords, recipients and labels."
     },
     {
+      "name": "terminal",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A command-line style panel that types its lines in once: a prompt, the commands, then the output. It has a copy button, and a still mode that shows every line at once. The lines are real text in the page from the start."
+    },
+    {
+      "name": "text-animate",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "Text that animates in by character, word or line using a preset: fade in, blur in, slide up or scale up. The words are real text in the page from the start."
+    },
+    {
       "name": "text-field",
       "type": "registry:ui",
       "version": "0.1.1",
       "description": "Single-line or multi-line text input with a label, help text and error message."
     },
     {
+      "name": "text-highlighter",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A marker highlight that sweeps behind text when it scrolls into view. The text itself is untouched, ordinary inline text that wraps normally."
+    },
+    {
+      "name": "text-reveal",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A passage whose words come into full strength as you scroll it into view, or all together when it appears. The real text is always in the page."
+    },
+    {
       "name": "text-shimmer",
       "type": "registry:ui",
       "version": "0.1.0",
       "description": "Text with a band of light sweeping across it, for a loading message or a quiet accent. The words stay real text: selectable and read as normal."
+    },
+    {
+      "name": "text3d-flip",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "Letters or words that flip over in 3D, when the pointer or focus arrives or once when the text comes into view."
+    },
+    {
+      "name": "theme-toggler",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A light, dark and system theme switch, as a three-option button group or a single cycling button, with a small animated icon change. It only reports the choice; it can optionally set data-theme on the page root. It reads and writes no storage: saving the choice is up to your app."
     },
     {
       "name": "time-field",
@@ -716,6 +1046,12 @@
       "description": "An expandable hierarchy such as folders and files or a nested menu, with keyboard navigation and optional selection. Build it from nested TreeItem elements."
     },
     {
+      "name": "typing-animation",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "Text that types itself out one character at a time, with an optional blinking cursor and an optional loop. The full text is in the page from the start."
+    },
+    {
       "name": "typography",
       "type": "registry:ui",
       "version": "0.1.0",
@@ -738,6 +1074,24 @@
       "type": "registry:ui",
       "version": "0.1.0",
       "description": "The avatar button that opens the account menu: the person's name and email at the top, your own entries (settings, billing, help) in groups, a row for the theme, and a Sign out entry that can ask first, shows that it is working, and tells screen readers how it went."
+    },
+    {
+      "name": "video-text",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "Large text that shows a video you supply through its letters. The text stays real text; a gradient fallback shows until the video plays."
+    },
+    {
+      "name": "weave-grid",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "rdloom's signature backdrop: warp and weft threads crossing in a woven grid, with an ember shuttle that passes through slowly."
+    },
+    {
+      "name": "word-rotate",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A phrase where one word swaps for the next in the same spot, cycling through a list. The slot is as wide as the longest word, so nothing around it jumps."
     }
   ]
 }

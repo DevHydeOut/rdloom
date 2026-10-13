@@ -1,0 +1,106 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Text3dFlip",
+  "version": "0.1.0",
+  "category": "motion",
+  "status": "experimental",
+  "states": [
+    "default"
+  ],
+  "slots": [
+    "root"
+  ],
+  "a11y": {
+    "role": "text",
+    "keyboard": [],
+    "requirements": [
+      "The text is ordinary text in the page from the server render, readable with no JavaScript, and read once by screen readers",
+      "Decoration only: the animated layers are hidden from assistive technology and never take focus",
+      "Stands still for visitors who ask for less motion (prefers-reduced-motion), and can also be shown still with the rdm-still class or isPaused",
+      "In forced-colors (high contrast) mode the text is drawn in the system colours with no effect",
+      "Does not flash: nothing changes more than three times in a second (WCAG 2.3.1)",
+      "Optional: it is a separate component, so projects that do not add it carry none of its code",
+      "The hover trigger plays only where a real pointer exists, and also plays when focus is inside the element (for example when it wraps a link)",
+      "The element is not made focusable by this component"
+    ],
+    "screenReader": [
+      "Read as ordinary text: the effect is purely visual"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "figma": {
+    "componentKey": null,
+    "variantMap": {
+      "by": "By",
+      "trigger": "Trigger",
+      "isPaused": "Paused"
+    }
+  },
+  "description": "Letters or words that flip over in 3D, when the pointer or focus arrives or once when the text comes into view.",
+  "props": {
+    "children": {
+      "type": "string",
+      "description": "The text.",
+      "required": true
+    },
+    "by": {
+      "type": "enum",
+      "values": [
+        "letter",
+        "word"
+      ],
+      "default": "letter",
+      "description": "What flips."
+    },
+    "trigger": {
+      "type": "enum",
+      "values": [
+        "hover",
+        "view"
+      ],
+      "default": "hover",
+      "description": "hover flips on pointer over or focus inside; view flips once when the text scrolls into view."
+    },
+    "duration": {
+      "type": "number",
+      "default": 0.6,
+      "description": "Seconds one flip takes."
+    },
+    "stagger": {
+      "type": "number",
+      "default": 0.04,
+      "description": "Seconds between one unit and the next."
+    },
+    "isPaused": {
+      "type": "boolean",
+      "default": false,
+      "description": "Stops the animation and shows the text plainly. Moving content that lasts more than five seconds should be stoppable."
+    }
+  },
+  "variants": [
+    "by",
+    "trigger",
+    "isPaused"
+  ],
+  "tokens": [
+    "color.text.default"
+  ],
+  "usage": {
+    "use_when": [
+      "A heading or link label that should react to the pointer",
+      "A short title that flips in once"
+    ],
+    "avoid_when": [
+      "Long text",
+      "Text people must read while it is mid-flip"
+    ],
+    "anti_patterns": [
+      "Flipping whole paragraphs"
+    ]
+  },
+  "examples": [
+    "on-hover",
+    "on-view",
+    "by-word"
+  ]
+}

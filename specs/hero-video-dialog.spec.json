@@ -1,0 +1,40 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "HeroVideoDialog",
+  "version": "0.1.0",
+  "category": "motion",
+  "status": "experimental",
+  "description": "A poster thumbnail with a play button that opens a dialog with your video. No video is bundled and none is fetched until the dialog opens. Focus moves into the dialog and returns to the thumbnail on close; Escape closes.",
+  "props": {
+    "videoSrc": { "type": "string", "required": true, "description": "URL of the video file you supply. It loads only after the dialog opens." },
+    "title": { "type": "string", "required": true, "description": "Name of the video. It names the thumbnail button and the dialog." },
+    "poster": { "type": "node", "description": "The thumbnail: an image URL string, or any element such as an img or a gradient." },
+    "tracks": { "type": "node", "description": "track elements for captions and descriptions, placed inside the video." },
+    "isStill": { "type": "boolean", "default": false, "description": "Turns off the hover zoom of the thumbnail." }
+  },
+  "variants": ["isStill"],
+  "states": ["default", "hover", "focus", "open"],
+  "slots": ["root", "poster", "play", "dialog", "video"],
+  "tokens": ["color.surface.raised", "color.focus.ring", "radius.overlay"],
+  "a11y": {
+    "role": "button",
+    "keyboard": ["Enter or Space: opens the video dialog", "Escape: closes it and returns focus to the thumbnail", "Tab: moves between the video controls and the Close button"],
+    "requirements": [
+      "The thumbnail is a real button named Play video: followed by the title, and opens a modal dialog with the same title",
+      "The poster image is decoration (alt empty): the button name carries the meaning",
+      "The dialog traps focus, closes with Escape or the Close button, and returns focus to the thumbnail",
+      "The video has native controls and does not start by itself loudly: it begins when the visitor opens it, and they can pause it",
+      "Supply captions through tracks; a video without captions fails WCAG 1.2.2",
+      "Nothing is loaded from videoSrc until the dialog opens; the hover zoom is off for reduced motion and isStill"
+    ],
+    "screenReader": ["Button: Play video: title. Dialog: title, video controls, Close button"],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["A product demo on a landing page", "A tutorial the visitor chooses to watch"],
+    "avoid_when": ["Video that must be visible without an action", "Background loops"],
+    "anti_patterns": ["Shipping a video without captions", "Autoplaying with sound on page load"]
+  },
+  "examples": ["basic", "with-captions", "still"],
+  "figma": { "componentKey": null, "variantMap": {} }
+}

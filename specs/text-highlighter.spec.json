@@ -1,0 +1,98 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "TextHighlighter",
+  "version": "0.1.0",
+  "category": "motion",
+  "status": "experimental",
+  "description": "A marker highlight that sweeps behind text when it scrolls into view. The text itself is untouched, ordinary inline text that wraps normally.",
+  "props": {
+    "children": {
+      "type": "string",
+      "description": "The text to highlight.",
+      "required": true
+    },
+    "color": {
+      "type": "string",
+      "description": "Any CSS colour for the marker. Defaults to a soft tint of the action colour. Keep enough contrast with the text."
+    },
+    "whenInView": {
+      "type": "boolean",
+      "default": true,
+      "description": "Waits until the text scrolls into view before sweeping. When false it sweeps on load."
+    },
+    "duration": {
+      "type": "number",
+      "default": 0.8,
+      "description": "Seconds the sweep takes."
+    },
+    "delay": {
+      "type": "number",
+      "default": 0,
+      "description": "Seconds to wait before the sweep starts."
+    },
+    "isPaused": {
+      "type": "boolean",
+      "default": false,
+      "description": "Stops the animation and shows the finished text. Moving content that lasts more than five seconds should be stoppable."
+    }
+  },
+  "variants": [
+    "whenInView",
+    "isPaused"
+  ],
+  "states": [
+    "default"
+  ],
+  "slots": [
+    "root"
+  ],
+  "tokens": [
+    "color.text.default",
+    "color.action.primary"
+  ],
+  "a11y": {
+    "role": "generic",
+    "keyboard": [],
+    "requirements": [
+      "The marker is a background of the text element, so the text is never split, copied or re-announced",
+      "The marker colour must keep the text at 4.5:1 contrast; the default is a light tint",
+      "The marker runs once and then stays: nothing keeps moving",
+      "Decoration only: the animated layers are hidden from assistive technology and never take focus",
+      "Stands still for visitors who ask for less motion (prefers-reduced-motion), and can also be shown still with the rdm-still class or isPaused",
+      "In forced-colors (high contrast) mode the text is drawn in the system colours with no effect",
+      "Does not flash: nothing changes more than three times in a second (WCAG 2.3.1)",
+      "The text is real text in the server HTML, readable with no script",
+      "Optional: it is a separate component, so projects that do not add it carry none of its code"
+    ],
+    "screenReader": [
+      "The text, as ordinary text"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "Drawing the eye to one key phrase in a paragraph",
+      "Marking a phrase as the point of a section"
+    ],
+    "avoid_when": [
+      "Highlighting whole paragraphs",
+      "Dark or saturated marker colours that cut the text contrast"
+    ],
+    "anti_patterns": [
+      "Stacking several highlights in one sentence",
+      "Using the highlight as the only sign that text matters (add words or structure too)"
+    ]
+  },
+  "examples": [
+    "basic",
+    "in-a-paragraph",
+    "custom-color"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {
+      "whenInView": "When in view",
+      "isPaused": "Paused"
+    }
+  }
+}

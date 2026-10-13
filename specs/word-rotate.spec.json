@@ -1,0 +1,93 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "WordRotate",
+  "version": "0.1.0",
+  "category": "motion",
+  "status": "experimental",
+  "description": "A phrase where one word swaps for the next in the same spot, cycling through a list. The slot is as wide as the longest word, so nothing around it jumps.",
+  "props": {
+    "words": {
+      "type": "custom",
+      "tsType": "string[]",
+      "description": "The words to cycle through, in order.",
+      "required": true
+    },
+    "duration": {
+      "type": "number",
+      "default": 2500,
+      "description": "Milliseconds each word stays before the next replaces it."
+    },
+    "announce": {
+      "type": "boolean",
+      "default": false,
+      "description": "Announces each new word politely to screen readers. Off by default: most rotating words are decoration."
+    },
+    "label": {
+      "type": "string",
+      "description": "Accessible name for the whole slot when announce is off. Defaults to all the words, joined with commas."
+    },
+    "isPaused": {
+      "type": "boolean",
+      "default": false,
+      "description": "Stops the animation and shows the finished text. Moving content that lasts more than five seconds should be stoppable."
+    }
+  },
+  "variants": [
+    "announce",
+    "isPaused"
+  ],
+  "states": [
+    "default"
+  ],
+  "slots": [
+    "root"
+  ],
+  "tokens": [
+    "color.text.default",
+    "color.text.muted"
+  ],
+  "a11y": {
+    "role": "group",
+    "keyboard": [],
+    "requirements": [
+      "Without announce, the slot has an accessible name listing all the words, and the visible word is hidden from assistive technology",
+      "With announce, the visible word sits in a polite live region and is read when it changes",
+      "Hidden sizing copies of the other words are invisible to everyone, so they are never read twice",
+      "Decoration only: the animated layers are hidden from assistive technology and never take focus",
+      "Stands still for visitors who ask for less motion (prefers-reduced-motion), and can also be shown still with the rdm-still class or isPaused",
+      "In forced-colors (high contrast) mode the text is drawn in the system colours",
+      "Does not flash: nothing changes more than three times in a second (WCAG 2.3.1)",
+      "Optional: it is a separate component, so projects that do not add it carry none of its code"
+    ],
+    "screenReader": [
+      "Without announce: the list of all words, once",
+      "With announce: each new word, politely"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "A headline such as Built for teams, makers, studios where one word changes",
+      "Showing the range of things a product handles"
+    ],
+    "avoid_when": [
+      "Words that carry information people must not miss",
+      "Lists longer than six words"
+    ],
+    "anti_patterns": [
+      "Turning announce on for a purely decorative swap, which interrupts reading",
+      "Putting a different meaning in each word and expecting every one to be noticed"
+    ]
+  },
+  "examples": [
+    "basic",
+    "in-a-heading"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {
+      "announce": "Announce",
+      "isPaused": "Paused"
+    }
+  }
+}

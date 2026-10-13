@@ -1,0 +1,60 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Marquee",
+  "version": "0.1.0",
+  "category": "motion",
+  "status": "experimental",
+  "description": "An endless scrolling row (or column) of content, such as logos or short quotes. It pauses on hover and focus, and can show a visible Pause button.",
+  "props": {
+    "children": { "type": "node", "description": "The items that scroll.", "required": true },
+    "direction": { "type": "enum", "values": ["horizontal", "vertical"], "default": "horizontal", "description": "Axis the content scrolls along. A vertical marquee needs a parent or className that gives it a height." },
+    "reverse": { "type": "boolean", "description": "Scrolls the other way.", "default": false },
+    "speed": { "type": "number", "description": "Scroll speed in pixels per second.", "default": 40 },
+    "gap": { "type": "string", "description": "Space between items and between repeats, any CSS length.", "default": "1rem" },
+    "pauseOnHover": { "type": "boolean", "description": "Pauses while the pointer is over it or focus is inside it.", "default": true },
+    "showPauseButton": { "type": "boolean", "description": "Shows a visible Pause and Play button, so people can stop the motion (WCAG 2.2.2).", "default": false },
+    "pauseLabel": { "type": "string", "description": "Text of the button while moving.", "default": "Pause" },
+    "playLabel": { "type": "string", "description": "Text of the button while paused.", "default": "Play" },
+    "fade": { "type": "boolean", "description": "Fades the content out at both edges.", "default": true },
+    "isPaused": { "type": "boolean", "description": "Stops the scrolling.", "default": false }
+  },
+  "variants": ["direction", "reverse", "fade", "isPaused", "showPauseButton"],
+  "states": ["default", "hover", "focus"],
+  "slots": ["root", "viewport", "track", "item", "button"],
+  "tokens": ["color.text.default", "color.border.default", "color.surface.default", "radius.control"],
+  "a11y": {
+    "role": "group",
+    "keyboard": ["Tab: moves to the Pause button and to anything focusable in the items", "Enter or Space: pauses or resumes when the button is focused"],
+    "requirements": [
+      "Moving content longer than five seconds can be paused: by the Pause button, by hover and focus-within, and by isPaused (WCAG 2.2.2)",
+      "Only the first copy of the items is in the accessibility tree; the repeats are aria-hidden and inert, so nothing is read or focused twice",
+      "The items are real DOM in the server HTML and are readable with no JavaScript",
+      "Visitors who ask for less motion (prefers-reduced-motion), and anything inside rdm-still, get a still row that can be scrolled by hand, with the repeats removed",
+      "In forced-colors (high contrast) mode the edge fade is removed",
+      "Scrolls the right way in right-to-left layouts"
+    ],
+    "screenReader": [
+      "The items are read once, in order, as ordinary content"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "A row of customer logos",
+      "Short, non-essential quotes or tags"
+    ],
+    "avoid_when": [
+      "Content people must read closely or act on, since moving targets are hard to use",
+      "Navigation"
+    ],
+    "anti_patterns": [
+      "Putting essential links in a moving row without a Pause button",
+      "Very fast speeds"
+    ]
+  },
+  "examples": ["basic", "with-pause-button", "vertical"],
+  "figma": {
+    "componentKey": null,
+    "variantMap": { "direction": "Direction", "isPaused": "Paused" }
+  }
+}
