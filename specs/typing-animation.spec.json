@@ -1,0 +1,98 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "TypingAnimation",
+  "version": "0.1.0",
+  "category": "motion",
+  "status": "experimental",
+  "description": "Text that types itself out one character at a time, with an optional blinking cursor and an optional loop. The full text is in the page from the start.",
+  "props": {
+    "children": {
+      "type": "string",
+      "description": "The text to type.",
+      "required": true
+    },
+    "speed": {
+      "type": "number",
+      "default": 70,
+      "description": "Milliseconds per character."
+    },
+    "delay": {
+      "type": "number",
+      "default": 0,
+      "description": "Seconds to wait before typing starts."
+    },
+    "cursor": {
+      "type": "boolean",
+      "default": true,
+      "description": "Shows a blinking cursor after the text."
+    },
+    "loop": {
+      "type": "boolean",
+      "default": false,
+      "description": "Types the text again after a short pause, once it has finished."
+    },
+    "isPaused": {
+      "type": "boolean",
+      "default": false,
+      "description": "Stops the animation and shows the finished text. Moving content that lasts more than five seconds should be stoppable."
+    }
+  },
+  "variants": [
+    "cursor",
+    "loop",
+    "isPaused"
+  ],
+  "states": [
+    "default"
+  ],
+  "slots": [
+    "root"
+  ],
+  "tokens": [
+    "color.text.default",
+    "color.text.muted"
+  ],
+  "a11y": {
+    "role": "text",
+    "keyboard": [],
+    "requirements": [
+      "The full text is present as visually hidden text from the first render, so assistive technology reads it once, never letter by letter",
+      "With no JavaScript, or with reduced motion, the finished text is shown at once",
+      "Decoration only: the animated layers are hidden from assistive technology and never take focus",
+      "Stands still for visitors who ask for less motion (prefers-reduced-motion), and can also be shown still with the rdm-still class or isPaused",
+      "In forced-colors (high contrast) mode the text is drawn in the system colours",
+      "Does not flash: nothing changes more than three times in a second (WCAG 2.3.1)",
+      "Optional: it is a separate component, so projects that do not add it carry none of its code"
+    ],
+    "screenReader": [
+      "The full text is read once, immediately; the typing is not announced"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "A short tagline or terminal-style line in a hero",
+      "Showing a command being typed"
+    ],
+    "avoid_when": [
+      "Text people must read the moment the page loads",
+      "Long paragraphs"
+    ],
+    "anti_patterns": [
+      "Looping text that is also the only place a message appears",
+      "Typing speeds so slow the text takes many seconds to finish"
+    ]
+  },
+  "examples": [
+    "basic",
+    "looping"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {
+      "cursor": "Cursor",
+      "loop": "Loop",
+      "isPaused": "Paused"
+    }
+  }
+}

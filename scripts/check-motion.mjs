@@ -24,7 +24,7 @@ const open = async (context, path) => {
 const running = (page) =>
   page.evaluate(() => document.getAnimations().filter((a) => a.playState === "running" && a.effect?.getTiming().iterations === Infinity).length);
 
-const names = ["shimmer-button", "pulse-button", "gradient-button", "shuttle-border", "shine-border", "text-shimmer", "gradient-text", "ripple"];
+const names = ["shimmer-button", "pulse-button", "gradient-button", "shuttle-border", "shine-border", "text-shimmer", "gradient-text", "ripple", "marquee"];
 const result = {};
 
 // 1. Each effect animates in a normal context, and none do when the visitor prefers reduced motion.

@@ -1,0 +1,123 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "TextAnimate",
+  "version": "0.1.0",
+  "category": "motion",
+  "status": "experimental",
+  "description": "Text that animates in by character, word or line using a preset: fade in, blur in, slide up or scale up. The words are real text in the page from the start.",
+  "props": {
+    "children": {
+      "type": "string",
+      "description": "The text. In line mode, each new line (a newline character) is one unit.",
+      "required": true
+    },
+    "by": {
+      "type": "enum",
+      "values": [
+        "character",
+        "word",
+        "line"
+      ],
+      "default": "word",
+      "description": "What is animated one after another."
+    },
+    "animation": {
+      "type": "enum",
+      "values": [
+        "fadeIn",
+        "blurIn",
+        "slideUp",
+        "scaleUp"
+      ],
+      "default": "fadeIn",
+      "description": "The preset each unit plays."
+    },
+    "delay": {
+      "type": "number",
+      "default": 0,
+      "description": "Seconds before the first unit starts."
+    },
+    "duration": {
+      "type": "number",
+      "default": 0.5,
+      "description": "Seconds each unit takes."
+    },
+    "stagger": {
+      "type": "number",
+      "default": 0.05,
+      "description": "Seconds between one unit starting and the next."
+    },
+    "whenInView": {
+      "type": "boolean",
+      "default": false,
+      "description": "Waits until the text scrolls into view before playing."
+    },
+    "isPaused": {
+      "type": "boolean",
+      "default": false,
+      "description": "Stops the animation and shows the finished text. Moving content that lasts more than five seconds should be stoppable."
+    }
+  },
+  "variants": [
+    "by",
+    "animation",
+    "whenInView",
+    "isPaused"
+  ],
+  "states": [
+    "default"
+  ],
+  "slots": [
+    "root"
+  ],
+  "tokens": [
+    "color.text.default",
+    "color.text.muted"
+  ],
+  "a11y": {
+    "role": "text",
+    "keyboard": [],
+    "requirements": [
+      "The full text is present as visually hidden text, so assistive technology reads it once and never character by character",
+      "The animated copy is hidden from assistive technology",
+      "With no JavaScript, or with reduced motion, the text is shown at once",
+      "Decoration only: the animated layers are hidden from assistive technology and never take focus",
+      "Stands still for visitors who ask for less motion (prefers-reduced-motion), and can also be shown still with the rdm-still class or isPaused",
+      "In forced-colors (high contrast) mode the text is drawn in the system colours",
+      "Does not flash: nothing changes more than three times in a second (WCAG 2.3.1)",
+      "Optional: it is a separate component, so projects that do not add it carry none of its code"
+    ],
+    "screenReader": [
+      "The full text is read once; the animation is not announced"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "A heading or short intro that should arrive with some life",
+      "Staggering a short list of words"
+    ],
+    "avoid_when": [
+      "Long passages, especially by character",
+      "Text that changes often"
+    ],
+    "anti_patterns": [
+      "Animating by character on text that will be read aloud",
+      "A very long total time: delay plus stagger times the number of units should stay short"
+    ]
+  },
+  "examples": [
+    "basic",
+    "presets",
+    "by-character"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {
+      "by": "By",
+      "animation": "Animation",
+      "whenInView": "When in view",
+      "isPaused": "Paused"
+    }
+  }
+}

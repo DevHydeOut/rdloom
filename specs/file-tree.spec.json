@@ -1,0 +1,121 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "FileTree",
+  "version": "0.1.0",
+  "category": "data",
+  "status": "experimental",
+  "description": "A file and folder tree built on Tree, from a list of nodes. Folders show open and closed icons, files get an icon by extension, and each row can carry a size or a status badge.",
+  "props": {
+    "label": {
+      "type": "string",
+      "description": "Accessible name of the tree, e.g. \"Project files\".",
+      "required": true
+    },
+    "items": {
+      "type": "custom",
+      "tsType": "import(\"../file-tree/file-tree\").FileTreeNode[]",
+      "description": "The nodes. A node with children is a folder; the id is its key and is unique across the whole tree.",
+      "required": true
+    },
+    "selectionMode": {
+      "type": "enum",
+      "values": ["none", "single", "multiple"],
+      "description": "Whether rows can be selected.",
+      "default": "single"
+    },
+    "selectedKeys": {
+      "type": "custom",
+      "tsType": "\"all\" | Iterable<import(\"react-aria-components\").Key>",
+      "description": "Controlled selection, by node id."
+    },
+    "defaultSelectedKeys": {
+      "type": "custom",
+      "tsType": "\"all\" | Iterable<import(\"react-aria-components\").Key>",
+      "description": "Initial selection when uncontrolled."
+    },
+    "onSelectionChange": {
+      "type": "callback",
+      "tsType": "(keys: \"all\" | Set<import(\"react-aria-components\").Key>) => void",
+      "description": "Called with the selected node ids."
+    },
+    "expandedKeys": {
+      "type": "custom",
+      "tsType": "Iterable<import(\"react-aria-components\").Key>",
+      "description": "Controlled set of open folders, by id."
+    },
+    "defaultExpandedKeys": {
+      "type": "custom",
+      "tsType": "Iterable<import(\"react-aria-components\").Key>",
+      "description": "Folders open at first."
+    },
+    "onExpandedChange": {
+      "type": "callback",
+      "tsType": "(keys: Set<import(\"react-aria-components\").Key>) => void",
+      "description": "Called when folders are opened or closed."
+    },
+    "onAction": {
+      "type": "callback",
+      "tsType": "(key: import(\"react-aria-components\").Key) => void",
+      "description": "Called when a row is activated with Enter or a double-click."
+    }
+  },
+  "variants": ["selectionMode"],
+  "states": ["default", "hover", "focus", "selected"],
+  "slots": ["tree", "item", "icon", "label", "badge"],
+  "tokens": [
+    "color.surface.default",
+    "color.surface.subtle",
+    "color.surface.selected",
+    "color.border.default",
+    "color.text.default",
+    "color.text.muted",
+    "color.focus.ring",
+    "radius.control"
+  ],
+  "a11y": {
+    "role": "tree",
+    "keyboard": [
+      "Tab moves into the tree, on one row, and out again",
+      "Up and Down arrows move between visible rows",
+      "Right arrow opens a closed folder, or moves to its first child; Left arrow closes it, or moves to its parent",
+      "Home and End jump to the first and last visible row",
+      "Enter activates the row (onAction); Space selects it when selection is on",
+      "Typing a letter jumps to the next row starting with it"
+    ],
+    "requirements": [
+      "Built on Tree: a named tree whose rows expose aria-level, aria-expanded (folders) and aria-selected (when selectable)",
+      "File and folder icons are decoration (aria-hidden); the name is the text of the row",
+      "A status such as modified is part of the row accessible name, not only a coloured badge, and the badge shows a letter as well as a colour",
+      "Sizes are text you supply, already formatted for your locale",
+      "Selection is shown by a filled row and aria-selected, not only colour"
+    ],
+    "screenReader": [
+      "Entering announces the tree name, the row, its level and position, and whether a folder is open",
+      "A row with a status is read as its name followed by the status",
+      "Opening or closing a folder announces the new state"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "Showing a project's files and folders",
+      "Picking a file from a hierarchy, with an optional size or change status"
+    ],
+    "avoid_when": [
+      "Flat file lists: use a ListBox or Table",
+      "Folders with thousands of children loaded at once"
+    ],
+    "anti_patterns": [
+      "Reusing the same id for two nodes",
+      "Showing the status only by colour",
+      "Using the file extension as the only way to tell what a file is"
+    ]
+  },
+  "examples": ["basic", "with-sizes-and-status", "controlled"],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {
+      "selectionMode": "Selection"
+    }
+  }
+}

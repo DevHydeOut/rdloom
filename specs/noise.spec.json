@@ -1,0 +1,84 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "version": "0.1.0",
+  "category": "motion",
+  "status": "experimental",
+  "states": [
+    "default"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {
+      "animated": "Animated",
+      "isStill": "Still"
+    }
+  },
+  "name": "Noise",
+  "description": "A fine static grain laid over a surface with CSS, still by default.",
+  "props": {
+    "opacity": {
+      "type": "number",
+      "description": "Strength of the grain, from 0 to 1.",
+      "default": 0.14
+    },
+    "size": {
+      "type": "number",
+      "description": "Size of one grain tile in pixels.",
+      "default": 160
+    },
+    "animated": {
+      "type": "boolean",
+      "description": "Shifts the grain slowly, about once a second. Off by default.",
+      "default": false
+    },
+    "isStill": {
+      "type": "boolean",
+      "description": "Stops the shift. Moving content should be stoppable.",
+      "default": false
+    }
+  },
+  "variants": [
+    "animated",
+    "isStill"
+  ],
+  "slots": [
+    "root"
+  ],
+  "tokens": [],
+  "a11y": {
+    "role": "presentation",
+    "keyboard": [],
+    "requirements": [
+      "Pure decoration: aria-hidden, never focusable, and pointer-events none so content on top stays usable",
+      "Still by default; the optional shift is about once a second, far below 3 changes a second",
+      "Drawn with CSS only, so it needs no JavaScript and is safe in server HTML",
+      "Stands still for visitors who ask for less motion (prefers-reduced-motion), with isStill, and inside an rdm-still container",
+      "Nothing flashes more than 3 times a second (WCAG 2.3.1) and moving content can be stopped (WCAG 2.2.2)",
+      "Hidden in forced-colors (high contrast) mode so it never fights system colours",
+      "Keep text on top at 4.5:1 against the effect: use a low-contrast colour"
+    ],
+    "screenReader": [
+      "Ignored: it is not announced"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "Taking the flat look off a large gradient or surface",
+      "A subtle film-grain feel"
+    ],
+    "avoid_when": [
+      "With a high opacity that dirties text",
+      "On top of photos or charts where precision matters"
+    ],
+    "anti_patterns": [
+      "Opacity above about 0.2",
+      "Stacking grain over text that must be crisp"
+    ]
+  },
+  "examples": [
+    "basic",
+    "overlay",
+    "animated"
+  ]
+}

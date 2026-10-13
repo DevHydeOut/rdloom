@@ -1,0 +1,52 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "SocialPostCard",
+  "version": "0.1.0",
+  "category": "motion",
+  "status": "experimental",
+  "description": "A generic social post: avatar, display name, handle, time text, body, an optional media slot and link preview slot, and a row of real buttons (reply, repost, like) with formatted counts. It is an article with no network branding.",
+  "props": {
+    "name": { "type": "string", "description": "Display name of the author.", "required": true },
+    "handle": { "type": "string", "description": "Handle of the author, with or without a leading @." },
+    "avatarSrc": { "type": "string", "description": "Avatar image URL. Without it the initials are shown." },
+    "timestamp": { "type": "string", "description": "Time as text, for example 2h or 12 Mar. Pass the already formatted text." },
+    "dateTime": { "type": "string", "description": "Machine readable date for the time element." },
+    "children": { "type": "node", "description": "The post body.", "required": true },
+    "media": { "type": "node", "description": "Optional media slot under the body, such as an image." },
+    "linkPreview": { "type": "node", "description": "Optional link preview slot under the media." },
+    "replyCount": { "type": "number", "description": "Number of replies." },
+    "repostCount": { "type": "number", "description": "Number of reposts." },
+    "likeCount": { "type": "number", "description": "Number of likes." },
+    "isLiked": { "type": "boolean", "description": "Whether the current user liked the post.", "default": false },
+    "isReposted": { "type": "boolean", "description": "Whether the current user reposted it.", "default": false },
+    "onReply": { "type": "callback", "tsType": "() => void", "description": "Called when Reply is pressed. The button is only drawn when this is set." },
+    "onRepost": { "type": "callback", "tsType": "() => void", "description": "Called when Repost is pressed. The button is only drawn when this is set." },
+    "onLike": { "type": "callback", "tsType": "() => void", "description": "Called when Like is pressed. The button is only drawn when this is set." },
+    "variant": { "type": "enum", "values": ["default", "compact"], "default": "default", "description": "Compact uses smaller spacing and text." },
+    "locale": { "type": "string", "description": "Locale used to format counts. Defaults to the app locale." }
+  },
+  "variants": ["variant", "isLiked", "isReposted"],
+  "states": ["default", "hover", "focus", "pressed", "selected"],
+  "slots": ["root", "header", "avatar", "name", "handle", "time", "body", "media", "linkPreview", "actions", "action"],
+  "tokens": ["color.surface.default", "color.border.default", "color.text.default", "color.text.muted", "color.focus.ring", "color.action.primary", "radius.overlay"],
+  "a11y": {
+    "role": "article",
+    "keyboard": ["Tab: moves to each action button in order", "Enter or Space: presses the focused button"],
+    "requirements": [
+      "The card is an article named by the author name through aria-labelledby",
+      "Reply, Repost and Like are real buttons with names like Reply, 12 replies; Repost and Like use aria-pressed",
+      "Counts are formatted with the default locale and compact notation, and the full number is in the accessible name",
+      "The avatar is decorative when the name is next to it; the time uses a time element",
+      "Media and link preview are slots: give images their own alt text",
+      "Static: no motion"
+    ],
+    "screenReader": ["Article with the author name, then body, media, then the action buttons with counts"],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["Showing a post, quote or testimonial from a feed", "Wall of reactions on a landing page"],
+    "avoid_when": ["Long conversations that need threading and moderation", "Anything that needs live updating counts without an announcement"]
+  },
+  "examples": ["basic", "with-media", "compact"],
+  "figma": { "componentKey": null, "variantMap": { "variant": "Variant" } }
+}

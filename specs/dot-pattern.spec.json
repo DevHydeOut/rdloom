@@ -1,0 +1,101 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "DotPattern",
+  "version": "0.1.0",
+  "category": "motion",
+  "status": "experimental",
+  "description": "A field of evenly spaced dots that fills its parent, with an optional edge fade and a slow drift.",
+  "props": {
+    "size": {
+      "type": "number",
+      "description": "Dot diameter in pixels.",
+      "default": 2
+    },
+    "gap": {
+      "type": "number",
+      "description": "Space between dots in pixels.",
+      "default": 20
+    },
+    "color": {
+      "type": "string",
+      "description": "Colour of the pattern: any CSS colour or a token such as var(--rd-color-border-default).",
+      "default": "color-mix(in srgb, var(--rd-color-text-default) 16%, transparent)"
+    },
+    "fade": {
+      "type": "boolean",
+      "description": "Fades the pattern out toward its edges.",
+      "default": true
+    },
+    "animated": {
+      "type": "boolean",
+      "description": "Drifts the pattern slowly, one tile per cycle. Off by default.",
+      "default": false
+    },
+    "isStill": {
+      "type": "boolean",
+      "description": "Stops the drift. Moving content should be stoppable.",
+      "default": false
+    },
+    "duration": {
+      "type": "number",
+      "description": "Seconds one drift cycle takes.",
+      "default": 10
+    }
+  },
+  "variants": [
+    "fade",
+    "animated",
+    "isStill"
+  ],
+  "states": [
+    "default"
+  ],
+  "slots": [
+    "root",
+    "layer"
+  ],
+  "tokens": [
+    "color.border.default"
+  ],
+  "a11y": {
+    "role": "presentation",
+    "keyboard": [],
+    "requirements": [
+      "Pure decoration: aria-hidden, never focusable, and pointer-events none so content on top stays usable",
+      "It is drawn with CSS only, so it needs no JavaScript and is safe in server HTML",
+      "Stands still for visitors who ask for less motion (prefers-reduced-motion), with isStill, and inside an rdm-still container",
+      "Drift is slow and never flashes (WCAG 2.2.2, 2.3.1)",
+      "Hidden in forced-colors (high contrast) mode so it never fights system colours",
+      "Keep text on top at 4.5:1 against the lines: use a low-contrast token for the pattern"
+    ],
+    "screenReader": [
+      "Ignored: it is not announced"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "A quiet dotted behind a hero, card or empty state",
+      "Giving a flat surface a little texture"
+    ],
+    "avoid_when": [
+      "Behind long text where the lines reduce legibility",
+      "As the only way to show a boundary or meaning"
+    ],
+    "anti_patterns": [
+      "A high-contrast colour that competes with the content",
+      "Animating several patterns on one screen"
+    ]
+  },
+  "examples": [
+    "basic",
+    "faded",
+    "animated"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {
+      "animated": "Animated"
+    }
+  }
+}

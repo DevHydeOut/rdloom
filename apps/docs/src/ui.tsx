@@ -204,7 +204,7 @@ export function Preview({ children, code, label, tall = false, motion = false, f
   const id = useId();
   return (
     <div data-docs-preview className="overflow-hidden rounded-xl border border-[var(--site-border)]">
-      <div className={`relative flex ${tall ? "min-h-[22rem]" : "min-h-48"} min-w-0 items-center justify-center overflow-x-auto bg-[var(--rd-color-surface-default)] ${flush ? "p-3" : "p-8"} ${still ? "rdm-still" : ""}`}>
+      <div className={`relative flex ${tall ? "min-h-[22rem]" : "min-h-48"} min-w-0 items-center justify-center overflow-x-auto bg-[var(--rd-color-surface-default)] ${flush ? "p-3" : motion ? "p-5 sm:p-6" : "p-8"} ${still ? "rdm-still" : ""}`}>
         {motion && (
           // The same switch the components honour for visitors who prefer reduced motion.
           <button
@@ -216,7 +216,7 @@ export function Preview({ children, code, label, tall = false, motion = false, f
             {still ? "Still: on" : "Still"}
           </button>
         )}
-        <div className={`flex min-w-0 max-w-full flex-wrap items-center justify-center gap-4 ${flush ? "w-full" : ""}`}>{children}</div>
+        <div className={`flex min-w-0 max-w-full flex-wrap items-center justify-center gap-4 ${flush || motion ? "w-full" : ""}`}>{children}</div>
       </div>
       <div className="relative border-t border-[var(--site-border)] bg-[var(--site-subtle)]">
         <div id={id} className={open ? "" : "max-h-[8.5rem] overflow-hidden"} inert={!open}>

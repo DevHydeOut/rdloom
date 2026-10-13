@@ -33,7 +33,7 @@ const moving = new Set(
 // depends on the machine, so no fixed picture exists. These examples are only checked for rendering without errors.
 const NO_PICTURE = new Set(["flickering-grid"]);
 
-const SLOW_TO_LOAD = new Set(["customer-table/server-side", "time-slot-picker/async-slots"]);
+const SLOW_TO_LOAD = new Set(["customer-table/server-side", "time-slot-picker/async-slots", "data-table/server-side"]);
 
 // A fixed "today", so calendars and date presets look the same every day.
 const NOW = new Date("2026-03-15T10:00:00Z");
@@ -53,7 +53,8 @@ async function open(page: Page, id: string, name: string, theme: string) {
       };
     });
   }
-  await page.goto(`/visual/${id}/${name}?theme=${theme}`);
+  // Motion examples are stages (a pattern, a video, a terminal): they get the width of the window, as in an app.
+  await page.goto(`/visual/${id}/${name}?theme=${theme}${moving.has(id) ? "&fit=1" : ""}`);
   await page.locator("[data-visual-ready]").waitFor({ state: "attached" });
   await page.evaluate(() => document.fonts.ready);
   // An image that fails (the avatar fallback example) swaps to its initials once the browser reports the failure.

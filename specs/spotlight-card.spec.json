@@ -1,0 +1,85 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "SpotlightCard",
+  "version": "0.1.0",
+  "category": "motion",
+  "status": "experimental",
+  "description": "A card with a soft light that follows the pointer. The light is off for touch and for visitors who ask for less motion, and the card keeps its own focus ring.",
+  "props": {
+    "children": {
+      "type": "node",
+      "description": "The card content.",
+      "required": true
+    },
+    "size": {
+      "type": "number",
+      "description": "Radius of the light in pixels.",
+      "default": 240
+    },
+    "color": {
+      "type": "string",
+      "description": "Colour of the light, any CSS colour. Defaults to the primary action colour."
+    },
+    "isPaused": {
+      "type": "boolean",
+      "description": "Turns the light off.",
+      "default": false
+    }
+  },
+  "variants": [
+    "isPaused"
+  ],
+  "states": [
+    "default",
+    "hover"
+  ],
+  "slots": [
+    "root",
+    "glow"
+  ],
+  "tokens": [
+    "color.surface.default",
+    "color.border.default",
+    "color.action.primary",
+    "radius.overlay"
+  ],
+  "a11y": {
+    "role": "group",
+    "keyboard": [],
+    "requirements": [
+      "The light is decoration: aria-hidden, behind the content and never blocks the pointer",
+      "Off for touch pointers, for reduced motion, inside rdm-still and with isPaused",
+      "Content and its contrast do not depend on the light: the light is a faint tint under the text",
+      "Any focusable child keeps its own visible focus ring: the card never replaces or hides it",
+      "In forced-colors (high contrast) mode the light is removed"
+    ],
+    "screenReader": [
+      "Read as ordinary content: the light is not announced"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "Feature or pricing cards",
+      "A grid of tiles that should feel responsive to the pointer"
+    ],
+    "avoid_when": [
+      "Cards that must be perfectly flat in a dense table"
+    ],
+    "anti_patterns": [
+      "Putting text colours that only pass contrast over the brightest part of the light",
+      "Hiding the focus ring of a link inside the card"
+    ]
+  },
+  "examples": [
+    "basic",
+    "grid",
+    "with-link"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {
+      "isPaused": "Paused"
+    }
+  }
+}

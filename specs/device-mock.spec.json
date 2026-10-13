@@ -1,0 +1,39 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "DeviceMock",
+  "version": "0.1.0",
+  "category": "motion",
+  "status": "experimental",
+  "description": "A drawn device frame (phone, tablet, laptop, desktop, watch or browser window) around your content, which becomes the screen. The frame is plain CSS decoration with neutral bezels; the screen is a real container, so everything inside keeps its own semantics and focus order.",
+  "props": {
+    "children": { "type": "node", "description": "The content shown on the screen.", "required": true },
+    "device": { "type": "enum", "values": ["phone", "tablet", "laptop", "desktop", "watch", "browser"], "default": "phone", "description": "Which frame to draw." },
+    "orientation": { "type": "enum", "values": ["portrait", "landscape"], "default": "portrait", "description": "Turns a phone or a tablet on its side. Other devices ignore it." },
+    "tone": { "type": "enum", "values": ["dark", "light"], "default": "dark", "description": "Bezel color." },
+    "label": { "type": "string", "description": "Accessible name of the group, for example Mobile preview. Without it the frame adds nothing to the accessibility tree." }
+  },
+  "variants": ["device", "orientation", "tone"],
+  "states": ["default"],
+  "slots": ["root", "frame", "screen", "decoration"],
+  "tokens": ["color.surface.default", "color.border.default", "color.text.default", "color.text.muted", "radius.overlay"],
+  "a11y": {
+    "role": "group",
+    "keyboard": ["Tab: moves through the focusable content inside the screen as if the frame were not there"],
+    "requirements": [
+      "The frame, notch, camera dots, stand and browser toolbar are aria-hidden decoration",
+      "The screen is a real div holding the children, so headings, forms and links inside keep their semantics",
+      "With label the root is a group named by it; without it the root is a plain div",
+      "Static: nothing moves, so there is no still switch",
+      "The frame scales down with its parent (width 100 percent up to a maximum) and never causes horizontal scroll",
+      "Forced colors: bezels keep a visible system-color border"
+    ],
+    "screenReader": ["Announced as a group with the label when given, then the screen content in order"],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["Showing how a screen looks on a phone, tablet, laptop or in a browser window", "Marketing and documentation previews"],
+    "avoid_when": ["The device shape carries meaning the user must act on", "Pixel-exact device simulation"]
+  },
+  "examples": ["basic", "devices", "tablet-landscape"],
+  "figma": { "componentKey": null, "variantMap": { "device": "Device", "orientation": "Orientation", "tone": "Tone" } }
+}

@@ -1,0 +1,39 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "Lens",
+  "version": "0.1.0",
+  "category": "motion",
+  "status": "experimental",
+  "description": "A magnifier that follows the mouse over an image or any content. The real content stays in place and fully accessible; the lens is a hidden, inert enlarged copy that appears only under a real pointer.",
+  "props": {
+    "children": { "type": "node", "description": "The content to magnify, usually an image with alt text.", "required": true },
+    "zoom": { "type": "number", "default": 2, "description": "Magnification factor." },
+    "size": { "type": "number", "default": 120, "description": "Diameter of the lens in px." },
+    "isStill": { "type": "boolean", "default": false, "description": "Turns the lens off. Also off for touch and for visitors who prefer reduced motion." }
+  },
+  "variants": ["isStill"],
+  "states": ["default", "hover"],
+  "slots": ["root", "lens"],
+  "tokens": ["color.border.strong"],
+  "a11y": {
+    "role": "presentation",
+    "keyboard": [],
+    "requirements": [
+      "The lens is decoration for mouse users: it never takes focus and no information may depend on it",
+      "The enlarged copy is aria-hidden and inert, so assistive technology reads the child once",
+      "The child keeps its own alt text, links and controls exactly as before",
+      "Off for touch input, for prefers-reduced-motion and inside rdm-still or with isStill",
+      "Keyboard users can still reach everything: zooming the page is the way to magnify for them",
+      "Forced-colors: the lens ring uses a system colour"
+    ],
+    "screenReader": ["The child is announced as usual; the lens is not announced"],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["Product photos and diagrams where detail matters", "Maps and charts with fine print"],
+    "avoid_when": ["Content that is only meaningful when enlarged, since not everyone can use a mouse", "Touch-first layouts"],
+    "anti_patterns": ["Wrapping interactive forms, whose copy would be inert", "Using it as the only way to read small text"]
+  },
+  "examples": ["basic", "size-and-zoom", "with-text"],
+  "figma": { "componentKey": null, "variantMap": {} }
+}
