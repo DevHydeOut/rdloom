@@ -101,7 +101,7 @@ describe("PlanCard", () => {
     await u.keyboard("{Escape}");
     await waitFor(() => expect(screen.queryByRole("alertdialog")).toBeNull());
     expect(onCancel).not.toHaveBeenCalled();
-    expect(screen.getByRole("button", { name: "Cancel subscription" })).toHaveFocus();
+    await waitFor(() => expect(screen.getByRole("button", { name: "Cancel subscription" })).toHaveFocus());
   });
 
   it("offers a new plan instead of cancelling once canceled", () => {
