@@ -1,0 +1,124 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "AnimatedBeam",
+  "version": "0.1.0",
+  "category": "motion",
+  "status": "experimental",
+  "description": "A light that travels along a curved line between two elements, such as two cards in a diagram. The line is drawn on a canvas that fills the container, so nothing is added to the accessibility tree.",
+  "props": {
+    "containerRef": {
+      "type": "custom",
+      "description": "Ref of the positioned element that holds both endpoints.",
+      "required": true,
+      "tsType": "import(\"react\").RefObject<HTMLElement | null>"
+    },
+    "fromRef": {
+      "type": "custom",
+      "description": "Ref of the element the line starts at. Use this or fromId.",
+      "tsType": "import(\"react\").RefObject<HTMLElement | null>"
+    },
+    "toRef": {
+      "type": "custom",
+      "description": "Ref of the element the line ends at. Use this or toId.",
+      "tsType": "import(\"react\").RefObject<HTMLElement | null>"
+    },
+    "fromId": {
+      "type": "string",
+      "description": "The id of the start element, when a ref is not handy."
+    },
+    "toId": {
+      "type": "string",
+      "description": "The id of the end element, when a ref is not handy."
+    },
+    "curvature": {
+      "type": "number",
+      "description": "How far the line bows away from a straight one, in pixels. Negative bows the other way.",
+      "default": 0
+    },
+    "reverse": {
+      "type": "boolean",
+      "description": "The light travels from the end to the start.",
+      "default": false
+    },
+    "duration": {
+      "type": "number",
+      "description": "Seconds for the light to cross.",
+      "default": 3
+    },
+    "pathColor": {
+      "type": "string",
+      "description": "Colour of the resting line, any CSS colour. Defaults to the border colour."
+    },
+    "beamColor": {
+      "type": "string",
+      "description": "Colour of the travelling light, any CSS colour. Defaults to the primary action colour."
+    },
+    "pathWidth": {
+      "type": "number",
+      "description": "Line width in pixels.",
+      "default": 2
+    },
+    "isPaused": {
+      "type": "boolean",
+      "description": "Stops the effect and shows it still.",
+      "default": false
+    }
+  },
+  "variants": [
+    "reverse",
+    "isPaused"
+  ],
+  "states": [
+    "default"
+  ],
+  "slots": [
+    "root"
+  ],
+  "tokens": [
+    "color.border.default",
+    "color.action.primary"
+  ],
+  "a11y": {
+    "role": "presentation",
+    "keyboard": [],
+    "requirements": [
+      "Decoration only: the effect is aria-hidden, never takes focus and never blocks the pointer",
+      "Stands still for visitors who ask for less motion (prefers-reduced-motion) and inside an rdm-still container, and isPaused stops it too",
+      "Does not flash: nothing changes more than three times in a second (WCAG 2.3.1)",
+      "The resting line stays visible when the light is still, so the connection is never lost",
+      "The connection must also be stated in text near the diagram: the line alone says nothing to a screen reader",
+      "In forced-colors (high contrast) mode the canvas is hidden",
+      "Redraws when the container or an endpoint changes size, and is paused while off-screen"
+    ],
+    "screenReader": [
+      "Not announced: the canvas is hidden from assistive technology"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "A flow between two or three boxes in a diagram",
+      "Showing that two services are connected"
+    ],
+    "avoid_when": [
+      "Carrying meaning that is not also written down",
+      "Many lines that all move at once"
+    ],
+    "anti_patterns": [
+      "Relying on the line to explain the relationship",
+      "Leaving the container without position: relative, so the canvas escapes it"
+    ]
+  },
+  "examples": [
+    "basic",
+    "curved",
+    "with-ids"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {
+      "reverse": "Reverse",
+      "isPaused": "Paused"
+    }
+  }
+}

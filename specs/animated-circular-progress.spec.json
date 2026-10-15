@@ -1,0 +1,62 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "AnimatedCircularProgress",
+  "version": "0.1.0",
+  "category": "motion",
+  "status": "experimental",
+  "description": "A ring that fills to its value after it appears, with the value in the middle. It can also spin when the amount of work is not known.",
+  "props": {
+    "value": { "type": "number", "description": "Current value between minValue and maxValue. Ignored while indeterminate.", "default": 0 },
+    "minValue": { "type": "number", "description": "Value at which the ring is empty.", "default": 0 },
+    "maxValue": { "type": "number", "description": "Value at which the ring is full.", "default": 100 },
+    "label": { "type": "string", "description": "Accessible name of the progress bar, for example \"Upload progress\". Required unless aria-labelledby is given." },
+    "size": { "type": "number", "description": "Width and height of the ring in pixels.", "default": 96 },
+    "thickness": { "type": "number", "description": "Width of the ring stroke in pixels.", "default": 8 },
+    "showValue": { "type": "boolean", "description": "Shows the value as text in the middle of the ring.", "default": true },
+    "isIndeterminate": { "type": "boolean", "description": "Spins a short arc for work of unknown length. No value is announced.", "default": false },
+    "duration": { "type": "number", "description": "Seconds the fill takes, or for one turn while indeterminate. Defaults to 0.9 for the fill and 1.2 for the spin." },
+    "isPaused": { "type": "boolean", "description": "Stops the spinning. The fill still moves to new values, only once.", "default": false },
+    "children": { "type": "node", "description": "Replaces the value text in the middle of the ring." }
+  },
+  "variants": ["isIndeterminate", "isPaused", "showValue"],
+  "states": ["default", "loading"],
+  "slots": ["root", "ring", "value"],
+  "tokens": ["color.action.primary", "color.border.default", "color.text.default"],
+  "a11y": {
+    "role": "progressbar",
+    "keyboard": [],
+    "requirements": [
+      "Exposes role=progressbar with aria-valuenow, aria-valuemin and aria-valuemax; while indeterminate aria-valuenow is omitted",
+      "Needs an accessible name from the label prop or aria-labelledby",
+      "The value text is real text in the server HTML, so the final value is readable with no JavaScript and no animation",
+      "The fill animates after mount only; visitors who ask for less motion (prefers-reduced-motion), and anything inside rdm-still, see the final ring at once",
+      "The spin can be stopped with isPaused (WCAG 2.2.2) and stops for reduced motion",
+      "In forced-colors (high contrast) mode the ring uses the system highlight and text colours",
+      "Does not flash: nothing changes more than three times in a second (WCAG 2.3.1)"
+    ],
+    "screenReader": [
+      "Announced as a progress bar with its name and its percentage",
+      "The animation is not announced: only the final value is exposed"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "A single measurable task such as an upload, a score or a quota",
+      "A compact progress display where a bar would not fit"
+    ],
+    "avoid_when": [
+      "Several steps with names, where a stepper tells more",
+      "Work that finishes in under a second"
+    ],
+    "anti_patterns": [
+      "Leaving the label off, which gives screen readers an unnamed progress bar",
+      "Showing a spinning ring for work that has a known amount"
+    ]
+  },
+  "examples": ["basic", "indeterminate", "custom-center"],
+  "figma": {
+    "componentKey": null,
+    "variantMap": { "isIndeterminate": "Indeterminate" }
+  }
+}

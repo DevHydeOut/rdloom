@@ -1,0 +1,97 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "KineticText",
+  "version": "0.1.0",
+  "category": "motion",
+  "status": "experimental",
+  "description": "Text whose letters move one after another in a loop: a wave, a bounce or a pulse. Plain CSS, staggered by letter position.",
+  "props": {
+    "children": {
+      "type": "string",
+      "description": "The text. Words never split across lines mid-word.",
+      "required": true
+    },
+    "effect": {
+      "type": "enum",
+      "values": [
+        "wave",
+        "bounce",
+        "pulse"
+      ],
+      "default": "wave",
+      "description": "How each letter moves."
+    },
+    "duration": {
+      "type": "number",
+      "default": 1.6,
+      "description": "Seconds for one loop of a single letter."
+    },
+    "stagger": {
+      "type": "number",
+      "default": 0.08,
+      "description": "Seconds between one letter starting and the next."
+    },
+    "isPaused": {
+      "type": "boolean",
+      "default": false,
+      "description": "Stops the animation and shows the finished text. Moving content that lasts more than five seconds should be stoppable."
+    }
+  },
+  "variants": [
+    "effect",
+    "isPaused"
+  ],
+  "states": [
+    "default"
+  ],
+  "slots": [
+    "root"
+  ],
+  "tokens": [
+    "color.text.default"
+  ],
+  "a11y": {
+    "role": "group",
+    "keyboard": [],
+    "requirements": [
+      "The full text is in a visually hidden copy; the animated letters are hidden from assistive technology",
+      "Letters move by a fraction of a line height and never leave their slot, so the text stays readable and does not reflow",
+      "Decoration only: the animated layers are hidden from assistive technology and never take focus",
+      "Stands still for visitors who ask for less motion (prefers-reduced-motion), and can also be shown still with the rdm-still class or isPaused",
+      "In forced-colors (high contrast) mode the text is drawn in the system colours with no effect",
+      "Does not flash: nothing changes more than three times in a second (WCAG 2.3.1)",
+      "The text is real text in the server HTML, readable with no script",
+      "Optional: it is a separate component, so projects that do not add it carry none of its code"
+    ],
+    "screenReader": [
+      "The text, once"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "A short playful heading or a loading message",
+      "A single word that should draw the eye"
+    ],
+    "avoid_when": [
+      "Paragraphs and any text people have to read closely",
+      "Content that must stay still for people who are easily distracted: always offer isPaused"
+    ],
+    "anti_patterns": [
+      "Looping a long sentence, which makes it tiring to read",
+      "Setting duration under one second"
+    ]
+  },
+  "examples": [
+    "basic",
+    "bounce",
+    "pulse-and-slow"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {
+      "effect": "Effect",
+      "isPaused": "Paused"
+    }
+  }
+}

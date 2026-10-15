@@ -1,0 +1,42 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "ThemeToggler",
+  "version": "0.1.0",
+  "category": "motion",
+  "status": "experimental",
+  "description": "A light, dark and system theme switch, as a three-option button group or a single cycling button, with a small animated icon change. It only reports the choice; it can optionally set data-theme on the page root. It reads and writes no storage: saving the choice is up to your app.",
+  "props": {
+    "value": { "type": "enum", "values": ["light", "dark", "system"], "description": "Controlled theme choice." },
+    "defaultValue": { "type": "enum", "values": ["light", "dark", "system"], "default": "system", "description": "Initial choice when uncontrolled." },
+    "onValueChange": { "type": "callback", "tsType": "(value: \"light\" | \"dark\" | \"system\") => void", "description": "Called with the new choice." },
+    "mode": { "type": "enum", "values": ["group", "button"], "default": "group", "description": "group shows all three options; button cycles light, dark, system." },
+    "applyToDocument": { "type": "boolean", "default": false, "description": "Sets data-theme (light or dark) on the document root. System follows the device setting live. Nothing is stored." },
+    "size": { "type": "enum", "values": ["sm", "md", "lg"], "default": "md", "description": "Control size." },
+    "label": { "type": "string", "default": "Theme", "description": "Accessible name of the group or button." },
+    "isStill": { "type": "boolean", "default": false, "description": "Turns off the icon animation." }
+  },
+  "variants": ["mode", "size", "isStill"],
+  "states": ["default", "hover", "focus", "pressed", "selected"],
+  "slots": ["root", "item", "icon"],
+  "tokens": ["color.border.default", "color.surface.default", "color.surface.subtle", "color.focus.ring", "radius.control"],
+  "a11y": {
+    "role": "radiogroup",
+    "keyboard": ["Tab: moves to the control", "Arrow keys: move between light, dark and system in the group", "Enter or Space: chooses the option, or cycles in button mode"],
+    "requirements": [
+      "Group mode is a toggle button group with one tab stop and arrow keys; every option has a text name (Light, Dark, System) and icons are decoration",
+      "Button mode names the current choice and what pressing does, for example Theme: light. Switch to dark",
+      "Always one option is chosen; the current choice is exposed as checked state (a radio group), not by icon or colour alone",
+      "The icon animation is short, plays once per change, and is off for prefers-reduced-motion, rdm-still and isStill",
+      "Reads and writes no storage and no cookies; applyToDocument only sets one attribute on the root"
+    ],
+    "screenReader": ["Group named Theme with Light, Dark and System buttons and which is pressed; in button mode, the current theme and the next one"],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["A site or app header that offers a manual theme", "Settings screens"],
+    "avoid_when": ["When the app has a single theme"],
+    "anti_patterns": ["Relying on the icon alone to show the state", "Storing the choice without telling the user in your privacy notes"]
+  },
+  "examples": ["basic", "button", "apply-to-page"],
+  "figma": { "componentKey": null, "variantMap": { "mode": "Mode", "size": "Size", "isStill": "Still" } }
+}

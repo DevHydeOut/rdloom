@@ -17,14 +17,49 @@ const examples = fs
       .map((f) => ({ id: d.name, name: f.slice(0, -4) })),
   );
 
-const SLOW_TO_LOAD = new Set(["customer-table/server-side", "time-slot-picker/async-slots"]);
+// Motion components move on their own (canvas, timers), so a photograph is never the same twice. For these the page asks
+// for reduced motion, which every one of them honours by showing one still frame: that is the picture we compare.
+const specsDir = path.resolve(__dirname, "../../specs");
+const moving = new Set(
+  fs
+    .readdirSync(specsDir)
+    .filter((f) => f.endsWith(".spec.json"))
+    .map((f) => JSON.parse(fs.readFileSync(path.join(specsDir, f), "utf8")) as { name: string; category: string })
+    .filter((s) => s.category === "motion")
+    .map((s) => s.name.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase()),
+);
+
+// The cells of a flickering grid are redrawn from random numbers each time the box is measured, and how often that happens
+// depends on the machine, so no fixed picture exists. These examples are only checked for rendering without errors.
+const NO_PICTURE = new Set(["flickering-grid"]);
+
+const SLOW_TO_LOAD = new Set(["customer-table/server-side", "time-slot-picker/async-slots", "data-table/server-side"]);
 
 // A fixed "today", so calendars and date presets look the same every day.
 const NOW = new Date("2026-03-15T10:00:00Z");
 
 async function open(page: Page, id: string, name: string, theme: string) {
   await page.clock.setFixedTime(NOW);
-  await page.goto(`/visual/${id}/${name}?theme=${theme}`);
+  // Examples hotlink free photos and a sample video. The pictures must not depend on the network, so the photos come from
+  // the test folder and the video is never fetched.
+  await page.route(/images\.unsplash\.com\/photo-1506744038136/, (route) => route.fulfill({ path: path.resolve(__dirname, "fixtures/photo-valley.jpg"), contentType: "image/jpeg" }));
+  await page.route(/images\.unsplash\.com\/photo-1470071459604/, (route) => route.fulfill({ path: path.resolve(__dirname, "fixtures/photo-highlands.jpg"), contentType: "image/jpeg" }));
+  await page.route(/interactive-examples\.mdn\.mozilla\.net/, (route) => route.abort());
+  if (moving.has(id)) {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    // Scattered particles, sparkles and flickering cells use Math.random: a fixed sequence makes the still frame repeatable.
+    await page.addInitScript(() => {
+      let a = 0x9e3779b9;
+      Math.random = () => {
+        a = (a + 0x6d2b79f5) | 0;
+        let t = Math.imul(a ^ (a >>> 15), 1 | a);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      };
+    });
+  }
+  // Motion examples are stages (a pattern, a video, a terminal): they get the width of the window, as in an app.
+  await page.goto(`/visual/${id}/${name}?theme=${theme}${moving.has(id) ? "&fit=1" : ""}`);
   await page.locator("[data-visual-ready]").waitFor({ state: "attached" });
   await page.evaluate(() => document.fonts.ready);
   // An image that fails (the avatar fallback example) swaps to its initials once the browser reports the failure.
@@ -44,6 +79,7 @@ for (const theme of ["light", "dark"]) {
     for (const { id, name } of examples) {
       test(`${id}/${name}`, async ({ page }) => {
         await open(page, id, name, theme);
+        if (NO_PICTURE.has(id)) return void (await expect(page.locator("[data-visual]")).toBeVisible());
         await expect(page.locator("[data-visual]")).toHaveScreenshot(`${id}--${name}--${theme}.png`);
       });
     }

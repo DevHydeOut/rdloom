@@ -1,0 +1,90 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "MorphingText",
+  "version": "0.1.0",
+  "category": "motion",
+  "status": "experimental",
+  "description": "A phrase that blurs and cross-fades into the next phrase in a list, in the same spot. The slot is as wide as the longest phrase, so nothing around it jumps.",
+  "props": {
+    "texts": {
+      "type": "custom",
+      "tsType": "string[]",
+      "description": "The phrases to morph through, in order.",
+      "required": true
+    },
+    "interval": {
+      "type": "number",
+      "default": 3000,
+      "description": "Milliseconds each phrase stays before the next one replaces it."
+    },
+    "duration": {
+      "type": "number",
+      "default": 900,
+      "description": "Milliseconds the blur and cross-fade take."
+    },
+    "label": {
+      "type": "string",
+      "description": "Accessible name for the whole slot. Defaults to all the phrases, joined with commas."
+    },
+    "isPaused": {
+      "type": "boolean",
+      "default": false,
+      "description": "Stops the animation and shows the finished text. Moving content that lasts more than five seconds should be stoppable."
+    }
+  },
+  "variants": [
+    "isPaused"
+  ],
+  "states": [
+    "default"
+  ],
+  "slots": [
+    "root"
+  ],
+  "tokens": [
+    "color.text.default"
+  ],
+  "a11y": {
+    "role": "group",
+    "keyboard": [],
+    "requirements": [
+      "The slot has an accessible name listing every phrase once, and the visible layers are hidden from assistive technology",
+      "Hidden sizing copies of the other phrases are invisible to everyone, so nothing is read twice",
+      "Decoration only: the animated layers are hidden from assistive technology and never take focus",
+      "Stands still for visitors who ask for less motion (prefers-reduced-motion), and can also be shown still with the rdm-still class or isPaused",
+      "In forced-colors (high contrast) mode the text is drawn in the system colours with no effect",
+      "Does not flash: nothing changes more than three times in a second (WCAG 2.3.1)",
+      "The text is real text in the server HTML, readable with no script",
+      "Optional: it is a separate component, so projects that do not add it carry none of its code"
+    ],
+    "screenReader": [
+      "The list of all phrases, once"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "A hero line that cycles through a few short statements",
+      "Showing a range of things a product handles"
+    ],
+    "avoid_when": [
+      "Phrases that carry information people must not miss",
+      "Lists longer than six phrases"
+    ],
+    "anti_patterns": [
+      "Putting a different meaning in each phrase and expecting every one to be read",
+      "Very short intervals, which make the text hard to read"
+    ]
+  },
+  "examples": [
+    "basic",
+    "slow-and-large",
+    "paused"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {
+      "isPaused": "Paused"
+    }
+  }
+}

@@ -91,20 +91,20 @@ export const EagerExamples = createContext<Record<string, ComponentType> | null>
  * "More", and a test fails so it gets a home.
  */
 export const componentGroupDefs: Array<{ id: string; label: string; ids: string[] }> = [
-  { id: "buttons", label: "Buttons", ids: ["button", "action-button", "shimmer-button", "ripple-button", "pulse-button", "gradient-button", "reveal-button", "button-group"] },
+  { id: "buttons", label: "Buttons", ids: ["button", "action-button", "shimmer-button", "ripple-button", "pulse-button", "interactive-hover-button", "rainbow-button", "shiny-button", "gradient-button", "reveal-button", "button-group"] },
   { id: "search", label: "Search and commands", ids: ["command-palette", "combobox"] },
   { id: "text-inputs", label: "Text and number inputs", ids: ["text-field", "input-group", "input-otp", "number-field", "tag-input", "file-upload"] },
   { id: "choice", label: "Choices and toggles", ids: ["select", "checkbox", "radio-group", "switch", "slider", "segmented-control", "toggle-button", "toggle-group", "color-picker", "rating", "native-select"] },
   { id: "forms", label: "Forms", ids: ["form", "error-summary", "field-array"] },
   { id: "date-time", label: "Dates and times", ids: ["calendar", "date-picker", "date-range-picker", "time-field"] },
-  { id: "data", label: "Tables and data", ids: ["data-grid", "table", "tree", "pagination"] },
+  { id: "data", label: "Tables and data", ids: ["data-grid", "table", "tree", "file-tree", "pagination"] },
   { id: "charts", label: "Charts and stats", ids: ["chart", "sparkline", "stat"] },
   { id: "navigation", label: "Navigation", ids: ["tabs", "breadcrumbs", "steps", "menu", "navigation-menu", "menubar"] },
   { id: "overlays", label: "Dialogs and popovers", ids: ["dialog", "alert-dialog", "sheet", "drawer", "popover", "tooltip", "hover-card", "context-menu"] },
   { id: "feedback", label: "Feedback and status", ids: ["alert", "toast", "progress", "skeleton", "empty-state", "error-state", "badge", "spinner"] },
   { id: "display", label: "Content and layout", ids: ["card", "accordion", "avatar", "kbd", "collapsible", "scroll-area", "separator", "avatar-group", "carousel", "resizable-panels", "aspect-ratio", "direction", "item", "typography"] },
   { id: "ai", label: "AI chat and agents", ids: ["chat", "message", "prompt-input", "response", "tool-call", "agent-activity", "approval-box", "citation", "sources", "generated-table", "generated-chart", "attachment", "bubble", "marker", "message-scroller", "questionnaire"] },
-  { id: "motion", label: "Motion and effects", ids: ["text-shimmer", "gradient-text", "blur-fade", "shine-border", "shuttle-border", "ripple"] },
+  { id: "motion", label: "Motion and effects", ids: ["text-shimmer", "animated-circular-progress", "number-ticker", "marquee", "orbiting-circles", "icon-cloud", "backlight","typing-animation", "word-rotate", "text-reveal", "text-animate", "morphing-text", "spinning-text", "kinetic-text", "text-highlighter", "hyper-text", "sparkles-text", "aurora-text", "line-shadow-text", "text3d-flip", "comic-text", "video-text", "scroll-velocity", "gradient-text", "blur-fade", "shine-border", "shuttle-border", "ripple", "animated-list", "bento-grid", "terminal", "code-comparison", "dock", "grid-pattern", "dot-pattern", "striped-pattern", "hexagon-pattern", "interactive-grid-pattern", "flickering-grid", "retro-grid", "light-rays", "noise", "weave-grid", "scroll-progress", "animated-beam", "spotlight-card", "glare-hover", "meteors", "confetti", "particles", "globe", "dotted-map","selvedge-blur", "lens", "pixel-image", "theme-toggler", "hero-video-dialog", "smooth-cursor", "pointer", "device-mock", "social-post-card"] },
   { id: "blocks", label: "Blocks", ids: ["dashboard-shell", "dashboard-page", "page-header", "section-header", "app-footer", "auth-card", "sidebar", "customer-table", "data-table", "invite-dialog", "user-form", "settings-section", "plan-card", "usage-meter", "event-calendar", "time-slot-picker", "payment-method-card", "api-key-list", "user-menu", "app-header", "top-nav"] },
 ];
 

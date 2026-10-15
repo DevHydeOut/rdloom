@@ -1,0 +1,38 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "SelvedgeBlur",
+  "version": "0.1.0",
+  "category": "motion",
+  "status": "experimental",
+  "description": "A progressive blur along one edge of a scrolling area or image: stacked layers of backdrop blur that fade from sharp to blurred, so content softens as it nears the edge. Pure decoration: it ignores the pointer and is hidden from assistive technology.",
+  "props": {
+    "position": { "type": "enum", "values": ["top", "bottom", "start", "end"], "default": "bottom", "description": "Which edge of the parent is blurred. start and end follow the reading direction." },
+    "strength": { "type": "number", "default": 8, "description": "Blur radius in px at the very edge." },
+    "size": { "type": "string", "default": "30%", "description": "How far the blur reaches in from the edge, any CSS length." },
+    "layers": { "type": "number", "default": 5, "description": "Number of stacked blur layers. More layers give a smoother fade." }
+  },
+  "variants": ["position"],
+  "states": ["default"],
+  "slots": ["root", "layer"],
+  "tokens": [],
+  "a11y": {
+    "role": "presentation",
+    "keyboard": [],
+    "requirements": [
+      "Decoration only: aria-hidden, never focusable, and pointer-events none so the content below stays clickable and selectable",
+      "It does not move, so there is nothing to pause; the blur is the same for visitors who prefer reduced motion",
+      "It only softens what is under it: do not put content the reader needs to read inside the blurred zone",
+      "In forced-colors (high contrast) mode the blur is removed, so text is never obscured",
+      "Place it inside a positioned parent (position: relative), above the content in stacking order"
+    ],
+    "screenReader": ["Not announced"],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["The edge of a scrolling list or feed that continues off screen", "The bottom of a card with an image behind text"],
+    "avoid_when": ["Over text that must stay readable", "Where backdrop-filter is not wanted for performance reasons on long pages"],
+    "anti_patterns": ["Covering interactive controls, which become hard to see", "Using a large strength with a tiny size, which looks like a hard band"]
+  },
+  "examples": ["basic", "scroll-edges", "horizontal"],
+  "figma": { "componentKey": null, "variantMap": { "position": "Position" } }
+}

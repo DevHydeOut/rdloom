@@ -13,7 +13,13 @@ export default function DialogFormExample() {
               close();
             }}
           >
-            <TextField label="Email" type="email" isRequired autoFocus />
+            <TextField
+              label="Email"
+              type="email"
+              isRequired
+              autoFocus
+              validate={(value) => (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) ? null : "Enter a valid email address, like name@example.com.")}
+            />
             <div className="flex justify-end gap-2">
               <Button variant="secondary" onPress={close}>
                 Cancel
