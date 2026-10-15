@@ -33,7 +33,7 @@ rdloom is a library of React blocks and components for **ERP, SaaS and B2B apps*
 
 ## Why rdloom
 
-| | |
+| Principle | In practice |
 |---|---|
 | **You own the code** | Components are copied into your project, not imported from a package you cannot change. Nothing breaks when we publish a new version. |
 | **Upgrades that merge** | `rdloom upgrade` compares three versions, as shipped, yours and the new one, and merges them the way git does. Real conflicts get conflict markers. |
