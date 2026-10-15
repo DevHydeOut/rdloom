@@ -8,19 +8,42 @@ import { repoUrl } from "./data";
 
 // --- Copy ------------------------------------------------------------------
 
+/** Writes to the clipboard; where that is blocked, falls back to a hidden selection. Resolves false when both fail. */
+async function copyText(text: string): Promise<boolean> {
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+  } catch {
+    // Fall through to the selection route below.
+  }
+  try {
+    const area = document.createElement("textarea");
+    area.value = text;
+    area.setAttribute("readonly", "");
+    area.style.cssText = "position:fixed;top:0;opacity:0";
+    document.body.appendChild(area);
+    area.select();
+    const ok = document.execCommand("copy");
+    area.remove();
+    return ok;
+  } catch {
+    return false;
+  }
+}
+
 /** A labelled button that copies text: the whole button is the target, not only its icon. */
 export function CopyPill({ text, label, copiedLabel = "Copied", className = "" }: { text: string; label: string; copiedLabel?: string; className?: string }) {
-  const [copied, setCopied] = useState(false);
+  const [copied, setCopied] = useState<"yes" | "failed" | false>(false);
   return (
     <>
       <button
         type="button"
         onClick={async () => {
-          try {
-            await navigator.clipboard?.writeText(text);
-            setCopied(true);
-            setTimeout(() => setCopied(false), 1600);
-          } catch {}
+          const ok = await copyText(text);
+          setCopied(ok ? "yes" : "failed");
+          setTimeout(() => setCopied(false), 1600);
         }}
         className={
           "inline-flex h-8 items-center gap-1.5 rounded-lg border border-[var(--site-border)] bg-[var(--site-subtle)] px-2.5 text-sm font-medium text-[var(--site-fg)] outline-none transition-colors " +
@@ -28,29 +51,27 @@ export function CopyPill({ text, label, copiedLabel = "Copied", className = "" }
           className
         }
       >
-        {copied ? copiedLabel : label}
-        {copied ? <CheckIcon size={15} /> : <CopyIcon size={15} />}
+        {copied === "failed" ? "Copy failed" : copied ? copiedLabel : label}
+        {copied === "yes" ? <CheckIcon size={15} /> : <CopyIcon size={15} />}
       </button>
       <span role="status" className="sr-only">
-        {copied ? "Copied to clipboard" : ""}
+        {copied === "failed" ? "Copy failed. Select the text and copy it by hand." : copied ? "Copied to clipboard" : ""}
       </span>
     </>
   );
 }
 
 export function CopyButton({ text, label = "Copy", className = "" }: { text: string; label?: string; className?: string }) {
-  const [copied, setCopied] = useState(false);
+  const [copied, setCopied] = useState<"yes" | "failed" | false>(false);
   return (
     <>
       <button
         type="button"
         aria-label={label}
         onClick={async () => {
-          try {
-            await navigator.clipboard?.writeText(text);
-            setCopied(true);
-            setTimeout(() => setCopied(false), 1600);
-          } catch {}
+          const ok = await copyText(text);
+          setCopied(ok ? "yes" : "failed");
+          setTimeout(() => setCopied(false), 1600);
         }}
         className={
           "inline-flex size-7 items-center justify-center rounded-md text-[var(--site-muted)] outline-none transition-colors " +
@@ -58,10 +79,10 @@ export function CopyButton({ text, label = "Copy", className = "" }: { text: str
           className
         }
       >
-        {copied ? <CheckIcon size={15} /> : <CopyIcon size={15} />}
+        {copied === "yes" ? <CheckIcon size={15} /> : <CopyIcon size={15} />}
       </button>
       <span role="status" className="sr-only">
-        {copied ? "Copied to clipboard" : ""}
+        {copied === "failed" ? "Copy failed. Select the text and copy it by hand." : copied ? "Copied to clipboard" : ""}
       </span>
     </>
   );
@@ -183,7 +204,7 @@ export function Preview({ children, code, label, tall = false, motion = false, f
   const id = useId();
   return (
     <div data-docs-preview className="overflow-hidden rounded-xl border border-[var(--site-border)]">
-      <div className={`relative flex ${tall ? "min-h-[22rem]" : "min-h-48"} min-w-0 items-center justify-center overflow-x-auto bg-[var(--rd-color-surface-default)] ${flush ? "p-3" : "p-8"} ${still ? "rdm-still" : ""}`}>
+      <div className={`relative flex ${tall ? "min-h-[22rem]" : "min-h-48"} min-w-0 items-center justify-center overflow-x-auto bg-[var(--rd-color-surface-default)] ${flush ? "p-3" : motion ? "p-5 sm:p-6" : "p-8"} ${still ? "rdm-still" : ""}`}>
         {motion && (
           // The same switch the components honour for visitors who prefer reduced motion.
           <button
@@ -195,7 +216,7 @@ export function Preview({ children, code, label, tall = false, motion = false, f
             {still ? "Still: on" : "Still"}
           </button>
         )}
-        <div className={`flex min-w-0 max-w-full flex-wrap items-center justify-center gap-4 ${flush ? "w-full" : ""}`}>{children}</div>
+        <div className={`flex min-w-0 max-w-full flex-wrap items-center justify-center gap-4 ${flush || motion ? "w-full" : ""}`}>{children}</div>
       </div>
       <div className="relative border-t border-[var(--site-border)] bg-[var(--site-subtle)]">
         <div id={id} className={open ? "" : "max-h-[8.5rem] overflow-hidden"} inert={!open}>

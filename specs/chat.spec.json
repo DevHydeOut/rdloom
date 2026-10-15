@@ -176,7 +176,8 @@
     "basic",
     "with-tools",
     "suggestions",
-    "with-attachments"
+    "with-attachments",
+    "simulated-run"
   ],
   "figma": {
     "componentKey": null,

@@ -1,0 +1,88 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "ComicText",
+  "version": "0.1.0",
+  "category": "motion",
+  "status": "experimental",
+  "states": [
+    "default"
+  ],
+  "slots": [
+    "root"
+  ],
+  "a11y": {
+    "role": "text",
+    "keyboard": [],
+    "requirements": [
+      "The text is ordinary text in the page from the server render, readable with no JavaScript, and read once by screen readers",
+      "Decoration only: the animated layers are hidden from assistive technology and never take focus",
+      "Stands still for visitors who ask for less motion (prefers-reduced-motion), and can also be shown still with the rdm-still class or isPaused",
+      "In forced-colors (high contrast) mode the text is drawn in the system colours with no effect",
+      "Does not flash: nothing changes more than three times in a second (WCAG 2.3.1)",
+      "Optional: it is a separate component, so projects that do not add it carry none of its code"
+    ],
+    "screenReader": [
+      "Read as ordinary text: the effect is purely visual"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "figma": {
+    "componentKey": null,
+    "variantMap": {
+      "popIn": "Pop in",
+      "isPaused": "Paused"
+    }
+  },
+  "description": "Bold, outlined, comic-style text with a hard offset shadow and an optional pop-in when it first appears.",
+  "props": {
+    "children": {
+      "type": "string",
+      "description": "The text.",
+      "required": true
+    },
+    "popIn": {
+      "type": "boolean",
+      "default": false,
+      "description": "Plays one short pop when the text first appears."
+    },
+    "fill": {
+      "type": "string",
+      "default": "var(--rd-color-surface-default)",
+      "description": "Letter colour, any CSS colour."
+    },
+    "outline": {
+      "type": "string",
+      "default": "var(--rd-color-text-default)",
+      "description": "Outline and shadow colour, any CSS colour."
+    },
+    "isPaused": {
+      "type": "boolean",
+      "default": false,
+      "description": "Skips the pop-in and shows the text plainly."
+    }
+  },
+  "variants": [
+    "popIn",
+    "isPaused"
+  ],
+  "tokens": [
+    "color.text.default",
+    "color.surface.default"
+  ],
+  "usage": {
+    "use_when": [
+      "A playful title, label or sticker"
+    ],
+    "avoid_when": [
+      "Serious or dense content"
+    ],
+    "anti_patterns": [
+      "Fill and outline colours with little contrast between them"
+    ]
+  },
+  "examples": [
+    "basic",
+    "pop-in",
+    "custom-colors"
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "CodeComparison",
+  "version": "0.1.0",
+  "category": "motion",
+  "status": "experimental",
+  "description": "Two code panels, before and after, side by side on wider screens and stacked on phones. Each has a label, line numbers and optional highlighted lines. It does no syntax colouring and has no dependency.",
+  "props": {
+    "before": { "type": "string", "description": "The code shown in the first panel.", "required": true },
+    "after": { "type": "string", "description": "The code shown in the second panel.", "required": true },
+    "beforeLabel": { "type": "string", "description": "Caption of the first panel.", "default": "Before" },
+    "afterLabel": { "type": "string", "description": "Caption of the second panel.", "default": "After" },
+    "beforeHighlight": { "type": "custom", "tsType": "number[]", "description": "Line numbers (starting at 1) to mark in the first panel." },
+    "afterHighlight": { "type": "custom", "tsType": "number[]", "description": "Line numbers (starting at 1) to mark in the second panel." },
+    "label": { "type": "string", "description": "Accessible name of the whole comparison.", "default": "Code comparison" },
+    "language": { "type": "string", "description": "Language name, shown in the caption and used as a data attribute. No colouring is applied." }
+  },
+  "variants": [],
+  "states": ["default", "focus"],
+  "slots": ["root", "panel", "caption", "code", "line", "lineNumber"],
+  "tokens": ["color.surface.subtle", "color.border.default", "color.text.default", "color.text.muted", "color.action.primary", "color.focus.ring", "radius.control"],
+  "a11y": {
+    "role": "group",
+    "keyboard": ["Tab: moves to each code area, which scrolls with the arrow keys when a line is wide"],
+    "requirements": [
+      "The comparison is a group named by label; each panel is a figure with a caption",
+      "The code is real text in pre and code, in the server HTML, with no JavaScript needed",
+      "Highlighted lines are marked by a bar and a tint, not by colour alone, and the caption lists them in text for screen readers",
+      "Line numbers are decoration and are not read or copied",
+      "Panels stack on phones and sit side by side from the medium breakpoint, and the page never scrolls sideways",
+      "No motion"
+    ],
+    "screenReader": ["Group, then each figure with its caption, the highlighted line numbers, then the code"],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": ["Showing a migration or a fix as before and after", "Docs that compare two ways to write the same thing"],
+    "avoid_when": ["A line-by-line diff of real files (use a diff tool)", "Code that needs syntax colouring"],
+    "anti_patterns": ["Highlighting most of the lines", "Comparing code in different languages"]
+  },
+  "examples": ["basic", "with-highlights"],
+  "figma": { "componentKey": null, "variantMap": {} }
+}

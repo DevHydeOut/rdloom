@@ -1,0 +1,74 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "LineShadowText",
+  "version": "0.1.0",
+  "category": "motion",
+  "status": "experimental",
+  "states": [
+    "default"
+  ],
+  "slots": [
+    "root"
+  ],
+  "a11y": {
+    "role": "text",
+    "keyboard": [],
+    "requirements": [
+      "The text is ordinary text in the page from the server render, readable with no JavaScript, and read once by screen readers",
+      "Decoration only: the animated layers are hidden from assistive technology and never take focus",
+      "Stands still for visitors who ask for less motion (prefers-reduced-motion), and can also be shown still with the rdm-still class or isPaused",
+      "In forced-colors (high contrast) mode the text is drawn in the system colours with no effect",
+      "Does not flash: nothing changes more than three times in a second (WCAG 2.3.1)",
+      "Optional: it is a separate component, so projects that do not add it carry none of its code"
+    ],
+    "screenReader": [
+      "Read as ordinary text: the effect is purely visual"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "figma": {
+    "componentKey": null,
+    "variantMap": {
+      "isPaused": "Paused"
+    }
+  },
+  "description": "Text with a diagonal line-pattern shadow behind it that slowly slides. The shadow copy is hidden from assistive technology.",
+  "props": {
+    "children": {
+      "type": "string",
+      "description": "The text.",
+      "required": true
+    },
+    "shadowColor": {
+      "type": "string",
+      "default": "var(--rd-color-text-muted)",
+      "description": "Colour of the shadow lines, any CSS colour."
+    },
+    "isPaused": {
+      "type": "boolean",
+      "default": false,
+      "description": "Stops the animation and shows the text plainly. Moving content that lasts more than five seconds should be stoppable."
+    }
+  },
+  "variants": [
+    "isPaused"
+  ],
+  "tokens": [
+    "color.text.default"
+  ],
+  "usage": {
+    "use_when": [
+      "A bold heading that needs depth"
+    ],
+    "avoid_when": [
+      "Small or light-weight text"
+    ],
+    "anti_patterns": [
+      "Shadow colours so strong they compete with the text"
+    ]
+  },
+  "examples": [
+    "basic",
+    "custom-color"
+  ]
+}

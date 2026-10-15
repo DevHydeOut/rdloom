@@ -1,0 +1,103 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "VideoText",
+  "version": "0.1.0",
+  "category": "motion",
+  "status": "experimental",
+  "states": [
+    "default"
+  ],
+  "slots": [
+    "root"
+  ],
+  "a11y": {
+    "role": "text",
+    "keyboard": [],
+    "requirements": [
+      "The text is ordinary text in the page from the server render, readable with no JavaScript, and read once by screen readers",
+      "Decoration only: the animated layers are hidden from assistive technology and never take focus",
+      "Stands still for visitors who ask for less motion (prefers-reduced-motion), and can also be shown still with the rdm-still class or isPaused",
+      "In forced-colors (high contrast) mode the text is drawn in the system colours with no effect",
+      "Does not flash: nothing changes more than three times in a second (WCAG 2.3.1)",
+      "Optional: it is a separate component, so projects that do not add it carry none of its code",
+      "No video is included: you supply src. The video is muted, plays inline, loops and is hidden from assistive technology",
+      "Until the video has loaded, and whenever it is paused, stopped by reduced motion or unavailable, the letters show the fallback gradient",
+      "A video behind letters has no guaranteed contrast: keep the text large and bold, and do not use it for text people must read to act",
+      "Decorative video needs no captions; if the video carries meaning, give that meaning in nearby text"
+    ],
+    "screenReader": [
+      "Read as ordinary text: the effect is purely visual"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "figma": {
+    "componentKey": null,
+    "variantMap": {
+      "tone": "Tone",
+      "isPaused": "Paused"
+    }
+  },
+  "description": "Large text that shows a video you supply through its letters. The text stays real text; a gradient fallback shows until the video plays.",
+  "props": {
+    "children": {
+      "type": "string",
+      "description": "The text.",
+      "required": true
+    },
+    "src": {
+      "type": "string",
+      "description": "URL of the video you supply. Without it the fallback gradient is shown."
+    },
+    "poster": {
+      "type": "string",
+      "description": "URL of a poster image for the video."
+    },
+    "fallback": {
+      "type": "string",
+      "default": "linear-gradient(120deg, var(--rd-color-action-primary), var(--rd-color-feedback-info))",
+      "description": "CSS background shown through the letters until the video plays, or instead of it."
+    },
+    "tone": {
+      "type": "enum",
+      "values": [
+        "light",
+        "dark"
+      ],
+      "default": "light",
+      "description": "The surface the video box sits on: light draws a white box, dark a black one."
+    },
+    "isPaused": {
+      "type": "boolean",
+      "default": false,
+      "description": "Pauses the video and shows the fallback gradient instead. Moving content that lasts more than five seconds should be stoppable."
+    }
+  },
+  "variants": [
+    "tone",
+    "isPaused"
+  ],
+  "tokens": [
+    "color.text.default",
+    "color.action.primary",
+    "color.feedback.info"
+  ],
+  "usage": {
+    "use_when": [
+      "A large hero word over a short looping video"
+    ],
+    "avoid_when": [
+      "Small text",
+      "Text people must read to act",
+      "Slow connections where the video is large"
+    ],
+    "anti_patterns": [
+      "Autoplaying video with sound",
+      "Long videos with fast cuts or flashing"
+    ]
+  },
+  "examples": [
+    "basic",
+    "dark",
+    "paused"
+  ]
+}

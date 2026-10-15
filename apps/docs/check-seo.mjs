@@ -90,7 +90,8 @@ else {
     for (const pre of html.matchAll(/<pre[\s\S]*?<\/pre>/g)) {
       const code = pre[0].replace(/<[^>]+>/g, "").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&").replace(/&quot;/g, '"');
       for (const line of code.split(/\r?\n/)) {
-        const m = line.match(/npx\s+rdloom\s+add\s+([^#]*)/);
+        // Only a line that is itself the command: a string inside example source that shows a command is not one.
+        const m = line.match(/^\s*(?:\$\s*)?npx\s+rdloom\s+add\s+([^#]*)/);
         if (!m) continue;
         for (const token of m[1].trim().split(/\s+/)) {
           if (token.startsWith("-")) break;
@@ -100,6 +101,24 @@ else {
         }
       }
     }
+  }
+}
+
+// Honest maturity: while any component is below stable, no page and no README may call the library production-ready,
+// and the components page must say what the experimental label means.
+{
+  const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
+  const specDir = path.join(root, "specs");
+  const unstable = fs.existsSync(specDir)
+    ? fs.readdirSync(specDir).filter((n) => n.endsWith(".spec.json")).filter((n) => JSON.parse(fs.readFileSync(path.join(specDir, n), "utf8")).status !== "stable")
+    : [];
+  if (unstable.length) {
+    const claim = /production[- ]ready/i;
+    for (const f of files) if (claim.test(fs.readFileSync(f, "utf8"))) problems.push(`${routeOf(f)}: says "production-ready" while ${unstable.length} components are not stable`);
+    const readme = path.join(root, "README.md");
+    if (fs.existsSync(readme) && claim.test(fs.readFileSync(readme, "utf8"))) problems.push(`README.md says "production-ready" while ${unstable.length} components are not stable`);
+    const index = path.join(dist, "components.html");
+    if (fs.existsSync(index) && !fs.readFileSync(index, "utf8").includes("Maturity:")) problems.push("/components does not explain what the experimental label means");
   }
 }
 

@@ -1,0 +1,94 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "version": "0.1.0",
+  "category": "motion",
+  "status": "experimental",
+  "states": [
+    "default"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {
+      "position": "Position"
+    }
+  },
+  "name": "ScrollProgress",
+  "description": "A thin bar showing how far the page, or a scrolling container, has been read.",
+  "props": {
+    "target": {
+      "type": "custom",
+      "tsType": "import(\"react\").RefObject<HTMLElement | null>",
+      "description": "A ref to a scrolling container to track. Omit to track the page."
+    },
+    "position": {
+      "type": "enum",
+      "values": [
+        "top",
+        "bottom"
+      ],
+      "default": "top",
+      "description": "Which edge the bar sits on."
+    },
+    "label": {
+      "type": "string",
+      "description": "Accessible name of the bar.",
+      "default": "Reading progress"
+    },
+    "color": {
+      "type": "string",
+      "description": "Colour of the bar: any CSS colour or token.",
+      "default": "var(--rd-color-ember-500)"
+    },
+    "thickness": {
+      "type": "number",
+      "description": "Height of the bar in pixels.",
+      "default": 3
+    }
+  },
+  "variants": [
+    "position"
+  ],
+  "slots": [
+    "root",
+    "bar"
+  ],
+  "tokens": [
+    "color.border.default"
+  ],
+  "a11y": {
+    "role": "progressbar",
+    "keyboard": [],
+    "requirements": [
+      "role=progressbar with an accessible name and aria-valuemin 0, aria-valuemax 100 and aria-valuenow updated as the reader scrolls",
+      "Updates to aria-valuenow are throttled so assistive technology is not flooded",
+      "Never focusable and pointer-events none, so content under it stays usable",
+      "For reduced motion the bar still shows progress but moves instantly, with no easing",
+      "Forced-colors mode draws the bar in the system Highlight colour",
+      "The bar is supplementary: it must not be the only way to know where you are"
+    ],
+    "screenReader": [
+      "Announced as a progress bar with its percentage when the reader queries it",
+      "Not a live region: it does not interrupt reading"
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "Long articles and documentation pages",
+      "A scrolling panel where position matters"
+    ],
+    "avoid_when": [
+      "Short pages that barely scroll",
+      "As a replacement for real navigation"
+    ],
+    "anti_patterns": [
+      "Using it as the only position cue",
+      "A thickness so large it covers a fixed header"
+    ]
+  },
+  "examples": [
+    "container",
+    "bottom",
+    "colored"
+  ]
+}

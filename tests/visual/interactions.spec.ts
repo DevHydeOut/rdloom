@@ -72,3 +72,106 @@ test.describe("DataGrid on a phone", () => {
     await expect(page.getByRole("textbox")).toHaveCount(0);
   });
 });
+
+// Things a tester hit on the live site, kept here so they cannot come back.
+test.describe("docs site basics", () => {
+  for (const [typed, shown] of [
+    ["DataGrid", "Data Grid"],
+    ["datagrid", "Data Grid"],
+    ["TextField", "Text Field"],
+    ["data grid", "Data Grid"],
+  ] as const) {
+    test(`search for "${typed}" finds ${shown}`, async ({ page }) => {
+      await page.goto("/", { waitUntil: "networkidle" });
+      await page.getByRole("button", { name: /Search the docs/ }).first().click();
+      await page.keyboard.type(typed);
+      await expect(page.getByRole("dialog", { name: "Search the docs" }).getByText(shown, { exact: true }).first()).toBeVisible();
+    });
+  }
+
+  test("a copy button always says what happened, even when the clipboard is blocked", async ({ page }) => {
+    await page.addInitScript(() => {
+      Object.defineProperty(navigator, "clipboard", { value: { writeText: () => Promise.reject(new Error("blocked")) }, configurable: true });
+      document.execCommand = () => false;
+    });
+    await page.goto("/docs/getting-started", { waitUntil: "networkidle" });
+    const button = page.getByRole("button", { name: "Copy init command" });
+    await button.click();
+    await expect(page.getByText(/Copy failed/).first()).toBeVisible();
+  });
+
+  test("a copy button confirms a successful copy", async ({ page, context }) => {
+    await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+    await page.goto("/docs/getting-started", { waitUntil: "networkidle" });
+    await page.getByRole("button", { name: "Copy init command" }).click();
+    await expect(page.getByText("Copied").first()).toBeVisible();
+  });
+
+  test("the invite example names the problem with a wrong email address", async ({ page }) => {
+    await page.goto("/components/dialog", { waitUntil: "networkidle" });
+    await page.getByRole("button", { name: "Invite member" }).first().click();
+    await page.getByLabel(/Email/).fill("not-an-email");
+    await page.getByRole("button", { name: "Send invite" }).click();
+    await expect(page.locator("[slot=errorMessage]").getByText("Enter a valid email address, like name@example.com.")).toBeVisible();
+  });
+});
+
+test("the simulated chat goes through failure, Try again, approval and a finished reply", async ({ page }) => {
+  await page.goto("/visual/chat/simulated-run");
+  await page.locator("[data-visual-ready]").waitFor({ state: "attached" });
+  await page.getByRole("button", { name: /this one breaks once/ }).click();
+  await expect(page.getByRole("button", { name: /Try again/ })).toBeVisible({ timeout: 8000 });
+  await page.getByRole("button", { name: /Try again/ }).click();
+  await expect(page.getByText(/refunds stayed under 2%/)).toBeVisible({ timeout: 8000 });
+  await expect(page.getByRole("button", { name: /Try again/ })).toHaveCount(0);
+});
+
+test("the simulated chat asks before it sends", async ({ page }) => {
+  await page.goto("/visual/chat/simulated-run");
+  await page.locator("[data-visual-ready]").waitFor({ state: "attached" });
+  await page.getByRole("button", { name: /send the report/ }).click();
+  await page.getByRole("button", { name: /Approve|Allow/ }).first().click({ timeout: 10000 });
+  await expect(page.getByText("Sent to finance.")).toBeVisible({ timeout: 8000 });
+});
+
+// Motion fixes a reviewer asked for, kept as tests so they stay fixed.
+test.describe("motion components", () => {
+  test("dock: a grown icon pushes its neighbours aside instead of covering them", async ({ page }) => {
+    await page.goto("/visual/dock/basic?fit=1");
+    await page.locator("[data-visual-ready]").waitFor({ state: "attached" });
+    const items = page.locator("[data-rdm-dock-item]");
+    const box = (await items.nth(2).boundingBox())!;
+    await page.mouse.move(box.x + box.width / 2 - 30, box.y + box.height / 2);
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2, { steps: 6 });
+    await page.waitForTimeout(400);
+    const rects = await items.evaluateAll((els) => els.map((el) => el.getBoundingClientRect()).map((r) => ({ l: r.left, r: r.right })));
+    for (let i = 1; i < rects.length; i++) expect(rects[i]!.l).toBeGreaterThanOrEqual(rects[i - 1]!.r - 0.5);
+    expect(rects[2]!.r - rects[2]!.l).toBeGreaterThan(50);
+  });
+
+  test("lens: the enlarged copy is opaque, so the original text is not seen through it", async ({ page }) => {
+    await page.goto("/visual/lens/with-text?fit=1");
+    await page.locator("[data-visual-ready]").waitFor({ state: "attached" });
+    const lens = page.locator(".rdm-lens").first();
+    const box = (await lens.boundingBox())!;
+    await page.mouse.move(box.x + 40, box.y + 30);
+    await page.mouse.move(box.x + 60, box.y + 40, { steps: 4 });
+    await expect(page.locator(".rdm-lens-layer")).toHaveCount(1);
+    const bg = await page.locator(".rdm-lens-layer").evaluate((el) => getComputedStyle(el).backgroundColor);
+    expect(bg).not.toBe("rgba(0, 0, 0, 0)");
+  });
+
+  test("ripple: the rings are centred on the box", async ({ page }) => {
+    await page.goto("/visual/ripple/basic?fit=1");
+    await page.locator("[data-visual-ready]").waitFor({ state: "attached" });
+    const { host, rings } = await page.evaluate(() => {
+      const h = document.querySelector("[data-visual] > div, [data-visual] .relative")!.getBoundingClientRect();
+      return { host: { x: h.left + h.width / 2, y: h.top + h.height / 2 }, rings: [...document.querySelectorAll(".rdm-ring")].map((r) => { const b = r.getBoundingClientRect(); return { x: b.left + b.width / 2, y: b.top + b.height / 2 }; }) };
+    });
+    expect(rings.length).toBeGreaterThan(0);
+    for (const r of rings) {
+      expect(Math.abs(r.x - host.x)).toBeLessThan(1.5);
+      expect(Math.abs(r.y - host.y)).toBeLessThan(1.5);
+    }
+  });
+});
