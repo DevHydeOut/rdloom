@@ -30,7 +30,7 @@ Plus Button, Dialog, Sheet, Menu, Select, Tabs, Toast, Accordion, Slider and mor
 
 ## Requirements
 
-React 18.3 or 19, Tailwind CSS v3.4 or v4, and Node 22+ for the CLI. Works with Vite. Every component ships with `"use client"`, so a Server Component can render one directly; the Next.js App Router is the intended setup but has not been tested yet.
+React 18.3 or 19, Tailwind CSS v3.4 or v4, and Node 22+ for the CLI. Checked with Vite, the Next.js App Router, React Router 7 and Astro 5. Every component ships with `"use client"`, so a Server Component can render one directly.
 
 ## Commands
 

@@ -24,6 +24,19 @@ import { Link, navigate } from "../router";
 import { registryBase } from "../routes";
 import { addCommand, Badge, CodeBlock, CommandBlock, CopyPill, DocTabs, H2, H3, List, Muted, PageHeader, Preview, runCommand } from "../ui";
 
+/** Pages that list what a component can do, each with the runnable example that shows it. */
+const featureGuides: Record<string, Array<{ feature: string; example: string; note: string }>> = {
+  "data-grid": [
+    { feature: "Sorting, selection and large data", example: "selection", note: "Click a header to sort; select rows with the keyboard or a checkbox. Thousands of rows scroll smoothly." },
+    { feature: "Editing cells", example: "editing", note: "Enter, F2, double-click or typing starts an edit; Enter commits and Escape cancels." },
+    { feature: "Filtering", example: "filter", note: "A search box that matches formatted values. Column filters and the column menu have their own examples." },
+    { feature: "Grouping and tree data", example: "grouping", note: "Group rows by a column with counts, or show parent and child rows." },
+    { feature: "Copy, paste and export", example: "range-copy-export", note: "Select a range of cells, copy it, paste into it and export to CSV." },
+    { feature: "Server-side data", example: "server-side", note: "Sorting, filtering and paging answered by your own API." },
+    { feature: "Pinned columns", example: "pinned", note: "Keep the name column in view while scrolling sideways. Row reorder and fill have their own examples." },
+  ],
+};
+
 const title = (name: string) => name.replace(/-/g, " ").replace(/^./, (c) => c.toUpperCase());
 
 export function Live({ component, example }: { component: DocComponent; example: Example }) {
@@ -568,6 +581,25 @@ export function ComponentPage({ component, layout = "page" }: { component: DocCo
 
       <H2 id="usage">Usage</H2>
       {usage ? <CodeBlock code={usage} label="Usage" /> : <Muted>See the examples below.</Muted>}
+
+      {featureGuides[id] && (
+        <section className="min-w-0">
+          <H2 id="features" label="Features">
+            What it can do
+          </H2>
+          <ul className="grid gap-3 sm:grid-cols-2">
+            {featureGuides[id]!.filter((f) => component.examples.some((e) => e.name === f.example)).map((f) => (
+              <li key={f.feature} className="rounded-xl border border-[var(--site-border)] p-4">
+                <p className="font-medium">{f.feature}</p>
+                <p className="pt-1 text-[13px] leading-5 text-[var(--site-muted)]">{f.note}</p>
+                <a href={`#example-${f.example}`} className="mt-2 inline-block text-sm font-medium underline underline-offset-4">
+                  See the {title(f.example).toLowerCase()} example
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       {!asBlock && more.map((e) => (
         <section key={e.name} className="min-w-0">
