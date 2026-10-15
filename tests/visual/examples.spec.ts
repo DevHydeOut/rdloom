@@ -40,11 +40,6 @@ const NOW = new Date("2026-03-15T10:00:00Z");
 
 async function open(page: Page, id: string, name: string, theme: string) {
   await page.clock.setFixedTime(NOW);
-  // Examples hotlink free photos and a sample video. The pictures must not depend on the network, so the photos come from
-  // the test folder and the video is never fetched.
-  await page.route(/images\.unsplash\.com\/photo-1506744038136/, (route) => route.fulfill({ path: path.resolve(__dirname, "fixtures/photo-valley.jpg"), contentType: "image/jpeg" }));
-  await page.route(/images\.unsplash\.com\/photo-1470071459604/, (route) => route.fulfill({ path: path.resolve(__dirname, "fixtures/photo-highlands.jpg"), contentType: "image/jpeg" }));
-  await page.route(/interactive-examples\.mdn\.mozilla\.net/, (route) => route.abort());
   if (moving.has(id)) {
     await page.emulateMedia({ reducedMotion: "reduce" });
     // Scattered particles, sparkles and flickering cells use Math.random: a fixed sequence makes the still frame repeatable.
