@@ -43,6 +43,41 @@ export function Save() {
           Commit <code>rdloom.json</code>, <code>rdloom.lock.json</code> and the <code>.rdloom/</code> folder. They record what was shipped, which
           is what lets <Link href="/docs/cli">upgrades</Link> merge into your edits.
         </p>
+        <H2 id="works-with">Works with</H2>
+        <p>
+          Each row below was checked by installing the packed package into a fresh app and building it. Next.js and Vite are rebuilt on every change in our
+          own test runs; the others were checked by hand for a release, so tell us if one breaks.
+        </p>
+        <div role="region" aria-label="Supported setups" tabIndex={0} className="overflow-x-auto">
+          <table className="w-full min-w-[32rem] text-left text-sm">
+            <thead>
+              <tr className="border-b border-[var(--site-border)]">
+                <th scope="col" className="py-2 pe-4 font-medium">Setup</th>
+                <th scope="col" className="py-2 pe-4 font-medium">Versions</th>
+                <th scope="col" className="py-2 font-medium">Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                ["React", "18.3 and 19", "Both build and run."],
+                ["Tailwind CSS", "3.4 and 4", "v4: add @source for the components folder. v3: add that folder to content in tailwind.config."],
+                ["Vite", "6 and 7", "The setup used in the sample app."],
+                ["Next.js", "15, App Router", "Every component has \"use client\", so a Server Component can render one directly."],
+                ["React Router (the successor to Remix)", "7, server rendering", "Rendered on the server and hydrated, with no hydration warnings."],
+                ["Astro", "5", "As React islands, for example client:load."],
+                ["Package managers", "npm, pnpm, yarn, bun", "The CLI detects yours from the lock file."],
+                ["Node, for the CLI", "22 or newer", "Your app can run on any Node that its framework supports."],
+              ].map((r) => (
+                <tr key={r[0]} className="border-b border-[var(--site-border)] align-top">
+                  <th scope="row" className="py-2 pe-4 font-medium">{r[0]}</th>
+                  <td className="py-2 pe-4">{r[1]}</td>
+                  <td className="py-2">{r[2]}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p>Not checked yet: monorepos with several apps sharing one components folder, and React Native.</p>
         <H2 id="theme">Dark mode</H2>
         <p>
           The tokens follow <code>prefers-color-scheme</code>. To force a theme, set <code>data-theme="light"</code> or <code>data-theme="dark"</code>{" "}

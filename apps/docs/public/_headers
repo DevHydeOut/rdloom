@@ -8,6 +8,10 @@
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
 
+# Photos and the sample video are not renamed when they change, so they get a shorter lifetime.
+/media/*
+  Cache-Control: public, max-age=86400
+
 # The component registry is fetched by the rdloom CLI and by other tools.
 /r/*
   Access-Control-Allow-Origin: *
