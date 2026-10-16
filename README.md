@@ -3,7 +3,7 @@
 <a href="https://rdloom.vimalbhatt.com">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="docs/assets/brand/logo-dark.png" />
-    <img src="docs/assets/brand/logo-light.png" alt="rdloom" height="64" />
+    <img src="docs/assets/brand/logo-light.png" alt="rdloom" height="150" />
   </picture>
 </a>
 
