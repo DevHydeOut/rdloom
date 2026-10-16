@@ -1,9 +1,15 @@
 <div align="center">
 
-<img src="docs/assets/readme/banner.png" alt="rdloom: accessible React blocks you copy into your app and own" width="100%" />
+<a href="https://rdloom.vimalbhatt.com">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/brand/logo-dark.png" />
+    <img src="docs/assets/brand/logo-light.png" alt="rdloom" height="64" />
+  </picture>
+</a>
 
-<br />
-<br />
+<h3>Accessible React blocks you copy into your app and own.</h3>
+
+<p>Data tables, forms, dashboards, settings, billing, sign-in, an AI chat and 69 motion effects,<br />built for ERP, SaaS and B2B products.</p>
 
 [![CI](https://github.com/DevHydeOut/rdloom/actions/workflows/ci.yml/badge.svg)](https://github.com/DevHydeOut/rdloom/actions/workflows/ci.yml)
 [![npm](https://img.shields.io/npm/v/rdloom?label=rdloom&color=c2410c)](https://www.npmjs.com/package/rdloom)
@@ -12,7 +18,7 @@
 [![Status: experimental](https://img.shields.io/badge/status-experimental%20%280.x%29-orange.svg)](#project-status)
 [![Built on React Aria](https://img.shields.io/badge/built%20on-React%20Aria-5b21b6.svg)](https://react-spectrum.adobe.com/react-aria/)
 
-**[Documentation](https://rdloom.vimalbhatt.com)** &nbsp;·&nbsp;
+**[Get started](https://rdloom.vimalbhatt.com/docs/getting-started)** &nbsp;·&nbsp;
 **[Components](https://rdloom.vimalbhatt.com/components)** &nbsp;·&nbsp;
 **[Blocks](https://rdloom.vimalbhatt.com/blocks)** &nbsp;·&nbsp;
 **[AI agents](https://rdloom.vimalbhatt.com/docs/mcp)** &nbsp;·&nbsp;
@@ -22,42 +28,100 @@
 
 <br />
 
-rdloom is a library of React blocks and components for **ERP, SaaS and B2B apps**: data tables, forms, dashboards, settings and billing pages, sign-in screens, invite dialogs, an AI chat and more. You add what you need with one command. The source lands in **your** project, so you can read it, change it and keep it, and later take new versions without losing your edits.
-
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/assets/readme/shell-dark.png" />
   <img src="docs/assets/readme/shell-light.png" alt="A dashboard built from rdloom's dashboard shell, stat cards and chart, in light and dark mode" width="100%" />
 </picture>
 
-<sub>The dashboard shell, stat cards and chart blocks. Light and dark mode come from the same design tokens.</sub>
+<br />
+<br />
+
+<div align="center">
+
+| **179** | **21** | **69** | **15** | **2** |
+|:---:|:---:|:---:|:---:|:---:|
+| components and blocks | ready-made blocks | motion effects | AI components | themes, light and dark |
+
+</div>
+
+rdloom is a library of React blocks and components for **ERP, SaaS and B2B apps**. You add what you need with one command. The source lands in **your** project, so you can read it, change it and keep it, and later take new versions without losing your edits.
 
 ## Why rdloom
 
-| Principle | In practice |
-|---|---|
-| **You own the code** | Components are copied into your project, not imported from a package you cannot change. Nothing breaks when we publish a new version. |
-| **Upgrades that merge** | `rdloom upgrade` compares three versions, as shipped, yours and the new one, and merges them the way git does. Real conflicts get conflict markers. |
-| **Accessible by default** | Built on [React Aria Components](https://react-spectrum.adobe.com/react-aria/). Keyboard use, focus and screen reader support are part of every component, and every example is checked with automated accessibility tests. |
-| **Made for business apps** | Tables with a lot of rows, forms with validation, permissions, loading, empty and error states, and the layouts of an admin or SaaS product. |
-| **Your API stays yours** | rdloom owns the screen around a request. It never fetches data, signs anyone in or does routing for you, so it works with any backend. |
-| **Your look** | Uses your app's font and its own design tokens, in light and dark. Change a token, change the whole product. |
-
-## See it
-
 <table>
   <tr>
-    <td width="50%"><img src="docs/assets/readme/customer-table.png" alt="Customer table block with stat cards, a chart, search, filters and a sortable table" /><br /><sub><b>Customer table.</b> Insights, search, filters, sorting, paging and export, with permissions per action.</sub></td>
-    <td width="50%"><img src="docs/assets/readme/chat.png" alt="AI chat asking the person to approve an action before it runs" /><br /><sub><b>AI chat.</b> Streaming replies, tool steps and approvals. It never calls a model: you bring your own.</sub></td>
+    <td width="33%" valign="top"><b>You own the code</b><br />Components are copied into your project, not imported from a package you cannot change. Nothing breaks when we publish a new version.</td>
+    <td width="33%" valign="top"><b>Upgrades that merge</b><br /><code>rdloom upgrade</code> compares the shipped, your and the new version, and merges them the way git does. Real conflicts get conflict markers.</td>
+    <td width="33%" valign="top"><b>Accessible by default</b><br />Built on React Aria Components. Keyboard, focus and screen reader support are part of every component, and every example is checked with automated accessibility tests.</td>
   </tr>
   <tr>
-    <td width="50%"><img src="docs/assets/readme/dashboard-light.png" alt="Dashboard page with stat cards, a revenue chart and recent activity" /><br /><sub><b>Dashboard page.</b> Stat cards with sparklines, charts with a table view, activity and goals.</sub></td>
-    <td width="50%"><img src="docs/assets/readme/settings.png" alt="Settings page with a profile form and notification toggles" /><br /><sub><b>Settings.</b> Sections, validated fields, toggles and a danger zone.</sub></td>
-  </tr>
-  <tr>
-    <td width="50%"><img src="docs/assets/readme/invite.png" alt="Invite dialog with email rows and role pickers" /><br /><sub><b>Invite people.</b> Typed emails, a directory search or a pick from a list, with roles and server errors.</sub></td>
-    <td width="50%"><img src="docs/assets/readme/auth.png" alt="Sign-in card with email, password and single sign-on" /><br /><sub><b>Sign-in screens.</b> Sign in, sign up, forgot password and one-time code, in several layouts.</sub></td>
+    <td valign="top"><b>Made for business apps</b><br />Tables with a lot of rows, validated forms, permissions, and loading, empty and error states for the screens of an admin or SaaS product.</td>
+    <td valign="top"><b>Your API stays yours</b><br />rdloom owns the screen around a request. It never fetches data, signs anyone in or does routing, so it works with any backend.</td>
+    <td valign="top"><b>Your look</b><br />Your app's font and rdloom's design tokens, in light and dark. Change a token and the whole product follows.</td>
   </tr>
 </table>
+
+## A tour
+
+### Blocks for real products
+
+Whole screens, not just parts: billing, user management, calendars, appointments, API keys and sign-in layouts. Each block takes your data and your callbacks, and handles the loading, empty, error and permission states.
+
+<img src="docs/assets/readme/blocks.png" alt="Six blocks: billing, user management, an event calendar, appointment booking, API keys and a sign-in layout" width="100%" />
+
+### Data at scale
+
+The **DataGrid** handles tens of thousands of rows with sorting, filtering, grouping, in-place editing, range copy and paste, CSV export, pinned columns, row reorder and server-side data. A search box that matches the values people actually see, and tables with bulk actions and row menus.
+
+<img src="docs/assets/readme/data.png" alt="A grouped data grid and a user table with search, filters, bulk actions and row menus" width="100%" />
+
+### Inputs and forms that behave
+
+Date range pickers with presets, comboboxes that load more as you scroll, a command palette, selects, calendars and a form that gathers its errors into one summary. All of it works with a keyboard and a screen reader.
+
+<img src="docs/assets/readme/inputs.png" alt="A date range picker, a combobox, a command palette, a select, a form with validation errors and a two month calendar" width="100%" />
+
+### Light and dark, from one set of tokens
+
+Every colour, space, radius and shadow is a design token. Light and dark follow the visitor's setting, or you force one with `data-theme`. The same tokens are exported for Figma, so design and code share one source.
+
+<img src="docs/assets/readme/dark.png" alt="The dashboard shell, settings, customer table and AI chat in dark mode" width="100%" />
+
+### An AI chat that asks before it acts
+
+Streaming replies, tool steps, approvals, citations and generated charts and tables. It never calls a model: you bring your own, and the chat shows exactly what you give it, including a clear Approve or Deny step before anything that changes the outside world.
+
+<img src="docs/assets/readme/chat.png" alt="An AI chat asking the person to approve an email before it is sent" width="70%" />
+
+### Motion for landing pages and product moments
+
+69 optional effects: text effects, backgrounds, a dock, a globe, a terminal, a marquee, a bento grid, an animated beam and more. Every one stands still for visitors who prefer reduced motion, can be paused, and is hidden from assistive technology when it is only decoration.
+
+<img src="docs/assets/readme/motion.png" alt="Six motion components: a dock, a globe, a perspective grid, orbiting circles, meteors and an animated beam" width="100%" />
+
+### Own the code, and still take upgrades
+
+One command copies a component into your project. Edit it freely. When a new version ships, `rdloom upgrade` shows what would change and merges it into your edits, the way git does.
+
+<img src="docs/assets/readme/terminal.png" alt="A terminal running rdloom init, add, diff and upgrade with a dry run" width="100%" />
+
+### Made for AI coding tools
+
+The **`@rdloom/mcp`** server gives Claude Code, Cursor and other MCP clients the real props, usage rules, accessibility requirements, tokens and tested examples, so they write correct code the first time instead of guessing. It is read-only and needs no network access.
+
+```bash
+claude mcp add rdloom -- npx rdloom-mcp
+```
+
+```json
+{
+  "mcpServers": {
+    "rdloom": { "command": "npx", "args": ["rdloom-mcp"] }
+  }
+}
+```
+
+Tools: `list_components`, `get_component`, `get_example`, `get_component_source`, `get_tokens`, `validate_props` and `get_setup`.
 
 ## Quick start
 
@@ -128,35 +192,11 @@ npx rdloom upgrade              # apply it
 | **AI** | 15 | Chat, messages, tool calls, approvals, citations, sources, prompt input, generated charts and tables |
 | **Motion and effects** | 69 | Text effects, backgrounds and patterns, dock, globe, terminal, marquee, bento grid, animated beam and more |
 
-### Motion and effects
+## Documentation
 
-An optional set for landing pages and product moments. Every one stands still for visitors who prefer reduced motion, can be paused, and is hidden from assistive technology when it is only decoration.
+Every component and block has its own page on the **[documentation site](https://rdloom.vimalbhatt.com)**: live examples you can use, copy-ready code, the full props table, keyboard and screen reader behaviour, and guidelines for when to use it and when not to. There is a guide for the CLI and upgrades, one for AI agents, one for the Figma plugin and one for the design tokens.
 
-<img src="docs/assets/readme/motion.png" alt="Six motion components: a dock, a globe, a perspective grid, orbiting circles, meteors and an animated beam" width="100%" />
-
-## Made for AI coding tools
-
-The **`@rdloom/mcp`** server gives Claude Code, Cursor and other MCP clients the real props, usage rules, accessibility requirements, design tokens and tested examples, so they write correct code the first time instead of guessing. It is read-only and needs no network access.
-
-```bash
-claude mcp add rdloom -- npx rdloom-mcp
-```
-
-or in an MCP config such as `.mcp.json`:
-
-```json
-{
-  "mcpServers": {
-    "rdloom": { "command": "npx", "args": ["rdloom-mcp"] }
-  }
-}
-```
-
-Tools: `list_components`, `get_component`, `get_example`, `get_component_source`, `get_tokens`, `validate_props` and `get_setup`.
-
-## Design tokens and theming
-
-All colour, spacing, radius, type and elevation values are tokens (CSS variables such as `--rd-color-action-primary`). Light and dark follow `prefers-color-scheme`. To force a theme, set `data-theme="light"` or `data-theme="dark"` on `<html>`. The same tokens are exported for Figma, so design and code share one source.
+<img src="docs/assets/readme/site-home.png" alt="The rdloom documentation site home page" width="100%" />
 
 ## Accessibility
 
