@@ -296,7 +296,7 @@ function Shell() {
             <MenuIcon size={18} />
           </button>
           <Link href="/" className="flex items-center gap-2.5">
-            <img src="/favicon.svg" alt="" width="24" height="24" />
+            <img src="/favicon-192.png" alt="" width="28" height="28" />
             <span className="font-display text-[22px] leading-none tracking-[-0.04em]">rdloom</span>
           </Link>
           <nav aria-label="Primary" className="hidden md:block">
