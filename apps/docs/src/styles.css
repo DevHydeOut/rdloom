@@ -29,6 +29,7 @@
   --site-primary-hover: #3a3631;
   --site-on-primary: #faf8f5;
   --site-accent: #c2410c;
+  --site-brand: #ea580c;
   --site-accent-soft: #fff4ec;
   --site-on-accent: #ffffff;
   --site-radius: 8px;
@@ -47,6 +48,7 @@
     --site-primary-hover: #d8d3ca;
     --site-on-primary: #12100e;
     --site-accent: #fb923c;
+    --site-brand: #ff7a1a;
     --site-accent-soft: #2a1608;
     --site-on-accent: #12100e;
   }
@@ -63,6 +65,7 @@
   --site-primary-hover: #d8d3ca;
   --site-on-primary: #12100e;
   --site-accent: #fb923c;
+  --site-brand: #ff7a1a;
   --site-accent-soft: #2a1608;
   --site-on-accent: #12100e;
 }
