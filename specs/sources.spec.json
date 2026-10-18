@@ -16,6 +16,11 @@
       "type": "string",
       "description": "Heading and accessible name of the list.",
       "default": "Sources"
+    },
+    "headingLevel": {
+      "type": "number",
+      "description": "The level of the heading, 1 to 6, so it fits under the heading above it. Out-of-range values fall back to 4.",
+      "default": 4
     }
   },
   "states": [

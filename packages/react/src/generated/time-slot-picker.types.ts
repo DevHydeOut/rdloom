@@ -32,6 +32,10 @@ export interface TimeSlotPickerSpecProps {
    */
   locale?: string;
   /**
+   * Change this value to load the times again for the day on show, for example after a booking is made elsewhere. The picker also reloads by itself after onSelect succeeds.
+   */
+  refreshKey?: string | number;
+  /**
    * The date treated as today, as YYYY-MM-DD. Default: the device's date. Set it for stable screenshots and tests.
    */
   today?: string;

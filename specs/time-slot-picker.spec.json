@@ -38,6 +38,11 @@
       "type": "string",
       "description": "A BCP 47 locale for date and time names. Default: en-US on the server and during hydration, then the browser's."
     },
+    "refreshKey": {
+      "type": "custom",
+      "tsType": "string | number",
+      "description": "Change this value to load the times again for the day on show, for example after a booking is made elsewhere. The picker also reloads by itself after onSelect succeeds."
+    },
     "today": {
       "type": "string",
       "description": "The date treated as today, as YYYY-MM-DD. Default: the device's date. Set it for stable screenshots and tests."

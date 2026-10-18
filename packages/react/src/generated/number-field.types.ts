@@ -38,8 +38,7 @@ export interface NumberFieldSpecProps {
    */
   maxValue?: number;
   /**
-   * How much the buttons and the arrow keys change the value. Values snap to multiples of the step, counted from minValue (or from 0 when there is none).
-   * @default 1
+   * How much the buttons and the arrow keys change the value. When set, typed values snap to multiples of the step, counted from minValue (or from 0 when there is none). Left unset, the buttons change the value by 1 and a typed value is kept as written, so 19.99 stays 19.99.
    */
   step?: number;
   /**
@@ -73,7 +72,6 @@ export interface NumberFieldSpecProps {
 }
 
 export const numberFieldDefaults = {
-  step: 1,
   showStepper: true,
   size: "md",
   isDisabled: false,

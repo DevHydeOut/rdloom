@@ -233,8 +233,8 @@ export const Carousel = forwardRef<HTMLDivElement, CarouselProps>(function Carou
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     onKeyDown?.(e);
-    // Only when the carousel itself has focus: arrows inside a slide's own controls are left alone.
-    if (e.defaultPrevented || e.target !== e.currentTarget) return;
+    // Only when the scrolling area itself has focus: arrows inside a slide's own controls are left alone.
+    if (e.defaultPrevented || e.target !== viewportRef.current) return;
     const rtl = !vertical && getComputedStyle(e.currentTarget).direction === "rtl";
     const forward = vertical ? "ArrowDown" : rtl ? "ArrowLeft" : "ArrowRight";
     const back = vertical ? "ArrowUp" : rtl ? "ArrowRight" : "ArrowLeft";
@@ -268,7 +268,6 @@ export const Carousel = forwardRef<HTMLDivElement, CarouselProps>(function Carou
       role="region"
       aria-roledescription="carousel"
       aria-label={label}
-      tabIndex={0}
       data-orientation={orientation}
       onKeyDown={handleKeyDown}
       onPointerEnter={(e) => {
@@ -289,8 +288,7 @@ export const Carousel = forwardRef<HTMLDivElement, CarouselProps>(function Carou
         if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setFocused(false);
       }}
       className={cx(
-        "relative flex w-full flex-col gap-3 rounded-[var(--rd-radius-control)] outline-none",
-        "focus-visible:ring-2 focus-visible:ring-[var(--rd-color-focus-ring)] focus-visible:ring-offset-2",
+        "relative flex w-full flex-col gap-3 rounded-[var(--rd-radius-control)]",
         classNames?.root,
         className,
       )}
@@ -298,10 +296,13 @@ export const Carousel = forwardRef<HTMLDivElement, CarouselProps>(function Carou
       <div className="relative">
         <div
           ref={viewportRef}
+          // The one tab stop: a scrolling area has to be focusable for keyboard users, and the arrow keys work from it.
+          tabIndex={0}
           onScroll={onScroll}
           style={{ gap: gapValue }}
           className={cx(
-            "flex overscroll-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+            "flex overscroll-contain rounded-[var(--rd-radius-control)] outline-none [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+            "focus-visible:ring-2 focus-visible:ring-[var(--rd-color-focus-ring)] focus-visible:ring-offset-2",
             vertical ? "h-72 flex-col snap-y snap-mandatory overflow-y-auto" : "snap-x snap-mandatory overflow-x-auto",
             classNames?.viewport,
           )}

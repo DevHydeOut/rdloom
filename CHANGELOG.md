@@ -2,6 +2,25 @@
 
 All notable changes to rdloom are listed here. The library is below version 1.0, so every component is marked experimental: a prop or a name can still change in a minor release, and each change is listed below. Your copy of a component only changes when you run `rdloom upgrade`.
 
+## 0.3.1
+
+### Improved
+
+- TimeSlotPicker: a new `refreshKey` prop loads the times for the day on show again, and the picker reloads by itself after `onSelect` succeeds, so a booked time shows as taken.
+- Sources: a new `headingLevel` prop (1 to 6, default 4) so the heading fits under the one above it.
+- CLI: `rdloom list` also marks an item as outdated when its files changed upstream without a version change.
+- CLI: the lock file records the newest CLI that wrote it, and an older CLI refuses to `upgrade` over it unless you pass `--force`.
+
+### Fixed
+
+- Backlight: the glow keeps animating under reduced motion, because the rule that stops it was less specific than the rules that start it.
+- NumberField: typed values no longer snap to a whole number when no `step` is set (19.99 stayed 20). `step` has no default now; the buttons still change the value by 1.
+- Carousel: the scrolling area is now keyboard focusable (it is the one tab stop, and the arrow keys work from it).
+- CardMedia: an empty `alt` without `decorative` is treated as decorative instead of exposing an unnamed image.
+- CLI: conflict markers left by an earlier upgrade are reported by `diff` and `upgrade` (exit code 1) instead of "up to date".
+- CLI: the motion `@import` added to the tokens file is no longer shown as your edit.
+- CLI: a corrupt `rdloom.lock.json` or `rdloom.json` fails with a short message instead of a stack trace.
+
 ## 0.3.0
 
 ### Added
