@@ -171,6 +171,8 @@ export type CardMediaProps = MediaA11y & {
 export function CardMedia({ src, alt, decorative, aspectRatio = "photo", className, style, children, loading = "lazy" }: CardMediaProps) {
   const card = useCard();
   const overlay = card?.layout === "overlay";
+  // An empty alt names nothing: treat it as decorative rather than expose a nameless image.
+  const hidden = decorative || !alt?.trim();
   const shape = cx(
     "block w-full overflow-hidden bg-[var(--rd-color-surface-subtle)]",
     overlay ? "absolute inset-0 h-full" : cx("relative", ratios[aspectRatio], mediaRadii[card?.rounded ?? "default"]),
@@ -179,14 +181,14 @@ export function CardMedia({ src, alt, decorative, aspectRatio = "photo", classNa
   if (src) {
     return (
       // eslint-disable-next-line @next/next/no-img-element
-      <img src={src} alt={decorative ? "" : alt} loading={loading} className={cx(shape, "object-cover")} style={style} />
+      <img src={src} alt={hidden ? "" : alt} loading={loading} className={cx(shape, "object-cover")} style={style} />
     );
   }
   return (
     <div
-      role={decorative ? undefined : "img"}
-      aria-label={decorative ? undefined : alt}
-      aria-hidden={decorative ? true : undefined}
+      role={hidden ? undefined : "img"}
+      aria-label={hidden ? undefined : alt}
+      aria-hidden={hidden ? true : undefined}
       className={shape}
       style={style}
     >

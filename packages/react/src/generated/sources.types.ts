@@ -12,10 +12,16 @@ export interface SourcesSpecProps {
    * @default "Sources"
    */
   label?: string;
+  /**
+   * The level of the heading, 1 to 6, so it fits under the heading above it. Out-of-range values fall back to 4.
+   * @default 4
+   */
+  headingLevel?: number;
 }
 
 export const sourcesDefaults = {
   label: "Sources",
+  headingLevel: 4,
 } as const;
 
 export const sourcesMeta = {
