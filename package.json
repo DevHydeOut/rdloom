@@ -27,7 +27,9 @@
     "build:docs": "npm run build -w @rdloom/docs",
     "test:visual": "playwright test",
     "bench:grid": "node scripts/bench-grid.mjs",
-    "test:visual:update": "playwright test --update-snapshots"
+    "test:visual:update": "playwright test --update-snapshots",
+    "test:blocks": "playwright test -c playwright.blocks.config.ts",
+    "dev:blocks": "npm run dev -w @rdloom/block-lab"
   },
   "devDependencies": {
     "@playwright/test": "^1.63.0",
