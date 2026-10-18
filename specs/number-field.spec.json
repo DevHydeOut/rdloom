@@ -14,7 +14,7 @@
     "onChange": { "type": "callback", "tsType": "(value: number) => void", "description": "Called with the number, or with a value that is not a number when the field is emptied (test it with Number.isNaN)." },
     "minValue": { "type": "number", "description": "Smallest allowed value. Typing below it is corrected on blur." },
     "maxValue": { "type": "number", "description": "Largest allowed value." },
-    "step": { "type": "number", "default": 1, "description": "How much the buttons and the arrow keys change the value. Values snap to multiples of the step, counted from minValue (or from 0 when there is none)." },
+    "step": { "type": "number", "description": "How much the buttons and the arrow keys change the value. When set, typed values snap to multiples of the step, counted from minValue (or from 0 when there is none). Left unset, the buttons change the value by 1 and a typed value is kept as written, so 19.99 stays 19.99." },
     "formatOptions": { "type": "custom", "tsType": "Intl.NumberFormatOptions", "description": "How the number is shown and parsed, e.g. { style: 'currency', currency: 'USD' } or { style: 'percent' }. Follows the user's locale." },
     "showStepper": { "type": "boolean", "default": true, "description": "Shows the − and + buttons. Arrow keys and the mouse wheel stay available." },
     "size": { "type": "enum", "values": ["sm", "md", "lg"], "default": "md", "description": "Field height and text size." },

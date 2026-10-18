@@ -60,6 +60,7 @@ export function TimeSlotPicker({
   timeZone,
   locale: localeProp,
   today: todayProp,
+  refreshKey,
   label = timeSlotPickerDefaults.label,
   confirmLabel = timeSlotPickerDefaults.confirmLabel,
   permissions,
@@ -112,7 +113,7 @@ export function TimeSlotPicker({
     return () => {
       current = false;
     };
-  }, [key, attempt]);
+  }, [key, attempt, refreshKey]);
 
   const dateFormat = useMemo(() => new Intl.DateTimeFormat(locale, { dateStyle: "full", timeZone: "UTC" }), [locale]);
   const dateText = dateFormat.format(new Date(Date.UTC(date.year, date.month - 1, date.day)));
@@ -131,7 +132,10 @@ export function TimeSlotPicker({
   const app = resolvePermission(permissions?.confirm);
   const permission: PermissionValue | undefined = !app.isAllowed ? permissions?.confirm : chosen ? undefined : { state: "disabled" };
   const confirm = useCallback(async () => {
-    if (chosen) await onSelect?.({ date: key, slot: chosen });
+    if (!chosen) return;
+    await onSelect?.({ date: key, slot: chosen });
+    // The booking changes what is free: load the day again so the slot shows as taken. A failed onSelect throws before this.
+    setAttempt((n) => n + 1);
   }, [chosen, onSelect, key]);
 
   let body;
