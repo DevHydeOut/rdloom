@@ -40,7 +40,7 @@ Usage:
   rdloom add <component...> [--overwrite] [--install]
   rdloom list
   rdloom diff [component...] [--patch]
-  rdloom upgrade [component...] [--dry-run] [--install]
+  rdloom upgrade [component...] [--dry-run] [--install] [--force]
   rdloom registry build [manifest]      (default: rdloom-registry.json)
   rdloom registry validate [manifest]
 
@@ -76,6 +76,7 @@ const ctx: Context = {
   out: json
     ? { info: (m) => messages.push(m.trim()), warn: (m) => warnings.push(m.trim()) }
     : { info: (m) => console.log(m), warn: (m) => console.warn(m) },
+  cliVersion: readJson<{ version?: string }>(path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../package.json"))?.version,
   run: json ? (cmd, cwd) => runCommand(cmd, cwd, true) : undefined,
 };
 const on = (name: string) => flags[name] === "true";
@@ -86,7 +87,7 @@ const COMMAND_FLAGS: Record<string, string[]> = {
   add: ["overwrite", "install"],
   list: [],
   diff: ["patch"],
-  upgrade: ["dry-run", "install"],
+  upgrade: ["dry-run", "install", "force"],
   registry: [],
   help: [],
 };
@@ -166,7 +167,9 @@ try {
       result = list(ctx);
       break;
     case "diff":
-      result = summarize(diff(ctx, args, { patch: on("patch") }), new Project(ctx.cwd));
+      const plans = diff(ctx, args, { patch: on("patch") });
+      result = summarize(plans, new Project(ctx.cwd));
+      if (plans.some((p) => p.files.some((f) => f.status === "unresolved"))) process.exitCode = 1; // so scripts and CI notice
       break;
     case "registry": {
       const [sub, manifest] = args;
@@ -179,7 +182,7 @@ try {
       break;
     }
     case "upgrade": {
-      const upgraded = upgrade(ctx, args, { dryRun: on("dry-run"), install: on("install") });
+      const upgraded = upgrade(ctx, args, { dryRun: on("dry-run"), install: on("install"), force: on("force") });
       result = upgraded;
       if (upgraded.conflicts.length) process.exitCode = 1; // so scripts and CI notice
       break;

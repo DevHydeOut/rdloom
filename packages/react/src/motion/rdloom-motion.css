@@ -2060,7 +2060,8 @@
   .rdm-orbit-item,
   .rdm-cloud-sphere,
   .rdm-cloud-face,
-  .rdm-backlight-glow {
+  .rdm-backlight-glow,
+  .rdm-backlight-glow[data-mode] {
     animation: none;
   }
 
@@ -2127,7 +2128,8 @@
 .rdm-still .rdm-orbit-item,
 .rdm-still .rdm-cloud-sphere,
 .rdm-still .rdm-cloud-face,
-.rdm-still .rdm-backlight-glow {
+.rdm-still .rdm-backlight-glow,
+.rdm-still .rdm-backlight-glow[data-mode] {
   animation: none;
 }
 
