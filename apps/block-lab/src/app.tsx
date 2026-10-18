@@ -84,7 +84,7 @@ interface Run {
 }
 
 /** One block: every example of it, each with its own result. */
-function BlockPage({ block, controls, results, setResult }: Run & { block: Block }) {
+function BlockPage({ block, only, controls, results, setResult }: Run & { block: Block; only?: string }) {
   return (
     <div className="flex flex-col gap-8">
       <header>
@@ -95,7 +95,7 @@ function BlockPage({ block, controls, results, setResult }: Run & { block: Block
           <div><dt className="inline font-semibold">Permissions: </dt><dd className="inline">{block.permissions.join(", ") || "none"}</dd></div>
         </dl>
       </header>
-      {block.examples.map((ex) => (
+      {block.examples.filter((ex) => !only || ex.name === only).map((ex) => (
         <section key={ex.name} id={`${block.id}-${ex.name}`} className="flex flex-col gap-2">
           <div className="flex items-center gap-3">
             <h2 className="font-mono text-sm font-semibold">{ex.name}</h2>
@@ -186,7 +186,10 @@ export function App() {
     document.documentElement.dataset.theme = controls.theme;
     document.documentElement.style.colorScheme = controls.theme;
   }, [controls.theme]);
-  const block = blocks.find((b) => b.id === hash);
+  // "#data-table" shows every example of a block; "#data-table/basic" shows just one, so a modal open in one example
+  // can't make another inert while it is being tested.
+  const [blockId, only] = hash.split("/");
+  const block = blocks.find((b) => b.id === blockId);
   return (
     <div className="flex min-h-screen">
       <nav aria-label="Blocks" className={`sticky top-0 flex h-screen w-60 shrink-0 flex-col gap-1 overflow-y-auto border-e p-3 text-sm ${border}`}>
@@ -208,7 +211,7 @@ export function App() {
           <Select label="Direction" value={controls.dir} onChange={(v) => setControls({ ...controls, dir: v as Dir })} options={[{ label: "LTR", value: "ltr" }, { label: "RTL", value: "rtl" }]} />
           <Select label="Width" value={controls.width} onChange={(v) => setControls({ ...controls, width: Number(v) })} options={WIDTHS} />
         </div>
-        {block ? <BlockPage key={block.id} block={block} controls={controls} results={results} setResult={setResult} /> : <Suite controls={controls} results={results} setResult={setResult} />}
+        {block ? <BlockPage key={`${block.id}/${only ?? ""}`} block={block} only={only} controls={controls} results={results} setResult={setResult} /> : <Suite controls={controls} results={results} setResult={setResult} />}
       </main>
       <ToastRegion />
     </div>

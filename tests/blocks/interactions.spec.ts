@@ -6,7 +6,7 @@ async function example(page: Page, block: string, name: string) {
   const problems: string[] = [];
   page.on("pageerror", (e) => problems.push(`uncaught: ${e.message}`));
   page.on("console", (m) => m.type() === "error" && problems.push(`console: ${m.text()}`));
-  await page.goto(`/#${block}`);
+  await page.goto(`/#${block}/${name}`);
   const frame = page.locator(`#${block}-${name}`);
   await expect(frame.locator("[data-result]")).toHaveAttribute("data-result", "pass", { timeout: 15_000 });
   return { frame, problems };
@@ -15,35 +15,36 @@ async function example(page: Page, block: string, name: string) {
 test.describe("DataTable", () => {
   test("searches, and says how many rows match", async ({ page }) => {
     const { frame, problems } = await example(page, "data-table", "with-selection-and-bulk-actions");
-    await frame.getByRole("searchbox").or(frame.getByRole("textbox", { name: "Search" })).first().fill("Harbor");
-    await expect(frame.getByRole("row", { name: /Harbor Mills/ }).first()).toBeVisible();
-    await expect(frame.getByRole("row", { name: /Northgate Foods/ })).toHaveCount(0);
+    await frame.getByRole("searchbox").fill("Harbor");
+    await expect(frame.getByRole("row").filter({ hasText: "Harbor Mills" }).first()).toBeVisible();
+    await expect(frame.getByRole("row").filter({ hasText: "Northgate Foods" })).toHaveCount(0);
     expect(problems).toEqual([]);
   });
 
   test("sorts by a column and reports it with aria-sort", async ({ page }) => {
     const { frame } = await example(page, "data-table", "basic");
     const header = frame.getByRole("columnheader", { name: /Customer/ });
-    await header.getByRole("button").first().click();
+    await header.click();
     await expect(header).toHaveAttribute("aria-sort", "ascending");
-    await header.getByRole("button").first().click();
+    await header.click();
     await expect(header).toHaveAttribute("aria-sort", "descending");
   });
 
   test("selecting rows shows bulk actions; a danger action asks first and names the count", async ({ page }) => {
     const { frame, problems } = await example(page, "data-table", "with-selection-and-bulk-actions");
-    const rows = frame.getByRole("row");
-    const before = await rows.count();
-    await frame.getByRole("checkbox", { name: /^Select/ }).nth(1).check();
-    await frame.getByRole("checkbox", { name: /^Select/ }).nth(2).check();
-    await expect(frame.getByText(/2 selected/)).toBeVisible();
+    const body = frame.getByRole("row").filter({ has: page.getByRole("checkbox") });
+    const picked = [(await frame.getByRole("row").nth(1).innerText()).match(/#\d+/)![0], (await frame.getByRole("row").nth(2).innerText()).match(/#\d+/)![0]];
+    await frame.getByRole("checkbox", { name: /^Select/ }).nth(1).check({ force: true });
+    await frame.getByRole("checkbox", { name: /^Select/ }).nth(2).check({ force: true });
+    await expect(frame.getByText(/2 selected/).first()).toBeVisible();
     await frame.getByRole("button", { name: "Delete" }).click();
     const dialog = page.getByRole("alertdialog");
     await expect(dialog).toBeVisible();
     await expect(dialog).toContainText(/2/);
     await dialog.getByRole("button", { name: "Delete orders" }).click();
     await expect(dialog).toBeHidden();
-    await expect(rows).toHaveCount(before - 2);
+    for (const id of picked) await expect(frame.getByRole("row").filter({ hasText: id })).toHaveCount(0);
+    expect(await body.count()).toBeGreaterThan(0);
     expect(problems).toEqual([]);
   });
 
@@ -51,7 +52,7 @@ test.describe("DataTable", () => {
     const { frame } = await example(page, "data-table", "with-selection-and-bulk-actions");
     const rows = frame.getByRole("row");
     const before = await rows.count();
-    await frame.getByRole("checkbox", { name: /^Select/ }).nth(1).check();
+    await frame.getByRole("checkbox", { name: /^Select/ }).nth(1).check({ force: true });
     await frame.getByRole("button", { name: "Delete" }).click();
     await expect(page.getByRole("alertdialog")).toBeVisible();
     await page.keyboard.press("Escape");
@@ -83,9 +84,9 @@ test.describe("CustomerTable", () => {
     const { frame, problems } = await example(page, "customer-table", "basic");
     const rows = frame.getByRole("row");
     const all = await rows.count();
-    await frame.getByRole("textbox", { name: /Search/ }).fill("zzzz-no-such-customer");
+    await frame.getByRole("searchbox").fill("zzzz-no-such-customer");
     await expect(frame.getByText(/no .*(match|found|customers)/i).first()).toBeVisible();
-    await frame.getByRole("textbox", { name: /Search/ }).fill("");
+    await frame.getByRole("searchbox").fill("");
     await expect(rows).toHaveCount(all);
     await frame.locator("select").first().selectOption({ index: 1 });
     expect(await rows.count()).toBeLessThanOrEqual(all);
@@ -129,13 +130,16 @@ test.describe("dialogs and confirmations", () => {
     await expect(page.getByRole("alertdialog")).toBeVisible();
   });
 
-  test("ApiKeyList revokes a key only after confirming", async ({ page }) => {
+  test("ApiKeyList revokes a key only after its name is typed to confirm", async ({ page }) => {
     const { frame } = await example(page, "api-key-list", "basic");
     await frame.getByRole("button", { name: "Revoke Deploy script" }).click();
     const dialog = page.getByRole("alertdialog");
     await expect(dialog).toBeVisible();
-    await expect(frame.getByText("Deploy script")).toBeVisible();
-    await dialog.getByRole("button", { name: /Revoke/ }).last().click();
+    const revoke = dialog.getByRole("button", { name: "Revoke key" });
+    await expect(revoke).toBeDisabled();
+    await dialog.getByRole("textbox").fill("Deploy script");
+    await expect(revoke).toBeEnabled();
+    await revoke.click();
     await expect(frame.getByRole("button", { name: "Revoke Deploy script" })).toHaveCount(0);
     await expect(frame.getByRole("button", { name: "Revoke Reporting job" })).toBeVisible();
   });
@@ -159,10 +163,18 @@ test.describe("forms and settings", () => {
     expect(problems).toEqual([]);
   });
 
-  test("UserForm shows an error for an empty required field", async ({ page }) => {
+  test("UserForm keeps Create disabled until the form is filled, and names a bad email", async ({ page }) => {
     const { frame } = await example(page, "user-form", "create");
-    await frame.getByRole("button", { name: /Create|Save|Invite|Add/ }).last().click();
-    await expect(frame.getByText(/required|enter|fill|missing/i).first()).toBeVisible();
+    const create = frame.getByRole("button", { name: "Create user" });
+    await expect(create).toBeDisabled();
+    await frame.locator("input[name=name]").fill("Grace Hopper");
+    await frame.locator("input[name=email]").fill("grace@example.com");
+    await expect(create).toBeEnabled();
+    // A bad address is named on submit, in words and to assistive technology.
+    await frame.locator("input[name=email]").fill("not-an-email");
+    await create.click();
+    await expect(frame.locator("input[name=email]")).toHaveAttribute("aria-invalid", "true");
+    await expect(frame.getByText("Enter a valid email address.").first()).toBeVisible();
   });
 
   test("SettingsSection switches can be toggled with the keyboard", async ({ page }) => {
