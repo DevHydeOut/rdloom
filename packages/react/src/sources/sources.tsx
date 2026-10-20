@@ -17,11 +17,13 @@ const hostOf = (url: string) => {
 const isWeb = (url: string) => /^https?:/i.test(url);
 
 /** The numbered list of sources a reply drew on. Each entry is what a Citation marker jumps to. */
-export function Sources({ sources, label = sourcesDefaults.label, className }: SourcesProps) {
+export function Sources({ sources, label = sourcesDefaults.label, headingLevel = sourcesDefaults.headingLevel, className }: SourcesProps) {
   if (sources.length === 0) return null;
+  const level = Number.isInteger(headingLevel) && headingLevel >= 1 && headingLevel <= 6 ? headingLevel : 4;
+  const Heading = `h${level}` as "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
   return (
     <section aria-label={label} className={cx("text-sm", className)}>
-      <h4 className="mb-2 text-xs font-semibold tracking-wide text-[var(--rd-color-text-muted)] uppercase">{label}</h4>
+      <Heading className="mb-2 text-xs font-semibold tracking-wide text-[var(--rd-color-text-muted)] uppercase">{label}</Heading>
       <ol className="flex flex-col gap-1.5">
         {sources.map((source, i) => {
           const host = source.url ? hostOf(source.url) : undefined;

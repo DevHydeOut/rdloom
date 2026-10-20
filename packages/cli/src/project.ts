@@ -36,6 +36,8 @@ export interface LockItem {
 }
 export interface Lock {
   lockVersion?: number;
+  /** The newest rdloom CLI that wrote this lock. An older CLI refuses to upgrade over it (upgrade --force overrides). */
+  cli?: string;
   items: Record<string, LockItem>;
 }
 
@@ -89,7 +91,23 @@ export function closest(input: string, candidates: string[]): string | undefined
 export const sha = (s: string) => createHash("sha256").update(s).digest("hex").slice(0, 16);
 
 export function readJson<T>(file: string): T | undefined {
-  return fs.existsSync(file) ? (JSON.parse(fs.readFileSync(file, "utf8")) as T) : undefined;
+  if (!fs.existsSync(file)) return undefined;
+  try {
+    return JSON.parse(fs.readFileSync(file, "utf8")) as T;
+  } catch (error) {
+    throw new CliError(`can't read ${path.basename(file)}: it isn't valid JSON (${(error as Error).message}). Fix it, or restore it from version control.`);
+  }
+}
+
+/** Compares dotted version numbers: negative when a is older than b. Anything after a "-" is ignored. */
+export function compareVersions(a: string, b: string): number {
+  const parts = (v: string) => v.split("-")[0].split(".").map((n) => parseInt(n, 10) || 0);
+  const [x, y] = [parts(a), parts(b)];
+  for (let i = 0; i < Math.max(x.length, y.length); i++) {
+    const d = (x[i] ?? 0) - (y[i] ?? 0);
+    if (d) return d;
+  }
+  return 0;
 }
 
 export function writeJson(file: string, data: unknown) {
@@ -231,8 +249,10 @@ export class Project {
     return readJson<Lock>(path.join(this.root, LOCK_FILE)) ?? { lockVersion: 2, items: {} };
   }
 
-  saveLock(lock: Lock) {
-    writeJson(path.join(this.root, LOCK_FILE), { ...lock, lockVersion: 2 });
+  /** Saves the lock, stamped with the CLI that wrote it (never lowering an existing stamp). */
+  saveLock(lock: Lock, cli?: string) {
+    const stamp = cli && (!lock.cli || compareVersions(cli, lock.cli) > 0) ? cli : lock.cli;
+    writeJson(path.join(this.root, LOCK_FILE), { ...lock, lockVersion: 2, ...(stamp ? { cli: stamp } : {}) });
   }
 
   /** Where a registry file lives in the user's project. */

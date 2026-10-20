@@ -12,7 +12,30 @@ This folder holds only the app's own code. `src/components/rdloom/` and
 
 ## Run it
 
-From the repo root:
+There are two ways. Both end with the app at http://localhost:5180.
+
+### 1. With the published CLI (any shell, including Windows PowerShell)
+
+This needs only Node 22 or newer and npm. Copy this folder somewhere outside the repo, then:
+
+```bash
+cd admin-demo
+npm install
+npx rdloom init
+npx rdloom add button text-field select combobox date-picker date-range-picker dialog toast data-grid --install
+npm run dev
+```
+
+`rdloom init` writes `rdloom.json` and the design tokens; `rdloom add` copies the component source into
+`src/components/rdloom/`, and `--install` adds the npm packages they use. Running `npm run build` before
+those commands stops with a message telling you to run them.
+
+If `npm install` stops with `EPERM` or `TAR_ENTRY_ERROR`, your npm cache is damaged. Use a cache inside the
+project for the install: `npm install --cache ./.npm-cache`.
+
+### 2. From a checkout of this repo (also tests the packed CLI)
+
+From the repo root, with Bash (Git Bash on Windows works):
 
 ```bash
 bash scripts/sample-app.sh            # sets it up in $TMPDIR/rdloom-admin-demo
