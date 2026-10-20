@@ -46,7 +46,7 @@ export const NumberField = forwardRef<HTMLDivElement, NumberFieldProps>(function
     // controlled and would hide its own validation (min, max, required).
     isInvalid,
     isRequired = numberFieldDefaults.isRequired,
-    step = numberFieldDefaults.step,
+    step,
     className,
     ...rest
   },

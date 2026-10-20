@@ -296,8 +296,10 @@ function Shell() {
             <MenuIcon size={18} />
           </button>
           <Link href="/" className="flex items-center gap-2.5">
-            <img src="/favicon.svg" alt="" width="24" height="24" />
-            <span className="font-display text-[22px] leading-none tracking-[-0.04em]">rdloom</span>
+            <img src="/favicon-192.png" alt="" width="40" height="40" />
+            <span className="font-display text-[22px] leading-none tracking-[-0.04em]">
+              <span className="text-[var(--site-brand)]">rd</span>loom
+            </span>
           </Link>
           <nav aria-label="Primary" className="hidden md:block">
             <ul className="flex items-center gap-6 text-sm">

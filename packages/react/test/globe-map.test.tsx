@@ -74,6 +74,15 @@ describe("the world dot data", () => {
     expect(isLand(0, -150)).toBe(false); // central Pacific
     expect(isLand(-30, -20)).toBe(false); // south Atlantic
     expect(landSpherePoints(4).length / 3).toBeGreaterThan(400);
+    // Places a recognisable map must get right.
+    expect(isLand(48.9, 2.4)).toBe(true); // Paris
+    expect(isLand(40.4, -3.7)).toBe(true); // Madrid
+    expect(isLand(52, -1)).toBe(true); // Great Britain
+    expect(isLand(36, 138)).toBe(true); // Japan
+    expect(isLand(-19, 47)).toBe(true); // Madagascar
+    expect(isLand(35, 18)).toBe(false); // the Mediterranean
+    expect(isLand(60, -85)).toBe(false); // Hudson Bay
+    expect(isLand(20, 38)).toBe(false); // the Red Sea
   });
 });
 
