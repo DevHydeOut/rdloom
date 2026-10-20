@@ -6,6 +6,7 @@ import { mergeDiff3 } from "node-diff3";
 import {
   CliError,
   closest,
+  compareVersions,
   CONFIG_FILE,
   normalizeName,
   DEFAULT_CONFIG,
@@ -37,6 +38,8 @@ export interface Context {
   run?: (cmd: string[], cwd: string) => number | null;
   /** GitHub registry items fetched for this command (index.ts, remote.ts). */
   remote?: LoadedRemote;
+  /** The version of this CLI, stamped into the lock it writes. */
+  cliVersion?: string;
 }
 
 const registryOf = (ctx: Context) => new Registry(ctx.registryDir, ctx.remote?.items);
@@ -154,6 +157,18 @@ export interface AddOptions {
  * Makes the tokens CSS import the motion CSS, once, so an added motion component needs no setup.
  * An @import has to come before other rules (comments may precede it), and after any @charset.
  */
+const MOTION_IMPORT = `@import "./${MOTION_CSS}";`;
+
+/** The tokens CSS with the motion import added at the top (after any @charset). */
+function withMotionImport(text: string): string {
+  const charset = text.match(/^@charset[^;]*;\s*\n?/);
+  const head = charset ? charset[0] : "";
+  return `${head}${MOTION_IMPORT}\n${text.slice(head.length)}`;
+}
+
+/** The tokens CSS without the motion import that `add` wrote: what the file looked like as shipped. */
+const withoutMotionImport = (text: string) => (text.startsWith(`${MOTION_IMPORT}\n`) ? text.slice(MOTION_IMPORT.length + 1) : text.replace(`\n${MOTION_IMPORT}\n`, "\n"));
+
 function ensureMotionImport(ctx: Context, project: Project, config: Config) {
   const motion = project.target("@motion", config);
   const tokens = project.target("@tokens", config);
@@ -163,10 +178,7 @@ function ensureMotionImport(ctx: Context, project: Project, config: Config) {
     return;
   }
   if (current.text.includes(MOTION_CSS)) return;
-  const line = `@import "./${MOTION_CSS}";`;
-  const charset = current.text.match(/^@charset[^;]*;\s*\n?/);
-  const head = charset ? charset[0] : "";
-  writeText(tokens, `${head}${line}\n${current.text.slice(head.length)}`, current.eol);
+  writeText(tokens, withMotionImport(current.text), current.eol);
   ctx.out.info(`write ${project.rel(tokens)} (imports ${MOTION_CSS})`);
 }
 
@@ -211,7 +223,7 @@ export function add(ctx: Context, requested: string[], opts: AddOptions = {}) {
     item.dependencies.forEach((d) => deps.add(d));
     added.push(item.name);
   }
-  project.saveLock(lock);
+  project.saveLock(lock, ctx.cliVersion);
   // The motion CSS is only useful once something loads it: tie it to the tokens file you already import.
   if (added.includes("motion-css")) ensureMotionImport(ctx, project, config);
 
@@ -223,16 +235,27 @@ export function add(ctx: Context, requested: string[], opts: AddOptions = {}) {
 
 // --- list --------------------------------------------------------------------
 
+/** Do the files the registry ships now differ from the ones recorded when this item was installed? */
+function contentChanged(lockItem: LockItem, item: { files: Array<{ path: string; content: string }> }): boolean {
+  const shipped = new Map(item.files.map((f) => [f.path, sha(f.content)]));
+  const recorded = Object.keys(lockItem.files);
+  return recorded.length !== shipped.size || recorded.some((p) => shipped.get(p) !== lockItem.files[p]);
+}
+
 export function list(ctx: Context) {
   const lock = new Project(ctx.cwd).lock();
-  return registryOf(ctx)
+  const registry = registryOf(ctx);
+  return registry
     .index()
     .filter((i) => i.type === "registry:ui")
     .map((item) => {
       const installed = lock.items[item.name]?.version;
-      const note = !installed ? "" : installed === item.version ? "  (installed)" : `  (installed ${installed})`;
+      // Versions are not always bumped when files change, so also compare what was installed with what ships now.
+      const changed = !!installed && contentChanged(lock.items[item.name], registry.item(item.name));
+      const outdated = !!installed && (installed !== item.version || changed);
+      const note = !installed ? "" : !outdated ? "  (installed)" : installed === item.version ? "  (installed; files changed upstream, run `rdloom upgrade`)" : `  (installed ${installed})`;
       ctx.out.info(`${item.name.padEnd(20)} ${item.version.padEnd(8)} ${item.description}${note}`);
-      return { name: item.name, version: item.version, description: item.description, installed: installed ?? null };
+      return { name: item.name, version: item.version, description: item.description, installed: installed ?? null, outdated };
     });
 }
 
@@ -247,6 +270,7 @@ export type FileStatus =
   | "new" //        a file the new version adds
   | "removed" //    a file the new version no longer ships: your copy is kept
   | "missing" //    you deleted it: not restored
+  | "unresolved" // a past upgrade left conflict markers in it and they are still there: kept as is
   | "no-base"; //   installed before merge bases existed and you changed it
 
 export interface FilePlan {
@@ -258,6 +282,8 @@ export interface FilePlan {
   upstream?: string;
   /** Merged content, for "merge" and "conflict" (with markers). */
   merged?: string;
+  /** The tokens file had the motion import `add` writes: it is left out of `local` and put back when the file is written. */
+  motionImport?: boolean;
 }
 
 export interface ItemPlan {
@@ -271,10 +297,19 @@ export interface ItemPlan {
 
 const lines = (s: string) => s.split("\n");
 
+/** The markers `upgrade` writes into a file it could not merge. */
+const CONFLICT_MARKERS = /^<{7} yours$[\s\S]*^>{7} rdloom /m;
+
+/** What gets written: the tokens file keeps its motion import. */
+const forFile = (f: FilePlan, content: string) => (f.motionImport ? withMotionImport(content) : content);
+
 function planFile(project: Project, config: Config, lockItem: LockItem, filePath: string, upstream: string | undefined, toVersion: string): FilePlan {
   const target = project.target(filePath, config);
-  const local = readText(target);
-  const plan = (status: FileStatus, extra: Partial<FilePlan> = {}): FilePlan => ({ path: filePath, target, status, local, upstream, ...extra });
+  let local = readText(target);
+  // `add` imports the motion CSS from the tokens file after recording its hash: that line is not your edit.
+  const motionImport = filePath === "@tokens" && !!local && withoutMotionImport(local.text) !== local.text;
+  if (motionImport && local) local = { ...local, text: withoutMotionImport(local.text) };
+  const plan = (status: FileStatus, extra: Partial<FilePlan> = {}): FilePlan => ({ path: filePath, target, status, local, upstream, ...(motionImport ? { motionImport } : {}), ...extra });
 
   if (upstream === undefined) return plan("removed");
   if (!(filePath in lockItem.files)) {
@@ -284,6 +319,8 @@ function planFile(project: Project, config: Config, lockItem: LockItem, filePath
     return plan("conflict", { base: "", merged: merged.result.join("\n") });
   }
   if (!local) return plan("missing");
+  // Conflict markers from an earlier upgrade are still in the file: say so, and don't merge over them.
+  if (CONFLICT_MARKERS.test(local.text)) return plan("unresolved");
 
   let base = readText(project.base(filePath))?.text;
   if (base === undefined) {
@@ -351,6 +388,7 @@ const describe: Record<FileStatus, string> = {
   new: "new in this version; upgrade will add it",
   removed: "no longer shipped; your copy stays",
   missing: "you deleted it; upgrade won't restore it",
+  unresolved: "still has conflict markers from an earlier upgrade; resolve the <<<<<<< sections",
   "no-base": "you changed it, but it was installed before merge bases existed; upgrade will write the new version next to it",
 };
 
@@ -383,12 +421,14 @@ export function diff(ctx: Context, names: string[], opts: { patch?: boolean } = 
     if (item.newDependencies.length) ctx.out.info(`  new dependencies: ${item.newDependencies.join(", ")}`);
   }
 
+  const unresolved = counts.unresolved ?? 0;
   const pending = (counts.update ?? 0) + (counts.merge ?? 0) + (counts.conflict ?? 0) + (counts.new ?? 0) + (counts["no-base"] ?? 0);
-  ctx.out.info(
-    pending
-      ? `\n${pending} file(s) to upgrade${counts.conflict ? `, ${counts.conflict} with conflicts` : ""}. Run \`rdloom upgrade\`${opts.patch ? "" : ", or add --patch to see the changes"}.`
-      : "\nEverything is up to date.",
-  );
+  if (unresolved) ctx.out.warn(`\n${unresolved} file(s) still have unresolved conflict markers (<<<<<<< yours). Fix them, then commit.`);
+  if (pending) {
+    ctx.out.info(`\n${pending} file(s) to upgrade${counts.conflict ? `, ${counts.conflict} with conflicts` : ""}. Run \`rdloom upgrade\`${opts.patch ? "" : ", or add --patch to see the changes"}.`);
+  } else if (!unresolved) {
+    ctx.out.info("\nEverything is up to date.");
+  }
   return plans;
 }
 
@@ -401,8 +441,15 @@ export interface UpgradeResult {
   changed: number;
 }
 
-export function upgrade(ctx: Context, names: string[], opts: { dryRun?: boolean; install?: boolean } = {}): UpgradeResult {
+export function upgrade(ctx: Context, names: string[], opts: { dryRun?: boolean; install?: boolean; force?: boolean } = {}): UpgradeResult {
   const project = new Project(ctx.cwd);
+  const wroteWith = project.lock().cli;
+  if (!opts.force && ctx.cliVersion && wroteWith && compareVersions(wroteWith, ctx.cliVersion) > 0) {
+    throw new CliError(
+      `this project was last upgraded with rdloom ${wroteWith}, and this is ${ctx.cliVersion}: upgrading now could write older files over newer ones. ` +
+        "Update the CLI (npx rdloom@latest upgrade), or add --force if you mean it.",
+    );
+  }
   const plans = planItems(ctx, names);
   const lock = project.lock();
   const conflicts: string[] = [];
@@ -426,23 +473,27 @@ export function upgrade(ctx: Context, names: string[], opts: { dryRun?: boolean;
         case "update":
         case "new":
           ctx.out.info(`  ${would}${f.status === "new" ? "add    " : "update "} ${rel}`);
-          if (!opts.dryRun) writeText(f.target, f.upstream!, eol);
+          if (!opts.dryRun) writeText(f.target, forFile(f, f.upstream!), eol);
           changed++;
           break;
         case "merge":
           ctx.out.info(`  ${would}merge   ${rel}  (kept your changes)`);
-          if (!opts.dryRun) writeText(f.target, f.merged!, eol);
+          if (!opts.dryRun) writeText(f.target, forFile(f, f.merged!), eol);
           changed++;
           break;
         case "conflict":
           ctx.out.warn(`  ${would}CONFLICT ${rel}  (resolve the <<<<<<< markers)`);
-          if (!opts.dryRun) writeText(f.target, f.merged!, eol);
+          if (!opts.dryRun) writeText(f.target, forFile(f, f.merged!), eol);
           conflicts.push(rel);
           changed++;
           break;
+        case "unresolved":
+          ctx.out.warn(`  CONFLICT ${rel}  (still has <<<<<<< markers from an earlier upgrade; left as is)`);
+          conflicts.push(rel);
+          break;
         case "no-base":
           ctx.out.warn(`  ${would}write   ${rel}.upstream  (merge it into ${rel} by hand)`);
-          if (!opts.dryRun) writeText(`${f.target}.upstream`, f.upstream!, eol);
+          if (!opts.dryRun) writeText(`${f.target}.upstream`, forFile(f, f.upstream!), eol);
           changed++;
           break;
         case "removed":
@@ -473,7 +524,7 @@ export function upgrade(ctx: Context, names: string[], opts: { dryRun?: boolean;
     ctx.out.info(`\nDry run: nothing was written. ${changed} file(s) would change.`);
     return { conflicts, changed };
   }
-  project.saveLock(lock);
+  project.saveLock(lock, ctx.cliVersion);
 
   if (newItems.size) {
     ctx.out.info(`\nAdding new dependencies of upgraded components: ${[...newItems].join(", ")}`);

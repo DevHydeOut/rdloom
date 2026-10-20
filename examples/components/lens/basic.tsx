@@ -1,7 +1,7 @@
 import { Lens } from "@rdloom/react";
 
-// A free-to-use photo from Unsplash. Swap in your own image.
-const picture = "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80";
+// A photo that this site serves from /media (from Unsplash, free to use). Use your own image.
+const picture = "/media/valley.jpg";
 
 // Move the mouse over the picture. The image keeps its alt text and the lens is hidden from screen readers.
 export default function LensBasicExample() {

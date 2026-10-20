@@ -8,8 +8,8 @@ export default function HeroVideoDialogStillExample() {
         <HeroVideoDialog
           isStill
           title="Release notes walkthrough"
-          videoSrc="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
-          poster={<img src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1200&q=80" alt="" className="size-full object-cover" />}
+          videoSrc="/media/flower.mp4"
+          poster={<img src="/media/highlands.jpg" alt="" className="size-full object-cover" />}
         />
       </div>
     </div>
