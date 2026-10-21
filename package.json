@@ -32,7 +32,7 @@
     "dev:blocks": "npm run dev -w @rdloom/block-lab"
   },
   "devDependencies": {
-    "@playwright/test": "^1.63.0",
+    "@playwright/test": "^1.64.1",
     "@types/node": "^22.20.4",
     "tsx": "^4.19.0",
     "typescript": "^5.6.0"
