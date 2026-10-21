@@ -34,7 +34,7 @@ const moving = new Set(
 const NO_PICTURE = new Set(["flickering-grid"]);
 
 // The icon cloud is a sphere of small rotated icons. How their edges are smoothed changes with each Chromium release, so a
-// browser update alone moves about 1% of the pixels. These compare with a small allowance; a layout change still fails.
+// browser update alone moves up to about 200 pixels. These allow 500 (the config allows none); a layout change still fails.
 const LOOSE = new Set(["icon-cloud"]);
 
 const SLOW_TO_LOAD = new Set(["customer-table/server-side", "time-slot-picker/async-slots", "data-table/server-side"]);
@@ -81,7 +81,7 @@ for (const theme of ["light", "dark"]) {
         if (NO_PICTURE.has(id)) return void (await expect(page.locator("[data-visual]")).toBeVisible());
         await expect(page.locator("[data-visual]")).toHaveScreenshot(
           `${id}--${name}--${theme}.png`,
-          LOOSE.has(id) ? { maxDiffPixelRatio: 0.03 } : {},
+          LOOSE.has(id) ? { maxDiffPixels: 500 } : {},
         );
       });
     }
