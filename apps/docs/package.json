@@ -14,7 +14,7 @@
     "@internationalized/date": "^3.12.4",
     "@rdloom/react": "*",
     "@rdloom/tokens": "*",
-    "@tanstack/react-table": "^8.21.3",
+    "@tanstack/react-table": "^9.3.1",
     "react": "^19.0.0",
     "react-aria-components": "^1.21.1",
     "react-dom": "^19.3.1",
