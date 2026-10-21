@@ -24,13 +24,7 @@ const moving = new Set(
   fs
     .readdirSync(specsDir)
     .filter((f) => f.endsWith(".spec.json"))
-    .map(
-      (f) =>
-        JSON.parse(fs.readFileSync(path.join(specsDir, f), "utf8")) as {
-          name: string;
-          category: string;
-        },
-    )
+    .map((f) => JSON.parse(fs.readFileSync(path.join(specsDir, f), "utf8")) as { name: string; category: string })
     .filter((s) => s.category === "motion")
     .map((s) => s.name.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase()),
 );
@@ -43,11 +37,7 @@ const NO_PICTURE = new Set(["flickering-grid"]);
 // browser update alone moves about 1% of the pixels. These compare with a small allowance; a layout change still fails.
 const LOOSE = new Set(["icon-cloud"]);
 
-const SLOW_TO_LOAD = new Set([
-  "customer-table/server-side",
-  "time-slot-picker/async-slots",
-  "data-table/server-side",
-]);
+const SLOW_TO_LOAD = new Set(["customer-table/server-side", "time-slot-picker/async-slots", "data-table/server-side"]);
 
 // A fixed "today", so calendars and date presets look the same every day.
 const NOW = new Date("2026-03-15T10:00:00Z");
@@ -68,27 +58,19 @@ async function open(page: Page, id: string, name: string, theme: string) {
     });
   }
   // Motion examples are stages (a pattern, a video, a terminal): they get the width of the window, as in an app.
-  await page.goto(
-    `/visual/${id}/${name}?theme=${theme}${moving.has(id) ? "&fit=1" : ""}`,
-  );
+  await page.goto(`/visual/${id}/${name}?theme=${theme}${moving.has(id) ? "&fit=1" : ""}`);
   await page.locator("[data-visual-ready]").waitFor({ state: "attached" });
   await page.evaluate(() => document.fonts.ready);
   // An image that fails (the avatar fallback example) swaps to its initials once the browser reports the failure.
-  await page.waitForFunction(() =>
-    [...document.images].every((img) => img.complete),
-  );
+  await page.waitForFunction(() => [...document.images].every((img) => img.complete));
   // The streaming example types its text out on a timer: wait until the whole reply is there.
-  if (id === "response" && name === "streaming")
-    await expect(page.getByText("GROUP BY month")).toBeVisible({
-      timeout: 10_000,
-    });
+  if (id === "response" && name === "streaming") await expect(page.getByText("GROUP BY month")).toBeVisible({ timeout: 10_000 });
   // These examples stand in for a server that answers after about 0.6 to 0.7 seconds, and they show no spinner while they wait.
   // A slow runner could photograph the waiting state, so give them time to finish loading.
   if (SLOW_TO_LOAD.has(`${id}/${name}`)) await page.waitForTimeout(2000);
   // Examples that fetch (combobox/async) show a spinner first; wait it out.
   // The Spinner examples are the spinner, so they keep it.
-  if (id !== "spinner")
-    await expect(page.getByRole("status", { name: "Loading" })).toHaveCount(0);
+  if (id !== "spinner") await expect(page.getByRole("status", { name: "Loading" })).toHaveCount(0);
 }
 
 for (const theme of ["light", "dark"]) {
@@ -96,10 +78,7 @@ for (const theme of ["light", "dark"]) {
     for (const { id, name } of examples) {
       test(`${id}/${name}`, async ({ page }) => {
         await open(page, id, name, theme);
-        if (NO_PICTURE.has(id))
-          return void (await expect(
-            page.locator("[data-visual]"),
-          ).toBeVisible());
+        if (NO_PICTURE.has(id)) return void (await expect(page.locator("[data-visual]")).toBeVisible());
         await expect(page.locator("[data-visual]")).toHaveScreenshot(
           `${id}--${name}--${theme}.png`,
           LOOSE.has(id) ? { maxDiffPixelRatio: 0.03 } : {},
@@ -108,21 +87,9 @@ for (const theme of ["light", "dark"]) {
     }
 
     // Open states of the hard components, where most visual bugs hide.
-    const opened: Array<{
-      id: string;
-      name: string;
-      open: (page: Page) => Promise<void>;
-    }> = [
-      {
-        id: "select",
-        name: "basic",
-        open: (p) => p.getByRole("button", { name: /Country/ }).click(),
-      },
-      {
-        id: "date-range-picker",
-        name: "with-presets",
-        open: (p) => p.getByRole("button", { name: "Calendar" }).click(),
-      },
+    const opened: Array<{ id: string; name: string; open: (page: Page) => Promise<void> }> = [
+      { id: "select", name: "basic", open: (p) => p.getByRole("button", { name: /Country/ }).click() },
+      { id: "date-range-picker", name: "with-presets", open: (p) => p.getByRole("button", { name: "Calendar" }).click() },
       {
         id: "combobox",
         name: "basic",
@@ -131,30 +98,16 @@ for (const theme of ["light", "dark"]) {
           await p.keyboard.press("ArrowDown");
         },
       },
-      {
-        id: "dialog",
-        name: "alert",
-        open: (p) => p.getByRole("button", { name: "Delete project" }).click(),
-      },
-      {
-        id: "menu",
-        name: "sections",
-        open: (p) => p.getByRole("button", { name: "Project" }).click(),
-      },
-      {
-        id: "sheet",
-        name: "filters",
-        open: (p) => p.getByRole("button", { name: "Filters" }).click(),
-      },
+      { id: "dialog", name: "alert", open: (p) => p.getByRole("button", { name: "Delete project" }).click() },
+      { id: "menu", name: "sections", open: (p) => p.getByRole("button", { name: "Project" }).click() },
+      { id: "sheet", name: "filters", open: (p) => p.getByRole("button", { name: "Filters" }).click() },
     ];
     for (const o of opened) {
       test(`${o.id}/${o.name} open`, async ({ page }) => {
         await open(page, o.id, o.name, theme);
         await o.open(page);
         await page.waitForTimeout(300); // let the entry animation settle
-        await expect(page).toHaveScreenshot(
-          `${o.id}--${o.name}--open--${theme}.png`,
-        );
+        await expect(page).toHaveScreenshot(`${o.id}--${o.name}--open--${theme}.png`);
       });
     }
   });
