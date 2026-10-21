@@ -188,7 +188,7 @@ describe("DataGrid set filter", () => {
     await user.keyboard("{Enter}");
     expect(screen.getByRole("listbox", { name: "Filter City" })).toBeInTheDocument();
     await user.keyboard("{ArrowDown}{ArrowDown} ");
-    expect(firstColumn().length).toBeLessThan(4);
+    await waitFor(() => expect(firstColumn().length).toBeLessThan(4));
   });
 
   it("offers the values you give it, not just the loaded ones", async () => {
