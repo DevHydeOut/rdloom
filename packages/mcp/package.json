@@ -29,7 +29,7 @@
     "zod": "^4.0.0"
   },
   "devDependencies": {
-    "vitest": "^5.0.3"
+    "vitest": "^5.0.5"
   },
   "scripts": {
     "prepack": "node ../../scripts/build-bins.mjs"
