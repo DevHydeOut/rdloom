@@ -54,9 +54,9 @@ export interface DocComponent {
 
 const specs = import.meta.glob<Spec>("../../../specs/*.spec.json", { eager: true, import: "default" });
 // Only the dependency lists up front: the registry items also hold every file's source.
-const registry = import.meta.glob<string[]>(["../../../packages/cli/registry/*.json", "!**/index.json"], { eager: true, import: "dependencies" });
-const registryParts = import.meta.glob<string[]>(["../../../packages/cli/registry/*.json", "!**/index.json"], { eager: true, import: "registryDependencies" });
-const registrySources = import.meta.glob<RegistryFile[]>(["../../../packages/cli/registry/*.json", "!**/index.json"], { import: "files" });
+const registry = import.meta.glob<string[]>(["../../../packages/cli/registry/*.json", "!../../../packages/cli/registry/index.json"], { eager: true, import: "dependencies" });
+const registryParts = import.meta.glob<string[]>(["../../../packages/cli/registry/*.json", "!../../../packages/cli/registry/index.json"], { eager: true, import: "registryDependencies" });
+const registrySources = import.meta.glob<RegistryFile[]>(["../../../packages/cli/registry/*.json", "!../../../packages/cli/registry/index.json"], { import: "files" });
 // Example components load with their page; their source text is small enough to bundle.
 const modules = import.meta.glob<ComponentType>("../../../examples/components/*/*.tsx", { import: "default" });
 const sources = import.meta.glob<string>("../../../examples/components/*/*.tsx", { eager: true, query: "?raw", import: "default" });
