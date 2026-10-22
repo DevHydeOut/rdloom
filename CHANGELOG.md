@@ -4,6 +4,10 @@ All notable changes to rdloom are listed here. The library is below version 1.0,
 
 ## 0.3.1
 
+### Changed
+
+- The new rdloom logo in the README and the docs: the header, the favicon and app icons, and the share picture. The share picture no longer says "Production-ready".
+
 ### Improved
 
 - TimeSlotPicker: a new `refreshKey` prop loads the times for the day on show again, and the picker reloads by itself after `onSelect` succeeds, so a booked time shows as taken.
