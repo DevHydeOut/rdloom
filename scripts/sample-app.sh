@@ -62,6 +62,13 @@ for part in customer-table chart stat sparkline table pagination select badge av
 done
 test -e src/components/rdloom/customer-table/query.ts || { echo "✗ the customer table logic (query.ts) was not installed"; exit 1; }
 echo "✓ customer table and its parts installed"
+npx rdloom add invoices-table --install
+for part in invoices-table data-table stat badge button table pagination select menu alert-dialog sheet empty-state error-state skeleton; do
+  test -e "src/components/rdloom/$part/$part.tsx" || { echo "✗ rdloom add invoices-table did not bring $part"; exit 1; }
+done
+test -e src/components/rdloom/invoices-table/query.ts || { echo "✗ the invoice logic (query.ts) was not installed"; exit 1; }
+test -e src/components/rdloom/data-table/query.ts || { echo "✗ the data table logic (data-table/query.ts) was not installed"; exit 1; }
+echo "✓ invoices table and its parts installed"
 npx rdloom add dashboard-shell dashboard-page --install
 for part in dashboard-shell dashboard-page sidebar sheet tooltip menu avatar; do
   test -e "src/components/rdloom/$part/$part.tsx" || { echo "✗ rdloom add dashboard-shell did not bring $part"; exit 1; }
