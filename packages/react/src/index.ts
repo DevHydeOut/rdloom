@@ -305,6 +305,7 @@ export { ApiKeyList, type ApiKeyListProps } from "./api-key-list/api-key-list";
 export { UserMenu, type UserMenuProps, type UserMenuItem, type UserMenuGroup } from "./user-menu/user-menu";
 export { AppHeader, type AppHeaderProps } from "./app-header/app-header";
 export { TopNav, type TopNavProps } from "./top-nav/top-nav";
+export { BottomNav, type BottomNavProps, type BottomNavSlot, type BottomNavClassNames } from "./bottom-nav/bottom-nav";
 // The icon family the components use, for your own buttons and menu entries.
 export * from "./utils/icons";
 // Forms: the Form, its fields, the error summary and repeating rows. The engine behind them is one adapter file.

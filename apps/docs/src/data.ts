@@ -99,7 +99,7 @@ export const componentGroupDefs: Array<{ id: string; label: string; ids: string[
   { id: "date-time", label: "Dates and times", ids: ["calendar", "date-picker", "date-range-picker", "time-field"] },
   { id: "data", label: "Tables and data", ids: ["data-grid", "table", "tree", "file-tree", "pagination"] },
   { id: "charts", label: "Charts and stats", ids: ["chart", "sparkline", "stat"] },
-  { id: "navigation", label: "Navigation", ids: ["tabs", "breadcrumbs", "steps", "menu", "navigation-menu", "menubar"] },
+  { id: "navigation", label: "Navigation", ids: ["tabs", "breadcrumbs", "steps", "menu", "navigation-menu", "menubar", "bottom-nav"] },
   { id: "overlays", label: "Dialogs and popovers", ids: ["dialog", "alert-dialog", "sheet", "drawer", "popover", "tooltip", "hover-card", "context-menu"] },
   { id: "feedback", label: "Feedback and status", ids: ["alert", "toast", "progress", "skeleton", "empty-state", "error-state", "badge", "spinner"] },
   { id: "display", label: "Content and layout", ids: ["card", "accordion", "avatar", "kbd", "collapsible", "scroll-area", "separator", "avatar-group", "carousel", "resizable-panels", "aspect-ratio", "direction", "item", "typography"] },

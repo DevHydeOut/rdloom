@@ -739,6 +739,33 @@
       "properties": []
     },
     {
+      "name": "BottomNav",
+      "id": "bottom-nav",
+      "version": "0.1.0",
+      "description": "A tab bar for the bottom of a phone-sized screen: three to five main places, each with an icon and a short label, the current one marked. It keeps clear of the home indicator, has touch-sized targets, and can show a count on a tab. It comes plain or as a floating bar.",
+      "properties": [
+        {
+          "prop": "variant",
+          "name": "variant",
+          "values": [
+            "plain",
+            "floating"
+          ],
+          "default": "plain"
+        },
+        {
+          "prop": "labels",
+          "name": "labels",
+          "values": [
+            "always",
+            "active",
+            "never"
+          ],
+          "default": "always"
+        }
+      ]
+    },
+    {
       "name": "Breadcrumbs",
       "id": "breadcrumbs",
       "version": "0.1.0",

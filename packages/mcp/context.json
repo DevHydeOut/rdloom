@@ -3472,6 +3472,209 @@
       ]
     },
     {
+      "id": "bottom-nav",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "BottomNav",
+        "version": "0.1.0",
+        "category": "navigation",
+        "status": "experimental",
+        "description": "A tab bar for the bottom of a phone-sized screen: three to five main places, each with an icon and a short label, the current one marked. It keeps clear of the home indicator, has touch-sized targets, and can show a count on a tab. It comes plain or as a floating bar.",
+        "props": {
+          "items": {
+            "type": "custom",
+            "description": "The tabs as data: { id, label, href?, icon?, badge?, permission? }. Three to five fit well. Sub-items (children) are ignored: a tab bar is one level. An item may carry a permission (\"allow\", \"disabled\", \"hidden\" or { state, reason }): hidden items are not drawn; disabled items stay as focusable, non-navigating entries (aria-disabled) with the reason read out.",
+            "required": true,
+            "tsType": "import(\"../sidebar/nav\").NavItem[]"
+          },
+          "currentId": {
+            "type": "string",
+            "description": "The id of the place you are on. It is marked as the current page (aria-current) and drawn with a pill behind its icon and a heavier label."
+          },
+          "label": {
+            "type": "string",
+            "description": "Accessible name of the navigation.",
+            "default": "Main navigation"
+          },
+          "onNavigate": {
+            "type": "callback",
+            "description": "Called with the item when one is chosen. Items without an href use this to do their work.",
+            "tsType": "(item: import(\"../sidebar/nav\").NavItem) => void"
+          },
+          "renderLink": {
+            "type": "custom",
+            "description": "Draw the tabs as your router's link. Return the link with the given className and children; call onClick when chosen. Without it, items with an href are plain links.",
+            "tsType": "(props: { item: import(\"../sidebar/nav\").NavItem; className: string; children: import(\"react\").ReactNode; isCurrent: boolean; onClick: () => void }) => import(\"react\").ReactNode"
+          },
+          "labels": {
+            "type": "enum",
+            "values": [
+              "always",
+              "active",
+              "never"
+            ],
+            "default": "always",
+            "description": "always: every tab shows its label. active: only the current tab does. never: icons only. A hidden label is still the tab's name for screen readers, so every item needs a label."
+          },
+          "variant": {
+            "type": "enum",
+            "values": [
+              "plain",
+              "floating"
+            ],
+            "default": "plain",
+            "description": "plain: a bar across the full width with a line above it. floating: a rounded bar with a shadow and a margin around it."
+          },
+          "fixed": {
+            "type": "boolean",
+            "default": false,
+            "description": "Pin the bar to the bottom of the screen. Leave room for it at the bottom of the page yourself. Without it the bar sits in the flow, for example at the bottom of a framed app."
+          },
+          "classNames": {
+            "type": "custom",
+            "description": "Class names for the parts, by slot name, added after the built-in ones. Slots: root, list, item, icon, label, badge.",
+            "tsType": "Partial<Record<\"root\" | \"list\" | \"item\" | \"icon\" | \"label\" | \"badge\", string>>"
+          }
+        },
+        "variants": [
+          "variant",
+          "labels"
+        ],
+        "states": [
+          "default",
+          "hover",
+          "focus",
+          "disabled"
+        ],
+        "slots": [
+          "root",
+          "list",
+          "item",
+          "icon",
+          "label",
+          "badge"
+        ],
+        "tokens": [
+          "color.surface.default",
+          "color.surface.raised",
+          "color.surface.subtle",
+          "color.surface.selected",
+          "color.border.default",
+          "color.text.default",
+          "color.text.muted",
+          "color.action.primary",
+          "color.focus.ring",
+          "radius.control",
+          "elevation.raised"
+        ],
+        "a11y": {
+          "role": "navigation",
+          "keyboard": [
+            "Tab: moves through the tabs in order",
+            "Enter or Space: follows a link or runs the tab's action"
+          ],
+          "requirements": [
+            "The tabs are inside one named navigation landmark and form a list of links, not a tablist: they go to other places, they do not switch panels of this page",
+            "The current place is marked with aria-current=\"page\" and also drawn with a pill behind the icon and a heavier label, never by color alone",
+            "Every tab has a name even when its label is hidden (labels active or never)",
+            "A count on a tab is read after the label (\"Inbox, 3\") and the visual count is hidden from screen readers",
+            "A disabled tab stays focusable (aria-disabled), goes nowhere and says why",
+            "Each tab is at least 44 by 44 CSS pixels",
+            "The bar keeps clear of the home indicator with the bottom safe-area inset",
+            "Hover, focus and the current mark respect reduced motion"
+          ],
+          "screenReader": [
+            "\"Main navigation, navigation\", then each tab as a link; the current one reads \"Home, current page\"",
+            "\"Inbox, 3, link\" for a tab with a count",
+            "A hidden label is still read: \"Search, link\""
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "The main places of an app on a phone: home, search, inbox, account",
+            "Places people move between often and want one tap away"
+          ],
+          "avoid_when": [
+            "More than five places: group the rest behind a More tab, or use Sidebar in a sheet",
+            "Switching between views of one page: use Tabs",
+            "A wide screen: use TopNav or Sidebar and show BottomNav only on narrow screens"
+          ],
+          "anti_patterns": [
+            "A different set of tabs on different pages: the bar is the same everywhere in the app",
+            "Icon-only tabs that nobody can tell apart: keep the labels unless the icons are universal",
+            "Using it as a toolbar for page actions: tabs go to places, buttons do things",
+            "UI permission is not security: hiding or disabling a tab only changes what people see, so the server must check access again for every request"
+          ]
+        },
+        "examples": [
+          "basic",
+          "with-badges",
+          "active-label-only",
+          "floating",
+          "permissions",
+          "with-your-router",
+          "classNames"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {}
+        }
+      },
+      "install": {
+        "command": "npx rdloom add bottom-nav",
+        "dependencies": [
+          "react-aria-components@^1.21.1"
+        ],
+        "registryDependencies": [
+          "tokens",
+          "sidebar",
+          "tooltip",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import { useState } from \"react\";\nimport { BottomNav, HomeIcon, InboxIcon, SearchIcon, UserIcon, type NavItem } from \"@rdloom/react\";\n\nconst items: NavItem[] = [\n  { id: \"home\", label: \"Home\", icon: <HomeIcon /> },\n  { id: \"search\", label: \"Search\", icon: <SearchIcon /> },\n  { id: \"inbox\", label: \"Inbox\", icon: <InboxIcon /> },\n  { id: \"account\", label: \"Account\", icon: <UserIcon /> },\n];\n\n// Items without an href are buttons: onNavigate does the work. The current one has aria-current, a pill behind its icon and a heavier label.\n// In your app add fixed to pin the bar to the bottom of the screen; here it sits at the bottom of the frame.\nexport default function BottomNavBasicExample() {\n  const [current, setCurrent] = useState(\"home\");\n  return (\n    <div className=\"mx-auto flex h-64 w-[22rem] max-w-full flex-col justify-end overflow-hidden rounded-3xl border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-subtle)]\">\n      <BottomNav items={items} currentId={current} onNavigate={(item) => setCurrent(item.id)} />\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "with-badges",
+          "code": "import { useState } from \"react\";\nimport { BottomNav, BellIcon, HomeIcon, InboxIcon, UserIcon, type NavItem } from \"@rdloom/react\";\n\nconst items: NavItem[] = [\n  { id: \"home\", label: \"Home\", icon: <HomeIcon /> },\n  { id: \"inbox\", label: \"Inbox\", icon: <InboxIcon />, badge: 3 },\n  { id: \"alerts\", label: \"Alerts\", icon: <BellIcon />, badge: \"New\" },\n  { id: \"account\", label: \"Account\", icon: <UserIcon /> },\n];\n\n// A count or a short word sits on the icon. A screen reader hears it after the label: \"Inbox, 3\".\nexport default function BottomNavWithBadgesExample() {\n  const [current, setCurrent] = useState(\"inbox\");\n  return (\n    <div className=\"mx-auto flex h-64 w-[22rem] max-w-full flex-col justify-end overflow-hidden rounded-3xl border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-subtle)]\">\n      <BottomNav items={items} currentId={current} onNavigate={(item) => setCurrent(item.id)} />\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "active-label-only",
+          "code": "import { useState } from \"react\";\nimport { BottomNav, HomeIcon, InboxIcon, SearchIcon, SettingsIcon, UserIcon, type NavItem } from \"@rdloom/react\";\n\nconst items: NavItem[] = [\n  { id: \"home\", label: \"Home\", icon: <HomeIcon /> },\n  { id: \"search\", label: \"Search\", icon: <SearchIcon /> },\n  { id: \"inbox\", label: \"Inbox\", icon: <InboxIcon /> },\n  { id: \"settings\", label: \"Settings\", icon: <SettingsIcon /> },\n  { id: \"account\", label: \"Account\", icon: <UserIcon /> },\n];\n\n// labels=\"active\" shows only the current tab's label, which suits five tabs in a narrow bar. The others keep their names for screen readers.\nexport default function BottomNavActiveLabelOnlyExample() {\n  const [current, setCurrent] = useState(\"search\");\n  return (\n    <div className=\"mx-auto flex h-64 w-[22rem] max-w-full flex-col justify-end overflow-hidden rounded-3xl border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-subtle)]\">\n      <BottomNav items={items} currentId={current} labels=\"active\" onNavigate={(item) => setCurrent(item.id)} />\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "floating",
+          "code": "import { useState } from \"react\";\nimport { BottomNav, HomeIcon, InboxIcon, SearchIcon, UserIcon, type NavItem } from \"@rdloom/react\";\n\nconst items: NavItem[] = [\n  { id: \"home\", label: \"Home\", icon: <HomeIcon /> },\n  { id: \"search\", label: \"Search\", icon: <SearchIcon /> },\n  { id: \"inbox\", label: \"Inbox\", icon: <InboxIcon />, badge: 2 },\n  { id: \"account\", label: \"Account\", icon: <UserIcon /> },\n];\n\n// A rounded bar with a shadow and a margin around it. It still keeps clear of the home indicator.\nexport default function BottomNavFloatingExample() {\n  const [current, setCurrent] = useState(\"home\");\n  return (\n    <div className=\"mx-auto flex h-64 w-[22rem] max-w-full flex-col justify-end overflow-hidden rounded-3xl border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-subtle)]\">\n      <BottomNav items={items} currentId={current} variant=\"floating\" onNavigate={(item) => setCurrent(item.id)} />\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "permissions",
+          "code": "import { useState } from \"react\";\nimport { BottomNav, HomeIcon, InboxIcon, SettingsIcon, UserIcon, type NavItem } from \"@rdloom/react\";\n\n// Your app decides what each person may open and passes the answer on each item. Hidden tabs are not drawn;\n// a disabled tab stays focusable, goes nowhere and says why. The server must check access again.\nconst items: NavItem[] = [\n  { id: \"home\", label: \"Home\", icon: <HomeIcon /> },\n  { id: \"inbox\", label: \"Inbox\", icon: <InboxIcon />, permission: { state: \"disabled\", reason: \"Verify your email to read messages\" } },\n  { id: \"admin\", label: \"Admin\", icon: <SettingsIcon />, permission: \"hidden\" },\n  { id: \"account\", label: \"Account\", icon: <UserIcon /> },\n];\n\nexport default function BottomNavPermissionsExample() {\n  const [current, setCurrent] = useState(\"home\");\n  return (\n    <div className=\"mx-auto flex h-64 w-[22rem] max-w-full flex-col justify-end overflow-hidden rounded-3xl border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-subtle)]\">\n      <BottomNav items={items} currentId={current} onNavigate={(item) => setCurrent(item.id)} />\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "with-your-router",
+          "code": "import { useState } from \"react\";\nimport { BottomNav, HomeIcon, InboxIcon, UserIcon, type NavItem } from \"@rdloom/react\";\n\nconst items: NavItem[] = [\n  { id: \"home\", label: \"Home\", href: \"/\", icon: <HomeIcon /> },\n  { id: \"inbox\", label: \"Inbox\", href: \"/inbox\", icon: <InboxIcon /> },\n  { id: \"account\", label: \"Account\", href: \"/account\", icon: <UserIcon /> },\n];\n\n// renderLink hands you the class names and the content; return your router's link (Link in React Router, Next.js and others).\n// Here a plain anchor stands in for it and the current place is kept in state.\nexport default function BottomNavWithYourRouterExample() {\n  const [current, setCurrent] = useState(\"home\");\n  return (\n    <div className=\"mx-auto flex h-64 w-[22rem] max-w-full flex-col justify-end overflow-hidden rounded-3xl border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-subtle)]\">\n      <BottomNav\n        items={items}\n        currentId={current}\n        renderLink={({ item, className, children, isCurrent, onClick }) => (\n          <a\n            href={item.href}\n            className={className}\n            aria-current={isCurrent ? \"page\" : undefined}\n            onClick={(event) => {\n              event.preventDefault();\n              onClick();\n              setCurrent(item.id);\n            }}\n          >\n            {children}\n          </a>\n        )}\n      />\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "classNames",
+          "code": "import { useState } from \"react\";\nimport { BottomNav, HomeIcon, InboxIcon, SearchIcon, UserIcon, type NavItem } from \"@rdloom/react\";\n\nconst items: NavItem[] = [\n  { id: \"home\", label: \"Home\", icon: <HomeIcon /> },\n  { id: \"search\", label: \"Search\", icon: <SearchIcon /> },\n  { id: \"inbox\", label: \"Inbox\", icon: <InboxIcon />, badge: 4 },\n  { id: \"account\", label: \"Account\", icon: <UserIcon /> },\n];\n\n// Slots: root, list, item, icon, label, badge. Your classes are added after the built-in ones.\nexport default function BottomNavClassNamesExample() {\n  const [current, setCurrent] = useState(\"home\");\n  return (\n    <div className=\"mx-auto flex h-64 w-[22rem] max-w-full flex-col justify-end overflow-hidden rounded-3xl border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-subtle)]\">\n      <BottomNav\n        items={items}\n        currentId={current}\n        onNavigate={(item) => setCurrent(item.id)}\n        classNames={{ root: \"bg-[var(--rd-color-surface-raised)]\", label: \"uppercase tracking-wide\", badge: \"bg-[var(--rd-color-text-default)]\" }}\n      />\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "bottom-nav/bottom-nav.tsx",
+          "content": "\"use client\";\n\nimport { forwardRef, useId } from \"react\";\nimport { Button as AriaButton, Link as AriaLink, TooltipTrigger } from \"react-aria-components\";\nimport { bottomNavDefaults, type BottomNavSpecProps } from \"../generated/bottom-nav.types\";\nimport { badgeText, initialOf, navPermission, visibleItems, type NavItem } from \"../sidebar/nav\";\nimport { Tooltip } from \"../tooltip/tooltip\";\nimport { cx } from \"../utils/cx\";\n\nexport interface BottomNavProps extends BottomNavSpecProps {\n  className?: string;\n}\n\n/** The parts of the tab bar that take a class name of their own. */\nexport type BottomNavSlot = \"root\" | \"list\" | \"item\" | \"icon\" | \"label\" | \"badge\";\nexport type BottomNavClassNames = Partial<Record<BottomNavSlot, string>>;\n\nconst focusRing = \"outline-none data-[focus-visible]:ring-2 data-[focus-visible]:ring-inset data-[focus-visible]:ring-[var(--rd-color-focus-ring)]\";\n\n// Every tab is at least 44 by 44 px, and the tabs share the width equally.\nconst tabBase =\n  \"group relative flex min-h-12 min-w-11 flex-1 flex-col items-center justify-center gap-0.5 px-1 pt-1.5 pb-1 text-[11px] leading-4 text-[var(--rd-color-text-muted)] \" +\n  \"transition-colors data-[hovered]:text-[var(--rd-color-text-default)] motion-reduce:transition-none \" +\n  focusRing;\nconst tabCurrent = \"font-semibold !text-[var(--rd-color-text-default)]\";\n\ninterface TabProps extends Pick<BottomNavSpecProps, \"onNavigate\" | \"renderLink\"> {\n  item: NavItem;\n  current: boolean;\n  labels: NonNullable<BottomNavSpecProps[\"labels\"]>;\n  classNames?: BottomNavClassNames;\n}\n\nfunction TabBody({ item, current, labels, classNames }: Pick<TabProps, \"item\" | \"current\" | \"labels\" | \"classNames\">) {\n  const badge = badgeText(item.badge);\n  // A hidden label is still the name of the tab.\n  const showLabel = labels === \"always\" || (labels === \"active\" && current);\n  return (\n    <>\n      <span\n        aria-hidden=\"true\"\n        className={cx(\n          \"relative flex h-7 w-14 items-center justify-center rounded-full transition-colors motion-reduce:transition-none [&_svg]:size-5\",\n          current ? \"bg-[var(--rd-color-surface-selected)]\" : \"group-data-[hovered]:bg-[var(--rd-color-surface-subtle)]\",\n          classNames?.icon,\n        )}\n      >\n        {item.icon ?? <span className=\"text-xs font-semibold\">{initialOf(item.label)}</span>}\n        {badge && (\n          <span\n            className={cx(\n              \"absolute top-0 right-2.5 inline-flex min-w-4 items-center justify-center rounded-full bg-[var(--rd-color-action-primary)] px-1 text-[10px] leading-4 font-semibold text-[var(--rd-color-surface-default)] tabular-nums\",\n              classNames?.badge,\n            )}\n          >\n            {badge}\n          </span>\n        )}\n      </span>\n      <span className={cx(showLabel ? \"max-w-full truncate\" : \"sr-only\", classNames?.label)}>{item.label}</span>\n      {badge && <span className=\"sr-only\">, {badge}</span>}\n    </>\n  );\n}\n\nfunction Tab({ item, current, labels, onNavigate, renderLink, classNames }: TabProps) {\n  const reasonId = useId();\n  const permission = navPermission(item);\n  const className = cx(tabBase, current && tabCurrent, classNames?.item);\n  const body = <TabBody item={item} current={current} labels={labels} classNames={classNames} />;\n\n  if (permission.isDisabled) {\n    // Shown, focusable and explained, but it goes nowhere.\n    const button = (\n      <AriaButton aria-disabled=\"true\" aria-describedby={permission.reason ? reasonId : undefined} onPress={() => {}} className={cx(className, \"cursor-not-allowed opacity-50\")}>\n        {body}\n      </AriaButton>\n    );\n    return (\n      <li className=\"flex flex-1\">\n        {permission.reason ? (\n          <TooltipTrigger delay={300}>\n            {button}\n            <Tooltip>{permission.reason}</Tooltip>\n          </TooltipTrigger>\n        ) : (\n          button\n        )}\n        {permission.reason && (\n          <span id={reasonId} className=\"sr-only\">\n            {permission.reason}\n          </span>\n        )}\n      </li>\n    );\n  }\n\n  const choose = () => onNavigate?.(item);\n  if (renderLink) {\n    return <li className=\"flex flex-1\">{renderLink({ item, className, children: body, isCurrent: current, onClick: choose })}</li>;\n  }\n  return (\n    <li className=\"flex flex-1\">\n      {item.href ? (\n        <AriaLink href={item.href} aria-current={current ? \"page\" : undefined} onPress={choose} className={className}>\n          {body}\n        </AriaLink>\n      ) : (\n        <AriaButton aria-current={current ? \"page\" : undefined} onPress={choose} className={className}>\n          {body}\n        </AriaButton>\n      )}\n    </li>\n  );\n}\n\nconst variants = {\n  plain: \"border-t border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-default)] pb-[env(safe-area-inset-bottom)]\",\n  floating:\n    \"mx-3 mb-[max(0.75rem,env(safe-area-inset-bottom))] rounded-2xl border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-raised)] [box-shadow:var(--rd-elevation-raised)]\",\n} as const;\n\n/**\n * A tab bar for the bottom of a phone-sized screen: a few main places, each with an icon and a short\n * label, the current one marked. It has no router of its own: items are links (with `href`, or through\n * `renderLink` for your router) or buttons (with `onNavigate`). The tabs are a list of links in a\n * navigation landmark, not a tablist, because they go to other places instead of switching panels.\n */\nexport const BottomNav = forwardRef<HTMLElement, BottomNavProps>(function BottomNav(\n  { items, currentId, label = bottomNavDefaults.label, onNavigate, renderLink, labels = bottomNavDefaults.labels, variant = bottomNavDefaults.variant, fixed = bottomNavDefaults.fixed, classNames, className },\n  ref,\n) {\n  // What the app hides is not drawn. A tab bar is one level, so sub-items are dropped.\n  const visible = visibleItems(items).map((item) => (item.children ? { ...item, children: undefined } : item));\n  return (\n    <nav\n      ref={ref}\n      aria-label={label}\n      data-variant={variant}\n      data-labels={labels}\n      className={cx(\"w-full text-[var(--rd-color-text-default)]\", variants[variant], fixed && \"fixed inset-x-0 bottom-0 z-30\", fixed && variant === \"floating\" && \"w-auto\", className, classNames?.root)}\n    >\n      <ul className={cx(\"mx-auto flex max-w-lg items-stretch\", classNames?.list)}>\n        {visible.map((item) => (\n          <Tab key={item.id} item={item} current={currentId === item.id} labels={labels} onNavigate={onNavigate} renderLink={renderLink} classNames={classNames} />\n        ))}\n      </ul>\n    </nav>\n  );\n});\n"
+        },
+        {
+          "path": "generated/bottom-nav.types.ts",
+          "content": "// Generated by rdloom codegen from specs/bottom-nav.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nimport type { ReactNode } from \"react\";\n\nexport const bottomNavLabelsValues = [\"always\", \"active\", \"never\"] as const;\nexport const bottomNavVariantValues = [\"plain\", \"floating\"] as const;\n\n/** A tab bar for the bottom of a phone-sized screen: three to five main places, each with an icon and a short label, the current one marked. It keeps clear of the home indicator, has touch-sized targets, and can show a count on a tab. It comes plain or as a floating bar. */\nexport interface BottomNavSpecProps {\n  /**\n   * The tabs as data: { id, label, href?, icon?, badge?, permission? }. Three to five fit well. Sub-items (children) are ignored: a tab bar is one level. An item may carry a permission (\"allow\", \"disabled\", \"hidden\" or { state, reason }): hidden items are not drawn; disabled items stay as focusable, non-navigating entries (aria-disabled) with the reason read out.\n   */\n  items: import(\"../sidebar/nav\").NavItem[];\n  /**\n   * The id of the place you are on. It is marked as the current page (aria-current) and drawn with a pill behind its icon and a heavier label.\n   */\n  currentId?: string;\n  /**\n   * Accessible name of the navigation.\n   * @default \"Main navigation\"\n   */\n  label?: string;\n  /**\n   * Called with the item when one is chosen. Items without an href use this to do their work.\n   */\n  onNavigate?: (item: import(\"../sidebar/nav\").NavItem) => void;\n  /**\n   * Draw the tabs as your router's link. Return the link with the given className and children; call onClick when chosen. Without it, items with an href are plain links.\n   */\n  renderLink?: (props: { item: import(\"../sidebar/nav\").NavItem; className: string; children: import(\"react\").ReactNode; isCurrent: boolean; onClick: () => void }) => import(\"react\").ReactNode;\n  /**\n   * always: every tab shows its label. active: only the current tab does. never: icons only. A hidden label is still the tab's name for screen readers, so every item needs a label.\n   * @default \"always\"\n   */\n  labels?: \"always\" | \"active\" | \"never\";\n  /**\n   * plain: a bar across the full width with a line above it. floating: a rounded bar with a shadow and a margin around it.\n   * @default \"plain\"\n   */\n  variant?: \"plain\" | \"floating\";\n  /**\n   * Pin the bar to the bottom of the screen. Leave room for it at the bottom of the page yourself. Without it the bar sits in the flow, for example at the bottom of a framed app.\n   * @default false\n   */\n  fixed?: boolean;\n  /**\n   * Class names for the parts, by slot name, added after the built-in ones. Slots: root, list, item, icon, label, badge.\n   */\n  classNames?: Partial<Record<\"root\" | \"list\" | \"item\" | \"icon\" | \"label\" | \"badge\", string>>;\n}\n\nexport const bottomNavDefaults = {\n  label: \"Main navigation\",\n  labels: \"always\",\n  variant: \"plain\",\n  fixed: false,\n} as const;\n\nexport const bottomNavMeta = {\n  \"name\": \"BottomNav\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"navigation\"\n} as const;\n"
+        }
+      ]
+    },
+    {
       "id": "breadcrumbs",
       "spec": {
         "$schema": "./schema/component.schema.json",

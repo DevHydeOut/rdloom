@@ -1087,6 +1087,30 @@ const blueprints: Record<string, Blueprint> = {
     ]);
   },
 
+  BottomNav: (c) => {
+    const floating = c.variant === "floating";
+    const labels = String(c.labels ?? "always");
+    const tab = (label: string, current = false) =>
+      frame({ name: current ? "tab current" : "tab", dir: "col", gap: 2, pad: [6, 4], w: "fill", h: 56, align: "center", cross: "center" }, [
+        frame({ name: "icon", dir: "row", w: 56, h: 28, align: "center", cross: "center", fill: current ? "color.surface.selected" : undefined, radius: 999 }, [
+          box(20, 20, { fill: current ? "color.text.default" : "color.text.muted", radius: 4, name: "glyph" }),
+        ]),
+        ...(labels === "always" || (labels === "active" && current) ? [text(label, 11, current ? "color.text.default" : "color.text.muted", current ? "Semi Bold" : "Regular")] : []),
+      ]);
+    return frame(
+      {
+        name: `bottom nav ${floating ? "floating" : "plain"}`,
+        dir: "row",
+        w: floating ? 354 : 390,
+        pad: [0, 4],
+        fill: floating ? "color.surface.raised" : "color.surface.default",
+        stroke: "color.border.default",
+        radius: floating ? 16 : undefined,
+      },
+      [tab("Home", true), tab("Search"), tab("Inbox"), tab("Account")],
+    );
+  },
+
   TopNav: (c) => {
     const variant = String(c.variant ?? "plain");
     const link = (label: string, current = false) =>
