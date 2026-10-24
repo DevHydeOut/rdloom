@@ -5,6 +5,7 @@ import { Button, FieldError, Radio, RadioGroup, Text } from "react-aria-componen
 import { useDefaultLocale } from "../utils/use-default-locale";
 import { ratingDefaults, type RatingSpecProps } from "../generated/rating.types";
 import { cx } from "../utils/cx";
+import { touchTarget } from "../utils/touch";
 import { fieldHelp, fieldLabel } from "../utils/field";
 import { StarIcon } from "../utils/icons";
 
@@ -12,7 +13,7 @@ export interface RatingProps extends RatingSpecProps {
   className?: string;
 }
 
-// The cell is the click target (at least 24px); the icon is a little smaller than the cell.
+// The cell is the click target (at least 24px, and the tap target size under touch density); the icon is a little smaller than the cell.
 const sizes = {
   sm: { cell: "size-6", icon: "size-5" },
   md: { cell: "size-8", icon: "size-6" },
@@ -120,7 +121,7 @@ export function Rating({
       <div className="flex items-center gap-3">
         <div className={cx("flex", isDisabled && "opacity-50")} onPointerLeave={() => setHover(null)}>
           {stars.map((i) => (
-            <span key={i} className={cx("relative inline-flex items-center justify-center", sizes[size].cell)}>
+            <span key={i} className={cx("relative inline-flex items-center justify-center", sizes[size].cell, touchTarget)}>
               <Star fill={fillOf(i, shown, allowHalf)} size={size} />
               {choices(i).map((v, half) => {
                 const isLeft = allowHalf && half === 0;

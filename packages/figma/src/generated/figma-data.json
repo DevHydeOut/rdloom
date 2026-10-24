@@ -304,6 +304,14 @@
       "type": "FLOAT",
       "light": "48px",
       "dark": "48px"
+    },
+    {
+      "name": "size/touch-target",
+      "token": "size.touch-target",
+      "cssVar": "--rd-size-touch-target",
+      "type": "FLOAT",
+      "light": "0px",
+      "dark": "0px"
     }
   ],
   "components": [

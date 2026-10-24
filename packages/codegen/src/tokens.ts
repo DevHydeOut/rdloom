@@ -45,6 +45,7 @@ export interface TokenSet {
   light: FlatToken[];
   dark: FlatToken[];
   compact: FlatToken[];
+  touch: FlatToken[];
 }
 
 export function loadTokens(): TokenSet {
@@ -53,6 +54,7 @@ export function loadTokens(): TokenSet {
     light: flatten(readTree("semantic.light.tokens.json")),
     dark: flatten(readTree("semantic.dark.tokens.json")),
     compact: flatten(readTree("density.compact.tokens.json")),
+    touch: flatten(readTree("density.touch.tokens.json")),
   };
 }
 
@@ -85,8 +87,12 @@ export function buildTokens(): string[] {
   const light = resolveMode(set, set.light);
   const dark = resolveMode(set, set.dark);
   const compact = resolveMode(set, set.compact);
+  const touch = resolveMode(set, set.touch);
   for (const t of set.compact) {
     if (!lightPaths.has(t.path)) throw new Error(`Compact density token ${t.path} has no default counterpart`);
+  }
+  for (const t of set.touch) {
+    if (!lightPaths.has(t.path)) throw new Error(`Touch density token ${t.path} has no default counterpart`);
   }
 
   const css = [
@@ -96,6 +102,12 @@ export function buildTokens(): string[] {
     block(':root[data-theme="dark"]', dark),
     // Density: put data-density="compact" on <html> or on any container to tighten everything inside it.
     block('[data-density="compact"]', compact),
+    // Touch: data-density="touch" makes controls and tap targets large enough for a finger (44px). data-density="auto" does the
+    // same only on devices whose main pointer is coarse (phones and tablets), and leaves desktops with a mouse as they are.
+    block('[data-density="touch"]', touch),
+    `@media (pointer: coarse) {
+${block('[data-density="auto"]', touch, "  ")}
+}`,
     "",
   ].join("\n\n");
 

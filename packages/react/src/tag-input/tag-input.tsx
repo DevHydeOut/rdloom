@@ -4,6 +4,7 @@ import { forwardRef, useId, useState, type ClipboardEvent, type KeyboardEvent } 
 import { Button, Tag, TagGroup, TagList, type Key } from "react-aria-components";
 import { tagInputDefaults, type TagInputSpecProps } from "../generated/tag-input.types";
 import { cx } from "../utils/cx";
+import { touchHitArea } from "../utils/touch";
 import { CloseIcon } from "../utils/icons";
 
 export interface TagInputProps extends TagInputSpecProps {
@@ -123,7 +124,8 @@ export const TagInput = forwardRef<HTMLDivElement, TagInputProps>(function TagIn
                 <Button
                   slot="remove"
                   className={
-                    "-my-0.5 flex size-6 items-center justify-center rounded-full text-[var(--rd-color-text-muted)] outline-none " +
+                    touchHitArea +
+                    " -my-0.5 flex size-6 items-center justify-center rounded-full text-[var(--rd-color-text-muted)] outline-none " +
                     "data-[hovered]:bg-[var(--rd-color-border-default)] data-[hovered]:text-[var(--rd-color-text-default)] " +
                     "data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)]"
                   }

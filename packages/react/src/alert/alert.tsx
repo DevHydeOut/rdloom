@@ -4,6 +4,7 @@ import { forwardRef, type HTMLAttributes } from "react";
 import { Button as AriaButton } from "react-aria-components";
 import { alertDefaults, type AlertSpecProps } from "../generated/alert.types";
 import { cx } from "../utils/cx";
+import { touchTarget } from "../utils/touch";
 import { CloseIcon, ErrorIcon, InfoIcon, SuccessIcon, WarningIcon } from "../utils/icons";
 
 export interface AlertProps
@@ -79,7 +80,8 @@ export const Alert = forwardRef<HTMLDivElement, AlertProps>(function Alert(
           aria-label={dismissLabel}
           onPress={onDismiss}
           className={
-            "-m-1 flex size-7 shrink-0 items-center justify-center rounded-[var(--rd-radius-control)] outline-none " +
+            touchTarget +
+            " -m-1 flex size-7 shrink-0 items-center justify-center rounded-[var(--rd-radius-control)] outline-none " +
             "data-[hovered]:bg-[var(--rd-color-surface-default)]/60 " +
             "data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)]"
           }

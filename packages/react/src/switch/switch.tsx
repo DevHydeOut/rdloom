@@ -4,6 +4,7 @@ import { forwardRef } from "react";
 import { Switch as AriaSwitch, type SwitchProps as AriaSwitchProps } from "react-aria-components";
 import { switchDefaults, type SwitchSpecProps } from "../generated/switch.types";
 import { cx } from "../utils/cx";
+import { touchTarget } from "../utils/touch";
 
 export interface SwitchProps
   extends SwitchSpecProps,
@@ -37,6 +38,7 @@ export const Switch = forwardRef<HTMLLabelElement, SwitchProps>(function Switch(
       className={cx(
         "group inline-flex items-center gap-2 text-sm text-[var(--rd-color-text-default)] cursor-pointer " +
           "data-[disabled]:opacity-50 data-[disabled]:cursor-not-allowed",
+        touchTarget,
         className,
       )}
     >

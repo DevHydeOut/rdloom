@@ -4,6 +4,7 @@ import { forwardRef } from "react";
 import { Checkbox as AriaCheckbox, type CheckboxProps as AriaCheckboxProps } from "react-aria-components";
 import { checkboxDefaults, type CheckboxSpecProps } from "../generated/checkbox.types";
 import { cx } from "../utils/cx";
+import { touchTarget } from "../utils/touch";
 import { CheckIcon, MinusIcon } from "../utils/icons";
 
 export interface CheckboxProps
@@ -47,6 +48,7 @@ export const Checkbox = forwardRef<HTMLLabelElement, CheckboxProps>(function Che
       className={cx(
         "group inline-flex items-center gap-2 text-sm text-[var(--rd-color-text-default)] cursor-pointer " +
           "data-[disabled]:opacity-50 data-[disabled]:cursor-not-allowed",
+        touchTarget,
         className,
       )}
     >
