@@ -692,6 +692,12 @@
       "description": "The message box of a chat: one rounded bar with a + menu on the left, the text in the middle, and your own controls, a microphone and Send on the right. Added files show above the text. You get only the buttons you ask for."
     },
     {
+      "name": "pull-to-refresh",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "Pull a list or page down at the top to load it again, the way phone apps do. The pull is a shortcut: a Refresh button does the same for the keyboard and screen readers. It shows how far to pull, says when to let go, shows progress while it loads, and tells people when it worked or failed with a way to try again."
+    },
+    {
       "name": "pulse-button",
       "type": "registry:ui",
       "version": "0.1.0",

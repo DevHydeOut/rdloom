@@ -1110,6 +1110,23 @@ const blueprints: Record<string, Blueprint> = {
     ]);
   },
 
+  PullToRefresh: () => {
+    const item = (label: string) => frame({ name: "item", dir: "row", pad: [12, 16], w: "fill", stroke: "color.border.default" }, [text(label, 14, "color.text.default")]);
+    const panel = (name: string, indicator: string | null, offset: number) =>
+      frame({ name, dir: "col", w: 352, fill: "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, [
+        ...(indicator ? [frame({ name: "indicator", dir: "row", gap: 8, w: "fill", h: offset, align: "center", cross: "center" }, [box(16, 16, { fill: "color.text.muted", radius: 4, name: "arrow" }), text(indicator, 14, "color.text.muted")])] : []),
+        item("Invoice 1042 was paid"),
+        item("New comment from Ana"),
+        item("Backup finished"),
+      ]);
+    return frame({ name: "pull to refresh", dir: "row", gap: 24 }, [
+      frame({ name: "pulling", dir: "col", gap: 8 }, [text("Pulling", 12, "color.text.muted"), panel("pulling", "Pull to refresh", 48)]),
+      frame({ name: "ready", dir: "col", gap: 8 }, [text("Ready to release", 12, "color.text.muted"), panel("ready", "Release to refresh", 72)]),
+      frame({ name: "refreshing", dir: "col", gap: 8 }, [text("Refreshing", 12, "color.text.muted"), panel("refreshing", "Refreshing", 72)]),
+      frame({ name: "failed", dir: "col", gap: 8 }, [text("Failed", 12, "color.text.muted"), panel("failed", "Could not refresh   Try again", 56)]),
+    ]);
+  },
+
   BottomNav: (c) => {
     const floating = c.variant === "floating";
     const labels = String(c.labels ?? "always");

@@ -128,8 +128,8 @@ test -e src/components/rdloom/data-table/query.ts || { echo "✗ the table logic
 echo "✓ users workflow installed"
 
 step "Navigation, settings and billing blocks, and the last core components"
-npx rdloom add user-menu app-header top-nav bottom-nav swipeable-row settings-section plan-card usage-meter payment-method-card api-key-list carousel resizable-panels hover-card context-menu color-picker rating event-calendar time-slot-picker --install
-for part in user-menu app-header top-nav bottom-nav swipeable-row settings-section plan-card usage-meter payment-method-card api-key-list carousel resizable-panels hover-card context-menu color-picker rating event-calendar time-slot-picker calendar sidebar sheet alert-dialog; do
+npx rdloom add user-menu app-header top-nav bottom-nav swipeable-row pull-to-refresh settings-section plan-card usage-meter payment-method-card api-key-list carousel resizable-panels hover-card context-menu color-picker rating event-calendar time-slot-picker --install
+for part in user-menu app-header top-nav bottom-nav swipeable-row pull-to-refresh settings-section plan-card usage-meter payment-method-card api-key-list carousel resizable-panels hover-card context-menu color-picker rating event-calendar time-slot-picker calendar sidebar sheet alert-dialog; do
   test -e "src/components/rdloom/$part/$part.tsx" || { echo "✗ rdloom add did not bring $part"; exit 1; }
 done
 echo "✓ navigation, settings, billing and the last core components installed"

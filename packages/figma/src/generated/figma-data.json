@@ -2737,6 +2737,13 @@
       "properties": []
     },
     {
+      "name": "PullToRefresh",
+      "id": "pull-to-refresh",
+      "version": "0.1.0",
+      "description": "Pull a list or page down at the top to load it again, the way phone apps do. The pull is a shortcut: a Refresh button does the same for the keyboard and screen readers. It shows how far to pull, says when to let go, shows progress while it loads, and tells people when it worked or failed with a way to try again.",
+      "properties": []
+    },
+    {
       "name": "PulseButton",
       "id": "pulse-button",
       "version": "0.1.0",
