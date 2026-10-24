@@ -3664,6 +3664,13 @@
       ]
     },
     {
+      "name": "SwipeableRow",
+      "id": "swipeable-row",
+      "version": "0.1.0",
+      "description": "A list row that slides sideways to show actions behind it, such as archive or delete. Swiping is a shortcut: the same actions are reachable with a button and the keyboard, so nobody depends on the gesture. Actions can sit on either side, can be turned off per person, and the row stays scrollable up and down.",
+      "properties": []
+    },
+    {
       "name": "Switch",
       "id": "switch",
       "version": "0.1.0",

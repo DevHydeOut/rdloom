@@ -29,6 +29,7 @@ All notable changes to rdloom are listed here. The library is below version 1.0,
 
 ### Added
 
+- SwipeableRow: a list row that slides sideways to show actions behind it, such as archive or delete, for phones. Swiping is only a shortcut: a button reveals the same actions for the keyboard and screen readers, and the row still scrolls up and down. Actions can sit on both sides, take a danger or primary tone, and each can sit behind a permission. An optional long swipe runs the first action (meant for undoable ones), the row can be controlled to keep one open in a list, and reading direction swaps the sides.
 - BottomNav: a tab bar for the bottom of a phone-sized screen. Three to five main places with an icon and a short label, the current one marked with a pill, a heavier label and aria-current (never by color alone). Touch-sized tabs, a count on a tab, labels shown always, only on the current tab, or never (the names stay for screen readers), a plain or floating look, and it keeps clear of the home indicator. Each tab can sit behind a permission. It is a list of links in a navigation landmark, not a tablist.
 - **Motion and effects: 69 components**, each optional and installed with its own `rdloom add`. They stand still for visitors who prefer reduced motion and can be paused.
   - Text: shimmer, typing, word rotate, text reveal, text animate, hyper text, kinetic, spinning, morphing, sparkles, aurora, line shadow, 3D flip, comic, highlighter, scroll velocity, video text and gradient text.

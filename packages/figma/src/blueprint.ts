@@ -1087,6 +1087,29 @@ const blueprints: Record<string, Blueprint> = {
     ]);
   },
 
+  SwipeableRow: () => {
+    const action = (label: string, fill: string, textColor: string) =>
+      frame({ name: "action", dir: "col", gap: 4, w: 80, h: 64, align: "center", cross: "center", fill }, [box(20, 20, { fill: textColor, radius: 4, name: "icon" }), text(label, 12, textColor, "Medium")]);
+    const content = frame({ name: "content", dir: "row", gap: 12, pad: [12, 16], w: 320, h: 64, cross: "center", fill: "color.surface.default", stroke: "color.border.default" }, [
+      box(40, 40, { fill: "color.surface.subtle", radius: 999, name: "avatar" }),
+      frame({ name: "text", dir: "col", gap: 2, w: "fill" }, [text("Ana Ruiz", 14, "color.text.default", "Medium"), text("Can we move the review to Thursday?", 14, "color.text.muted")]),
+    ]);
+    return frame({ name: "swipeable row", dir: "col", gap: 16, w: 400 }, [
+      frame({ name: "closed", dir: "col", gap: 8 }, [text("At rest", 12, "color.text.muted"), content]),
+      frame({ name: "open", dir: "col", gap: 8 }, [
+        text("Swiped open", 12, "color.text.muted"),
+        frame({ name: "revealed", dir: "row", h: 64, cross: "center" }, [
+          frame({ name: "content shifted", dir: "row", gap: 12, pad: [12, 16], w: 240, h: 64, cross: "center", fill: "color.surface.default", stroke: "color.border.default" }, [
+            box(40, 40, { fill: "color.surface.subtle", radius: 999, name: "avatar" }),
+            text("Ana Ruiz", 14, "color.text.default", "Medium"),
+          ]),
+          action("Archive", "color.action.primary", "color.action.on-primary"),
+          action("Delete", "color.action.danger", "color.action.on-primary"),
+        ]),
+      ]),
+    ]);
+  },
+
   BottomNav: (c) => {
     const floating = c.variant === "floating";
     const labels = String(c.labels ?? "always");

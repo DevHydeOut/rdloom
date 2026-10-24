@@ -25075,6 +25075,210 @@
       ]
     },
     {
+      "id": "swipeable-row",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "SwipeableRow",
+        "version": "0.1.0",
+        "category": "display",
+        "status": "experimental",
+        "description": "A list row that slides sideways to show actions behind it, such as archive or delete. Swiping is a shortcut: the same actions are reachable with a button and the keyboard, so nobody depends on the gesture. Actions can sit on either side, can be turned off per person, and the row stays scrollable up and down.",
+        "props": {
+          "children": {
+            "type": "node",
+            "description": "The row's content. It sits on an opaque surface that covers the actions until it is moved. Put any buttons or links the row needs inside it as usual.",
+            "required": true
+          },
+          "startActions": {
+            "type": "custom",
+            "description": "Actions behind the start of the row, revealed by swiping toward the end: { id, label, icon?, tone?, onAction, permission? }. Keep to one to three. tone is \"default\", \"primary\" or \"danger\". An action may carry a permission (\"allow\", \"disabled\", \"hidden\" or { state, reason }): hidden actions are not drawn; disabled ones stay as focusable, inactive buttons with the reason read out.",
+            "tsType": "import(\"../swipeable-row/swipeable-row\").SwipeAction[]"
+          },
+          "endActions": {
+            "type": "custom",
+            "description": "Actions behind the end of the row, revealed by swiping toward the start. Same shape as startActions. Reading direction is followed, so in a right-to-left page the sides swap with the text.",
+            "tsType": "import(\"../swipeable-row/swipeable-row\").SwipeAction[]"
+          },
+          "actionsLabel": {
+            "type": "string",
+            "description": "Accessible name of the button that shows the actions without a swipe, and of the group of actions. Name the row in it: \"Actions for invoice 1042\".",
+            "default": "Row actions"
+          },
+          "open": {
+            "type": "custom",
+            "description": "Which side is open, to control it. Pass null to keep the row closed. Use with onOpenChange. Leave it out to let the row manage itself.",
+            "tsType": "\"start\" | \"end\" | null"
+          },
+          "defaultOpen": {
+            "type": "custom",
+            "description": "Which side starts open when you do not control it.",
+            "tsType": "\"start\" | \"end\" | null"
+          },
+          "onOpenChange": {
+            "type": "callback",
+            "description": "Called with the side that is now open, or null when the row closed.",
+            "tsType": "(side: \"start\" | \"end\" | null) => void"
+          },
+          "fullSwipe": {
+            "type": "boolean",
+            "default": false,
+            "description": "A long swipe, past most of the row's width, runs the first action of that side and closes the row. Use it only for actions that are easy to undo: archive, not delete."
+          },
+          "closeOnAction": {
+            "type": "boolean",
+            "default": true,
+            "description": "Close the row after an action runs."
+          },
+          "isDisabled": {
+            "type": "boolean",
+            "default": false,
+            "description": "Turn swiping off. The actions stay reachable with the button and the keyboard."
+          },
+          "classNames": {
+            "type": "custom",
+            "description": "Class names for the parts, by slot name, added after the built-in ones. Slots: root, content, actions, action, toggle.",
+            "tsType": "Partial<Record<\"root\" | \"content\" | \"actions\" | \"action\" | \"toggle\", string>>"
+          }
+        },
+        "variants": [],
+        "states": [
+          "default",
+          "hover",
+          "focus",
+          "pressed",
+          "open",
+          "disabled"
+        ],
+        "slots": [
+          "root",
+          "content",
+          "actions",
+          "action",
+          "toggle"
+        ],
+        "tokens": [
+          "color.surface.default",
+          "color.surface.subtle",
+          "color.border.default",
+          "color.text.default",
+          "color.action.primary",
+          "color.action.on-primary",
+          "color.action.danger",
+          "color.focus.ring"
+        ],
+        "a11y": {
+          "role": "group",
+          "keyboard": [
+            "Tab: reaches the row's own controls, then the actions button",
+            "Enter or Space on the actions button: shows the actions and moves focus to the first one",
+            "Tab and Shift+Tab move between the actions; Enter or Space runs one",
+            "Escape: closes the row and returns focus to the actions button"
+          ],
+          "requirements": [
+            "Swiping is never the only way: a button shows the same actions, reachable by keyboard and screen reader",
+            "The actions button has a name, says whether the actions are shown (aria-expanded) and is revealed on focus so keyboard users see it",
+            "Actions that are not shown are out of the tab order and the accessibility tree",
+            "The actions are a named group of real buttons, each with a text label; an icon is never the only name",
+            "A disabled action stays focusable (aria-disabled), does nothing and says why",
+            "A swipe does not trigger a click on what was under the finger, and a tap on an open row closes it instead of activating it",
+            "Vertical scrolling still works over the row; only a horizontal move starts the swipe",
+            "Each action is at least 80 CSS pixels wide and as tall as the row",
+            "A long swipe that runs an action is off unless fullSwipe is set, and is meant for undoable actions",
+            "The slide is turned off when the user prefers reduced motion"
+          ],
+          "screenReader": [
+            "\"Actions for invoice 1042, button, collapsed\"; after it is pressed, \"expanded\" and the group \"Actions for invoice 1042\" with its buttons: \"Archive, button\", \"Delete, button\""
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "Lists of messages, tasks or records on a phone where each row has one to three quick actions",
+            "Actions people repeat often and want near their thumb"
+          ],
+          "avoid_when": [
+            "A row with many actions: use a menu button in the row",
+            "A destructive action with no confirmation or undo",
+            "Wide screens with a mouse: show the actions as buttons or a menu in the row"
+          ],
+          "anti_patterns": [
+            "Making the swipe the only way to reach an action: the actions button must stay available",
+            "Using fullSwipe for delete without an undo",
+            "More than three actions behind a row: they will not fit and cannot be told apart",
+            "Putting a horizontal scroller inside a row: the two gestures fight",
+            "UI permission is not security: hiding or disabling an action only changes what people see, so the server must check access again for every request"
+          ]
+        },
+        "examples": [
+          "basic",
+          "both-sides",
+          "controlled",
+          "full-swipe",
+          "permissions",
+          "in-a-list",
+          "classNames"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {}
+        }
+      },
+      "install": {
+        "command": "npx rdloom add swipeable-row",
+        "dependencies": [
+          "react-aria-components@^1.21.1"
+        ],
+        "registryDependencies": [
+          "tokens",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import { useState } from \"react\";\nimport { ArchiveIcon, SwipeableRow } from \"@rdloom/react\";\n\n// Swipe the row toward the start to show Archive. The \"Actions for ...\" button does the same for the keyboard and\n// screen readers: press Tab to reach it. Over the row, scrolling up and down still works.\nexport default function SwipeableRowBasicExample() {\n  const [archived, setArchived] = useState(false);\n  return (\n    <div className=\"mx-auto w-[22rem] max-w-full overflow-hidden rounded-xl border border-[var(--rd-color-border-default)]\">\n      {archived ? (\n        <p className=\"px-4 py-6 text-center text-sm text-[var(--rd-color-text-muted)]\">Archived.</p>\n      ) : (\n        <SwipeableRow\n          actionsLabel=\"Actions for the message from Ana Ruiz\"\n          endActions={[{ id: \"archive\", label: \"Archive\", icon: <ArchiveIcon />, onAction: () => setArchived(true) }]}\n        >\n          <div className=\"flex items-center gap-3 px-4 py-3\">\n          <span aria-hidden=\"true\" className=\"flex size-10 shrink-0 items-center justify-center rounded-full bg-[var(--rd-color-surface-subtle)] text-sm font-semibold\">A</span>\n          <span className=\"min-w-0 flex-1\">\n            <span className=\"block truncate text-sm font-medium\">Ana Ruiz</span>\n            <span className=\"block truncate text-sm text-[var(--rd-color-text-muted)]\">Can we move the review to Thursday?</span>\n          </span>\n        </div>\n        </SwipeableRow>\n      )}\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "both-sides",
+          "code": "import { useState } from \"react\";\nimport { ArchiveIcon, InboxIcon, SwipeableRow } from \"@rdloom/react\";\n\n// Actions can sit on both sides: swipe toward the end for Read / unread, toward the start for Archive and Delete.\n// The danger tone is for the destructive one. Nothing here depends on the swipe: the actions button reaches them all.\nexport default function SwipeableRowBothSidesExample() {\n  const [log, setLog] = useState(\"Nothing yet.\");\n  return (\n    <div className=\"mx-auto w-[22rem] max-w-full overflow-hidden rounded-xl border border-[var(--rd-color-border-default)]\">\n      <SwipeableRow\n        actionsLabel=\"Actions for the message from Ben Okafor\"\n        startActions={[{ id: \"read\", label: \"Mark read\", icon: <InboxIcon />, tone: \"primary\", onAction: () => setLog(\"Marked read\") }]}\n        endActions={[\n          { id: \"archive\", label: \"Archive\", icon: <ArchiveIcon />, onAction: () => setLog(\"Archived\") },\n          { id: \"delete\", label: \"Delete\", tone: \"danger\", onAction: () => setLog(\"Deleted\") },\n        ]}\n      >\n        <div className=\"flex items-center gap-3 px-4 py-3\">\n          <span aria-hidden=\"true\" className=\"flex size-10 shrink-0 items-center justify-center rounded-full bg-[var(--rd-color-surface-subtle)] text-sm font-semibold\">B</span>\n          <span className=\"min-w-0 flex-1\">\n            <span className=\"block truncate text-sm font-medium\">Ben Okafor</span>\n            <span className=\"block truncate text-sm text-[var(--rd-color-text-muted)]\">Invoice 1042 is attached.</span>\n          </span>\n        </div>\n      </SwipeableRow>\n      <p role=\"status\" className=\"border-t border-[var(--rd-color-border-default)] px-4 py-2 text-xs text-[var(--rd-color-text-muted)]\">\n        {log}\n      </p>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "controlled",
+          "code": "import { useState } from \"react\";\nimport { Button, SwipeableRow } from \"@rdloom/react\";\n\n// Control which side is open with open and onOpenChange, for example to keep only one row open in a list or to open one from code.\nexport default function SwipeableRowControlledExample() {\n  const [open, setOpen] = useState<\"start\" | \"end\" | null>(null);\n  return (\n    <div className=\"mx-auto flex w-[22rem] max-w-full flex-col gap-3\">\n      <div className=\"mx-auto w-[22rem] max-w-full overflow-hidden rounded-xl border border-[var(--rd-color-border-default)]\">\n        <SwipeableRow\n          open={open}\n          onOpenChange={setOpen}\n          actionsLabel=\"Actions for the message from Chen Wei\"\n          endActions={[\n            { id: \"snooze\", label: \"Snooze\", onAction: () => {} },\n            { id: \"archive\", label: \"Archive\", tone: \"primary\", onAction: () => {} },\n          ]}\n        >\n          <div className=\"flex items-center gap-3 px-4 py-3\">\n          <span aria-hidden=\"true\" className=\"flex size-10 shrink-0 items-center justify-center rounded-full bg-[var(--rd-color-surface-subtle)] text-sm font-semibold\">C</span>\n          <span className=\"min-w-0 flex-1\">\n            <span className=\"block truncate text-sm font-medium\">Chen Wei</span>\n            <span className=\"block truncate text-sm text-[var(--rd-color-text-muted)]\">Lunch tomorrow?</span>\n          </span>\n        </div>\n        </SwipeableRow>\n      </div>\n      <div className=\"flex items-center gap-2\">\n        <Button size=\"sm\" variant=\"secondary\" onPress={() => setOpen(\"end\")}>\n          Show actions\n        </Button>\n        <Button size=\"sm\" variant=\"ghost\" onPress={() => setOpen(null)}>\n          Close\n        </Button>\n        <span className=\"text-xs text-[var(--rd-color-text-muted)]\">Open side: {open ?? \"none\"}</span>\n      </div>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "full-swipe",
+          "code": "import { useState } from \"react\";\nimport { ArchiveIcon, SwipeableRow } from \"@rdloom/react\";\n\n// fullSwipe: a long swipe, past most of the row's width, runs the first action and closes the row. Use it only for actions that are\n// easy to undo, like archiving; here the app offers Undo. A shorter swipe just shows the actions.\nexport default function SwipeableRowFullSwipeExample() {\n  const [archived, setArchived] = useState(false);\n  return (\n    <div className=\"mx-auto w-[22rem] max-w-full overflow-hidden rounded-xl border border-[var(--rd-color-border-default)]\">\n      {archived ? (\n        <p className=\"flex items-center justify-between px-4 py-3 text-sm\">\n          Archived.\n          <button type=\"button\" className=\"font-medium underline\" onClick={() => setArchived(false)}>\n            Undo\n          </button>\n        </p>\n      ) : (\n        <SwipeableRow\n          fullSwipe\n          actionsLabel=\"Actions for the message from Dana Park\"\n          endActions={[{ id: \"archive\", label: \"Archive\", icon: <ArchiveIcon />, tone: \"primary\", onAction: () => setArchived(true) }]}\n        >\n          <div className=\"flex items-center gap-3 px-4 py-3\">\n          <span aria-hidden=\"true\" className=\"flex size-10 shrink-0 items-center justify-center rounded-full bg-[var(--rd-color-surface-subtle)] text-sm font-semibold\">D</span>\n          <span className=\"min-w-0 flex-1\">\n            <span className=\"block truncate text-sm font-medium\">Dana Park</span>\n            <span className=\"block truncate text-sm text-[var(--rd-color-text-muted)]\">Notes from the call are in the doc.</span>\n          </span>\n        </div>\n        </SwipeableRow>\n      )}\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "permissions",
+          "code": "import { SwipeableRow } from \"@rdloom/react\";\n\n// Your app decides what each person may do and passes the answer on each action. A hidden action is not drawn; a disabled one stays\n// focusable, does nothing and says why. The server must check access again.\nexport default function SwipeableRowPermissionsExample() {\n  return (\n    <div className=\"mx-auto w-[22rem] max-w-full overflow-hidden rounded-xl border border-[var(--rd-color-border-default)]\">\n      <SwipeableRow\n        defaultOpen=\"end\"\n        actionsLabel=\"Actions for the message from Eli Novak\"\n        endActions={[\n          { id: \"archive\", label: \"Archive\", onAction: () => {} },\n          { id: \"delete\", label: \"Delete\", tone: \"danger\", onAction: () => {}, permission: { state: \"disabled\", reason: \"Only admins can delete messages\" } },\n          { id: \"report\", label: \"Report\", onAction: () => {}, permission: \"hidden\" },\n        ]}\n      >\n        <div className=\"flex items-center gap-3 px-4 py-3\">\n          <span aria-hidden=\"true\" className=\"flex size-10 shrink-0 items-center justify-center rounded-full bg-[var(--rd-color-surface-subtle)] text-sm font-semibold\">E</span>\n          <span className=\"min-w-0 flex-1\">\n            <span className=\"block truncate text-sm font-medium\">Eli Novak</span>\n            <span className=\"block truncate text-sm text-[var(--rd-color-text-muted)]\">Your plan renews on the 1st.</span>\n          </span>\n        </div>\n      </SwipeableRow>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "in-a-list",
+          "code": "import { useState } from \"react\";\nimport { ArchiveIcon, SwipeableRow } from \"@rdloom/react\";\n\nconst people = [\n  { id: \"1\", name: \"Ana Ruiz\", note: \"Can we move the review to Thursday?\" },\n  { id: \"2\", name: \"Ben Okafor\", note: \"Invoice 1042 is attached.\" },\n  { id: \"3\", name: \"Chen Wei\", note: \"Lunch tomorrow?\" },\n  { id: \"4\", name: \"Dana Park\", note: \"Notes from the call are in the doc.\" },\n];\n\n// In a list keep one row open at a time: the open id lives in the parent and each row is controlled by it. The list scrolls normally.\nexport default function SwipeableRowInAListExample() {\n  const [rows, setRows] = useState(people);\n  const [openId, setOpenId] = useState<string | null>(null);\n  return (\n    <div className=\"mx-auto max-h-72 w-[22rem] max-w-full overflow-y-auto rounded-xl border border-[var(--rd-color-border-default)]\">\n      <ul className=\"divide-y divide-[var(--rd-color-border-default)]\">\n        {rows.map((person) => (\n          <li key={person.id}>\n            <SwipeableRow\n              open={openId === person.id ? \"end\" : null}\n              onOpenChange={(side) => setOpenId(side ? person.id : null)}\n              actionsLabel={`Actions for the message from ${person.name}`}\n              endActions={[{ id: \"archive\", label: \"Archive\", icon: <ArchiveIcon />, onAction: () => setRows((all) => all.filter((p) => p.id !== person.id)) }]}\n            >\n              <div className=\"flex items-center gap-3 px-4 py-3\">\n                <span aria-hidden=\"true\" className=\"flex size-10 shrink-0 items-center justify-center rounded-full bg-[var(--rd-color-surface-subtle)] text-sm font-semibold\">\n                  {person.name[0]}\n                </span>\n                <span className=\"min-w-0 flex-1\">\n                  <span className=\"block truncate text-sm font-medium\">{person.name}</span>\n                  <span className=\"block truncate text-sm text-[var(--rd-color-text-muted)]\">{person.note}</span>\n                </span>\n              </div>\n            </SwipeableRow>\n          </li>\n        ))}\n      </ul>\n      {rows.length === 0 && <p className=\"px-4 py-6 text-center text-sm text-[var(--rd-color-text-muted)]\">Inbox zero.</p>}\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "classNames",
+          "code": "import { ArchiveIcon, SwipeableRow } from \"@rdloom/react\";\n\n// Slots: root, content, actions, action, toggle. Your classes are added after the built-in ones.\nexport default function SwipeableRowClassNamesExample() {\n  return (\n    <div className=\"mx-auto w-[22rem] max-w-full overflow-hidden rounded-xl border border-[var(--rd-color-border-default)]\">\n      <SwipeableRow\n        actionsLabel=\"Actions for the message from Fay Lindqvist\"\n        endActions={[{ id: \"archive\", label: \"Archive\", icon: <ArchiveIcon />, tone: \"primary\", onAction: () => {} }]}\n        classNames={{ root: \"rounded-xl\", content: \"bg-[var(--rd-color-surface-subtle)]\", action: \"uppercase tracking-wide\" }}\n      >\n        <div className=\"flex items-center gap-3 px-4 py-3\">\n          <span aria-hidden=\"true\" className=\"flex size-10 shrink-0 items-center justify-center rounded-full bg-[var(--rd-color-surface-subtle)] text-sm font-semibold\">F</span>\n          <span className=\"min-w-0 flex-1\">\n            <span className=\"block truncate text-sm font-medium\">Fay Lindqvist</span>\n            <span className=\"block truncate text-sm text-[var(--rd-color-text-muted)]\">The new logo files are ready.</span>\n          </span>\n        </div>\n      </SwipeableRow>\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "swipeable-row/gesture.ts",
+          "content": "// The arithmetic of a swipe, with no React and no DOM, so it can be tested without a browser.\n//\n// Positions are logical, in pixels: 0 is the row at rest, a positive number is the row pushed toward\n// the start side (which shows the start actions) and a negative number is the row pulled toward the end\n// side (which shows the end actions). The component turns that into a left or right move for the\n// reading direction.\n\nexport type SwipeSide = \"start\" | \"end\";\n\n/** How far a flick carries on after the finger lifts, in milliseconds of travel at the release speed. */\nexport const PROJECTION_MS = 150;\n/** Slower than this (px per ms) a release is a drag, not a flick. */\nexport const FLICK_SPEED = 0.4;\n/** The pointer must move this far before the gesture is read as horizontal or vertical. */\nexport const AXIS_LOCK_PX = 8;\n/** The width given to each action, in pixels. */\nexport const ACTION_WIDTH = 80;\n/** A full swipe has to pass this share of the row's width. */\nexport const FULL_SWIPE_RATIO = 0.6;\n\nexport interface Widths {\n  /** Total width of the start actions, 0 when there are none. */\n  start: number;\n  /** Total width of the end actions, 0 when there are none. */\n  end: number;\n}\n\n/** Where the row rests for an open side. */\nexport function restingPosition(side: SwipeSide | null, widths: Widths): number {\n  return side === \"start\" ? widths.start : side === \"end\" ? -widths.end : 0;\n}\n\n/**\n * The position while the finger is down: the rest position plus the finger's travel, kept inside what\n * the actions allow. A side with no actions does not move at all, and the side with actions stretches a\n * little past its edge and pulls back, so the row feels attached to the finger without tearing loose.\n * With `reach` (the row's width, for a full swipe) the row follows the finger as far as that instead,\n * so a long swipe can get to the point where it runs the first action.\n */\nexport function dragPosition(rest: number, travel: number, widths: Widths, reach = 0): number {\n  const raw = rest + travel;\n  const overshoot = (over: number) => Math.min(over, 24) * 0.35;\n  if (raw > widths.start) {\n    if (widths.start === 0) return 0;\n    return reach > 0 ? Math.min(raw, reach) : widths.start + overshoot(raw - widths.start);\n  }\n  if (raw < -widths.end) {\n    if (widths.end === 0) return 0;\n    return reach > 0 ? Math.max(raw, -reach) : -widths.end - overshoot(-widths.end - raw);\n  }\n  return raw;\n}\n\nexport interface Release {\n  /** The side to leave open, or null to close. */\n  side: SwipeSide | null;\n  /** True when the swipe went far enough to run the first action of that side. */\n  full: boolean;\n}\n\n/**\n * What happens when the finger lifts. A flick carries the row on a little, then it settles on the\n * nearest of the places it may rest: closed, or open on a side that has actions. Going past most of\n * the row's width runs the first action when `fullSwipe` is on.\n */\nexport function resolveRelease(input: { position: number; velocity: number; widths: Widths; rowWidth: number; fullSwipe: boolean }): Release {\n  const { position, velocity, widths, rowWidth, fullSwipe } = input;\n  if (fullSwipe && rowWidth > 0) {\n    const limit = rowWidth * FULL_SWIPE_RATIO;\n    if (position >= limit && widths.start > 0) return { side: \"start\", full: true };\n    if (position <= -limit && widths.end > 0) return { side: \"end\", full: true };\n  }\n  // A slow release settles where the row is; a flick adds the distance it would still travel.\n  const projected = Math.abs(velocity) >= FLICK_SPEED ? position + velocity * PROJECTION_MS : position;\n  const places: Array<{ side: SwipeSide | null; at: number }> = [{ side: null, at: 0 }];\n  if (widths.start > 0) places.push({ side: \"start\", at: widths.start });\n  if (widths.end > 0) places.push({ side: \"end\", at: -widths.end });\n  let best = places[0];\n  for (const place of places) if (Math.abs(place.at - projected) < Math.abs(best.at - projected)) best = place;\n  return { side: best.side, full: false };\n}\n\n/** The total width of a side with this many actions. */\nexport const widthOf = (count: number) => count * ACTION_WIDTH;\n"
+        },
+        {
+          "path": "swipeable-row/swipeable-row.tsx",
+          "content": "\"use client\";\n\nimport { forwardRef, useEffect, useId, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactNode } from \"react\";\nimport { Button as AriaButton } from \"react-aria-components\";\nimport { swipeableRowDefaults, type SwipeableRowSpecProps } from \"../generated/swipeable-row.types\";\nimport { cx } from \"../utils/cx\";\nimport { resolvePermission, type PermissionValue } from \"../utils/permissions\";\nimport { ACTION_WIDTH, AXIS_LOCK_PX, dragPosition, resolveRelease, restingPosition, widthOf, type SwipeSide, type Widths } from \"./gesture\";\n\n/** One action behind a row. */\nexport interface SwipeAction {\n  /** A stable id. */\n  id: string;\n  /** The text on the button. An icon never stands in for it. */\n  label: string;\n  /** A 20-unit icon above the label. */\n  icon?: ReactNode;\n  /** The look: \"default\" is a quiet surface, \"primary\" the brand color, \"danger\" the destructive color. */\n  tone?: \"default\" | \"primary\" | \"danger\";\n  /** Runs when the action is chosen by swipe, button or keyboard. */\n  onAction: () => void;\n  /** What the app allows: \"allow\" (default), \"disabled\" (shown, inactive, with the reason read out) or \"hidden\" (not drawn). The server must check again. */\n  permission?: PermissionValue;\n}\n\nexport interface SwipeableRowProps extends SwipeableRowSpecProps {\n  className?: string;\n}\n\n/** The parts of the row that take a class name of their own. */\nexport type SwipeableRowSlot = \"root\" | \"content\" | \"actions\" | \"action\" | \"toggle\";\nexport type SwipeableRowClassNames = Partial<Record<SwipeableRowSlot, string>>;\n\nconst focusRing = \"outline-none data-[focus-visible]:ring-2 data-[focus-visible]:ring-inset data-[focus-visible]:ring-[var(--rd-color-focus-ring)]\";\n\nconst tones = {\n  default: \"bg-[var(--rd-color-surface-subtle)] text-[var(--rd-color-text-default)]\",\n  primary: \"bg-[var(--rd-color-action-primary)] text-[var(--rd-color-action-on-primary)]\",\n  danger: \"bg-[var(--rd-color-action-danger)] text-[var(--rd-color-action-on-primary)]\",\n} as const;\n\nconst visibleActions = (actions: SwipeAction[] | undefined) => (actions ?? []).filter((a) => resolvePermission(a.permission).isVisible);\n\ninterface ActionsProps {\n  side: SwipeSide;\n  actions: SwipeAction[];\n  shown: boolean;\n  /** How far the row has moved, so the first action can stretch to fill a long swipe. */\n  extent: number;\n  label: string;\n  onRun: (action: SwipeAction) => void;\n  classNames?: SwipeableRowClassNames;\n}\n\nfunction Actions({ side, actions, shown, extent, label, onRun, classNames }: ActionsProps) {\n  const ids = useId();\n  if (actions.length === 0) return null;\n  const style: CSSProperties = {\n    width: Math.max(widthOf(actions.length), extent),\n    // Out of the tab order and the accessibility tree while closed; the hide waits for the slide to finish.\n    visibility: shown ? \"visible\" : \"hidden\",\n    transition: shown ? undefined : \"visibility 0s linear 200ms\",\n  };\n  return (\n    <div\n      role=\"group\"\n      aria-label={label}\n      data-side={side}\n      style={style}\n      className={cx(\"absolute inset-y-0 flex\", side === \"start\" ? \"start-0\" : \"end-0\", classNames?.actions)}\n    >\n      {actions.map((action, index) => {\n        const permission = resolvePermission(action.permission);\n        const reasonId = `${ids}-${action.id}`;\n        return (\n          <span key={action.id} className={cx(\"flex\", index === 0 ? \"flex-1\" : \"shrink-0\")} style={{ minWidth: ACTION_WIDTH }}>\n            <AriaButton\n              aria-disabled={permission.isDisabled || undefined}\n              aria-describedby={permission.isDisabled && permission.reason ? reasonId : undefined}\n              onPress={() => {\n                if (permission.isAllowed) onRun(action);\n              }}\n              className={cx(\n                \"flex h-full w-full flex-col items-center justify-center gap-1 px-1 text-xs font-medium\",\n                tones[action.tone ?? \"default\"],\n                \"data-[pressed]:brightness-95\",\n                permission.isDisabled && \"cursor-not-allowed opacity-50\",\n                focusRing,\n                classNames?.action,\n              )}\n            >\n              {action.icon && (\n                <span aria-hidden=\"true\" className=\"flex size-5 items-center justify-center [&_svg]:size-5\">\n                  {action.icon}\n                </span>\n              )}\n              <span className=\"max-w-full truncate\">{action.label}</span>\n            </AriaButton>\n            {permission.isDisabled && permission.reason && (\n              <span id={reasonId} className=\"sr-only\">\n                {permission.reason}\n              </span>\n            )}\n          </span>\n        );\n      })}\n    </div>\n  );\n}\n\n/**\n * A list row that slides sideways to show actions behind it. The swipe is a shortcut: a button shows the\n * same actions for the keyboard and screen readers. Over the row, vertical movement still scrolls the\n * page; only a horizontal move starts the swipe.\n */\nexport const SwipeableRow = forwardRef<HTMLDivElement, SwipeableRowProps>(function SwipeableRow(\n  {\n    children,\n    startActions,\n    endActions,\n    actionsLabel = swipeableRowDefaults.actionsLabel,\n    open,\n    defaultOpen = null,\n    onOpenChange,\n    fullSwipe = swipeableRowDefaults.fullSwipe,\n    closeOnAction = swipeableRowDefaults.closeOnAction,\n    isDisabled = swipeableRowDefaults.isDisabled,\n    classNames,\n    className,\n  },\n  forwardedRef,\n) {\n  const start = visibleActions(startActions);\n  const end = visibleActions(endActions);\n  const widths: Widths = { start: widthOf(start.length), end: widthOf(end.length) };\n\n  const root = useRef<HTMLDivElement | null>(null);\n  const toggle = useRef<HTMLButtonElement | null>(null);\n\n  const controlled = open !== undefined;\n  const [inner, setInner] = useState<SwipeSide | null>(defaultOpen);\n  // A side with no actions cannot be open.\n  const wanted = controlled ? open : inner;\n  const side: SwipeSide | null = wanted === \"start\" && widths.start > 0 ? \"start\" : wanted === \"end\" && widths.end > 0 ? \"end\" : null;\n\n  const setSide = (next: SwipeSide | null) => {\n    if (next === side) return;\n    if (!controlled) setInner(next);\n    onOpenChange?.(next);\n  };\n\n  // While the finger is down: the live position, and the swipe's bookkeeping.\n  const [position, setPosition] = useState<number | null>(null);\n  const gesture = useRef<{ id: number; x: number; y: number; t: number; locked: boolean; last: number; lastT: number; speed: number; rest: number } | null>(null);\n  const swiped = useRef(false);\n  const focusFirst = useRef(false);\n\n  // Right to left pages swap the sides with the text.\n  const sign = () => (root.current && getComputedStyle(root.current).direction === \"rtl\" ? -1 : 1);\n\n  const onDown = (e: ReactPointerEvent<HTMLDivElement>) => {\n    if (isDisabled || (widths.start === 0 && widths.end === 0)) return;\n    if (e.pointerType === \"mouse\" && e.button !== 0) return;\n    const rest = restingPosition(side, widths);\n    gesture.current = { id: e.pointerId, x: e.clientX, y: e.clientY, t: e.timeStamp, locked: false, last: rest, lastT: e.timeStamp, speed: 0, rest };\n    swiped.current = false;\n  };\n\n  const onMove = (e: ReactPointerEvent<HTMLDivElement>) => {\n    const g = gesture.current;\n    if (!g || e.pointerId !== g.id) return;\n    const dx = (e.clientX - g.x) * sign();\n    const dy = e.clientY - g.y;\n    if (!g.locked) {\n      if (Math.abs(dx) < AXIS_LOCK_PX && Math.abs(dy) < AXIS_LOCK_PX) return;\n      // A mostly vertical move belongs to the page's scrolling.\n      if (Math.abs(dy) > Math.abs(dx)) {\n        gesture.current = null;\n        return;\n      }\n      g.locked = true;\n      e.currentTarget.setPointerCapture?.(e.pointerId);\n    }\n    const next = dragPosition(g.rest, dx, widths, fullSwipe ? root.current?.offsetWidth || 0 : 0);\n    const dt = Math.max(1, e.timeStamp - g.lastT);\n    g.speed = (next - g.last) / dt;\n    g.last = next;\n    g.lastT = e.timeStamp;\n    swiped.current = true;\n    setPosition(next);\n  };\n\n  const onUp = (e: ReactPointerEvent<HTMLDivElement>, cancelled: boolean) => {\n    const g = gesture.current;\n    if (!g || e.pointerId !== g.id) return;\n    gesture.current = null;\n    if (!g.locked) return;\n    setPosition(null);\n    if (cancelled) return;\n    const release = resolveRelease({ position: g.last, velocity: g.speed, widths, rowWidth: root.current?.offsetWidth ?? 0, fullSwipe });\n    if (release.full) {\n      const action = (release.side === \"start\" ? start : end).find((a) => resolvePermission(a.permission).isAllowed);\n      if (action) {\n        action.onAction();\n        setSide(null);\n        return;\n      }\n    }\n    setSide(release.side);\n  };\n\n  const run = (action: SwipeAction) => {\n    action.onAction();\n    if (closeOnAction) {\n      setSide(null);\n      if (root.current?.contains(document.activeElement)) toggle.current?.focus();\n    }\n  };\n\n  // Opened from the button: move to the first action so the keyboard can carry on.\n  useEffect(() => {\n    if (side && focusFirst.current) root.current?.querySelector<HTMLElement>(`[data-side=\"${side}\"] button`)?.focus();\n    focusFirst.current = false;\n  }, [side]);\n\n  const onKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {\n    if (e.key === \"Escape\" && side) {\n      e.stopPropagation();\n      setSide(null);\n      toggle.current?.focus();\n    }\n  };\n\n  // A tap outside closes an open row.\n  useEffect(() => {\n    if (!side) return;\n    const outside = (e: PointerEvent) => {\n      if (root.current && !root.current.contains(e.target as Node)) setSide(null);\n    };\n    document.addEventListener(\"pointerdown\", outside);\n    return () => document.removeEventListener(\"pointerdown\", outside);\n    // eslint-disable-next-line react-hooks/exhaustive-deps\n  }, [side]);\n\n  const rest = restingPosition(side, widths);\n  const logical = position ?? rest;\n  const dragging = position !== null;\n  const shown = side !== null || dragging;\n  const hasActions = widths.start > 0 || widths.end > 0;\n\n  return (\n    <div\n      ref={(node) => {\n        root.current = node;\n        if (typeof forwardedRef === \"function\") forwardedRef(node);\n        else if (forwardedRef) forwardedRef.current = node;\n      }}\n      data-open={side ?? undefined}\n      data-dragging={dragging || undefined}\n      onKeyDown={onKeyDown}\n      className={cx(\"relative isolate overflow-hidden\", className, classNames?.root)}\n    >\n      {start.length > 0 && <Actions side=\"start\" actions={start} shown={shown} extent={logical > 0 ? logical : 0} label={actionsLabel} onRun={run} classNames={classNames} />}\n      {end.length > 0 && <Actions side=\"end\" actions={end} shown={shown} extent={logical < 0 ? -logical : 0} label={actionsLabel} onRun={run} classNames={classNames} />}\n      <div\n        onPointerDown={onDown}\n        onPointerMove={onMove}\n        onPointerUp={(e) => onUp(e, false)}\n        onPointerCancel={(e) => onUp(e, true)}\n        // After a swipe the click that follows must not reach what was under the finger, and a tap on an open row closes it.\n        onClickCapture={(e) => {\n          if (swiped.current || side) {\n            e.preventDefault();\n            e.stopPropagation();\n            if (side && !swiped.current) setSide(null);\n            swiped.current = false;\n          }\n        }}\n        style={{ transform: logical === 0 ? undefined : `translateX(${logical * sign()}px)` }}\n        className={cx(\n          \"relative bg-[var(--rd-color-surface-default)]\",\n          // Vertical panning stays with the page; horizontal moves come to the row.\n          hasActions && !isDisabled && \"touch-pan-y\",\n          !dragging && \"transition-transform duration-200 ease-out motion-reduce:transition-none\",\n          classNames?.content,\n        )}\n      >\n        {children}\n      </div>\n      {hasActions && (\n        // Reached by keyboard and screen reader, shown when it has focus.\n        <AriaButton\n          ref={toggle}\n          aria-expanded={side !== null}\n          onPress={() => {\n            if (side) setSide(null);\n            else {\n              focusFirst.current = true;\n              setSide(widths.end > 0 ? \"end\" : \"start\");\n            }\n          }}\n          className={cx(\n            \"sr-only data-[focus-visible]:not-sr-only data-[focus-visible]:absolute data-[focus-visible]:end-2 data-[focus-visible]:top-1/2 data-[focus-visible]:z-10 data-[focus-visible]:-translate-y-1/2\",\n            \"rounded-[var(--rd-radius-control)] border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-default)] px-3 py-2 text-xs font-medium text-[var(--rd-color-text-default)]\",\n            focusRing,\n            classNames?.toggle,\n          )}\n        >\n          {actionsLabel}\n        </AriaButton>\n      )}\n    </div>\n  );\n});\n"
+        },
+        {
+          "path": "generated/swipeable-row.types.ts",
+          "content": "// Generated by rdloom codegen from specs/swipeable-row.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nimport type { ReactNode } from \"react\";\n\n/** A list row that slides sideways to show actions behind it, such as archive or delete. Swiping is a shortcut: the same actions are reachable with a button and the keyboard, so nobody depends on the gesture. Actions can sit on either side, can be turned off per person, and the row stays scrollable up and down. */\nexport interface SwipeableRowSpecProps {\n  /**\n   * The row's content. It sits on an opaque surface that covers the actions until it is moved. Put any buttons or links the row needs inside it as usual.\n   */\n  children: ReactNode;\n  /**\n   * Actions behind the start of the row, revealed by swiping toward the end: { id, label, icon?, tone?, onAction, permission? }. Keep to one to three. tone is \"default\", \"primary\" or \"danger\". An action may carry a permission (\"allow\", \"disabled\", \"hidden\" or { state, reason }): hidden actions are not drawn; disabled ones stay as focusable, inactive buttons with the reason read out.\n   */\n  startActions?: import(\"../swipeable-row/swipeable-row\").SwipeAction[];\n  /**\n   * Actions behind the end of the row, revealed by swiping toward the start. Same shape as startActions. Reading direction is followed, so in a right-to-left page the sides swap with the text.\n   */\n  endActions?: import(\"../swipeable-row/swipeable-row\").SwipeAction[];\n  /**\n   * Accessible name of the button that shows the actions without a swipe, and of the group of actions. Name the row in it: \"Actions for invoice 1042\".\n   * @default \"Row actions\"\n   */\n  actionsLabel?: string;\n  /**\n   * Which side is open, to control it. Pass null to keep the row closed. Use with onOpenChange. Leave it out to let the row manage itself.\n   */\n  open?: \"start\" | \"end\" | null;\n  /**\n   * Which side starts open when you do not control it.\n   */\n  defaultOpen?: \"start\" | \"end\" | null;\n  /**\n   * Called with the side that is now open, or null when the row closed.\n   */\n  onOpenChange?: (side: \"start\" | \"end\" | null) => void;\n  /**\n   * A long swipe, past most of the row's width, runs the first action of that side and closes the row. Use it only for actions that are easy to undo: archive, not delete.\n   * @default false\n   */\n  fullSwipe?: boolean;\n  /**\n   * Close the row after an action runs.\n   * @default true\n   */\n  closeOnAction?: boolean;\n  /**\n   * Turn swiping off. The actions stay reachable with the button and the keyboard.\n   * @default false\n   */\n  isDisabled?: boolean;\n  /**\n   * Class names for the parts, by slot name, added after the built-in ones. Slots: root, content, actions, action, toggle.\n   */\n  classNames?: Partial<Record<\"root\" | \"content\" | \"actions\" | \"action\" | \"toggle\", string>>;\n}\n\nexport const swipeableRowDefaults = {\n  actionsLabel: \"Row actions\",\n  fullSwipe: false,\n  closeOnAction: true,\n  isDisabled: false,\n} as const;\n\nexport const swipeableRowMeta = {\n  \"name\": \"SwipeableRow\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"group\"\n} as const;\n"
+        }
+      ]
+    },
+    {
       "id": "switch",
       "spec": {
         "$schema": "./schema/component.schema.json",
