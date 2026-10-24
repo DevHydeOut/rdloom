@@ -359,7 +359,7 @@
       "name": "drawer",
       "type": "registry:ui",
       "version": "0.1.0",
-      "description": "A modal panel that slides up from the bottom of the screen and can be dragged down to dismiss, for short tasks on phones. Open it with DialogTrigger."
+      "description": "A modal panel that slides up from the bottom of the screen and can be dragged down to dismiss, for short tasks on phones. With snap points it also rests at several heights (a peek, half, nearly full) and is dragged between them. Open it with DialogTrigger."
     },
     {
       "name": "empty-state",
