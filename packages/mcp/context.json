@@ -14152,6 +14152,392 @@
       ]
     },
     {
+      "id": "invoices-table",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "InvoicesTable",
+        "version": "0.1.0",
+        "category": "block",
+        "status": "experimental",
+        "description": "The invoice list of a billing page or an accounts screen: number, customer, issue and due dates, amount and a status in words. Overdue is worked out from the due date. Search, filter by status, sort, pages, selection, CSV, and the invoice actions (download, remind, record payment, void) each behind a permission and a confirmation. Totals above show what is outstanding, overdue and paid. It never fetches, sends or charges: you pass the invoices and do the actions.",
+        "props": {
+          "invoices": {
+            "type": "custom",
+            "description": "The invoices to show. With serverSide, only the current page.",
+            "required": true,
+            "tsType": "import(\"../invoices-table/query\").Invoice[]"
+          },
+          "label": {
+            "type": "string",
+            "description": "Accessible name of the table and the section, e.g. \"Invoices\".",
+            "default": "Invoices"
+          },
+          "currency": {
+            "type": "string",
+            "description": "ISO currency code of the table, e.g. \"USD\" or \"EUR\". An invoice can carry its own. The totals above the table add up this currency only and say how many invoices they left out.",
+            "default": "USD"
+          },
+          "locale": {
+            "type": "string",
+            "description": "Locale for numbers and dates, e.g. \"en-GB\". Defaults to en-US while rendering on the server and during hydration, then the visitor's language."
+          },
+          "asOf": {
+            "type": "string",
+            "description": "The day that decides what is overdue and what counts as paid in the last 30 days, as an ISO day such as \"2026-03-15\". Defaults to today. Set it in tests, screenshots and server rendering so the page never changes underneath you."
+          },
+          "summary": {
+            "type": "custom",
+            "description": "The totals above the table. \"auto\" works them out from the invoices (not with serverSide, where the table sees one page only); \"none\" hides them; or pass your own numbers.",
+            "default": "auto",
+            "tsType": "\"auto\" | \"none\" | import(\"../invoices-table/query\").InvoiceSummary"
+          },
+          "state": {
+            "type": "custom",
+            "description": "The data state, when your data layer gives you one: loading, empty, error or ready. It wins over isLoading and error. A ready table with no matching rows says nothing matches.",
+            "tsType": "import(\"../utils/state\").DataState"
+          },
+          "isLoading": {
+            "type": "boolean",
+            "description": "Show loading rows and skeleton cards, disable the controls, and mark the section busy.",
+            "default": false
+          },
+          "error": {
+            "type": "custom",
+            "description": "Something went wrong loading: a message to show instead of the rows (true uses a general one).",
+            "tsType": "string | boolean"
+          },
+          "onRetry": {
+            "type": "callback",
+            "description": "Adds a Try again button to the error state.",
+            "tsType": "() => void"
+          },
+          "emptyTitle": {
+            "type": "string",
+            "description": "Title shown when there are no rows at all. Defaults to \"Nothing here yet\"."
+          },
+          "emptyDescription": {
+            "type": "string",
+            "description": "Text under the empty title."
+          },
+          "emptyAction": {
+            "type": "custom",
+            "description": "A control shown in the empty state when there are no rows at all (not when a search found nothing), such as an Add button.",
+            "tsType": "import(\"react\").ReactNode"
+          },
+          "pageSize": {
+            "type": "number",
+            "description": "Rows per page.",
+            "default": 10
+          },
+          "query": {
+            "type": "custom",
+            "description": "The search, filters, sort and page, when you keep them yourself (for example in the address). Without it the table keeps them.",
+            "tsType": "import(\"../data-table/query\").DataTableQuery"
+          },
+          "defaultQuery": {
+            "type": "custom",
+            "description": "Start with a search, filters, a sort or a page already set.",
+            "tsType": "Partial<import(\"../data-table/query\").DataTableQuery>"
+          },
+          "onQueryChange": {
+            "type": "callback",
+            "description": "Called with the new query whenever the search, a filter, the sort or the page changes (typing waits for a short pause with serverSide). With serverSide, answer it with new rows.",
+            "tsType": "(query: import(\"../data-table/query\").DataTableQuery) => void"
+          },
+          "onSearch": {
+            "type": "callback",
+            "description": "Called with the search text whenever it changes.",
+            "tsType": "(search: string) => void"
+          },
+          "onFilter": {
+            "type": "callback",
+            "description": "Called with the chosen values of every filter whenever a filter changes or the filters are cleared.",
+            "tsType": "(filters: Record<string, string[]>) => void"
+          },
+          "serverSide": {
+            "type": "boolean",
+            "description": "The rows live on a server. The table then shows exactly the rows you pass and asks for new ones through onQueryChange.",
+            "default": false
+          },
+          "totalCount": {
+            "type": "number",
+            "description": "With serverSide: how many rows match in all, so the pages and the count are right."
+          },
+          "selectionMode": {
+            "type": "enum",
+            "description": "Add checkboxes to pick rows. The header box selects the rows on the page.",
+            "values": [
+              "none",
+              "multiple"
+            ],
+            "default": "none"
+          },
+          "selectedKeys": {
+            "type": "custom",
+            "description": "Controlled selection: the ids of the selected rows.",
+            "tsType": "Set<string>"
+          },
+          "defaultSelectedKeys": {
+            "type": "custom",
+            "description": "Rows selected at the start.",
+            "tsType": "Iterable<string>"
+          },
+          "onSelectionChange": {
+            "type": "callback",
+            "description": "Called with the ids of the selected rows.",
+            "tsType": "(keys: Set<string>) => void"
+          },
+          "onExport": {
+            "type": "callback",
+            "description": "Replaces the built-in CSV download. It gets the rows that match (all pages when the list is in memory) and the query. With serverSide the Export button is shown only when you give this.",
+            "tsType": "(rows: any[], query: import(\"../data-table/query\").DataTableQuery) => void"
+          },
+          "density": {
+            "type": "enum",
+            "description": "Row spacing of the table.",
+            "values": [
+              "compact",
+              "standard",
+              "comfortable"
+            ],
+            "default": "standard"
+          },
+          "layout": {
+            "type": "enum",
+            "description": "Table or cards. auto shows cards when the block itself is narrower than about 640px (not just the screen).",
+            "values": [
+              "auto",
+              "table",
+              "cards"
+            ],
+            "default": "auto"
+          },
+          "permissions": {
+            "type": "custom",
+            "description": "What the app allows, by action: open, download, remind (send a reminder), markPaid, void, export (Export CSV) and select (the checkboxes). Each answer is \"allow\", \"disabled\", \"hidden\", true, false or { state, reason }. Hidden removes the action; disabled keeps it visible with the reason. Actions that do not fit an invoice (a reminder for a paid one) never show, whatever the answer. The server must check every action again: the page is not security.",
+            "tsType": "import(\"../utils/permissions\").Permissions<\"open\" | \"download\" | \"remind\" | \"markPaid\" | \"void\" | \"export\" | \"select\">"
+          },
+          "onOpenInvoice": {
+            "type": "callback",
+            "description": "Makes each invoice number a button and calls this with the invoice, e.g. to open a details page or panel.",
+            "tsType": "(invoice: import(\"../invoices-table/query\").Invoice) => void"
+          },
+          "onDownload": {
+            "type": "callback",
+            "description": "Adds Download PDF to each row, and to the bulk bar for the selected rows. Called with the invoices to download. You make the file.",
+            "tsType": "(invoices: import(\"../invoices-table/query\").Invoice[]) => void | Promise<unknown>"
+          },
+          "onSendReminder": {
+            "type": "callback",
+            "description": "Adds Send reminder to unpaid rows (after a confirmation) and to the bulk bar for the selected unpaid ones. Called with the invoices to remind. You send the email.",
+            "tsType": "(invoices: import(\"../invoices-table/query\").Invoice[]) => void | Promise<unknown>"
+          },
+          "onMarkPaid": {
+            "type": "callback",
+            "description": "Adds Record payment to unpaid rows, after a confirmation. Called with the invoice. You record the payment.",
+            "tsType": "(invoice: import(\"../invoices-table/query\").Invoice) => void | Promise<unknown>"
+          },
+          "onVoid": {
+            "type": "callback",
+            "description": "Adds Void invoice to rows that can still be voided, after a confirmation. Called with the invoice. Voiding is yours to do and to allow.",
+            "tsType": "(invoice: import(\"../invoices-table/query\").Invoice) => void | Promise<unknown>"
+          },
+          "statusTones": {
+            "type": "custom",
+            "description": "Which badge color a status gets. The defaults are draft neutral, open blue, overdue amber, paid green, void neutral.",
+            "tsType": "Partial<Record<import(\"../invoices-table/query\").InvoiceStatus, \"neutral\" | \"info\" | \"success\" | \"warning\" | \"danger\">>"
+          },
+          "classNames": {
+            "type": "custom",
+            "description": "Class names for the parts of the block, by slot name, added after the built-in ones so you can restyle one part without editing the file. Slots: root, summary, stat, toolbar, search, filters, count, export, bulk-bar, table, header, row, cell, cards, card, empty, error, footer, pagination.",
+            "tsType": "Partial<Record<\"root\" | \"summary\" | \"stat\" | \"toolbar\" | \"search\" | \"filters\" | \"count\" | \"export\" | \"bulk-bar\" | \"table\" | \"header\" | \"row\" | \"cell\" | \"cards\" | \"card\" | \"empty\" | \"error\" | \"footer\" | \"pagination\", string>>"
+          }
+        },
+        "states": [
+          "default",
+          "loading"
+        ],
+        "slots": [
+          "root",
+          "summary",
+          "stat",
+          "toolbar",
+          "search",
+          "filters",
+          "count",
+          "export",
+          "bulk-bar",
+          "table",
+          "header",
+          "row",
+          "cell",
+          "cards",
+          "card",
+          "empty",
+          "error",
+          "footer",
+          "pagination"
+        ],
+        "tokens": [
+          "color.surface.default",
+          "color.surface.subtle",
+          "color.border.default",
+          "color.border.strong",
+          "color.text.default",
+          "color.text.muted",
+          "color.focus.ring",
+          "radius.control",
+          "radius.overlay",
+          "elevation.raised",
+          "size.control-md",
+          "color.feedback.warning",
+          "color.feedback.success"
+        ],
+        "a11y": {
+          "role": "region",
+          "keyboard": [
+            "Tab: moves through the search, filters, export, the table and the pagination",
+            "Arrow keys move between rows and cells in the table; Space selects a row when selection is on",
+            "Enter on the row menu opens the actions; a confirmation takes Escape to cancel and Enter to confirm"
+          ],
+          "requirements": [
+            "The block is a region named by label, and the table has the same name",
+            "The status is a badge with words (Draft, Open, Overdue, Paid, Void), never only a color",
+            "An overdue invoice says how many days late it is in text next to the due date",
+            "Amounts are right-aligned and formatted for the currency and locale, with the currency symbol, so a number is never read without its unit",
+            "Each action that changes money (record payment, void) asks first and says which invoice",
+            "A disabled action stays focusable and the reason is its description",
+            "The totals say which currency they add up and how many invoices they left out"
+          ],
+          "screenReader": [
+            "\"Invoices, region\"",
+            "\"INV-1042, Northgate Foods, due Mar 3, 2026, 12 days overdue, $2,310.00, Overdue\"",
+            "\"Record payment, menu item\"; the dialog says \"Record payment for INV-1042?\"",
+            "\"Totals in USD. 2 invoices in other currencies are not included\""
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "Listing a customer's invoices on a billing page, next to PlanCard, UsageMeter and PaymentMethodCard",
+            "An accounts or finance screen where staff chase unpaid invoices",
+            "Any list of money owed where overdue must be obvious"
+          ],
+          "avoid_when": [
+            "A list that is not money, or has other columns: use DataTable",
+            "Showing one subscription: use PlanCard",
+            "Editing an invoice: build the form with Form and FieldArray"
+          ],
+          "anti_patterns": [
+            "Treating the permissions prop as protection: UI permission is not security, so the server must check every action again",
+            "Adding amounts of different currencies together: the totals refuse to, and so should your server",
+            "Trusting the browser's clock for overdue in reports: send status from the server and set asOf for anything that must not change",
+            "Sending a reminder or recording a payment from inside the component: the callbacks are yours"
+          ]
+        },
+        "contract": {
+          "data": "A list of invoices (or one page of them with serverSide), each with a number, customer, dates, amount, currency and status.",
+          "dataStates": [
+            "loading",
+            "empty",
+            "error",
+            "ready"
+          ],
+          "permissions": [
+            "open",
+            "download",
+            "remind",
+            "markPaid",
+            "void",
+            "export",
+            "select"
+          ],
+          "events": [
+            "onOpenInvoice",
+            "onDownload",
+            "onSendReminder",
+            "onMarkPaid",
+            "onVoid",
+            "onQueryChange",
+            "onSelectionChange",
+            "onExport",
+            "onRetry"
+          ],
+          "customization": [
+            "classNames for each part",
+            "statusTones",
+            "summary: auto, none or your own numbers",
+            "asOf, currency and locale",
+            "serverSide with totalCount",
+            "density and layout"
+          ]
+        },
+        "examples": [
+          "basic",
+          "actions-and-permissions",
+          "states",
+          "server-side",
+          "multi-currency",
+          "classNames"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {}
+        }
+      },
+      "install": {
+        "command": "npx rdloom add invoices-table",
+        "dependencies": [],
+        "registryDependencies": [
+          "tokens",
+          "badge",
+          "data-table",
+          "stat",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import { InvoicesTable, type Invoice } from \"@rdloom/react\";\n\nconst AS_OF = \"2026-03-15\";\nconst addDays = (iso: string, days: number) => new Date(Date.parse(`${iso}T00:00:00Z`) + days * 86_400_000).toISOString().slice(0, 10);\n\nconst customers = [\n  [\"Northgate Foods\", \"accounts@northgate.example\"],\n  [\"Harbor Mills\", \"billing@harbormills.example\"],\n  [\"Brightwater Supplies\", \"finance@brightwater.example\"],\n  [\"Lindqvist Textiles\", \"ap@lindqvist.example\"],\n  [\"Orchard Row Cafe\", \"hello@orchardrow.example\"],\n  [\"Kestrel Logistics\", \"invoices@kestrel.example\"],\n];\nconst statuses: Invoice[\"status\"][] = [\"paid\", \"open\", \"paid\", \"open\", \"draft\", \"paid\", \"open\", \"void\", \"paid\", \"open\"];\n\n// Most are paid or open. Open invoices whose due day has passed are shown as overdue without you saying so.\nconst makeInvoices = (count: number): Invoice[] =>\n  Array.from({ length: count }, (_, i) => {\n    const [customer, customerEmail] = customers[i % customers.length];\n    const issuedAt = addDays(AS_OF, -(6 + i * 5));\n    const dueAt = addDays(issuedAt, 30);\n    const status = statuses[i % statuses.length];\n    return {\n      id: `inv-${1042 - i}`,\n      number: `INV-${1042 - i}`,\n      customer,\n      customerEmail,\n      issuedAt,\n      dueAt,\n      paidAt: status === \"paid\" ? addDays(dueAt, -4 - (i % 5)) : undefined,\n      amount: 240 + ((i * 377) % 2400) + (i % 3) * 0.5,\n      status,\n    };\n  });\n\nconst invoices = makeInvoices(24);\n\n// asOf fixes \"today\" so the overdue days and the totals stay the same. Leave it out in your app.\nexport default function InvoicesTableBasicExample() {\n  return (\n    <div className=\"mx-auto w-[64rem] max-w-full\">\n      <InvoicesTable invoices={invoices} asOf={AS_OF} pageSize={8} onOpenInvoice={() => {}} />\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "actions-and-permissions",
+          "code": "import { useState } from \"react\";\nimport { InvoicesTable, SegmentedControl, SegmentedControlItem, type Invoice, type InvoicesTableProps } from \"@rdloom/react\";\n\nconst AS_OF = \"2026-03-15\";\nconst addDays = (iso: string, days: number) => new Date(Date.parse(`${iso}T00:00:00Z`) + days * 86_400_000).toISOString().slice(0, 10);\n\nconst customers = [\n  [\"Northgate Foods\", \"accounts@northgate.example\"],\n  [\"Harbor Mills\", \"billing@harbormills.example\"],\n  [\"Brightwater Supplies\", \"finance@brightwater.example\"],\n  [\"Lindqvist Textiles\", \"ap@lindqvist.example\"],\n  [\"Orchard Row Cafe\", \"hello@orchardrow.example\"],\n  [\"Kestrel Logistics\", \"invoices@kestrel.example\"],\n];\nconst statuses: Invoice[\"status\"][] = [\"paid\", \"open\", \"paid\", \"open\", \"draft\", \"paid\", \"open\", \"void\", \"paid\", \"open\"];\n\n// Most are paid or open. Open invoices whose due day has passed are shown as overdue without you saying so.\nconst makeInvoices = (count: number): Invoice[] =>\n  Array.from({ length: count }, (_, i) => {\n    const [customer, customerEmail] = customers[i % customers.length];\n    const issuedAt = addDays(AS_OF, -(6 + i * 5));\n    const dueAt = addDays(issuedAt, 30);\n    const status = statuses[i % statuses.length];\n    return {\n      id: `inv-${1042 - i}`,\n      number: `INV-${1042 - i}`,\n      customer,\n      customerEmail,\n      issuedAt,\n      dueAt,\n      paidAt: status === \"paid\" ? addDays(dueAt, -4 - (i % 5)) : undefined,\n      amount: 240 + ((i * 377) % 2400) + (i % 3) * 0.5,\n      status,\n    };\n  });\n\nconst wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));\ntype Viewer = \"accountant\" | \"support\" | \"viewer\";\n\n// What each kind of person may do. The app decides; the table only receives the answers.\n// The server must check every one of these again: what the page shows is not security.\nconst permissionsFor = (viewer: Viewer): InvoicesTableProps[\"permissions\"] => ({\n  download: true,\n  remind: viewer === \"viewer\" ? { state: \"disabled\", reason: \"Only support and accounts can send reminders\" } : true,\n  markPaid: viewer === \"accountant\" ? true : viewer === \"support\" ? { state: \"disabled\", reason: \"Only accounts can record payments\" } : \"hidden\",\n  void: viewer === \"accountant\" ? true : \"hidden\",\n  export: viewer === \"viewer\" ? { state: \"disabled\", reason: \"Only accounts can export\" } : true,\n  select: viewer === \"viewer\" ? \"hidden\" : true,\n});\n\nexport default function InvoicesTableActionsExample() {\n  const [invoices, setInvoices] = useState(() => makeInvoices(16));\n  const [viewer, setViewer] = useState<Viewer>(\"accountant\");\n  const change = (id: string, patch: Partial<Invoice>) => setInvoices((all) => all.map((invoice) => (invoice.id === id ? { ...invoice, ...patch } : invoice)));\n\n  return (\n    <div className=\"mx-auto flex w-[64rem] max-w-full flex-col gap-5\">\n      <div className=\"flex flex-wrap items-center gap-3\">\n        <span className=\"text-sm text-[var(--rd-color-text-muted)]\">View as</span>\n        <SegmentedControl label=\"View as\" size=\"sm\" selectedKey={viewer} onChange={(key) => setViewer(String(key) as Viewer)}>\n          <SegmentedControlItem id=\"accountant\">Accounts</SegmentedControlItem>\n          <SegmentedControlItem id=\"support\">Support</SegmentedControlItem>\n          <SegmentedControlItem id=\"viewer\">Viewer</SegmentedControlItem>\n        </SegmentedControl>\n      </div>\n      <InvoicesTable\n        invoices={invoices}\n        asOf={AS_OF}\n        pageSize={8}\n        permissions={permissionsFor(viewer)}\n        onDownload={(rows) => console.log(`Download ${rows.map((r) => r.number).join(\", \")}`)}\n        onSendReminder={(rows) => wait(600).then(() => console.log(`Reminded ${rows.map((r) => r.customer).join(\", \")}`))}\n        onMarkPaid={(invoice) => wait(600).then(() => change(invoice.id, { status: \"paid\", paidAt: AS_OF }))}\n        onVoid={(invoice) => wait(600).then(() => change(invoice.id, { status: \"void\" }))}\n        onOpenInvoice={() => {}}\n      />\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "states",
+          "code": "import { useState } from \"react\";\nimport { Button, InvoicesTable, type Invoice } from \"@rdloom/react\";\n\n// While data is on its way pass isLoading: rows and totals turn into skeletons and the controls wait.\n// With no invoices the table says so in words; when a filter hides everything it offers to clear it.\nexport default function InvoicesTableStatesExample() {\n  const [state, setState] = useState<\"loading\" | \"empty\" | \"error\">(\"loading\");\n  const invoices: Invoice[] = [];\n  return (\n    <div className=\"mx-auto flex w-[64rem] max-w-full flex-col gap-4\">\n      <div role=\"group\" aria-label=\"State to show\" className=\"flex gap-2\">\n        {([\"loading\", \"empty\", \"error\"] as const).map((s) => (\n          <Button key={s} size=\"sm\" variant={state === s ? \"primary\" : \"secondary\"} onPress={() => setState(s)}>\n            {s[0].toUpperCase() + s.slice(1)}\n          </Button>\n        ))}\n      </div>\n      <InvoicesTable\n        invoices={invoices}\n        summary={state === \"loading\" ? \"auto\" : \"none\"}\n        isLoading={state === \"loading\"}\n        error={state === \"error\" ? \"The server did not answer.\" : undefined}\n        onRetry={() => setState(\"loading\")}\n      />\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "server-side",
+          "code": "import { useEffect, useRef, useState } from \"react\";\nimport { InvoicesTable, effectiveStatus, invoiceStatusLabels, type DataTableQuery, type Invoice, type InvoiceSummary } from \"@rdloom/react\";\n\nconst AS_OF = \"2026-03-15\";\nconst addDays = (iso: string, days: number) => new Date(Date.parse(`${iso}T00:00:00Z`) + days * 86_400_000).toISOString().slice(0, 10);\n\nconst customers = [\n  [\"Northgate Foods\", \"accounts@northgate.example\"],\n  [\"Harbor Mills\", \"billing@harbormills.example\"],\n  [\"Brightwater Supplies\", \"finance@brightwater.example\"],\n  [\"Lindqvist Textiles\", \"ap@lindqvist.example\"],\n  [\"Orchard Row Cafe\", \"hello@orchardrow.example\"],\n  [\"Kestrel Logistics\", \"invoices@kestrel.example\"],\n];\nconst statuses: Invoice[\"status\"][] = [\"paid\", \"open\", \"paid\", \"open\", \"draft\", \"paid\", \"open\", \"void\", \"paid\", \"open\"];\n\n// Most are paid or open. Open invoices whose due day has passed are shown as overdue without you saying so.\nconst makeInvoices = (count: number): Invoice[] =>\n  Array.from({ length: count }, (_, i) => {\n    const [customer, customerEmail] = customers[i % customers.length];\n    const issuedAt = addDays(AS_OF, -(6 + i * 5));\n    const dueAt = addDays(issuedAt, 30);\n    const status = statuses[i % statuses.length];\n    return {\n      id: `inv-${1042 - i}`,\n      number: `INV-${1042 - i}`,\n      customer,\n      customerEmail,\n      issuedAt,\n      dueAt,\n      paidAt: status === \"paid\" ? addDays(dueAt, -4 - (i % 5)) : undefined,\n      amount: 240 + ((i * 377) % 2400) + (i % 3) * 0.5,\n      status,\n    };\n  });\n\nconst everything = makeInvoices(240);\nconst PAGE = 8;\n\n// A stand-in for your API: it filters, sorts and cuts one page, then answers after a short wait.\n// In your app the server does this, and also adds up the totals for ALL the invoices that match, not for one page.\nfunction fetchInvoices(query: DataTableQuery) {\n  return new Promise<{ rows: Invoice[]; total: number; summary: InvoiceSummary }>((resolve) => {\n    let rows = everything.filter((invoice) => {\n      const status = effectiveStatus(invoice, AS_OF);\n      const wanted = query.filters.status ?? [];\n      const text = query.search.trim().toLowerCase();\n      return (wanted.length === 0 || wanted.includes(status)) && (!text || `${invoice.number} ${invoice.customer}`.toLowerCase().includes(text));\n    });\n    if (query.sort) {\n      const { column, direction } = query.sort;\n      const key = (invoice: Invoice) => (column === \"status\" ? invoiceStatusLabels[effectiveStatus(invoice, AS_OF)] : column === \"amount\" ? invoice.amount : ((invoice as unknown as Record<string, string>)[column] ?? \"\"));\n      rows = [...rows].sort((a, b) => (key(a) < key(b) ? -1 : key(a) > key(b) ? 1 : 0) * (direction === \"ascending\" ? 1 : -1));\n    }\n    const outstanding = rows.filter((i) => [\"open\", \"overdue\"].includes(effectiveStatus(i, AS_OF)));\n    const late = rows.filter((i) => effectiveStatus(i, AS_OF) === \"overdue\");\n    const sum = (list: Invoice[]) => Math.round(list.reduce((total, i) => total + i.amount, 0) * 100) / 100;\n    const summary: InvoiceSummary = { outstanding: sum(outstanding), overdue: sum(late), overdueCount: late.length, paidLast30Days: 0, currency: \"USD\", skipped: 0 };\n    setTimeout(() => resolve({ rows: rows.slice((query.page - 1) * PAGE, query.page * PAGE), total: rows.length, summary }), 600);\n  });\n}\n\nexport default function InvoicesTableServerSideExample() {\n  const [page, setPage] = useState<{ rows: Invoice[]; total: number; summary?: InvoiceSummary }>({ rows: [], total: 0 });\n  const [loading, setLoading] = useState(true);\n  const [error, setError] = useState<string>();\n  const last = useRef<DataTableQuery | undefined>(undefined);\n\n  const load = (query: DataTableQuery) => {\n    last.current = query;\n    setLoading(true);\n    setError(undefined);\n    fetchInvoices(query)\n      .then((result) => last.current === query && setPage(result)) // ignore an answer that arrives late\n      .catch(() => setError(\"The server did not answer.\"))\n      .finally(() => last.current === query && setLoading(false));\n  };\n  useEffect(() => load({ search: \"\", filters: {}, sort: null, page: 1 }), []);\n\n  return (\n    <div className=\"mx-auto w-[64rem] max-w-full\">\n      <InvoicesTable\n        invoices={page.rows}\n        asOf={AS_OF}\n        serverSide\n        totalCount={page.total}\n        pageSize={PAGE}\n        summary={page.summary ?? \"none\"}\n        isLoading={loading}\n        error={error}\n        onRetry={() => last.current && load(last.current)}\n        onQueryChange={load}\n      />\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "multi-currency",
+          "code": "import { InvoicesTable, type Invoice } from \"@rdloom/react\";\n\nconst AS_OF = \"2026-03-15\";\nconst addDays = (iso: string, days: number) => new Date(Date.parse(`${iso}T00:00:00Z`) + days * 86_400_000).toISOString().slice(0, 10);\n\nconst customers = [\n  [\"Northgate Foods\", \"accounts@northgate.example\"],\n  [\"Harbor Mills\", \"billing@harbormills.example\"],\n  [\"Brightwater Supplies\", \"finance@brightwater.example\"],\n  [\"Lindqvist Textiles\", \"ap@lindqvist.example\"],\n  [\"Orchard Row Cafe\", \"hello@orchardrow.example\"],\n  [\"Kestrel Logistics\", \"invoices@kestrel.example\"],\n];\nconst statuses: Invoice[\"status\"][] = [\"paid\", \"open\", \"paid\", \"open\", \"draft\", \"paid\", \"open\", \"void\", \"paid\", \"open\"];\n\n// Most are paid or open. Open invoices whose due day has passed are shown as overdue without you saying so.\nconst makeInvoices = (count: number): Invoice[] =>\n  Array.from({ length: count }, (_, i) => {\n    const [customer, customerEmail] = customers[i % customers.length];\n    const issuedAt = addDays(AS_OF, -(6 + i * 5));\n    const dueAt = addDays(issuedAt, 30);\n    const status = statuses[i % statuses.length];\n    return {\n      id: `inv-${1042 - i}`,\n      number: `INV-${1042 - i}`,\n      customer,\n      customerEmail,\n      issuedAt,\n      dueAt,\n      paidAt: status === \"paid\" ? addDays(dueAt, -4 - (i % 5)) : undefined,\n      amount: 240 + ((i * 377) % 2400) + (i % 3) * 0.5,\n      status,\n    };\n  });\n\n// Each invoice can carry its own currency. Amounts show in that currency, but the totals only add up the table's\n// currency and say how many invoices they left out: adding dollars to euros would be a wrong number.\nconst invoices: Invoice[] = makeInvoices(12).map((invoice, i) => ({ ...invoice, currency: i % 4 === 1 ? \"EUR\" : i % 4 === 3 ? \"GBP\" : \"USD\" }));\n\nexport default function InvoicesTableMultiCurrencyExample() {\n  return (\n    <div className=\"mx-auto flex w-[64rem] max-w-full flex-col gap-10\">\n      <InvoicesTable invoices={invoices} asOf={AS_OF} label=\"Invoices in dollars\" currency=\"USD\" pageSize={6} />\n      <InvoicesTable invoices={invoices} asOf={AS_OF} label=\"Invoices in euros\" currency=\"EUR\" locale=\"de-DE\" pageSize={6} />\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "classNames",
+          "code": "import { InvoicesTable, type Invoice } from \"@rdloom/react\";\n\nconst AS_OF = \"2026-03-15\";\nconst addDays = (iso: string, days: number) => new Date(Date.parse(`${iso}T00:00:00Z`) + days * 86_400_000).toISOString().slice(0, 10);\n\nconst customers = [\n  [\"Northgate Foods\", \"accounts@northgate.example\"],\n  [\"Harbor Mills\", \"billing@harbormills.example\"],\n  [\"Brightwater Supplies\", \"finance@brightwater.example\"],\n  [\"Lindqvist Textiles\", \"ap@lindqvist.example\"],\n  [\"Orchard Row Cafe\", \"hello@orchardrow.example\"],\n  [\"Kestrel Logistics\", \"invoices@kestrel.example\"],\n];\nconst statuses: Invoice[\"status\"][] = [\"paid\", \"open\", \"paid\", \"open\", \"draft\", \"paid\", \"open\", \"void\", \"paid\", \"open\"];\n\n// Most are paid or open. Open invoices whose due day has passed are shown as overdue without you saying so.\nconst makeInvoices = (count: number): Invoice[] =>\n  Array.from({ length: count }, (_, i) => {\n    const [customer, customerEmail] = customers[i % customers.length];\n    const issuedAt = addDays(AS_OF, -(6 + i * 5));\n    const dueAt = addDays(issuedAt, 30);\n    const status = statuses[i % statuses.length];\n    return {\n      id: `inv-${1042 - i}`,\n      number: `INV-${1042 - i}`,\n      customer,\n      customerEmail,\n      issuedAt,\n      dueAt,\n      paidAt: status === \"paid\" ? addDays(dueAt, -4 - (i % 5)) : undefined,\n      amount: 240 + ((i * 377) % 2400) + (i % 3) * 0.5,\n      status,\n    };\n  });\n\nconst invoices = makeInvoices(10);\n\n// Every part has its own class name, added after the built-in ones. Here: softer totals and a tinted toolbar.\nexport default function InvoicesTableClassNamesExample() {\n  return (\n    <div className=\"mx-auto w-[64rem] max-w-full\">\n      <InvoicesTable\n        invoices={invoices}\n        asOf={AS_OF}\n        pageSize={6}\n        classNames={{\n          summary: \"rounded-[var(--rd-radius-overlay)] bg-[var(--rd-color-surface-subtle)] p-3\",\n          stat: \"[box-shadow:none]\",\n          toolbar: \"rounded-[var(--rd-radius-control)] bg-[var(--rd-color-surface-subtle)] p-2\",\n          pagination: \"justify-center\",\n        }}\n      />\n    </div>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "invoices-table/invoices-table.tsx",
+          "content": "\"use client\";\n\nimport { forwardRef, useMemo, useState } from \"react\";\nimport { invoicesTableDefaults, type InvoicesTableSpecProps } from \"../generated/invoices-table.types\";\nimport { Badge } from \"../badge/badge\";\nimport { DataTable, type DataTableClassNames } from \"../data-table/data-table\";\nimport type { DataTableBulkAction, DataTableColumn, DataTableFilter, DataTableRowAction } from \"../data-table/query\";\nimport { Stat } from \"../stat/stat\";\nimport { cx } from \"../utils/cx\";\nimport { useDefaultLocale } from \"../utils/use-default-locale\";\nimport { permissionFor } from \"../utils/permissions\";\nimport {\n  daysOverdue,\n  effectiveStatus,\n  formatDay,\n  formatMoney,\n  invoiceStatusLabels,\n  invoiceStatuses,\n  isUnpaid,\n  isVoidable,\n  summarize,\n  todayIso,\n  type Invoice,\n  type InvoiceStatus,\n} from \"./query\";\n\nexport interface InvoicesTableProps extends InvoicesTableSpecProps {\n  className?: string;\n}\n\n/** The parts of the block that take a class name of their own. */\nexport type InvoicesTableSlot = \"summary\" | \"stat\" | keyof DataTableClassNames;\nexport type InvoicesTableClassNames = Partial<Record<InvoicesTableSlot, string>>;\n\ntype Tone = \"neutral\" | \"info\" | \"success\" | \"warning\" | \"danger\";\nconst defaultTones: Record<InvoiceStatus, Tone> = { draft: \"neutral\", open: \"info\", overdue: \"warning\", paid: \"success\", void: \"neutral\" };\n\nconst plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;\n\n/**\n * The invoice list of a billing page: number, customer, dates, amount and a status in words, with\n * overdue worked out from the due date, totals above, and the invoice actions (download, remind,\n * record payment, void) behind permissions and confirmations. It is a DataTable underneath, so search,\n * filters, sorting, pages, selection, CSV, states, cards on a phone and server-side data all work as\n * they do there. It never fetches, sends or charges: you pass the invoices and do the actions.\n */\nexport const InvoicesTable = forwardRef<HTMLDivElement, InvoicesTableProps>(function InvoicesTable(\n  {\n    invoices,\n    label = invoicesTableDefaults.label,\n    currency = invoicesTableDefaults.currency,\n    locale: localeProp,\n    asOf,\n    summary = invoicesTableDefaults.summary,\n    pageSize = invoicesTableDefaults.pageSize,\n    selectionMode,\n    serverSide = invoicesTableDefaults.serverSide,\n    emptyTitle = \"No invoices yet\",\n    emptyDescription = \"Invoices show up here once they are sent.\",\n    onOpenInvoice,\n    onDownload,\n    onSendReminder,\n    onMarkPaid,\n    onVoid,\n    permissions,\n    statusTones,\n    classNames,\n    className,\n    isLoading = invoicesTableDefaults.isLoading,\n    ...rest\n  },\n  ref,\n) {\n  const locale = useDefaultLocale(localeProp);\n  // The day is read once, so a page left open past midnight does not change under the reader.\n  const [today] = useState(todayIso);\n  const day = asOf ?? today;\n  const tones = { ...defaultTones, ...statusTones };\n\n  const statusOf = (invoice: Invoice) => effectiveStatus(invoice, day);\n  const money = (invoice: Invoice) => formatMoney(invoice.amount, invoice.currency ?? currency, locale);\n\n  const columns = useMemo<DataTableColumn<Invoice>[]>(\n    () => [\n      { id: \"number\", header: \"Invoice\", sortable: true, cell: (invoice) => <span className=\"font-medium\">{invoice.number}</span>, value: (invoice) => invoice.number },\n      {\n        id: \"customer\",\n        header: \"Customer\",\n        sortable: true,\n        value: (invoice) => invoice.customer,\n        cell: (invoice) => (\n          <span className=\"flex flex-col\">\n            <span>{invoice.customer}</span>\n            {invoice.customerEmail && <span className=\"text-xs text-[var(--rd-color-text-muted)]\">{invoice.customerEmail}</span>}\n          </span>\n        ),\n      },\n      { id: \"issuedAt\", header: \"Issued\", sortable: true, hideOnMobile: true, value: (invoice) => new Date(`${invoice.issuedAt}T00:00:00Z`), cell: (invoice) => formatDay(invoice.issuedAt, locale) },\n      {\n        id: \"dueAt\",\n        header: \"Due\",\n        sortable: true,\n        value: (invoice) => new Date(`${invoice.dueAt}T00:00:00Z`),\n        cell: (invoice) => {\n          const late = daysOverdue(invoice, day);\n          return (\n            <span className=\"flex flex-col\">\n              <span>{formatDay(invoice.dueAt, locale)}</span>\n              {late > 0 && <span className=\"text-xs text-[var(--rd-color-text-muted)]\">{plural(late, \"day\", \"days\")} overdue</span>}\n            </span>\n          );\n        },\n      },\n      {\n        id: \"amount\",\n        header: \"Amount\",\n        sortable: true,\n        align: \"end\",\n        value: (invoice) => invoice.amount,\n        cell: (invoice) => <span className=\"tabular-nums\">{money(invoice)}</span>,\n      },\n      {\n        id: \"status\",\n        header: \"Status\",\n        sortable: true,\n        value: (invoice) => invoiceStatusLabels[statusOf(invoice)],\n        cell: (invoice) => (\n          <Badge variant={tones[statusOf(invoice)]} size=\"sm\">\n            {invoiceStatusLabels[statusOf(invoice)]}\n          </Badge>\n        ),\n      },\n    ],\n    // eslint-disable-next-line react-hooks/exhaustive-deps\n    [locale, currency, day, statusTones],\n  );\n\n  const filters = useMemo<DataTableFilter<Invoice>[]>(\n    () => [\n      {\n        id: \"status\",\n        label: \"Status\",\n        options: invoiceStatuses.map((value) => ({ value, label: invoiceStatusLabels[value] })),\n        match: (invoice, value) => effectiveStatus(invoice, day) === value,\n      },\n    ],\n    [day],\n  );\n\n  const rowActions = (invoice: Invoice): DataTableRowAction<Invoice>[] => {\n    const status = statusOf(invoice);\n    const actions: DataTableRowAction<Invoice>[] = [];\n    if (onDownload) actions.push({ id: \"download\", label: \"Download PDF\", permission: permissions?.download, onAction: () => onDownload([invoice]) });\n    if (onSendReminder && isUnpaid(status)) {\n      actions.push({\n        id: \"remind\",\n        label: \"Send reminder\",\n        permission: permissions?.remind,\n        confirm: { title: `Send a reminder for ${invoice.number}?`, description: `${invoice.customer} gets an email about ${money(invoice)}.`, confirmLabel: \"Send reminder\" },\n        onAction: () => onSendReminder([invoice]),\n      });\n    }\n    if (onMarkPaid && isUnpaid(status)) {\n      actions.push({\n        id: \"markPaid\",\n        label: \"Record payment\",\n        permission: permissions?.markPaid,\n        confirm: { title: `Record payment for ${invoice.number}?`, description: `${money(invoice)} from ${invoice.customer} is marked as paid.`, confirmLabel: \"Record payment\" },\n        onAction: () => onMarkPaid(invoice),\n      });\n    }\n    if (onVoid && isVoidable(status)) {\n      actions.push({\n        id: \"void\",\n        label: \"Void invoice\",\n        variant: \"danger\",\n        permission: permissions?.void,\n        confirm: { title: `Void ${invoice.number}?`, description: \"A voided invoice can no longer be paid.\", confirmLabel: \"Void invoice\" },\n        onAction: () => onVoid(invoice),\n      });\n    }\n    return actions;\n  };\n\n  const bulkActions: DataTableBulkAction<Invoice>[] = [];\n  if (onSendReminder) {\n    bulkActions.push({\n      id: \"remind\",\n      label: \"Send reminders\",\n      permission: permissions?.remind,\n      confirm: { title: \"Send reminders for the selected invoices?\", description: \"Only unpaid invoices get one.\", confirmLabel: \"Send reminders\" },\n      onAction: (rows) => {\n        const unpaid = rows.filter((invoice) => isUnpaid(statusOf(invoice)));\n        return unpaid.length ? onSendReminder(unpaid) : undefined;\n      },\n    });\n  }\n  if (onDownload) bulkActions.push({ id: \"download\", label: \"Download PDFs\", permission: permissions?.download, onAction: (rows) => onDownload(rows) });\n\n  // Totals above the table. With serverSide the table only sees one page, so \"auto\" would add up the wrong thing.\n  const totals = summary === \"none\" || (summary === \"auto\" && serverSide) ? null : summary === \"auto\" ? summarize(invoices, currency, day) : summary;\n\n  return (\n    <div ref={ref} className={cx(\"flex w-full flex-col gap-4\", className, classNames?.root)}>\n      {totals && (\n        <div className={cx(\"flex flex-col gap-2\", classNames?.summary)}>\n          <div className=\"grid gap-3 sm:grid-cols-3\">\n            <Stat\n              variant=\"card\"\n              size=\"md\"\n              label=\"Outstanding\"\n              value={formatMoney(totals.outstanding, totals.currency, locale)}\n              summary=\"Open and overdue invoices\"\n              isLoading={isLoading}\n              className={classNames?.stat}\n            />\n            <Stat\n              variant=\"card\"\n              size=\"md\"\n              label=\"Overdue\"\n              value={formatMoney(totals.overdue, totals.currency, locale)}\n              summary={totals.overdueCount === 0 ? \"Nothing is late\" : `${plural(totals.overdueCount, \"invoice\", \"invoices\")} past due`}\n              isLoading={isLoading}\n              className={classNames?.stat}\n            />\n            <Stat\n              variant=\"card\"\n              size=\"md\"\n              label=\"Paid, last 30 days\"\n              value={formatMoney(totals.paidLast30Days, totals.currency, locale)}\n              summary=\"Received in the last 30 days\"\n              isLoading={isLoading}\n              className={classNames?.stat}\n            />\n          </div>\n          <p className=\"text-xs text-[var(--rd-color-text-muted)]\">\n            Totals in {totals.currency}.{totals.skipped > 0 ? ` ${plural(totals.skipped, \"invoice\", \"invoices\")} in other currencies ${totals.skipped === 1 ? \"is\" : \"are\"} not included.` : \"\"}\n          </p>\n        </div>\n      )}\n      <DataTable<Invoice>\n        {...rest}\n        label={label}\n        rows={invoices}\n        columns={columns}\n        getRowId={(invoice) => invoice.id}\n        filters={filters}\n        searchable={[\"number\", \"customer\"]}\n        searchPlaceholder=\"Search invoices\"\n        pageSize={pageSize}\n        serverSide={serverSide}\n        isLoading={isLoading}\n        emptyTitle={emptyTitle}\n        emptyDescription={emptyDescription}\n        selectionMode={selectionMode ?? (bulkActions.length > 0 ? \"multiple\" : \"none\")}\n        bulkActions={bulkActions}\n        rowActions={onDownload || onSendReminder || onMarkPaid || onVoid ? rowActions : undefined}\n        onRowOpen={permissionFor(permissions, \"open\").isAllowed ? onOpenInvoice : undefined}\n        permissions={{ export: permissions?.export, select: permissions?.select }}\n        classNames={classNames}\n      />\n    </div>\n  );\n});\n"
+        },
+        {
+          "path": "invoices-table/query.ts",
+          "content": "// The plain logic behind InvoicesTable: no React in here, so it is easy to test and to reuse on a server.\n\nexport type InvoiceStatus = \"draft\" | \"open\" | \"overdue\" | \"paid\" | \"void\";\n\n/** One invoice. Amounts are in whole units of the currency (1240.5 means $1,240.50). Dates are ISO days, \"2026-03-15\". */\nexport interface Invoice {\n  /** A stable id, such as the database id. */\n  id: string;\n  /** The number people read out and search for, e.g. \"INV-1042\". */\n  number: string;\n  /** Who is billed. */\n  customer: string;\n  customerEmail?: string;\n  /** The day the invoice was sent. */\n  issuedAt: string;\n  /** The day payment is due. */\n  dueAt: string;\n  /** The day it was paid. Needed for the \"paid in the last 30 days\" total. */\n  paidAt?: string;\n  amount: number;\n  /** An ISO currency code. Defaults to the table's currency. */\n  currency?: string;\n  /**\n   * What the invoice is. An open invoice whose due day has passed is shown as overdue without you\n   * setting it; send \"overdue\" yourself if your server already knows.\n   */\n  status: InvoiceStatus;\n}\n\n/** The totals above the table. */\nexport interface InvoiceSummary {\n  /** Open and overdue invoices together. */\n  outstanding: number;\n  /** Overdue invoices only. */\n  overdue: number;\n  overdueCount: number;\n  /** Invoices paid in the 30 days up to the as-of day. */\n  paidLast30Days: number;\n  /** The currency of the three amounts. */\n  currency: string;\n  /** How many invoices were left out because they are in another currency. */\n  skipped: number;\n}\n\nexport const invoiceStatusLabels: Record<InvoiceStatus, string> = {\n  draft: \"Draft\",\n  open: \"Open\",\n  overdue: \"Overdue\",\n  paid: \"Paid\",\n  void: \"Void\",\n};\n\nexport const invoiceStatuses = [\"draft\", \"open\", \"overdue\", \"paid\", \"void\"] as const satisfies readonly InvoiceStatus[];\n\n/** Today as an ISO day in the visitor's time zone. */\nexport function todayIso(now: Date = new Date()): string {\n  const month = String(now.getMonth() + 1).padStart(2, \"0\");\n  const day = String(now.getDate()).padStart(2, \"0\");\n  return `${now.getFullYear()}-${month}-${day}`;\n}\n\nconst DAY = 86_400_000;\nconst dayNumber = (iso: string) => Math.floor(Date.parse(`${iso.slice(0, 10)}T00:00:00Z`) / DAY);\n\n/** Whole days from one ISO day to another: positive when `to` is later. */\nexport function daysBetween(from: string, to: string): number {\n  return dayNumber(to) - dayNumber(from);\n}\n\n/** The status to show: an open invoice past its due day is overdue. */\nexport function effectiveStatus(invoice: Pick<Invoice, \"status\" | \"dueAt\">, asOf: string): InvoiceStatus {\n  if (invoice.status === \"open\" && daysBetween(invoice.dueAt, asOf) > 0) return \"overdue\";\n  return invoice.status;\n}\n\n/** How many days past due an unpaid invoice is, or 0. */\nexport function daysOverdue(invoice: Pick<Invoice, \"status\" | \"dueAt\">, asOf: string): number {\n  const status = effectiveStatus(invoice, asOf);\n  return status === \"overdue\" ? Math.max(0, daysBetween(invoice.dueAt, asOf)) : 0;\n}\n\n/** Can a reminder be sent, or the payment recorded? Only for unpaid invoices that were sent. */\nexport const isUnpaid = (status: InvoiceStatus) => status === \"open\" || status === \"overdue\";\n/** Can the invoice still be voided? Paid and already void ones cannot. */\nexport const isVoidable = (status: InvoiceStatus) => status === \"draft\" || status === \"open\" || status === \"overdue\";\n\nexport function formatMoney(amount: number, currency: string, locale: string): string {\n  try {\n    return new Intl.NumberFormat(locale, { style: \"currency\", currency }).format(amount);\n  } catch {\n    // An unknown currency code: show the number with the code rather than failing to render.\n    return `${new Intl.NumberFormat(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amount)} ${currency}`;\n  }\n}\n\nexport function formatDay(iso: string, locale: string): string {\n  return new Intl.DateTimeFormat(locale, { dateStyle: \"medium\", timeZone: \"UTC\" }).format(new Date(`${iso.slice(0, 10)}T00:00:00Z`));\n}\n\nconst round2 = (n: number) => Math.round(n * 100) / 100;\n\n/** The totals for the invoices in one currency. Invoices in other currencies are counted in `skipped`, never added in. */\nexport function summarize(invoices: readonly Invoice[], currency: string, asOf: string): InvoiceSummary {\n  let outstanding = 0;\n  let overdue = 0;\n  let overdueCount = 0;\n  let paid = 0;\n  let skipped = 0;\n  for (const invoice of invoices) {\n    if ((invoice.currency ?? currency) !== currency) {\n      skipped += 1;\n      continue;\n    }\n    const status = effectiveStatus(invoice, asOf);\n    if (isUnpaid(status)) outstanding += invoice.amount;\n    if (status === \"overdue\") {\n      overdue += invoice.amount;\n      overdueCount += 1;\n    }\n    if (status === \"paid\" && invoice.paidAt) {\n      const ago = daysBetween(invoice.paidAt, asOf);\n      if (ago >= 0 && ago <= 30) paid += invoice.amount;\n    }\n  }\n  return { outstanding: round2(outstanding), overdue: round2(overdue), overdueCount, paidLast30Days: round2(paid), currency, skipped };\n}\n"
+        },
+        {
+          "path": "generated/invoices-table.types.ts",
+          "content": "// Generated by rdloom codegen from specs/invoices-table.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\nimport type { ReactNode } from \"react\";\n\nexport const invoicesTableSelectionModeValues = [\"none\", \"multiple\"] as const;\nexport const invoicesTableDensityValues = [\"compact\", \"standard\", \"comfortable\"] as const;\nexport const invoicesTableLayoutValues = [\"auto\", \"table\", \"cards\"] as const;\n\n/** The invoice list of a billing page or an accounts screen: number, customer, issue and due dates, amount and a status in words. Overdue is worked out from the due date. Search, filter by status, sort, pages, selection, CSV, and the invoice actions (download, remind, record payment, void) each behind a permission and a confirmation. Totals above show what is outstanding, overdue and paid. It never fetches, sends or charges: you pass the invoices and do the actions. */\nexport interface InvoicesTableSpecProps {\n  /**\n   * The invoices to show. With serverSide, only the current page.\n   */\n  invoices: import(\"../invoices-table/query\").Invoice[];\n  /**\n   * Accessible name of the table and the section, e.g. \"Invoices\".\n   * @default \"Invoices\"\n   */\n  label?: string;\n  /**\n   * ISO currency code of the table, e.g. \"USD\" or \"EUR\". An invoice can carry its own. The totals above the table add up this currency only and say how many invoices they left out.\n   * @default \"USD\"\n   */\n  currency?: string;\n  /**\n   * Locale for numbers and dates, e.g. \"en-GB\". Defaults to en-US while rendering on the server and during hydration, then the visitor's language.\n   */\n  locale?: string;\n  /**\n   * The day that decides what is overdue and what counts as paid in the last 30 days, as an ISO day such as \"2026-03-15\". Defaults to today. Set it in tests, screenshots and server rendering so the page never changes underneath you.\n   */\n  asOf?: string;\n  /**\n   * The totals above the table. \"auto\" works them out from the invoices (not with serverSide, where the table sees one page only); \"none\" hides them; or pass your own numbers.\n   * @default \"auto\"\n   */\n  summary?: \"auto\" | \"none\" | import(\"../invoices-table/query\").InvoiceSummary;\n  /**\n   * The data state, when your data layer gives you one: loading, empty, error or ready. It wins over isLoading and error. A ready table with no matching rows says nothing matches.\n   */\n  state?: import(\"../utils/state\").DataState;\n  /**\n   * Show loading rows and skeleton cards, disable the controls, and mark the section busy.\n   * @default false\n   */\n  isLoading?: boolean;\n  /**\n   * Something went wrong loading: a message to show instead of the rows (true uses a general one).\n   */\n  error?: string | boolean;\n  /**\n   * Adds a Try again button to the error state.\n   */\n  onRetry?: () => void;\n  /**\n   * Title shown when there are no rows at all. Defaults to \"Nothing here yet\".\n   */\n  emptyTitle?: string;\n  /**\n   * Text under the empty title.\n   */\n  emptyDescription?: string;\n  /**\n   * A control shown in the empty state when there are no rows at all (not when a search found nothing), such as an Add button.\n   */\n  emptyAction?: import(\"react\").ReactNode;\n  /**\n   * Rows per page.\n   * @default 10\n   */\n  pageSize?: number;\n  /**\n   * The search, filters, sort and page, when you keep them yourself (for example in the address). Without it the table keeps them.\n   */\n  query?: import(\"../data-table/query\").DataTableQuery;\n  /**\n   * Start with a search, filters, a sort or a page already set.\n   */\n  defaultQuery?: Partial<import(\"../data-table/query\").DataTableQuery>;\n  /**\n   * Called with the new query whenever the search, a filter, the sort or the page changes (typing waits for a short pause with serverSide). With serverSide, answer it with new rows.\n   */\n  onQueryChange?: (query: import(\"../data-table/query\").DataTableQuery) => void;\n  /**\n   * Called with the search text whenever it changes.\n   */\n  onSearch?: (search: string) => void;\n  /**\n   * Called with the chosen values of every filter whenever a filter changes or the filters are cleared.\n   */\n  onFilter?: (filters: Record<string, string[]>) => void;\n  /**\n   * The rows live on a server. The table then shows exactly the rows you pass and asks for new ones through onQueryChange.\n   * @default false\n   */\n  serverSide?: boolean;\n  /**\n   * With serverSide: how many rows match in all, so the pages and the count are right.\n   */\n  totalCount?: number;\n  /**\n   * Add checkboxes to pick rows. The header box selects the rows on the page.\n   * @default \"none\"\n   */\n  selectionMode?: \"none\" | \"multiple\";\n  /**\n   * Controlled selection: the ids of the selected rows.\n   */\n  selectedKeys?: Set<string>;\n  /**\n   * Rows selected at the start.\n   */\n  defaultSelectedKeys?: Iterable<string>;\n  /**\n   * Called with the ids of the selected rows.\n   */\n  onSelectionChange?: (keys: Set<string>) => void;\n  /**\n   * Replaces the built-in CSV download. It gets the rows that match (all pages when the list is in memory) and the query. With serverSide the Export button is shown only when you give this.\n   */\n  onExport?: (rows: any[], query: import(\"../data-table/query\").DataTableQuery) => void;\n  /**\n   * Row spacing of the table.\n   * @default \"standard\"\n   */\n  density?: \"compact\" | \"standard\" | \"comfortable\";\n  /**\n   * Table or cards. auto shows cards when the block itself is narrower than about 640px (not just the screen).\n   * @default \"auto\"\n   */\n  layout?: \"auto\" | \"table\" | \"cards\";\n  /**\n   * What the app allows, by action: open, download, remind (send a reminder), markPaid, void, export (Export CSV) and select (the checkboxes). Each answer is \"allow\", \"disabled\", \"hidden\", true, false or { state, reason }. Hidden removes the action; disabled keeps it visible with the reason. Actions that do not fit an invoice (a reminder for a paid one) never show, whatever the answer. The server must check every action again: the page is not security.\n   */\n  permissions?: import(\"../utils/permissions\").Permissions<\"open\" | \"download\" | \"remind\" | \"markPaid\" | \"void\" | \"export\" | \"select\">;\n  /**\n   * Makes each invoice number a button and calls this with the invoice, e.g. to open a details page or panel.\n   */\n  onOpenInvoice?: (invoice: import(\"../invoices-table/query\").Invoice) => void;\n  /**\n   * Adds Download PDF to each row, and to the bulk bar for the selected rows. Called with the invoices to download. You make the file.\n   */\n  onDownload?: (invoices: import(\"../invoices-table/query\").Invoice[]) => void | Promise<unknown>;\n  /**\n   * Adds Send reminder to unpaid rows (after a confirmation) and to the bulk bar for the selected unpaid ones. Called with the invoices to remind. You send the email.\n   */\n  onSendReminder?: (invoices: import(\"../invoices-table/query\").Invoice[]) => void | Promise<unknown>;\n  /**\n   * Adds Record payment to unpaid rows, after a confirmation. Called with the invoice. You record the payment.\n   */\n  onMarkPaid?: (invoice: import(\"../invoices-table/query\").Invoice) => void | Promise<unknown>;\n  /**\n   * Adds Void invoice to rows that can still be voided, after a confirmation. Called with the invoice. Voiding is yours to do and to allow.\n   */\n  onVoid?: (invoice: import(\"../invoices-table/query\").Invoice) => void | Promise<unknown>;\n  /**\n   * Which badge color a status gets. The defaults are draft neutral, open blue, overdue amber, paid green, void neutral.\n   */\n  statusTones?: Partial<Record<import(\"../invoices-table/query\").InvoiceStatus, \"neutral\" | \"info\" | \"success\" | \"warning\" | \"danger\">>;\n  /**\n   * Class names for the parts of the block, by slot name, added after the built-in ones so you can restyle one part without editing the file. Slots: root, summary, stat, toolbar, search, filters, count, export, bulk-bar, table, header, row, cell, cards, card, empty, error, footer, pagination.\n   */\n  classNames?: Partial<Record<\"root\" | \"summary\" | \"stat\" | \"toolbar\" | \"search\" | \"filters\" | \"count\" | \"export\" | \"bulk-bar\" | \"table\" | \"header\" | \"row\" | \"cell\" | \"cards\" | \"card\" | \"empty\" | \"error\" | \"footer\" | \"pagination\", string>>;\n}\n\nexport const invoicesTableDefaults = {\n  label: \"Invoices\",\n  currency: \"USD\",\n  summary: \"auto\",\n  isLoading: false,\n  pageSize: 10,\n  serverSide: false,\n  selectionMode: \"none\",\n  density: \"standard\",\n  layout: \"auto\",\n} as const;\n\nexport const invoicesTableMeta = {\n  \"name\": \"InvoicesTable\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"region\"\n} as const;\n"
+        }
+      ]
+    },
+    {
       "id": "item",
       "spec": {
         "$schema": "./schema/component.schema.json",

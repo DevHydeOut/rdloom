@@ -506,6 +506,12 @@
       "description": "A dialog for inviting people, in three shapes: typed emails with a role on one compact line each, a search of a directory you pass, or a two-step pick-from-a-list with a role per person. Checks for format, duplicates and people who are already members, an error summary, an optional message and a submit button that says how many invitations it sends. Your onInvite does the work. UI permission is not security: the server must check again."
     },
     {
+      "name": "invoices-table",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "The invoice list of a billing page or an accounts screen: number, customer, issue and due dates, amount and a status in words. Overdue is worked out from the due date. Search, filter by status, sort, pages, selection, CSV, and the invoice actions (download, remind, record payment, void) each behind a permission and a confirmation. Totals above show what is outstanding, overdue and paid. It never fetches, sends or charges: you pass the invoices and do the actions."
+    },
+    {
       "name": "item",
       "type": "registry:ui",
       "version": "0.1.0",
