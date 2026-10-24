@@ -2556,6 +2556,32 @@
       ]
     },
     {
+      "name": "OrientationGuard",
+      "id": "orientation-guard",
+      "version": "0.1.0",
+      "description": "Asks a phone to be turned the way your screen needs, such as upright for a form or sideways for a video or a game. A web page cannot lock the screen, so it covers the content with a clear message until the phone is turned, and lets people continue anyway by default. Only for screens where one orientation is truly essential.",
+      "properties": [
+        {
+          "prop": "require",
+          "name": "require",
+          "values": [
+            "portrait",
+            "landscape"
+          ],
+          "default": "portrait"
+        },
+        {
+          "prop": "scope",
+          "name": "scope",
+          "values": [
+            "screen",
+            "container"
+          ],
+          "default": "screen"
+        }
+      ]
+    },
+    {
       "name": "PageHeader",
       "id": "page-header",
       "version": "0.1.0",

@@ -1141,6 +1141,16 @@ const blueprints: Record<string, Blueprint> = {
     ]);
   },
 
+  OrientationGuard: (c) => {
+    const landscape = c.require === "landscape";
+    return frame({ name: `orientation guard ${landscape ? "landscape" : "portrait"}`, dir: "col", gap: 16, pad: 32, w: 320, h: 400, align: "center", cross: "center", fill: "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, [
+      box(landscape ? 64 : 32, landscape ? 32 : 64, { stroke: "color.text.muted", radius: 6, name: "phone" }),
+      text("Rotate your device", 20, "color.text.default", "Semi Bold"),
+      text(landscape ? "This works best sideways. Turn your phone sideways." : "This works best upright. Turn your phone so it is upright.", 14, "color.text.muted"),
+      button("Continue anyway", "secondary"),
+    ]);
+  },
+
   BottomNav: (c) => {
     const floating = c.variant === "floating";
     const labels = String(c.labels ?? "always");

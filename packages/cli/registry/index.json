@@ -638,6 +638,12 @@
       "description": "Items that travel around a centre on one or more circular paths, such as the tools a product works with. The items are your own children and the orbit is plain CSS."
     },
     {
+      "name": "orientation-guard",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "Asks a phone to be turned the way your screen needs, such as upright for a form or sideways for a video or a game. A web page cannot lock the screen, so it covers the content with a clear message until the phone is turned, and lets people continue anyway by default. Only for screens where one orientation is truly essential."
+    },
+    {
       "name": "page-header",
       "type": "registry:ui",
       "version": "0.1.0",

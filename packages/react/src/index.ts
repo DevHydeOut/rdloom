@@ -369,6 +369,7 @@ export { Carousel, CarouselItem, type CarouselItemProps, type CarouselProps } fr
 export { ResizableHandle, ResizablePanel, ResizablePanelGroup, ResizablePanels, type ResizableHandleProps, type ResizablePanelGroupProps, type ResizablePanelProps } from "./resizable-panels/resizable-panels";
 export { Drawer, type DrawerProps } from "./drawer/drawer";
 export { ActionSheet, type ActionSheetProps, type ActionSheetAction, type ActionSheetSlot, type ActionSheetClassNames } from "./action-sheet/action-sheet";
+export { OrientationGuard, type OrientationGuardProps, type OrientationGuardSlot, type OrientationGuardClassNames } from "./orientation-guard/orientation-guard";
 export { ScrollArea, type ScrollAreaProps } from "./scroll-area/scroll-area";
 export { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuTrigger, type NavigationMenuContentProps, type NavigationMenuItemProps, type NavigationMenuLinkProps, type NavigationMenuProps, type NavigationMenuTriggerProps } from "./navigation-menu/navigation-menu";
 export { Menubar, MenubarGroup, MenubarItem, MenubarMenu, MenubarSeparator, MenubarSubmenu, type MenubarGroupProps, type MenubarItemProps, type MenubarMenuProps, type MenubarProps, type MenubarSubmenuProps } from "./menubar/menubar";

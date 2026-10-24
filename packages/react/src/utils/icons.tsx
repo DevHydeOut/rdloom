@@ -528,6 +528,24 @@ export function RetryIcon({ className = "size-4 shrink-0", strokeWidth }: IconPr
   );
 }
 
+export function PhoneIcon({ className = "size-4 shrink-0", strokeWidth }: IconProps) {
+  return (
+    <Icon className={className} strokeWidth={strokeWidth}>
+      <R x={5} y={1.5} width={6} height={13} rx={1.5} />
+      <P d="M7 12h2" />
+    </Icon>
+  );
+}
+
+export function PhoneLandscapeIcon({ className = "size-4 shrink-0", strokeWidth }: IconProps) {
+  return (
+    <Icon className={className} strokeWidth={strokeWidth}>
+      <R x={1.5} y={5} width={13} height={6} rx={1.5} />
+      <P d="M12 7v2" />
+    </Icon>
+  );
+}
+
 export function ArchiveIcon({ className = "size-5 shrink-0", strokeWidth }: IconProps) {
   return (
     <Icon className={className} strokeWidth={strokeWidth}>

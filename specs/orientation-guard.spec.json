@@ -1,0 +1,129 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "OrientationGuard",
+  "version": "0.1.0",
+  "category": "layout",
+  "status": "experimental",
+  "description": "Asks a phone to be turned the way your screen needs, such as upright for a form or sideways for a video or a game. A web page cannot lock the screen, so it covers the content with a clear message until the phone is turned, and lets people continue anyway by default. Only for screens where one orientation is truly essential.",
+  "props": {
+    "children": {
+      "type": "node",
+      "description": "The screen that needs the orientation. It stays in the page and keeps its state while the message is shown; it just cannot be reached.",
+      "required": true
+    },
+    "require": {
+      "type": "enum",
+      "values": ["portrait", "landscape"],
+      "default": "portrait",
+      "description": "The orientation the content needs. The message is shown when the phone is held the other way."
+    },
+    "dismissible": {
+      "type": "boolean",
+      "default": true,
+      "description": "Show a Continue anyway button. Leave it on unless the content truly cannot work in the other orientation: people may be unable to turn their device (it can be fixed in a mount or a wheelchair holder), and WCAG 2.2 criterion 1.3.4 asks that content is not restricted to one orientation unless it is essential."
+    },
+    "appliesBelow": {
+      "type": "number",
+      "default": 600,
+      "description": "Only act on a touch screen whose shorter side is below this many pixels, so phones are asked to turn and tablets, laptops and desktop windows never are."
+    },
+    "scope": {
+      "type": "enum",
+      "values": ["screen", "container"],
+      "default": "screen",
+      "description": "screen: the message covers the whole screen. container: it covers only the guard's own box, for a part of a page, a preview or a phone frame. A container needs a height."
+    },
+    "current": {
+      "type": "enum",
+      "values": ["portrait", "landscape"],
+      "description": "Act as if the phone is held this way instead of reading the device, and ignore the touch and size checks. For previews, tests and a page that already knows the orientation."
+    },
+    "tryLock": {
+      "type": "boolean",
+      "default": false,
+      "description": "Also ask the browser to lock the screen to the required orientation. Browsers only allow it in fullscreen or an installed app, and iOS Safari never does, so this is an extra on top of the message, which always works."
+    },
+    "isDisabled": {
+      "type": "boolean",
+      "default": false,
+      "description": "Turn the guard off: the content is shown whatever the orientation."
+    },
+    "labels": {
+      "type": "custom",
+      "description": "The words, for translation: { title, message, dismiss }. Without a message, one that fits the required orientation is used.",
+      "tsType": "Partial<Record<\"title\" | \"message\" | \"dismiss\", string>>"
+    },
+    "onDismiss": {
+      "type": "callback",
+      "description": "Called when someone chooses Continue anyway.",
+      "tsType": "() => void"
+    },
+    "onBlockedChange": {
+      "type": "callback",
+      "description": "Called with true when the message appears and false when it goes away, so the content can pause, for example a video or a game.",
+      "tsType": "(blocked: boolean) => void"
+    },
+    "classNames": {
+      "type": "custom",
+      "description": "Class names for the parts, by slot name, added after the built-in ones. Slots: root, content, overlay, icon, title, message, button.",
+      "tsType": "Partial<Record<\"root\" | \"content\" | \"overlay\" | \"icon\" | \"title\" | \"message\" | \"button\", string>>"
+    }
+  },
+  "variants": ["require", "scope"],
+  "states": ["default", "focus", "pressed", "disabled"],
+  "slots": ["root", "content", "overlay", "icon", "title", "message", "button"],
+  "tokens": [
+    "color.surface.default",
+    "color.surface.raised",
+    "color.border.default",
+    "color.text.default",
+    "color.text.muted",
+    "color.action.primary",
+    "color.action.on-primary",
+    "color.focus.ring",
+    "radius.control"
+  ],
+  "a11y": {
+    "role": "dialog",
+    "keyboard": [
+      "Tab: moves to the Continue anyway button; the content behind cannot be reached",
+      "Enter or Space on Continue anyway: shows the content in the current orientation",
+      "Escape: does the same when the guard can be dismissed"
+    ],
+    "requirements": [
+      "The content is not restricted to one orientation unless that is essential, so Continue anyway is on by default (WCAG 1.3.4)",
+      "The message is a modal dialog with a name; focus moves to it when it appears and returns to where it was when it goes away",
+      "The content behind is hidden from assistive technology and cannot be reached while the message is shown, but stays in the page and keeps its state",
+      "The message is in words and a picture; the picture is decoration and the words say which way to turn the phone",
+      "It acts only on touch screens with a small shorter side, never on tablets, laptops or desktop windows",
+      "The turning movement of the picture is turned off when the user prefers reduced motion",
+      "When the phone is turned the right way the message goes away by itself, and a choice to Continue anyway is kept until the guard is removed",
+      "Server rendering shows the content: the message appears only after the page has loaded and the orientation is known"
+    ],
+    "screenReader": [
+      "\"Rotate your device, dialog\", then the message \"This works best upright. Turn your phone so it is upright.\" and \"Continue anyway, button\""
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "A video player, a game, a camera or scanner, or a signature pad that truly needs landscape",
+      "A long form or a document that is unusable sideways on a small phone"
+    ],
+    "avoid_when": [
+      "Ordinary pages and apps: make the layout work in both orientations instead",
+      "Content that works in either orientation but looks nicer in one: let people choose"
+    ],
+    "anti_patterns": [
+      "Turning dismissible off for a normal screen: it locks out people who cannot turn their device",
+      "Wrapping a whole app in it",
+      "Relying on tryLock: it fails in most browsers, so the message is the real feature",
+      "Hiding the reason: say why the orientation matters in labels.message when it is not obvious"
+    ]
+  },
+  "examples": ["basic", "landscape-video", "inside-a-frame", "required", "translated", "classNames"],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {}
+  }
+}
