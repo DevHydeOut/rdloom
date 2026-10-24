@@ -361,6 +361,212 @@
       ]
     },
     {
+      "id": "action-sheet",
+      "spec": {
+        "$schema": "./schema/component.schema.json",
+        "name": "ActionSheet",
+        "version": "0.1.0",
+        "category": "overlay",
+        "status": "experimental",
+        "description": "A short list of choices that slides up from the bottom of a phone screen for one thing the person just picked: share, move, delete. Big touch-sized buttons, a separate Cancel, danger actions that ask once more, actions that can wait on a request, and per-person permissions. Open it with DialogTrigger.",
+        "props": {
+          "title": {
+            "type": "string",
+            "description": "Heading, also the accessible name. Name the thing the actions are about: \"Invoice 1042\". Without a title, pass aria-label."
+          },
+          "description": {
+            "type": "string",
+            "description": "Short supporting text under the title."
+          },
+          "actions": {
+            "type": "custom",
+            "description": "The choices as data: { id, label, description?, icon?, tone?, onAction, confirm?, permission? }. tone is \"default\" or \"danger\". onAction may return a promise: the action shows it is working, the others wait, and the sheet closes when it succeeds or shows the error message when it fails. confirm ({ description?, confirmLabel? }) asks once more before onAction runs. An action may carry a permission (\"allow\", \"disabled\", \"hidden\" or { state, reason }): hidden actions are not drawn; disabled ones stay as focusable, inactive buttons with the reason shown.",
+            "required": true,
+            "tsType": "import(\"../action-sheet/action-sheet\").ActionSheetAction[]"
+          },
+          "showCancel": {
+            "type": "boolean",
+            "default": true,
+            "description": "Show the separate Cancel button under the list. Turn it off only when the sheet closes another way people can see, such as a clear backdrop to tap."
+          },
+          "onCancel": {
+            "type": "callback",
+            "description": "Called when the Cancel button is pressed. To hear about every way the sheet closes (Escape, the backdrop, a drag down), control it with isOpen and onOpenChange.",
+            "tsType": "() => void"
+          },
+          "onError": {
+            "type": "callback",
+            "description": "Called with the error when an action's promise rejects, for logging.",
+            "tsType": "(error: unknown, action: import(\"../action-sheet/action-sheet\").ActionSheetAction) => void"
+          },
+          "labels": {
+            "type": "custom",
+            "description": "The words, for translation: { cancel, back, error, working }. cancel is the Cancel button, back returns from the confirmation step, error is shown when an action fails and working is announced while one runs.",
+            "tsType": "Partial<Record<\"cancel\" | \"back\" | \"error\" | \"working\", string>>"
+          },
+          "portalContainer": {
+            "type": "custom",
+            "description": "Draw the sheet and its backdrop inside this element instead of over the whole page. Use it to show a sheet inside a preview, a framed app or a phone mock. The element must be positioned (relative) and clip its overflow.",
+            "tsType": "Element | null"
+          },
+          "isDismissable": {
+            "type": "boolean",
+            "default": true,
+            "description": "Closes on backdrop click and on a drag down. Esc always closes."
+          },
+          "classNames": {
+            "type": "custom",
+            "description": "Class names for the parts, by slot name, added after the built-in ones. Slots: list, action, cancel, confirm, error.",
+            "tsType": "Partial<Record<\"list\" | \"action\" | \"cancel\" | \"confirm\" | \"error\", string>>"
+          }
+        },
+        "variants": [
+          "isDismissable"
+        ],
+        "states": [
+          "open",
+          "hover",
+          "focus",
+          "pressed",
+          "disabled",
+          "loading"
+        ],
+        "slots": [
+          "list",
+          "action",
+          "cancel",
+          "confirm",
+          "error"
+        ],
+        "tokens": [
+          "color.overlay.backdrop",
+          "color.surface.raised",
+          "color.surface.subtle",
+          "color.border.default",
+          "color.border.strong",
+          "color.text.default",
+          "color.text.muted",
+          "color.action.danger",
+          "color.action.on-primary",
+          "color.feedback.danger",
+          "color.focus.ring",
+          "radius.overlay",
+          "radius.control"
+        ],
+        "a11y": {
+          "role": "dialog",
+          "keyboard": [
+            "Tab and Shift+Tab: move through the actions and Cancel; focus stays inside the sheet",
+            "Arrow Down and Arrow Up: move between the actions; Home and End go to the first and last",
+            "Enter or Space: chooses the focused action",
+            "Escape: in the confirmation step goes back to the list; otherwise closes the sheet and returns focus to what opened it"
+          ],
+          "requirements": [
+            "The sheet is a modal dialog with a name (the title); the page behind cannot be reached and focus returns to the trigger on close",
+            "The actions are real buttons in a list, each with a text label; an icon never stands in for it",
+            "Each action is at least 48 CSS pixels tall and as wide as the sheet",
+            "A danger action is told apart by its words and position as well as its color",
+            "A confirmation step names the action and what it does, moves focus into it and can be left with Back or Escape",
+            "While an action waits on a request the sheet says so (aria-busy on the list and a status message), the other actions are inactive and a second press does nothing",
+            "A failed action keeps the sheet open and shows the error message in an alert, so the person can try again or cancel",
+            "A disabled action stays focusable (aria-disabled), does nothing and shows why",
+            "The slide is turned off when the user prefers reduced motion"
+          ],
+          "screenReader": [
+            "\"Invoice 1042, dialog\", then the list: \"Download PDF, button\", \"Delete invoice, button\"",
+            "\"Delete invoice\" asks: \"Delete this invoice? This cannot be undone.\" with \"Delete\" and \"Back\" buttons",
+            "While working: \"Working\"; on failure: \"Something went wrong. Try again.\""
+          ],
+          "wcag": "2.2 AA"
+        },
+        "usage": {
+          "use_when": [
+            "A handful of actions for one item the person just chose, on a phone",
+            "Share, move, rename, delete: one choice, then the sheet is gone",
+            "A destructive choice that needs one more tap to confirm"
+          ],
+          "avoid_when": [
+            "More than about 7 actions: use a Drawer with a searchable list, or a different screen",
+            "Picking a value for a field: use Select or NativeSelect",
+            "Information or a form: use Drawer or Dialog",
+            "A wide screen with a mouse: use Menu"
+          ],
+          "anti_patterns": [
+            "Actions that are not about the item the sheet names",
+            "Hiding Cancel while the sheet cannot be closed another way",
+            "A confirmation on every action: ask only for the ones that destroy or cost something",
+            "Icon-only actions: the label is the name",
+            "UI permission is not security: hiding or disabling an action only changes what people see, so the server must check access again for every request"
+          ]
+        },
+        "examples": [
+          "basic",
+          "danger-and-confirm",
+          "async-and-error",
+          "permissions",
+          "inside-a-frame",
+          "translated",
+          "classNames"
+        ],
+        "figma": {
+          "componentKey": null,
+          "variantMap": {}
+        }
+      },
+      "install": {
+        "command": "npx rdloom add action-sheet",
+        "dependencies": [
+          "react-aria-components@^1.21.1"
+        ],
+        "registryDependencies": [
+          "tokens",
+          "drawer",
+          "spinner",
+          "utils"
+        ]
+      },
+      "examples": [
+        {
+          "name": "basic",
+          "code": "import { useState } from \"react\";\nimport { ActionSheet, Button, CopyIcon, DialogTrigger, FileIcon, SendIcon } from \"@rdloom/react\";\n\n// Open it with DialogTrigger, like a Drawer. Each action is a touch-sized button; Cancel is separate. Arrow keys move between the actions.\nexport default function ActionSheetBasicExample() {\n  const [last, setLast] = useState(\"Nothing chosen yet.\");\n  return (\n    <div className=\"flex flex-col items-center gap-3\">\n      <DialogTrigger>\n        <Button variant=\"secondary\">Invoice 1042</Button>\n        <ActionSheet\n          title=\"Invoice 1042\"\n          description=\"Northgate Foods, 2,310.00 USD\"\n          actions={[\n            { id: \"pdf\", label: \"Download PDF\", icon: <FileIcon />, onAction: () => setLast(\"Downloaded the PDF\") },\n            { id: \"link\", label: \"Copy link\", icon: <CopyIcon />, onAction: () => setLast(\"Copied the link\") },\n            { id: \"send\", label: \"Send to customer\", description: \"accounts@northgate.example\", icon: <SendIcon />, onAction: () => setLast(\"Sent to the customer\") },\n          ]}\n        />\n      </DialogTrigger>\n      <p role=\"status\" className=\"text-sm text-[var(--rd-color-text-muted)]\">\n        {last}\n      </p>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "danger-and-confirm",
+          "code": "import { useState } from \"react\";\nimport { ActionSheet, Button, DialogTrigger, FileIcon } from \"@rdloom/react\";\n\n// tone=\"danger\" draws the action in the danger color. confirm asks once more inside the sheet: it names the action, says what it does\n// and has Back. Escape in that step goes back to the list instead of closing the sheet.\nexport default function ActionSheetDangerAndConfirmExample() {\n  const [last, setLast] = useState(\"Nothing chosen yet.\");\n  return (\n    <div className=\"flex flex-col items-center gap-3\">\n      <DialogTrigger>\n        <Button variant=\"secondary\">Invoice 1042</Button>\n        <ActionSheet\n          title=\"Invoice 1042\"\n          actions={[\n            { id: \"pdf\", label: \"Download PDF\", icon: <FileIcon />, onAction: () => setLast(\"Downloaded the PDF\") },\n            {\n              id: \"void\",\n              label: \"Void invoice\",\n              description: \"Keeps it on record, marked void\",\n              onAction: () => setLast(\"Voided the invoice\"),\n              confirm: { description: \"The customer will no longer owe this amount.\", confirmLabel: \"Void invoice\" },\n            },\n            {\n              id: \"delete\",\n              label: \"Delete invoice\",\n              tone: \"danger\",\n              onAction: () => setLast(\"Deleted the invoice\"),\n              confirm: { description: \"This cannot be undone.\", confirmLabel: \"Delete\" },\n            },\n          ]}\n        />\n      </DialogTrigger>\n      <p role=\"status\" className=\"text-sm text-[var(--rd-color-text-muted)]\">\n        {last}\n      </p>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "async-and-error",
+          "code": "import { useRef, useState } from \"react\";\nimport { ActionSheet, Button, DialogTrigger } from \"@rdloom/react\";\n\nconst wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));\n\n// onAction can return a promise. The action shows it is working, the others wait, and the sheet closes when it succeeds.\n// When it fails the sheet stays open with a message, so the person can try again or cancel; onError gets the error.\n// This one fails the first time and works the second.\nexport default function ActionSheetAsyncAndErrorExample() {\n  const attempts = useRef(0);\n  const [last, setLast] = useState(\"Nothing sent yet.\");\n  return (\n    <div className=\"flex flex-col items-center gap-3\">\n      <DialogTrigger>\n        <Button variant=\"secondary\">Send reminder</Button>\n        <ActionSheet\n          title=\"Invoice 1042 is overdue\"\n          onError={() => setLast(\"The reminder could not be sent.\")}\n          actions={[\n            {\n              id: \"remind\",\n              label: \"Send reminder\",\n              onAction: async () => {\n                await wait(900);\n                attempts.current += 1;\n                if (attempts.current === 1) throw new Error(\"offline\");\n                setLast(\"Reminder sent.\");\n              },\n            },\n            { id: \"snooze\", label: \"Snooze for a week\", onAction: () => wait(600) },\n          ]}\n        />\n      </DialogTrigger>\n      <p role=\"status\" className=\"text-sm text-[var(--rd-color-text-muted)]\">\n        {last}\n      </p>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "permissions",
+          "code": "import { ActionSheet, Button, DialogTrigger } from \"@rdloom/react\";\n\n// Your app decides what each person may do and passes the answer on each action. A hidden action is not drawn; a disabled one stays\n// focusable, does nothing and shows why. The server must check access again.\nexport default function ActionSheetPermissionsExample() {\n  return (\n    <DialogTrigger>\n      <Button variant=\"secondary\">Invoice 1042</Button>\n      <ActionSheet\n        title=\"Invoice 1042\"\n        actions={[\n          { id: \"pdf\", label: \"Download PDF\", onAction: () => {} },\n          { id: \"void\", label: \"Void invoice\", onAction: () => {}, permission: { state: \"disabled\", reason: \"Only finance can void invoices\" } },\n          { id: \"delete\", label: \"Delete invoice\", tone: \"danger\", onAction: () => {}, permission: \"hidden\" },\n        ]}\n      />\n    </DialogTrigger>\n  );\n}\n"
+        },
+        {
+          "name": "inside-a-frame",
+          "code": "import { useState } from \"react\";\nimport { ActionSheet, Button, DialogTrigger, FileIcon, SendIcon } from \"@rdloom/react\";\n\n// portalContainer draws the sheet and its backdrop inside an element instead of over the whole page: a phone frame, a preview, a framed app.\n// The element must be positioned (relative) and clip its overflow.\nexport default function ActionSheetInsideAFrameExample() {\n  const [frame, setFrame] = useState<HTMLDivElement | null>(null);\n  return (\n    <div ref={setFrame} className=\"relative mx-auto flex h-96 w-[22rem] max-w-full items-start justify-center overflow-hidden rounded-3xl border border-[var(--rd-color-border-default)] bg-[var(--rd-color-surface-subtle)] p-6\">\n      <DialogTrigger>\n        <Button variant=\"secondary\">Invoice 1042</Button>\n        <ActionSheet\n          portalContainer={frame}\n          title=\"Invoice 1042\"\n          actions={[\n            { id: \"pdf\", label: \"Download PDF\", icon: <FileIcon />, onAction: () => {} },\n            { id: \"send\", label: \"Send to customer\", icon: <SendIcon />, onAction: () => {} },\n            { id: \"delete\", label: \"Delete invoice\", tone: \"danger\", onAction: () => {}, confirm: { description: \"This cannot be undone.\", confirmLabel: \"Delete\" } },\n          ]}\n        />\n      </DialogTrigger>\n    </div>\n  );\n}\n"
+        },
+        {
+          "name": "translated",
+          "code": "import { ActionSheet, Button, DialogTrigger } from \"@rdloom/react\";\n\n// labels holds the words the sheet adds itself, so they can be translated. Your actions carry their own words.\nexport default function ActionSheetTranslatedExample() {\n  return (\n    <DialogTrigger>\n      <Button variant=\"secondary\">Factura 1042</Button>\n      <ActionSheet\n        title=\"Factura 1042\"\n        labels={{ cancel: \"Cancelar\", back: \"Atrás\", error: \"Algo salió mal. Inténtalo de nuevo.\", working: \"Trabajando\" }}\n        actions={[\n          { id: \"pdf\", label: \"Descargar PDF\", onAction: () => {} },\n          { id: \"delete\", label: \"Eliminar factura\", tone: \"danger\", onAction: () => {}, confirm: { description: \"No se puede deshacer.\", confirmLabel: \"Eliminar\" } },\n        ]}\n      />\n    </DialogTrigger>\n  );\n}\n"
+        },
+        {
+          "name": "classNames",
+          "code": "import { ActionSheet, Button, DialogTrigger } from \"@rdloom/react\";\n\n// Slots: list, action, cancel, confirm, error. The Drawer behind it takes className for the dialog itself. Your classes are added after the built-in ones.\nexport default function ActionSheetClassNamesExample() {\n  return (\n    <DialogTrigger>\n      <Button variant=\"secondary\">Invoice 1042</Button>\n      <ActionSheet\n        title=\"Invoice 1042\"\n        actions={[\n          { id: \"pdf\", label: \"Download PDF\", onAction: () => {} },\n          { id: \"send\", label: \"Send to customer\", onAction: () => {} },\n        ]}\n        classNames={{ list: \"gap-1\", action: \"rounded-xl\", cancel: \"uppercase tracking-wide\" }}\n      />\n    </DialogTrigger>\n  );\n}\n"
+        }
+      ],
+      "files": [
+        {
+          "path": "action-sheet/action-sheet.tsx",
+          "content": "\"use client\";\n\nimport { forwardRef, useEffect, useId, useRef, useState, type KeyboardEvent, type ReactNode } from \"react\";\nimport { Button as AriaButton } from \"react-aria-components\";\nimport { actionSheetDefaults, type ActionSheetSpecProps } from \"../generated/action-sheet.types\";\nimport { Drawer, type DrawerProps } from \"../drawer/drawer\";\nimport { Spinner } from \"../spinner/spinner\";\nimport { cx } from \"../utils/cx\";\nimport { resolvePermission, type PermissionValue } from \"../utils/permissions\";\n\n/** One choice in the sheet. */\nexport interface ActionSheetAction {\n  /** A stable id. */\n  id: string;\n  /** The text on the button. An icon never stands in for it. */\n  label: string;\n  /** A second line under the label. */\n  description?: string;\n  /** A 20-unit icon before the label. */\n  icon?: ReactNode;\n  /** \"default\", or \"danger\" for an action that destroys something: drawn in the danger color. */\n  tone?: \"default\" | \"danger\";\n  /** Runs when the action is chosen (after the confirmation, when there is one). Return a promise to keep the sheet open until it settles. */\n  onAction: () => void | Promise<unknown>;\n  /** Ask once more before running: the sheet shows the label, this description and a button to confirm. */\n  confirm?: { description?: string; confirmLabel?: string };\n  /** What the app allows: \"allow\" (default), \"disabled\" (shown, inactive, with the reason) or \"hidden\" (not drawn). The server must check again. */\n  permission?: PermissionValue;\n}\n\nexport interface ActionSheetProps\n  extends ActionSheetSpecProps,\n    Pick<DrawerProps, \"isOpen\" | \"onOpenChange\" | \"aria-label\" | \"aria-labelledby\" | \"aria-describedby\"> {\n  className?: string;\n}\n\n/** The parts of the sheet that take a class name of their own. */\nexport type ActionSheetSlot = \"list\" | \"action\" | \"cancel\" | \"confirm\" | \"error\";\nexport type ActionSheetClassNames = Partial<Record<ActionSheetSlot, string>>;\n\nconst words = { cancel: \"Cancel\", back: \"Back\", error: \"Something went wrong. Try again.\", working: \"Working\" } as const;\n\nconst focusRing = \"outline-none data-[focus-visible]:ring-2 data-[focus-visible]:ring-inset data-[focus-visible]:ring-[var(--rd-color-focus-ring)]\";\nconst buttonBase = \"flex w-full min-h-12 items-center gap-3 rounded-[var(--rd-radius-control)] px-4 py-2 text-start text-base\";\n\ninterface BodyProps extends Pick<ActionSheetSpecProps, \"actions\" | \"showCancel\" | \"onCancel\" | \"onError\" | \"labels\" | \"classNames\"> {\n  close: () => void;\n}\n\nfunction Body({ actions, showCancel = actionSheetDefaults.showCancel, onCancel, onError, labels, classNames, close }: BodyProps) {\n  const text = { ...words, ...labels };\n  const visible = actions.filter((a) => resolvePermission(a.permission).isVisible);\n  const [pendingId, setPendingId] = useState<string | null>(null);\n  const [confirming, setConfirming] = useState<ActionSheetAction | null>(null);\n  const [failed, setFailed] = useState(false);\n  const list = useRef<HTMLUListElement | null>(null);\n  const heading = useRef<HTMLHeadingElement | null>(null);\n  const returnTo = useRef<string | null>(null);\n  const mounted = useRef(true);\n  const headingId = useId();\n  useEffect(() => {\n    mounted.current = true;\n    return () => {\n      mounted.current = false;\n    };\n  }, []);\n\n  // Into the confirmation step the focus goes to its heading; back out it returns to the action that was chosen.\n  useEffect(() => {\n    if (confirming) heading.current?.focus();\n    else if (returnTo.current) {\n      list.current?.querySelector<HTMLElement>(`[data-action-id=\"${returnTo.current}\"]`)?.focus();\n      returnTo.current = null;\n    }\n  }, [confirming]);\n\n  const run = async (action: ActionSheetAction) => {\n    if (pendingId) return;\n    setFailed(false);\n    let result: void | Promise<unknown>;\n    try {\n      result = action.onAction();\n    } catch (error) {\n      setConfirming(null);\n      setFailed(true);\n      onError?.(error, action);\n      return;\n    }\n    if (result && typeof (result as Promise<unknown>).then === \"function\") {\n      setPendingId(action.id);\n      try {\n        await result;\n        close();\n      } catch (error) {\n        if (mounted.current) {\n          setConfirming(null);\n          setFailed(true);\n        }\n        onError?.(error, action);\n      } finally {\n        if (mounted.current) setPendingId(null);\n      }\n    } else {\n      close();\n    }\n  };\n\n  const choose = (action: ActionSheetAction) => {\n    if (action.confirm) {\n      returnTo.current = action.id;\n      setFailed(false);\n      setConfirming(action);\n    } else void run(action);\n  };\n\n  // Arrow keys move through the actions, like the list of a menu.\n  const onListKeyDown = (e: KeyboardEvent<HTMLUListElement>) => {\n    const keys = [\"ArrowDown\", \"ArrowUp\", \"Home\", \"End\"];\n    if (!keys.includes(e.key)) return;\n    const buttons = Array.from(e.currentTarget.querySelectorAll<HTMLElement>(\"[data-action-id]\"));\n    const at = buttons.indexOf(document.activeElement as HTMLElement);\n    if (buttons.length === 0) return;\n    e.preventDefault();\n    const next = e.key === \"Home\" ? 0 : e.key === \"End\" ? buttons.length - 1 : e.key === \"ArrowDown\" ? (at + 1) % buttons.length : (at - 1 + buttons.length) % buttons.length;\n    buttons[next].focus();\n  };\n\n  const status = (\n    <p role=\"status\" className=\"sr-only\">\n      {pendingId ? text.working : \"\"}\n    </p>\n  );\n\n  if (confirming) {\n    const danger = confirming.tone === \"danger\";\n    const working = pendingId === confirming.id;\n    return (\n      <div\n        role=\"group\"\n        aria-labelledby={headingId}\n        aria-busy={working || undefined}\n        onKeyDown={(e) => {\n          // Escape steps back to the list; it does not close the whole sheet.\n          if (e.key === \"Escape\" && !working) {\n            e.stopPropagation();\n            setConfirming(null);\n          }\n        }}\n        className={cx(\"flex flex-col gap-3\", classNames?.confirm)}\n      >\n        {status}\n        <div className=\"flex flex-col gap-1 px-1\">\n          <h3 id={headingId} ref={heading} tabIndex={-1} className=\"text-base font-semibold outline-none\">\n            {confirming.label}\n          </h3>\n          {confirming.confirm?.description && <p className=\"text-sm text-[var(--rd-color-text-muted)]\">{confirming.confirm.description}</p>}\n        </div>\n        <AriaButton\n          aria-disabled={working || undefined}\n          onPress={() => void run(confirming)}\n          className={cx(\n            buttonBase,\n            \"justify-center font-semibold\",\n            danger ? \"bg-[var(--rd-color-action-danger)] text-[var(--rd-color-action-on-primary)]\" : \"bg-[var(--rd-color-action-primary)] text-[var(--rd-color-action-on-primary)]\",\n            \"data-[pressed]:brightness-95\",\n            focusRing,\n          )}\n        >\n          {working && <Spinner decorative size=\"sm\" className=\"text-current\" />}\n          {confirming.confirm?.confirmLabel ?? confirming.label}\n        </AriaButton>\n        <AriaButton\n          isDisabled={working}\n          onPress={() => setConfirming(null)}\n          className={cx(buttonBase, \"justify-center border border-[var(--rd-color-border-default)] font-medium data-[hovered]:bg-[var(--rd-color-surface-subtle)]\", focusRing)}\n        >\n          {text.back}\n        </AriaButton>\n      </div>\n    );\n  }\n\n  return (\n    <div className=\"flex flex-col gap-3\">\n      {status}\n      <ul ref={list} aria-busy={pendingId !== null || undefined} onKeyDown={onListKeyDown} className={cx(\"flex flex-col\", classNames?.list)}>\n        {visible.map((action) => {\n          const permission = resolvePermission(action.permission);\n          const working = pendingId === action.id;\n          const other = pendingId !== null && !working;\n          const reasonId = `${headingId}-${action.id}`;\n          const showReason = permission.isDisabled && permission.reason;\n          return (\n            <li key={action.id}>\n              <AriaButton\n                data-action-id={action.id}\n                aria-disabled={permission.isDisabled || other || undefined}\n                data-working={working || undefined}\n                aria-describedby={showReason ? reasonId : undefined}\n                onPress={() => {\n                  if (permission.isAllowed && !pendingId) choose(action);\n                }}\n                className={cx(\n                  buttonBase,\n                  \"data-[hovered]:bg-[var(--rd-color-surface-subtle)]\",\n                  action.tone === \"danger\" ? \"text-[var(--rd-color-feedback-danger)]\" : \"text-[var(--rd-color-text-default)]\",\n                  (permission.isDisabled || other) && \"cursor-not-allowed opacity-50\",\n                  focusRing,\n                  classNames?.action,\n                )}\n              >\n                {working ? (\n                  <Spinner decorative size=\"sm\" className=\"text-current\" />\n                ) : (\n                  action.icon && (\n                    <span aria-hidden=\"true\" className=\"flex size-5 shrink-0 items-center justify-center [&_svg]:size-5\">\n                      {action.icon}\n                    </span>\n                  )\n                )}\n                <span className=\"flex min-w-0 flex-1 flex-col\">\n                  <span className=\"font-medium\">{action.label}</span>\n                  {action.description && <span className=\"text-sm font-normal text-[var(--rd-color-text-muted)]\">{action.description}</span>}\n                  {showReason && (\n                    <span id={reasonId} className=\"text-sm font-normal text-[var(--rd-color-text-muted)]\">\n                      {permission.reason}\n                    </span>\n                  )}\n                </span>\n              </AriaButton>\n            </li>\n          );\n        })}\n      </ul>\n      {failed && (\n        <p role=\"alert\" className={cx(\"px-4 text-sm text-[var(--rd-color-feedback-danger)]\", classNames?.error)}>\n          {text.error}\n        </p>\n      )}\n      {showCancel && (\n        <AriaButton\n          onPress={() => {\n            onCancel?.();\n            close();\n          }}\n          className={cx(buttonBase, \"justify-center border border-[var(--rd-color-border-default)] font-semibold data-[hovered]:bg-[var(--rd-color-surface-subtle)]\", focusRing, classNames?.cancel)}\n        >\n          {text.cancel}\n        </AriaButton>\n      )}\n    </div>\n  );\n}\n\n/**\n * A short list of choices that slides up from the bottom of a phone screen for one item the person just\n * picked. It is a Drawer with the actions as data: touch-sized buttons, a separate Cancel, a confirmation\n * step for the ones that destroy something and actions that wait on a request. Open it with `DialogTrigger`.\n */\nexport const ActionSheet = forwardRef<HTMLElement, ActionSheetProps>(function ActionSheet(\n  { title, description, actions, showCancel, onCancel, onError, labels, portalContainer, isDismissable = actionSheetDefaults.isDismissable, classNames, className, ...rest },\n  ref,\n) {\n  return (\n    <Drawer ref={ref} {...rest} title={title} description={description} portalContainer={portalContainer} isDismissable={isDismissable} className={className}>\n      {({ close }) => <Body actions={actions} showCancel={showCancel} onCancel={onCancel} onError={onError} labels={labels} classNames={classNames} close={close} />}\n    </Drawer>\n  );\n});\n"
+        },
+        {
+          "path": "generated/action-sheet.types.ts",
+          "content": "// Generated by rdloom codegen from specs/action-sheet.spec.json (v0.1.0).\n// Do not edit. Change the spec and run `npm run gen`.\n\n/** A short list of choices that slides up from the bottom of a phone screen for one thing the person just picked: share, move, delete. Big touch-sized buttons, a separate Cancel, danger actions that ask once more, actions that can wait on a request, and per-person permissions. Open it with DialogTrigger. */\nexport interface ActionSheetSpecProps {\n  /**\n   * Heading, also the accessible name. Name the thing the actions are about: \"Invoice 1042\". Without a title, pass aria-label.\n   */\n  title?: string;\n  /**\n   * Short supporting text under the title.\n   */\n  description?: string;\n  /**\n   * The choices as data: { id, label, description?, icon?, tone?, onAction, confirm?, permission? }. tone is \"default\" or \"danger\". onAction may return a promise: the action shows it is working, the others wait, and the sheet closes when it succeeds or shows the error message when it fails. confirm ({ description?, confirmLabel? }) asks once more before onAction runs. An action may carry a permission (\"allow\", \"disabled\", \"hidden\" or { state, reason }): hidden actions are not drawn; disabled ones stay as focusable, inactive buttons with the reason shown.\n   */\n  actions: import(\"../action-sheet/action-sheet\").ActionSheetAction[];\n  /**\n   * Show the separate Cancel button under the list. Turn it off only when the sheet closes another way people can see, such as a clear backdrop to tap.\n   * @default true\n   */\n  showCancel?: boolean;\n  /**\n   * Called when the Cancel button is pressed. To hear about every way the sheet closes (Escape, the backdrop, a drag down), control it with isOpen and onOpenChange.\n   */\n  onCancel?: () => void;\n  /**\n   * Called with the error when an action's promise rejects, for logging.\n   */\n  onError?: (error: unknown, action: import(\"../action-sheet/action-sheet\").ActionSheetAction) => void;\n  /**\n   * The words, for translation: { cancel, back, error, working }. cancel is the Cancel button, back returns from the confirmation step, error is shown when an action fails and working is announced while one runs.\n   */\n  labels?: Partial<Record<\"cancel\" | \"back\" | \"error\" | \"working\", string>>;\n  /**\n   * Draw the sheet and its backdrop inside this element instead of over the whole page. Use it to show a sheet inside a preview, a framed app or a phone mock. The element must be positioned (relative) and clip its overflow.\n   */\n  portalContainer?: Element | null;\n  /**\n   * Closes on backdrop click and on a drag down. Esc always closes.\n   * @default true\n   */\n  isDismissable?: boolean;\n  /**\n   * Class names for the parts, by slot name, added after the built-in ones. Slots: list, action, cancel, confirm, error.\n   */\n  classNames?: Partial<Record<\"list\" | \"action\" | \"cancel\" | \"confirm\" | \"error\", string>>;\n}\n\nexport const actionSheetDefaults = {\n  showCancel: true,\n  isDismissable: true,\n} as const;\n\nexport const actionSheetMeta = {\n  \"name\": \"ActionSheet\",\n  \"version\": \"0.1.0\",\n  \"status\": \"experimental\",\n  \"role\": \"dialog\"\n} as const;\n"
+        }
+      ]
+    },
+    {
       "id": "agent-activity",
       "spec": {
         "$schema": "./schema/component.schema.json",

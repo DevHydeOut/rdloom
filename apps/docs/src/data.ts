@@ -100,7 +100,7 @@ export const componentGroupDefs: Array<{ id: string; label: string; ids: string[
   { id: "data", label: "Tables and data", ids: ["data-grid", "table", "tree", "file-tree", "pagination"] },
   { id: "charts", label: "Charts and stats", ids: ["chart", "sparkline", "stat"] },
   { id: "navigation", label: "Navigation", ids: ["tabs", "breadcrumbs", "steps", "menu", "navigation-menu", "menubar", "bottom-nav"] },
-  { id: "overlays", label: "Dialogs and popovers", ids: ["dialog", "alert-dialog", "sheet", "drawer", "popover", "tooltip", "hover-card", "context-menu"] },
+  { id: "overlays", label: "Dialogs and popovers", ids: ["dialog", "alert-dialog", "sheet", "drawer", "action-sheet", "popover", "tooltip", "hover-card", "context-menu"] },
   { id: "feedback", label: "Feedback and status", ids: ["alert", "toast", "progress", "skeleton", "empty-state", "error-state", "badge", "spinner"] },
   { id: "display", label: "Content and layout", ids: ["card", "accordion", "avatar", "kbd", "collapsible", "scroll-area", "separator", "avatar-group", "carousel", "swipeable-row", "pull-to-refresh", "resizable-panels", "aspect-ratio", "direction", "item", "typography"] },
   { id: "ai", label: "AI chat and agents", ids: ["chat", "message", "prompt-input", "response", "tool-call", "agent-activity", "approval-box", "citation", "sources", "generated-table", "generated-chart", "attachment", "bubble", "marker", "message-scroller", "questionnaire"] },

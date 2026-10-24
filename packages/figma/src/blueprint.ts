@@ -1127,6 +1127,20 @@ const blueprints: Record<string, Blueprint> = {
     ]);
   },
 
+  ActionSheet: () => {
+    const row = (label: string, danger = false) =>
+      frame({ name: "action", dir: "row", gap: 12, pad: [0, 16], w: "fill", h: 48, cross: "center" }, [
+        box(20, 20, { fill: danger ? "color.feedback.danger" : "color.text.muted", radius: 4, name: "icon" }),
+        text(label, 16, danger ? "color.feedback.danger" : "color.text.default", "Medium"),
+      ]);
+    return frame({ name: "action sheet", dir: "col", gap: 12, pad: [12, 16], w: 390, fill: "color.surface.raised", stroke: "color.border.default", radius: "radius.overlay" }, [
+      frame({ name: "handle", dir: "row", w: "fill", align: "center" }, [box(40, 6, { fill: "color.border.strong", radius: 999, name: "grabber" })]),
+      frame({ name: "header", dir: "col", gap: 2, pad: [0, 16], w: "fill" }, [text("Invoice 1042", 18, "color.text.default", "Semi Bold"), text("Northgate Foods, 2,310.00 USD", 14, "color.text.muted")]),
+      frame({ name: "list", dir: "col", w: "fill" }, [row("Download PDF"), row("Copy link"), row("Void invoice"), row("Delete invoice", true)]),
+      frame({ name: "cancel", dir: "row", w: "fill", h: 48, align: "center", cross: "center", stroke: "color.border.default", radius: "radius.control" }, [text("Cancel", 16, "color.text.default", "Semi Bold")]),
+    ]);
+  },
+
   BottomNav: (c) => {
     const floating = c.variant === "floating";
     const labels = String(c.labels ?? "always");

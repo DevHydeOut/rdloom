@@ -32,6 +32,12 @@
       "description": "One button that handles the permission check, an optional confirmation, the pending state and a result message for an action. It does not fetch data, show toasts, cache or route: you pass the function that does the work."
     },
     {
+      "name": "action-sheet",
+      "type": "registry:ui",
+      "version": "0.1.0",
+      "description": "A short list of choices that slides up from the bottom of a phone screen for one thing the person just picked: share, move, delete. Big touch-sized buttons, a separate Cancel, danger actions that ask once more, actions that can wait on a request, and per-person permissions. Open it with DialogTrigger."
+    },
+    {
       "name": "agent-activity",
       "type": "registry:ui",
       "version": "0.1.0",

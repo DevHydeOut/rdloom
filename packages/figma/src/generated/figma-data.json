@@ -354,6 +354,23 @@
       ]
     },
     {
+      "name": "ActionSheet",
+      "id": "action-sheet",
+      "version": "0.1.0",
+      "description": "A short list of choices that slides up from the bottom of a phone screen for one thing the person just picked: share, move, delete. Big touch-sized buttons, a separate Cancel, danger actions that ask once more, actions that can wait on a request, and per-person permissions. Open it with DialogTrigger.",
+      "properties": [
+        {
+          "prop": "isDismissable",
+          "name": "isDismissable",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "true"
+        }
+      ]
+    },
+    {
       "name": "AgentActivity",
       "id": "agent-activity",
       "version": "0.1.0",
