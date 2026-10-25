@@ -876,6 +876,50 @@ const blueprints: Record<string, Blueprint> = {
     ]);
   },
 
+  InvoicesTable: () => {
+    const cell = (label: string, w: number | "fill", head = false, right = false) =>
+      frame({ name: head ? "head" : "cell", dir: "row", w, pad: [10, 12], align: right ? "end" : "start", cross: "center" }, [text(label, head ? 12 : 14, head ? "color.text.muted" : "color.text.default", head ? "Semi Bold" : "Regular")]);
+    const stat = (label: string, value: string, note: string) =>
+      frame({ name: "stat card", dir: "col", gap: 4, pad: 16, w: "fill", fill: "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, [
+        text(label, 13, "color.text.muted"),
+        text(value, 24, "color.text.default", "Semi Bold"),
+        text(note, 12, "color.text.muted"),
+      ]);
+    const row = (number: string, customer: string, due: string, amount: string, status: string, tone: string) =>
+      frame({ name: "row", dir: "row", w: "fill", cross: "center", stroke: "color.border.default" }, [
+        cell(number, 100),
+        frame({ name: "customer", dir: "col", w: 190, pad: [10, 12] }, [text(customer, 14, "color.text.default"), text("accounts@example.com", 12, "color.text.muted")]),
+        cell(due, 120),
+        cell(amount, 110, false, true),
+        frame({ name: "status", dir: "row", w: "fill", pad: [10, 12], cross: "center" }, [
+          frame({ name: "badge", dir: "row", gap: 6, pad: [2, 8], cross: "center", fill: tone === "neutral" ? "color.surface.subtle" : `color.feedback.${tone}-subtle`, radius: 999 }, [box(6, 6, { fill: tone === "neutral" ? "color.text.muted" : `color.feedback.${tone}`, radius: 999 }), text(status, 12, "color.text.default", "Medium")]),
+        ]),
+      ]);
+    return frame({ name: "invoices table", dir: "col", gap: 16, w: 760 }, [
+      frame({ name: "summary", dir: "col", gap: 8, w: "fill" }, [
+        frame({ name: "stats", dir: "row", gap: 12, w: "fill" }, [
+          stat("Outstanding", "$4,820.00", "Open and overdue invoices"),
+          stat("Overdue", "$1,310.00", "2 invoices past due"),
+          stat("Paid, last 30 days", "$2,640.50", "Received in the last 30 days"),
+        ]),
+        text("Totals in USD.", 12, "color.text.muted"),
+      ]),
+      frame({ name: "toolbar", dir: "row", gap: 8, w: "fill", cross: "center" }, [
+        frame({ name: "search", dir: "row", gap: 8, pad: [0, 12], w: "fill", h: 40, cross: "center", fill: "color.surface.default", stroke: "color.border.default", radius: "radius.control" }, [text("Search invoices", 14, "color.text.muted")]),
+        frame({ name: "filter", dir: "row", gap: 8, pad: [0, 12], w: 140, h: 40, cross: "center", fill: "color.surface.default", stroke: "color.border.default", radius: "radius.control" }, [text("Status", 14, "color.text.muted")]),
+        button("Export CSV", "secondary"),
+      ]),
+      frame({ name: "table", dir: "col", w: "fill", fill: "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, [
+        frame({ name: "header", dir: "row", w: "fill", fill: "color.surface.subtle" }, [cell("INVOICE", 100, true), cell("CUSTOMER", 190, true), cell("DUE", 120, true), cell("AMOUNT", 110, true, true), cell("STATUS", "fill", true)]),
+        row("INV-1042", "Northgate Foods", "Mar 3, 2026", "$2,310.00", "Overdue", "warning"),
+        row("INV-1041", "Harbor Mills", "Apr 1, 2026", "$860.00", "Open", "info"),
+        row("INV-1040", "Brightwater Supplies", "Feb 20, 2026", "$1,240.00", "Paid", "success"),
+        row("INV-1039", "Lindqvist Textiles", "Apr 9, 2026", "$415.00", "Draft", "neutral"),
+      ]),
+      frame({ name: "footer", dir: "row", w: "fill", align: "between", cross: "center" }, [text("Showing 1 to 4 of 24", 14, "color.text.muted"), button("1  2  3  \u203a", "secondary", "sm")]),
+    ]);
+  },
+
   DataTable: () => {
     const cell = (label: string, w: number | "fill", head = false, right = false) =>
       frame({ name: head ? "head" : "cell", dir: "row", w, pad: [10, 12], align: right ? "end" : "start", cross: "center" }, [text(label, head ? 12 : 14, head ? "color.text.muted" : "color.text.default", head ? "Semi Bold" : "Regular")]);

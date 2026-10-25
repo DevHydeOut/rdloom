@@ -2,6 +2,12 @@
 
 All notable changes to rdloom are listed here. The library is below version 1.0, so every component is marked experimental: a prop or a name can still change in a minor release, and each change is listed below. Your copy of a component only changes when you run `rdloom upgrade`.
 
+## Unreleased
+
+### Added
+
+- InvoicesTable block: the invoice list of a billing or accounts page. Number, customer, issue and due dates, amount and a status in words, with overdue worked out from the due date and shown with how many days late it is. Search, filter by status, sort, pages, selection and CSV come from DataTable. Totals above show what is outstanding, overdue and paid in the last 30 days, in one currency (invoices in another currency are counted as left out, never added in). Row and bulk actions (download, send reminder, record payment, void) each sit behind a permission and a confirmation, and appear only where they make sense: no reminder for a paid invoice. It never fetches, sends or charges.
+
 ## 0.3.1
 
 ### Changed

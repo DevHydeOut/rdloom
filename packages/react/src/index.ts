@@ -263,6 +263,18 @@ export {
   customerQueryToUrl,
   type CustomerUrlState,
 } from "./customer-table/url";
+export { InvoicesTable, type InvoicesTableClassNames, type InvoicesTableProps, type InvoicesTableSlot } from "./invoices-table/invoices-table";
+export {
+  daysBetween as daysBetweenInvoiceDays,
+  daysOverdue as invoiceDaysOverdue,
+  effectiveStatus,
+  invoiceStatusLabels,
+  invoiceStatuses,
+  summarize as summarizeInvoices,
+  type Invoice,
+  type InvoiceStatus,
+  type InvoiceSummary,
+} from "./invoices-table/query";
 export { DataTable, type DataTableClassNames, type DataTableProps, type DataTableSlot } from "./data-table/data-table";
 export {
   applyDataTableQuery,

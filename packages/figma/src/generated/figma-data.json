@@ -2122,6 +2122,13 @@
       ]
     },
     {
+      "name": "InvoicesTable",
+      "id": "invoices-table",
+      "version": "0.1.0",
+      "description": "The invoice list of a billing page or an accounts screen: number, customer, issue and due dates, amount and a status in words. Overdue is worked out from the due date. Search, filter by status, sort, pages, selection, CSV, and the invoice actions (download, remind, record payment, void) each behind a permission and a confirmation. Totals above show what is outstanding, overdue and paid. It never fetches, sends or charges: you pass the invoices and do the actions.",
+      "properties": []
+    },
+    {
       "name": "Item",
       "id": "item",
       "version": "0.1.0",
