@@ -118,19 +118,25 @@ export const OrientationGuard = forwardRef<HTMLDivElement, OrientationGuardProps
     latestCallback.current?.(blocked);
   }, [blocked]);
 
-  // The message takes focus when it appears and gives it back when it goes away.
+  // The message takes focus when it appears and gives it back when it goes away. A guard that covers the whole
+  // screen always takes it; a box inside a page only when focus was inside the content that just became unreachable
+  // (it would be lost otherwise), so a page that opens already blocked is not pulled to the message on load.
   const overlay = useRef<HTMLDivElement | null>(null);
+  const contentBox = useRef<HTMLDivElement | null>(null);
   const before = useRef<HTMLElement | null>(null);
-  const firstRun = useRef(true);
+  const moved = useRef(false);
   useEffect(() => {
-    const atLoad = firstRun.current;
-    firstRun.current = false;
     if (blocked) {
-      before.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-      // A box inside a page that is blocked from the start does not pull focus (or the page) to itself on load.
-      if (!(atLoad && scope === "container")) overlay.current?.focus({ preventScroll: true });
-    } else if (before.current) {
-      if (before.current.isConnected) before.current.focus({ preventScroll: true });
+      const active = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+      const lostFocus = !!active && !!contentBox.current?.contains(active);
+      if (scope === "screen" || lostFocus) {
+        before.current = active;
+        moved.current = true;
+        overlay.current?.focus({ preventScroll: true });
+      }
+    } else if (moved.current) {
+      moved.current = false;
+      if (before.current?.isConnected) before.current.focus({ preventScroll: true });
       before.current = null;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -165,7 +171,7 @@ export const OrientationGuard = forwardRef<HTMLDivElement, OrientationGuardProps
   return (
     <div ref={ref} data-blocked={blocked || undefined} data-require={require} className={cx("relative", className, classNames?.root)}>
       <style>{keyframes}</style>
-      <div {...(blocked ? inertProps : {})} aria-hidden={blocked || undefined} className={classNames?.content}>
+      <div ref={contentBox} {...(blocked ? inertProps : {})} aria-hidden={blocked || undefined} className={classNames?.content}>
         {children}
       </div>
       {blocked && (

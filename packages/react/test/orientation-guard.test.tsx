@@ -246,6 +246,32 @@ describe("OrientationGuard", () => {
     });
   });
 
+  it("takes focus for a box inside a page only when focus was inside the content that became unreachable", () => {
+    guard({ scope: "container" });
+    // Focus elsewhere on the page: the box leaves it alone when it appears.
+    turnTo(phoneSideways);
+    expect(screen.getByRole("dialog")).not.toHaveFocus();
+    turnTo(phoneUpright);
+    // Focus inside the content: it would be lost, so the message takes it and gives it back.
+    screen.getByRole("textbox").focus();
+    turnTo(phoneSideways);
+    expect(screen.getByRole("dialog")).toHaveFocus();
+    turnTo(phoneUpright);
+    expect(screen.getByRole("textbox")).toHaveFocus();
+  });
+
+  it("does not take focus when the page opens already blocked and the focus is elsewhere, even after the first render", () => {
+    // The first render is the server's (not blocked); the message appears on the next one.
+    setDevice(phoneSideways);
+    const outside = document.createElement("button");
+    document.body.appendChild(outside);
+    outside.focus();
+    guard({ scope: "container" });
+    expect(screen.getByRole("dialog")).not.toHaveFocus();
+    expect(outside).toHaveFocus();
+    outside.remove();
+  });
+
   it("takes focus at load only for the whole screen, not for a box inside a page", () => {
     setDevice(phoneSideways);
     const { unmount } = guard({ scope: "container" });

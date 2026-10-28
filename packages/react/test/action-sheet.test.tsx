@@ -55,7 +55,8 @@ describe("ActionSheet", () => {
     await user.click(screen.getByRole("button", { name: "Download" }));
     expect(onAction).toHaveBeenCalledTimes(1);
     await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
-    expect(screen.getByRole("button", { name: "Open" })).toHaveFocus();
+    // Focus goes back a moment after the dialog is gone.
+    await waitFor(() => expect(screen.getByRole("button", { name: "Open" })).toHaveFocus());
   });
 
   it("closes with Cancel, calls onCancel and runs no action", async () => {
