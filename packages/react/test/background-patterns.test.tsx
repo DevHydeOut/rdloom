@@ -5,6 +5,7 @@ import { renderToString } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { DotPattern, GridPattern, HexagonPattern, InteractiveGridPattern, StripedPattern } from "../src";
 import { axeViolations } from "./axe";
+import { animationEnd } from "./animation";
 
 const css = fs.readFileSync(path.join(__dirname, "..", "src", "motion", "rdloom-motion.css"), "utf8");
 
@@ -120,7 +121,7 @@ describe("InteractiveGridPattern", () => {
     move(b.host, 5, 5);
     move(b.host, 45, 5);
     expect(b.grid.querySelectorAll(".rdm-igrid-cell")).toHaveLength(2);
-    fireEvent.animationEnd(b.grid.querySelector(".rdm-igrid-cell")!);
+    animationEnd(b.grid.querySelector(".rdm-igrid-cell")!);
     expect(b.grid.querySelectorAll(".rdm-igrid-cell")).toHaveLength(1);
   });
 

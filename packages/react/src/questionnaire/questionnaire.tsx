@@ -292,7 +292,7 @@ export const Questionnaire = forwardRef<HTMLDivElement, QuestionnaireProps>(func
                       }}
                       className="shrink-0 rounded px-1 text-sm font-medium text-[var(--rd-color-action-primary)] underline underline-offset-2 outline-none data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)]"
                     >
-                      Edit<span className="sr-only"> answer: {q.title}</span>
+                      Edit <span className="sr-only">answer: {q.title}</span>
                     </AriaButton>
                   </li>
                 );

@@ -52,8 +52,8 @@ function CopyMessage({ text }: { text: string }) {
         }}
         className="inline-flex h-7 items-center gap-1.5 rounded px-2 text-xs text-[var(--rd-color-text-muted)] outline-none data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)] data-[hovered]:bg-[var(--rd-color-surface-subtle)]"
       >
-        {copied ? "Copied" : "Copy"}
-        <span className="sr-only"> message</span>
+        {copied ? "Copied" : "Copy"}{" "}
+        <span className="sr-only">message</span>
       </AriaButton>
       <span role="status" className="sr-only">
         {copied ? "Message copied" : ""}

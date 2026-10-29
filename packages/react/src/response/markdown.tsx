@@ -37,8 +37,8 @@ function renderLink(url: string, label: ReactNode, key: string): ReactNode {
   }
   return (
     <a key={key} href={url} target="_blank" rel="noopener noreferrer" className={linkClass}>
-      {label}
-      <span className="sr-only"> (opens in a new tab)</span>
+      {label}{" "}
+      <span className="sr-only">(opens in a new tab)</span>
     </a>
   );
 }
