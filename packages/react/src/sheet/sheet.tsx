@@ -11,6 +11,7 @@ import {
 } from "react-aria-components";
 import { sheetDefaults, type SheetSpecProps } from "../generated/sheet.types";
 import { cx } from "../utils/cx";
+import { touchTarget } from "../utils/touch";
 import { CloseIcon } from "../utils/icons";
 
 export interface SheetProps
@@ -99,7 +100,7 @@ export const Sheet = forwardRef<HTMLElement, SheetProps>(function Sheet(
                 <Button
                   slot="close"
                   aria-label="Close"
-                  className="flex size-8 shrink-0 items-center justify-center rounded-[var(--rd-radius-control)] text-[var(--rd-color-text-muted)] outline-none data-[hovered]:bg-[var(--rd-color-surface-subtle)] data-[hovered]:text-[var(--rd-color-text-default)] data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)]"
+                  className={cx(touchTarget, "flex size-8 shrink-0 items-center justify-center rounded-[var(--rd-radius-control)] text-[var(--rd-color-text-muted)] outline-none data-[hovered]:bg-[var(--rd-color-surface-subtle)] data-[hovered]:text-[var(--rd-color-text-default)] data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)]")}
                 >
                   <CloseIcon className="size-4" />
                 </Button>

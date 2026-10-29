@@ -37,7 +37,7 @@ const NO_PICTURE = new Set(["flickering-grid"]);
 // browser update alone moves up to about 200 pixels. These allow 500 (the config allows none); a layout change still fails.
 const LOOSE = new Set(["icon-cloud"]);
 
-const SLOW_TO_LOAD = new Set(["customer-table/server-side", "time-slot-picker/async-slots", "data-table/server-side"]);
+const SLOW_TO_LOAD = new Set(["customer-table/server-side", "time-slot-picker/async-slots", "data-table/server-side", "invoices-table/server-side"]);
 
 // A fixed "today", so calendars and date presets look the same every day.
 const NOW = new Date("2026-03-15T10:00:00Z");

@@ -1,0 +1,147 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "SwipeableRow",
+  "version": "0.1.0",
+  "category": "display",
+  "status": "experimental",
+  "description": "A list row that slides sideways to show actions behind it, such as archive or delete. Swiping is a shortcut: the same actions are reachable with a button and the keyboard, so nobody depends on the gesture. Actions can sit on either side, can be turned off per person, and the row stays scrollable up and down.",
+  "props": {
+    "children": {
+      "type": "node",
+      "description": "The row's content. It sits on an opaque surface that covers the actions until it is moved. Put any buttons or links the row needs inside it as usual.",
+      "required": true
+    },
+    "startActions": {
+      "type": "custom",
+      "description": "Actions behind the start of the row, revealed by swiping toward the end: { id, label, icon?, tone?, onAction, permission? }. Keep to one to three. tone is \"default\", \"primary\" or \"danger\". An action may carry a permission (\"allow\", \"disabled\", \"hidden\" or { state, reason }): hidden actions are not drawn; disabled ones stay as focusable, inactive buttons with the reason read out.",
+      "tsType": "import(\"../swipeable-row/swipeable-row\").SwipeAction[]"
+    },
+    "endActions": {
+      "type": "custom",
+      "description": "Actions behind the end of the row, revealed by swiping toward the start. Same shape as startActions. Reading direction is followed, so in a right-to-left page the sides swap with the text.",
+      "tsType": "import(\"../swipeable-row/swipeable-row\").SwipeAction[]"
+    },
+    "actionsLabel": {
+      "type": "string",
+      "description": "Accessible name of the button that shows the actions without a swipe, and of the group of actions. Name the row in it: \"Actions for invoice 1042\".",
+      "default": "Row actions"
+    },
+    "open": {
+      "type": "custom",
+      "description": "Which side is open, to control it. Pass null to keep the row closed. Use with onOpenChange. Leave it out to let the row manage itself.",
+      "tsType": "\"start\" | \"end\" | null"
+    },
+    "defaultOpen": {
+      "type": "custom",
+      "description": "Which side starts open when you do not control it.",
+      "tsType": "\"start\" | \"end\" | null"
+    },
+    "onOpenChange": {
+      "type": "callback",
+      "description": "Called with the side that is now open, or null when the row closed.",
+      "tsType": "(side: \"start\" | \"end\" | null) => void"
+    },
+    "fullSwipe": {
+      "type": "boolean",
+      "default": false,
+      "description": "A long swipe, past most of the row's width, runs the first action of that side and closes the row. Use it only for actions that are easy to undo: archive, not delete."
+    },
+    "closeOnAction": {
+      "type": "boolean",
+      "default": true,
+      "description": "Close the row after an action runs."
+    },
+    "isDisabled": {
+      "type": "boolean",
+      "default": false,
+      "description": "Turn swiping off. The actions stay reachable with the button and the keyboard."
+    },
+    "classNames": {
+      "type": "custom",
+      "description": "Class names for the parts, by slot name, added after the built-in ones. Slots: root, content, actions, action, toggle.",
+      "tsType": "Partial<Record<\"root\" | \"content\" | \"actions\" | \"action\" | \"toggle\", string>>"
+    }
+  },
+  "variants": [],
+  "states": [
+    "default",
+    "hover",
+    "focus",
+    "pressed",
+    "open",
+    "disabled"
+  ],
+  "slots": [
+    "root",
+    "content",
+    "actions",
+    "action",
+    "toggle"
+  ],
+  "tokens": [
+    "color.surface.default",
+    "color.surface.subtle",
+    "color.border.default",
+    "color.text.default",
+    "color.action.primary",
+    "color.action.on-primary",
+    "color.action.danger",
+    "color.focus.ring"
+  ],
+  "a11y": {
+    "role": "group",
+    "keyboard": [
+      "Tab: reaches the row's own controls, then the actions button",
+      "Enter or Space on the actions button: shows the actions and moves focus to the first one",
+      "Tab and Shift+Tab move between the actions; Enter or Space runs one",
+      "Escape: closes the row and returns focus to the actions button"
+    ],
+    "requirements": [
+      "Swiping is never the only way: a button shows the same actions, reachable by keyboard and screen reader",
+      "The actions button has a name, says whether the actions are shown (aria-expanded) and is revealed on focus so keyboard users see it",
+      "Actions that are not shown are out of the tab order and the accessibility tree",
+      "The actions are a named group of real buttons, each with a text label; an icon is never the only name",
+      "A disabled action stays focusable (aria-disabled), does nothing and says why",
+      "A swipe does not trigger a click on what was under the finger, and a tap on an open row closes it instead of activating it",
+      "Vertical scrolling still works over the row; only a horizontal move starts the swipe",
+      "Each action is at least 80 CSS pixels wide and as tall as the row",
+      "A long swipe that runs an action is off unless fullSwipe is set, and is meant for undoable actions",
+      "The slide is turned off when the user prefers reduced motion"
+    ],
+    "screenReader": [
+      "\"Actions for invoice 1042, button, collapsed\"; after it is pressed, \"expanded\" and the group \"Actions for invoice 1042\" with its buttons: \"Archive, button\", \"Delete, button\""
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "Lists of messages, tasks or records on a phone where each row has one to three quick actions",
+      "Actions people repeat often and want near their thumb"
+    ],
+    "avoid_when": [
+      "A row with many actions: use a menu button in the row",
+      "A destructive action with no confirmation or undo",
+      "Wide screens with a mouse: show the actions as buttons or a menu in the row"
+    ],
+    "anti_patterns": [
+      "Making the swipe the only way to reach an action: the actions button must stay available",
+      "Using fullSwipe for delete without an undo",
+      "More than three actions behind a row: they will not fit and cannot be told apart",
+      "Putting a horizontal scroller inside a row: the two gestures fight",
+      "UI permission is not security: hiding or disabling an action only changes what people see, so the server must check access again for every request"
+    ]
+  },
+  "examples": [
+    "basic",
+    "both-sides",
+    "controlled",
+    "full-swipe",
+    "permissions",
+    "in-a-list",
+    "classNames"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {}
+  }
+}

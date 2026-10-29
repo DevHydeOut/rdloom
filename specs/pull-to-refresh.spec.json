@@ -1,0 +1,137 @@
+{
+  "$schema": "./schema/component.schema.json",
+  "name": "PullToRefresh",
+  "version": "0.1.0",
+  "category": "layout",
+  "status": "experimental",
+  "description": "Pull a list or page down at the top to load it again, the way phone apps do. The pull is a shortcut: a Refresh button does the same for the keyboard and screen readers. It shows how far to pull, says when to let go, shows progress while it loads, and tells people when it worked or failed with a way to try again.",
+  "props": {
+    "children": {
+      "type": "node",
+      "description": "The content to refresh: a list, a feed or a page.",
+      "required": true
+    },
+    "onRefresh": {
+      "type": "callback",
+      "description": "Called when a pull is released past the threshold, or the Refresh button is pressed. Return a promise: the indicator stays until it settles. A rejected promise shows the error message with a Try again button. Load the data yourself; the component never fetches.",
+      "required": true,
+      "tsType": "() => Promise<unknown> | void"
+    },
+    "onError": {
+      "type": "callback",
+      "description": "Called with the error when onRefresh rejects, for logging or a toast.",
+      "tsType": "(error: unknown) => void"
+    },
+    "isRefreshing": {
+      "type": "boolean",
+      "default": false,
+      "description": "Show the refreshing state because something else is loading the data, for example a background refetch. The component shows it as it does its own refresh."
+    },
+    "threshold": {
+      "type": "number",
+      "default": 72,
+      "description": "How far to pull, in pixels of movement of the content, before letting go refreshes. The finger travels further than the content, because the pull resists."
+    },
+    "scrollElement": {
+      "type": "enum",
+      "values": [
+        "self",
+        "window"
+      ],
+      "default": "self",
+      "description": "self: the component scrolls its own content, so give it a height (a flex child or a fixed height). window: the page scrolls and the pull works when the page is at the top; then also set overscroll-behavior-y: contain on the page so the browser's own refresh does not start."
+    },
+    "isDisabled": {
+      "type": "boolean",
+      "default": false,
+      "description": "Turn the pull gesture off. The Refresh button is gone too."
+    },
+    "labels": {
+      "type": "custom",
+      "description": "The words, for translation: { pull, release, refreshing, done, error, retry, button }. The first three show beside the arrow, done and error are announced after the refresh ends, retry is the button shown with the error and button is the name of the Refresh button.",
+      "tsType": "Partial<Record<\"pull\" | \"release\" | \"refreshing\" | \"done\" | \"error\" | \"retry\" | \"button\", string>>"
+    },
+    "classNames": {
+      "type": "custom",
+      "description": "Class names for the parts, by slot name, added after the built-in ones. Slots: root, indicator, content, button.",
+      "tsType": "Partial<Record<\"root\" | \"indicator\" | \"content\" | \"button\", string>>"
+    }
+  },
+  "variants": [],
+  "states": [
+    "default",
+    "focus",
+    "pressed",
+    "disabled",
+    "loading"
+  ],
+  "slots": [
+    "root",
+    "indicator",
+    "content",
+    "button"
+  ],
+  "tokens": [
+    "color.surface.default",
+    "color.surface.subtle",
+    "color.border.default",
+    "color.text.default",
+    "color.text.muted",
+    "color.feedback.danger",
+    "color.action.primary",
+    "color.focus.ring",
+    "radius.control"
+  ],
+  "a11y": {
+    "role": "group",
+    "keyboard": [
+      "Tab: reaches the Refresh button, which is shown when it has focus",
+      "Enter or Space on the Refresh button: refreshes",
+      "After a failure: Tab to Try again, Enter or Space to run it again"
+    ],
+    "requirements": [
+      "Pulling is never the only way: a Refresh button does the same, reachable by keyboard and screen reader",
+      "The state is announced: refreshing, then done or an error, in a polite status region, so a screen reader hears the result without moving focus",
+      "The content is marked busy (aria-busy) while it refreshes",
+      "A failed refresh is shown in words with a Try again button, not by color alone",
+      "The pull only starts at the top of the content, so scrolling a long list is never mistaken for a pull",
+      "A mostly sideways move does not start a pull, and the pull does not take a swipe meant for a row inside the content",
+      "Letting go before the threshold cancels the refresh and nothing loads",
+      "The Refresh button does nothing while a refresh is running (aria-disabled) and never starts a second one",
+      "The arrow and the movement are decoration; the words say what to do. The movement is turned off when the user prefers reduced motion"
+    ],
+    "screenReader": [
+      "\"Refresh, button\"; after it is pressed, \"Refreshing\" and later \"Updated\" in the status region",
+      "After a failure: \"Could not refresh\" and a \"Try again, button\""
+    ],
+    "wcag": "2.2 AA"
+  },
+  "usage": {
+    "use_when": [
+      "A feed, inbox or list on a phone that people expect to refresh by pulling",
+      "Data that changes while the app is open and has no live updates"
+    ],
+    "avoid_when": [
+      "Data that already updates by itself: a refresh gesture invites distrust",
+      "Pages without a clear top to pull from, or with a map or a horizontal scroller at the top",
+      "Wide screens with a mouse: show a Refresh button instead"
+    ],
+    "anti_patterns": [
+      "Making the pull the only way to refresh: keep the button",
+      "Refreshing so often that the pull is not needed",
+      "Hiding a long error behind the pull: say what happened in the message and offer Try again",
+      "Using it inside another scrolling area that also starts at its top: the two gestures fight"
+    ]
+  },
+  "examples": [
+    "basic",
+    "failure",
+    "controlled",
+    "translated",
+    "classNames"
+  ],
+  "figma": {
+    "componentKey": null,
+    "variantMap": {}
+  }
+}

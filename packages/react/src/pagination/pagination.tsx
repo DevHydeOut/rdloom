@@ -38,7 +38,10 @@ export function paginationRange(page: number, pageCount: number, siblingCount = 
   return [1, "start-ellipsis", ...all(left, right), "end-ellipsis", total];
 }
 
-const sizes: Record<NonNullable<PaginationSpecProps["size"]>, string> = { sm: "h-8 min-w-8 px-2 text-sm", md: "h-10 min-w-10 px-3 text-sm" };
+const sizes: Record<NonNullable<PaginationSpecProps["size"]>, string> = {
+  sm: "h-8 min-h-[max(2rem,var(--rd-size-touch-target))] min-w-[max(2rem,var(--rd-size-touch-target))] px-2 text-sm",
+  md: "h-10 min-h-[max(2.5rem,var(--rd-size-touch-target))] min-w-[max(2.5rem,var(--rd-size-touch-target))] px-3 text-sm",
+};
 
 const shape =
   "inline-flex items-center justify-center rounded-[var(--rd-radius-control)] border font-medium tabular-nums select-none outline-none transition-colors " +
