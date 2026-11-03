@@ -32,8 +32,8 @@ export const AppFooter = forwardRef<HTMLElement, AppFooterProps>(function AppFoo
     const cls = cx(linkClass, classNames?.link);
     const label = link.external ? (
       <>
-        {link.label}
-        <span className="sr-only"> (opens in a new tab)</span>
+        {link.label}{" "}
+        <span className="sr-only">(opens in a new tab)</span>
       </>
     ) : (
       link.label

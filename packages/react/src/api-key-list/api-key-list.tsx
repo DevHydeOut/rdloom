@@ -175,7 +175,7 @@ export function ApiKeyList({
                 }}
                 className={classNames?.revokeButton}
               >
-                Revoke<span className="sr-only"> {key.name}</span>
+                Revoke <span className="sr-only">{key.name}</span>
               </ActionButton>
             </li>
           ))}
