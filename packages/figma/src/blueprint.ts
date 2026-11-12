@@ -1131,6 +1131,94 @@ const blueprints: Record<string, Blueprint> = {
     ]);
   },
 
+  SwipeableRow: () => {
+    const action = (label: string, fill: string, textColor: string) =>
+      frame({ name: "action", dir: "col", gap: 4, w: 80, h: 64, align: "center", cross: "center", fill }, [box(20, 20, { fill: textColor, radius: 4, name: "icon" }), text(label, 12, textColor, "Medium")]);
+    const content = frame({ name: "content", dir: "row", gap: 12, pad: [12, 16], w: 320, h: 64, cross: "center", fill: "color.surface.default", stroke: "color.border.default" }, [
+      box(40, 40, { fill: "color.surface.subtle", radius: 999, name: "avatar" }),
+      frame({ name: "text", dir: "col", gap: 2, w: "fill" }, [text("Ana Ruiz", 14, "color.text.default", "Medium"), text("Can we move the review to Thursday?", 14, "color.text.muted")]),
+    ]);
+    return frame({ name: "swipeable row", dir: "col", gap: 16, w: 400 }, [
+      frame({ name: "closed", dir: "col", gap: 8 }, [text("At rest", 12, "color.text.muted"), content]),
+      frame({ name: "open", dir: "col", gap: 8 }, [
+        text("Swiped open", 12, "color.text.muted"),
+        frame({ name: "revealed", dir: "row", h: 64, cross: "center" }, [
+          frame({ name: "content shifted", dir: "row", gap: 12, pad: [12, 16], w: 240, h: 64, cross: "center", fill: "color.surface.default", stroke: "color.border.default" }, [
+            box(40, 40, { fill: "color.surface.subtle", radius: 999, name: "avatar" }),
+            text("Ana Ruiz", 14, "color.text.default", "Medium"),
+          ]),
+          action("Archive", "color.action.primary", "color.action.on-primary"),
+          action("Delete", "color.action.danger", "color.action.on-primary"),
+        ]),
+      ]),
+    ]);
+  },
+
+  PullToRefresh: () => {
+    const item = (label: string) => frame({ name: "item", dir: "row", pad: [12, 16], w: "fill", stroke: "color.border.default" }, [text(label, 14, "color.text.default")]);
+    const panel = (name: string, indicator: string | null, offset: number) =>
+      frame({ name, dir: "col", w: 352, fill: "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, [
+        ...(indicator ? [frame({ name: "indicator", dir: "row", gap: 8, w: "fill", h: offset, align: "center", cross: "center" }, [box(16, 16, { fill: "color.text.muted", radius: 4, name: "arrow" }), text(indicator, 14, "color.text.muted")])] : []),
+        item("Invoice 1042 was paid"),
+        item("New comment from Ana"),
+        item("Backup finished"),
+      ]);
+    return frame({ name: "pull to refresh", dir: "row", gap: 24 }, [
+      frame({ name: "pulling", dir: "col", gap: 8 }, [text("Pulling", 12, "color.text.muted"), panel("pulling", "Pull to refresh", 48)]),
+      frame({ name: "ready", dir: "col", gap: 8 }, [text("Ready to release", 12, "color.text.muted"), panel("ready", "Release to refresh", 72)]),
+      frame({ name: "refreshing", dir: "col", gap: 8 }, [text("Refreshing", 12, "color.text.muted"), panel("refreshing", "Refreshing", 72)]),
+      frame({ name: "failed", dir: "col", gap: 8 }, [text("Failed", 12, "color.text.muted"), panel("failed", "Could not refresh   Try again", 56)]),
+    ]);
+  },
+
+  ActionSheet: () => {
+    const row = (label: string, danger = false) =>
+      frame({ name: "action", dir: "row", gap: 12, pad: [0, 16], w: "fill", h: 48, cross: "center" }, [
+        box(20, 20, { fill: danger ? "color.feedback.danger" : "color.text.muted", radius: 4, name: "icon" }),
+        text(label, 16, danger ? "color.feedback.danger" : "color.text.default", "Medium"),
+      ]);
+    return frame({ name: "action sheet", dir: "col", gap: 12, pad: [12, 16], w: 390, fill: "color.surface.raised", stroke: "color.border.default", radius: "radius.overlay" }, [
+      frame({ name: "handle", dir: "row", w: "fill", align: "center" }, [box(40, 6, { fill: "color.border.strong", radius: 999, name: "grabber" })]),
+      frame({ name: "header", dir: "col", gap: 2, pad: [0, 16], w: "fill" }, [text("Invoice 1042", 18, "color.text.default", "Semi Bold"), text("Northgate Foods, 2,310.00 USD", 14, "color.text.muted")]),
+      frame({ name: "list", dir: "col", w: "fill" }, [row("Download PDF"), row("Copy link"), row("Void invoice"), row("Delete invoice", true)]),
+      frame({ name: "cancel", dir: "row", w: "fill", h: 48, align: "center", cross: "center", stroke: "color.border.default", radius: "radius.control" }, [text("Cancel", 16, "color.text.default", "Semi Bold")]),
+    ]);
+  },
+
+  OrientationGuard: (c) => {
+    const landscape = c.require === "landscape";
+    return frame({ name: `orientation guard ${landscape ? "landscape" : "portrait"}`, dir: "col", gap: 16, pad: 32, w: 320, h: 400, align: "center", cross: "center", fill: "color.surface.default", stroke: "color.border.default", radius: "radius.overlay" }, [
+      box(landscape ? 64 : 32, landscape ? 32 : 64, { stroke: "color.text.muted", radius: 6, name: "phone" }),
+      text("Rotate your device", 20, "color.text.default", "Semi Bold"),
+      text(landscape ? "This works best sideways. Turn your phone sideways." : "This works best upright. Turn your phone so it is upright.", 14, "color.text.muted"),
+      button("Continue anyway", "secondary"),
+    ]);
+  },
+
+  BottomNav: (c) => {
+    const floating = c.variant === "floating";
+    const labels = String(c.labels ?? "always");
+    const tab = (label: string, current = false) =>
+      frame({ name: current ? "tab current" : "tab", dir: "col", gap: 2, pad: [6, 4], w: "fill", h: 56, align: "center", cross: "center" }, [
+        frame({ name: "icon", dir: "row", w: 56, h: 28, align: "center", cross: "center", fill: current ? "color.surface.selected" : undefined, radius: 999 }, [
+          box(20, 20, { fill: current ? "color.text.default" : "color.text.muted", radius: 4, name: "glyph" }),
+        ]),
+        ...(labels === "always" || (labels === "active" && current) ? [text(label, 11, current ? "color.text.default" : "color.text.muted", current ? "Semi Bold" : "Regular")] : []),
+      ]);
+    return frame(
+      {
+        name: `bottom nav ${floating ? "floating" : "plain"}`,
+        dir: "row",
+        w: floating ? 354 : 390,
+        pad: [0, 4],
+        fill: floating ? "color.surface.raised" : "color.surface.default",
+        stroke: "color.border.default",
+        radius: floating ? 16 : undefined,
+      },
+      [tab("Home", true), tab("Search"), tab("Inbox"), tab("Account")],
+    );
+  },
+
   TopNav: (c) => {
     const variant = String(c.variant ?? "plain");
     const link = (label: string, current = false) =>

@@ -4,6 +4,8 @@ import { AspectRatio } from "../src";
 import { axeViolations } from "./axe";
 
 const ratioOf = (el: HTMLElement) => el.style.aspectRatio;
+// "1.5" and "1.5 / 1" are the same CSS; jsdom versions differ in which one they write back.
+const same = (a: string, b: string) => a.replace(/ \/ 1$/, "") === b.replace(/ \/ 1$/, "");
 
 describe("AspectRatio", () => {
   it("defaults to 16 / 9, clips overflow and has no axe violations", async () => {
@@ -25,7 +27,7 @@ describe("AspectRatio", () => {
     ];
     for (const [ratio, css] of cases) {
       const { container, unmount } = render(<AspectRatio ratio={ratio} />);
-      expect(ratioOf(container.firstElementChild as HTMLElement)).toBe(css);
+      expect(same(ratioOf(container.firstElementChild as HTMLElement), css), `${String(ratio)}: ${ratioOf(container.firstElementChild as HTMLElement)}`).toBe(true);
       unmount();
     }
   });

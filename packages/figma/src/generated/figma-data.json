@@ -304,6 +304,14 @@
       "type": "FLOAT",
       "light": "48px",
       "dark": "48px"
+    },
+    {
+      "name": "size/touch-target",
+      "token": "size.touch-target",
+      "cssVar": "--rd-size-touch-target",
+      "type": "FLOAT",
+      "light": "0px",
+      "dark": "0px"
     }
   ],
   "components": [
@@ -350,6 +358,23 @@
             "lg"
           ],
           "default": "md"
+        }
+      ]
+    },
+    {
+      "name": "ActionSheet",
+      "id": "action-sheet",
+      "version": "0.1.0",
+      "description": "A short list of choices that slides up from the bottom of a phone screen for one thing the person just picked: share, move, delete. Big touch-sized buttons, a separate Cancel, danger actions that ask once more, actions that can wait on a request, and per-person permissions. Open it with DialogTrigger.",
+      "properties": [
+        {
+          "prop": "isDismissable",
+          "name": "isDismissable",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "true"
         }
       ]
     },
@@ -737,6 +762,33 @@
       "version": "0.1.0",
       "description": "Content that sharpens and slides into place when it first appears or when it scrolls into view. It is visible to start with, so it never hides content from anyone.",
       "properties": []
+    },
+    {
+      "name": "BottomNav",
+      "id": "bottom-nav",
+      "version": "0.1.0",
+      "description": "A tab bar for the bottom of a phone-sized screen: three to five main places, each with an icon and a short label, the current one marked. It keeps clear of the home indicator, has touch-sized targets, and can show a count on a tab. It comes plain or as a floating bar.",
+      "properties": [
+        {
+          "prop": "variant",
+          "name": "variant",
+          "values": [
+            "plain",
+            "floating"
+          ],
+          "default": "plain"
+        },
+        {
+          "prop": "labels",
+          "name": "labels",
+          "values": [
+            "always",
+            "active",
+            "never"
+          ],
+          "default": "always"
+        }
+      ]
     },
     {
       "name": "Breadcrumbs",
@@ -1472,7 +1524,7 @@
       "name": "Drawer",
       "id": "drawer",
       "version": "0.1.0",
-      "description": "A modal panel that slides up from the bottom of the screen and can be dragged down to dismiss, for short tasks on phones. Open it with DialogTrigger.",
+      "description": "A modal panel that slides up from the bottom of the screen and can be dragged down to dismiss, for short tasks on phones. With snap points it also rests at several heights (a peek, half, nearly full) and is dragged between them. Open it with DialogTrigger.",
       "properties": [
         {
           "prop": "isDismissable",
@@ -2519,6 +2571,32 @@
       ]
     },
     {
+      "name": "OrientationGuard",
+      "id": "orientation-guard",
+      "version": "0.1.0",
+      "description": "Asks a phone to be turned the way your screen needs, such as upright for a form or sideways for a video or a game. A web page cannot lock the screen, so it covers the content with a clear message until the phone is turned, and lets people continue anyway by default. Only for screens where one orientation is truly essential.",
+      "properties": [
+        {
+          "prop": "require",
+          "name": "require",
+          "values": [
+            "portrait",
+            "landscape"
+          ],
+          "default": "portrait"
+        },
+        {
+          "prop": "scope",
+          "name": "scope",
+          "values": [
+            "screen",
+            "container"
+          ],
+          "default": "screen"
+        }
+      ]
+    },
+    {
       "name": "PageHeader",
       "id": "page-header",
       "version": "0.1.0",
@@ -2714,6 +2792,13 @@
       "id": "prompt-input",
       "version": "0.1.0",
       "description": "The message box of a chat: one rounded bar with a + menu on the left, the text in the middle, and your own controls, a microphone and Send on the right. Added files show above the text. You get only the buttons you ask for.",
+      "properties": []
+    },
+    {
+      "name": "PullToRefresh",
+      "id": "pull-to-refresh",
+      "version": "0.1.0",
+      "description": "Pull a list or page down at the top to load it again, the way phone apps do. The pull is a shortcut: a Refresh button does the same for the keyboard and screen readers. It shows how far to pull, says when to let go, shows progress while it loads, and tells people when it worked or failed with a way to try again.",
       "properties": []
     },
     {
@@ -3642,6 +3727,13 @@
           "default": "false"
         }
       ]
+    },
+    {
+      "name": "SwipeableRow",
+      "id": "swipeable-row",
+      "version": "0.1.0",
+      "description": "A list row that slides sideways to show actions behind it, such as archive or delete. Swiping is a shortcut: the same actions are reachable with a button and the keyboard, so nobody depends on the gesture. Actions can sit on either side, can be turned off per person, and the row stays scrollable up and down.",
+      "properties": []
     },
     {
       "name": "Switch",

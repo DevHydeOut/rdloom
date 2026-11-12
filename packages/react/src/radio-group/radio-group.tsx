@@ -12,6 +12,7 @@ import {
 } from "react-aria-components";
 import { radioGroupDefaults, type RadioGroupSpecProps } from "../generated/radio-group.types";
 import { cx } from "../utils/cx";
+import { touchTarget } from "../utils/touch";
 
 export interface RadioGroupProps
   extends RadioGroupSpecProps,
@@ -76,6 +77,7 @@ export const Radio = forwardRef<HTMLLabelElement, RadioProps>(function Radio({ c
       className={cx(
         "group inline-flex items-center gap-2 text-sm text-[var(--rd-color-text-default)] cursor-pointer " +
           "data-[disabled]:opacity-50 data-[disabled]:cursor-not-allowed",
+        touchTarget,
         className,
       )}
     >

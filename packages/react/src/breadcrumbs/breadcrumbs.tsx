@@ -5,6 +5,7 @@ import { Breadcrumb, Breadcrumbs as AriaBreadcrumbs, Button as AriaButton, Link 
 import { breadcrumbsDefaults, type BreadcrumbsSpecProps } from "../generated/breadcrumbs.types";
 import { Menu, MenuItem, MenuTrigger } from "../menu/menu";
 import { cx } from "../utils/cx";
+import { touchTarget } from "../utils/touch";
 import { ChevronRightIcon, DotsIcon } from "../utils/icons";
 
 export interface BreadcrumbsProps extends BreadcrumbsSpecProps {
@@ -79,7 +80,7 @@ export interface BreadcrumbItemProps {
 export function BreadcrumbItem({ href, children, icon, separator, className }: BreadcrumbItemProps) {
   return (
     <Breadcrumb className={cx("group flex min-w-0 items-center gap-2", className)}>
-      <Link href={href} className={cx(linkClass, icon ? "inline-flex min-h-6 min-w-0 items-center gap-1.5" : "block min-h-6 min-w-0 truncate py-0.5")}>
+      <Link href={href} className={cx(linkClass, icon ? "inline-flex min-h-[max(1.5rem,var(--rd-size-touch-target))] min-w-0 items-center gap-1.5" : "block min-h-[max(1.5rem,var(--rd-size-touch-target))] min-w-0 truncate py-0.5")}>
         {icon ? (
           <>
             <span aria-hidden="true" className="inline-flex shrink-0 [&>svg]:size-4">
@@ -120,6 +121,7 @@ export function BreadcrumbEllipsis({ items, label = "Show hidden pages", separat
           aria-label={label}
           className={cx(
             "inline-flex size-6 items-center justify-center rounded-[var(--rd-radius-control)] outline-none transition-colors motion-reduce:transition-none",
+            touchTarget,
             "text-[var(--rd-color-text-muted)] data-[hovered]:bg-[var(--rd-color-surface-subtle)] data-[hovered]:text-[var(--rd-color-text-default)]",
             "data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)] data-[focus-visible]:ring-offset-2",
           )}

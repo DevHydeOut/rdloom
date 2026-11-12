@@ -20,6 +20,7 @@ import {
 } from "react-aria-components";
 import { calendarDefaults, type CalendarSpecProps } from "../generated/calendar.types";
 import { cx } from "../utils/cx";
+import { touchTarget } from "../utils/touch";
 import { Select, SelectItem } from "../select/select";
 import { ChevronLeftIcon, ChevronRightIcon } from "../utils/icons";
 
@@ -49,6 +50,8 @@ function NavButton({ slot }: { slot: "previous" | "next" }) {
 
 const cellBase =
   "relative flex size-9 cursor-default items-center justify-center text-sm tabular-nums outline-none " +
+  touchTarget +
+  " " +
   "text-[var(--rd-color-text-default)] data-[outside-month]:text-[var(--rd-color-text-muted)] data-[outside-month]:opacity-50 " +
   "data-[today]:font-semibold data-[today]:ring-1 data-[today]:ring-inset data-[today]:ring-[var(--rd-color-action-primary)] " +
   "data-[disabled]:opacity-40 data-[unavailable]:text-[var(--rd-color-text-muted)] data-[unavailable]:line-through data-[unavailable]:opacity-40 " +
@@ -73,7 +76,7 @@ function Grids({ visibleMonths, range }: { visibleMonths: number; range: boolean
         <CalendarGrid key={i} offset={i > 0 ? { months: i } : undefined} className="border-collapse">
           <CalendarGridHeader>
             {(day) => (
-              <CalendarHeaderCell className="size-9 pb-1 text-xs font-medium text-[var(--rd-color-text-muted)]">
+              <CalendarHeaderCell className={cx("size-9 pb-1 text-xs font-medium text-[var(--rd-color-text-muted)]", touchTarget)}>
                 {day}
               </CalendarHeaderCell>
             )}

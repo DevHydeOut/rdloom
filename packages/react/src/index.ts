@@ -317,6 +317,9 @@ export { ApiKeyList, type ApiKeyListProps } from "./api-key-list/api-key-list";
 export { UserMenu, type UserMenuProps, type UserMenuItem, type UserMenuGroup } from "./user-menu/user-menu";
 export { AppHeader, type AppHeaderProps } from "./app-header/app-header";
 export { TopNav, type TopNavProps } from "./top-nav/top-nav";
+export { BottomNav, type BottomNavProps, type BottomNavSlot, type BottomNavClassNames } from "./bottom-nav/bottom-nav";
+export { SwipeableRow, type SwipeableRowProps, type SwipeAction, type SwipeableRowSlot, type SwipeableRowClassNames } from "./swipeable-row/swipeable-row";
+export { PullToRefresh, type PullToRefreshProps, type PullToRefreshSlot, type PullToRefreshClassNames } from "./pull-to-refresh/pull-to-refresh";
 // The icon family the components use, for your own buttons and menu entries.
 export * from "./utils/icons";
 // Forms: the Form, its fields, the error summary and repeating rows. The engine behind them is one adapter file.
@@ -377,6 +380,8 @@ export { AvatarGroup, avatarGroupName, type AvatarGroupProps } from "./avatar-gr
 export { Carousel, CarouselItem, type CarouselItemProps, type CarouselProps } from "./carousel/carousel";
 export { ResizableHandle, ResizablePanel, ResizablePanelGroup, ResizablePanels, type ResizableHandleProps, type ResizablePanelGroupProps, type ResizablePanelProps } from "./resizable-panels/resizable-panels";
 export { Drawer, type DrawerProps } from "./drawer/drawer";
+export { ActionSheet, type ActionSheetProps, type ActionSheetAction, type ActionSheetSlot, type ActionSheetClassNames } from "./action-sheet/action-sheet";
+export { OrientationGuard, type OrientationGuardProps, type OrientationGuardSlot, type OrientationGuardClassNames } from "./orientation-guard/orientation-guard";
 export { ScrollArea, type ScrollAreaProps } from "./scroll-area/scroll-area";
 export { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuTrigger, type NavigationMenuContentProps, type NavigationMenuItemProps, type NavigationMenuLinkProps, type NavigationMenuProps, type NavigationMenuTriggerProps } from "./navigation-menu/navigation-menu";
 export { Menubar, MenubarGroup, MenubarItem, MenubarMenu, MenubarSeparator, MenubarSubmenu, type MenubarGroupProps, type MenubarItemProps, type MenubarMenuProps, type MenubarProps, type MenubarSubmenuProps } from "./menubar/menubar";

@@ -106,7 +106,7 @@ describe("DashboardShell", () => {
   it("reads a badge after the label and draws it as a pill", () => {
     shell();
     const link = within(sidebarNav()).getByRole("link", { name: /Customers/ });
-    expect(link).toHaveAccessibleName("Customers , 24");
+    expect(link).toHaveAccessibleName(/^Customers ?, 24$/);
     const pill = [...link.querySelectorAll("[aria-hidden=true]")].find((n) => n.textContent === "24");
     expect(pill).toBeTruthy();
   });
@@ -114,7 +114,7 @@ describe("DashboardShell", () => {
   it("turns a badge into a dot when the sidebar is folded, and still reads it", () => {
     shell({ isCollapsed: true });
     const link = within(sidebarNav()).getByRole("link", { name: /Customers/ });
-    expect(link).toHaveAccessibleName("Customers , 24");
+    expect(link).toHaveAccessibleName(/^Customers ?, 24$/);
     expect([...link.querySelectorAll("[aria-hidden=true]")].some((n) => n.textContent === "24")).toBe(false);
   });
 

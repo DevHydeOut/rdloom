@@ -419,7 +419,7 @@ export function AccessibilityGuide() {
 }
 
 export function TokensGuide() {
-  const [density, setDensity] = useState<"comfortable" | "compact">("comfortable");
+  const [density, setDensity] = useState<"comfortable" | "compact" | "touch">("comfortable");
   return (
     <article>
       <PageTitle lead="Semantic tokens as CSS variables. Use these instead of raw values: colors and shadows switch for dark mode by themselves, and sizes follow the density you choose.">Design tokens</PageTitle>
@@ -456,9 +456,14 @@ export function TokensGuide() {
           Control heights and padding come from tokens too. Put <code>data-density=&quot;compact&quot;</code> on <code>&lt;html&gt;</code>, or on any container, and everything inside tightens. Use it for data-heavy admin
           screens; leave it off for marketing pages and forms people fill in once.
         </p>
+        <p>
+          For phones and tablets use <code>data-density=&quot;touch&quot;</code>: controls grow to 44, 48 and 56 px, and small tap targets (checkboxes, switches, radios, rating stars, breadcrumb links, pagination, calendar days, close
+          buttons, tag removers) reach at least 44 px, the size of a finger. With <code>data-density=&quot;auto&quot;</code> the same happens only on devices whose main pointer is coarse, so a phone gets large targets and a desktop with
+          a mouse stays as it is. This is plain CSS: nothing to detect in code, and it renders the same on the server.
+        </p>
         <div className="not-prose flex flex-col gap-3 rounded-[var(--site-radius)] border border-[var(--site-border)] p-4">
           <div role="group" aria-label="Density" className="flex w-fit gap-1 rounded-lg border border-[var(--site-border)] bg-[var(--site-subtle)] p-1">
-            {(["comfortable", "compact"] as const).map((d) => (
+            {(["comfortable", "compact", "touch"] as const).map((d) => (
               <button
                 key={d}
                 type="button"
@@ -476,7 +481,7 @@ export function TokensGuide() {
             <Button variant="secondary">Filters</Button>
           </div>
         </div>
-        <CodeBlock label="Set the density" code={`<html data-density="compact">\n\n<section data-density="compact">…</section>`} />
+        <CodeBlock label="Set the density" code={`<html data-density="compact">\n\n<section data-density="compact">…</section>\n\n<!-- large targets on phones and tablets only -->\n<html data-density="auto">\n\n<!-- always large -->\n<html data-density="touch">`} />
         <H2 id="all">All tokens</H2>
       </Prose>
       <div role="region" aria-label="Tokens" tabIndex={0} className="overflow-x-auto rounded-[var(--site-radius)] border border-[var(--site-border)]">

@@ -10,6 +10,7 @@ import {
 } from "react-aria-components";
 import { toastDefaults, type ToastSpecProps } from "../generated/toast.types";
 import { cx } from "../utils/cx";
+import { touchTarget } from "../utils/touch";
 import { CloseIcon, ErrorIcon, InfoIcon, SuccessIcon } from "../utils/icons";
 
 // React Aria's toast API is still marked UNSTABLE_. Everything that touches
@@ -79,7 +80,8 @@ export function ToastRegion({ className }: { className?: string }) {
               slot="close"
               aria-label="Dismiss"
               className={
-                "-me-1 -mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-[var(--rd-radius-control)] text-[var(--rd-color-text-muted)] outline-none data-[hovered]:bg-[var(--rd-color-surface-subtle)] data-[hovered]:text-[var(--rd-color-text-default)] " +
+                touchTarget +
+                " -me-1 -mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-[var(--rd-radius-control)] text-[var(--rd-color-text-muted)] outline-none data-[hovered]:bg-[var(--rd-color-surface-subtle)] data-[hovered]:text-[var(--rd-color-text-default)] " +
                 "data-[focus-visible]:ring-2 data-[focus-visible]:ring-[var(--rd-color-focus-ring)]"
               }
             >

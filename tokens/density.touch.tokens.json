@@ -1,0 +1,9 @@
+{
+  "size": {
+    "$type": "dimension",
+    "control-sm": { "$value": "44px" },
+    "control-md": { "$value": "48px" },
+    "control-lg": { "$value": "56px" },
+    "touch-target": { "$value": "44px" }
+  }
+}

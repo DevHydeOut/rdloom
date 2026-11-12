@@ -3,7 +3,7 @@
 
 import type { ReactNode } from "react";
 
-/** A modal panel that slides up from the bottom of the screen and can be dragged down to dismiss, for short tasks on phones. Open it with DialogTrigger. */
+/** A modal panel that slides up from the bottom of the screen and can be dragged down to dismiss, for short tasks on phones. With snap points it also rests at several heights (a peek, half, nearly full) and is dragged between them. Open it with DialogTrigger. */
 export interface DrawerSpecProps {
   /**
    * Heading, also used as the drawer accessible name. Without a title, pass aria-label.
@@ -23,6 +23,27 @@ export interface DrawerSpecProps {
    */
   isDismissable?: boolean;
   /**
+   * Heights the drawer can rest at, as shares of the available height (the screen, or the portalContainer): [0.4, 0.9] rests at 40% and 90%. They are kept between 0.1 and 1 and put in order. Drag the handle or header up and down to move between them; a drag down from the lowest closes it when isDismissable. Without snapPoints the drawer is as tall as its content, up to 90% of the screen.
+   */
+  snapPoints?: number[];
+  /**
+   * Which snap point is showing, as an index into the sorted snapPoints, to control it. Use with onSnapChange.
+   */
+  snap?: number;
+  /**
+   * Which snap point it opens at, as an index into the sorted snapPoints, when you do not control it.
+   * @default 0
+   */
+  defaultSnap?: number;
+  /**
+   * Called with the new index when the drawer settles on another snap point.
+   */
+  onSnapChange?: (index: number) => void;
+  /**
+   * The words for the keyboard button that changes the height, for translation: { expand, collapse, expanded, collapsed }. Only used with two or more snap points.
+   */
+  labels?: Partial<Record<"expand" | "collapse" | "expanded" | "collapsed", string>>;
+  /**
    * Body and actions. A function receives close().
    */
   children?: ReactNode | ((opts: { close: () => void }) => ReactNode);
@@ -30,6 +51,7 @@ export interface DrawerSpecProps {
 
 export const drawerDefaults = {
   isDismissable: true,
+  defaultSnap: 0,
 } as const;
 
 export const drawerMeta = {

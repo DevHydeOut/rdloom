@@ -70,6 +70,7 @@
     "$type": "dimension",
     "control-sm": { "$value": "32px" },
     "control-md": { "$value": "40px" },
-    "control-lg": { "$value": "48px" }
+    "control-lg": { "$value": "48px" },
+    "touch-target": { "$value": "0px" }
   }
 }

@@ -20,6 +20,7 @@ import {
 } from "../src";
 import { motionVars } from "../src/utils/motion";
 import { axeViolations } from "./axe";
+import { animationEnd } from "./animation";
 
 // The motion rules live in one CSS file that the CLI installs and imports. jsdom leaves
 // import.meta.url as a non-file URL, so find the package by walking up from the working directory.
@@ -238,7 +239,7 @@ describe("RippleButton", () => {
     press(button, 20, 30);
     press(button, 60, 30);
     expect(container.querySelectorAll(".rdm-ripple")).toHaveLength(2);
-    fireEvent.animationEnd(container.querySelector(".rdm-ripple")!);
+    animationEnd(container.querySelector(".rdm-ripple")!);
     expect(container.querySelectorAll(".rdm-ripple")).toHaveLength(1);
   });
 
