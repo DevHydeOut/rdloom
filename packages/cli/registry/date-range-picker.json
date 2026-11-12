@@ -5,7 +5,7 @@
   "description": "Start and end date fields with a two-month calendar and optional presets like 'Last 7 days'.",
   "dependencies": [
     "@internationalized/date@^3.12.4",
-    "react-aria-components@^1.21.1"
+    "react-aria-components@^1.22.1"
   ],
   "registryDependencies": [
     "tokens",

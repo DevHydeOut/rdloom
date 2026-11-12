@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "description": "The menu that opens at the pointer on a right click, a long press or the keyboard (Shift+F10 or the Menu key) over an area such as a file row. It never replaces a visible way to do the same thing.",
   "dependencies": [
-    "react-aria-components@^1.21.1"
+    "react-aria-components@^1.22.1"
   ],
   "registryDependencies": [
     "tokens",

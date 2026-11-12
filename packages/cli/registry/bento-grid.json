@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "description": "A responsive grid of feature cards of different sizes. It is a real list: each BentoCard is a list item with its own heading, icon, description, optional background and optional link or action. Cards lift a little on hover.",
   "dependencies": [
-    "react-aria-components@^1.21.1"
+    "react-aria-components@^1.22.1"
   ],
   "registryDependencies": [
     "tokens",

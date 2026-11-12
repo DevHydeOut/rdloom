@@ -5,7 +5,7 @@
   "description": "A form that holds the values, runs your validators or a schema, and exposes its progress as an action state (idle, pending, success, error). Fields connect by name and the inputs already link label, help text and error. It never fetches or saves anything: your onSubmit does.",
   "dependencies": [
     "@tanstack/react-form@^1.33.5",
-    "react-aria-components@^1.21.1"
+    "react-aria-components@^1.22.1"
   ],
   "registryDependencies": [
     "tokens",

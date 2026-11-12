@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "description": "A short flow of questions asked one at a time, for onboarding or for an assistant that needs a few details. It shows progress, keeps answers when going back, and ends with a review step where each answer can be edited.",
   "dependencies": [
-    "react-aria-components@^1.21.1"
+    "react-aria-components@^1.22.1"
   ],
   "registryDependencies": [
     "tokens",
