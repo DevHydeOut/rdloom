@@ -8403,7 +8403,7 @@
         "command": "npx rdloom add data-grid",
         "dependencies": [
           "@tanstack/react-table@^8.21.3",
-          "@tanstack/react-virtual@^3.14.13",
+          "@tanstack/react-virtual@^3.14.26",
           "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [

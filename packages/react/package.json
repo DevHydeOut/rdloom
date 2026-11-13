@@ -16,7 +16,7 @@
     "@rdloom/tokens": "*",
     "@tanstack/react-form": "^1.33.5",
     "@tanstack/react-table": "^8.21.3",
-    "@tanstack/react-virtual": "^3.14.13",
+    "@tanstack/react-virtual": "^3.14.26",
     "react-aria-components": "^1.22.1"
   },
   "devDependencies": {
