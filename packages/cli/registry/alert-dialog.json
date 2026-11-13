@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "description": "Confirmation dialog for destructive or irreversible actions. It cannot be dismissed by clicking outside, and can ask the user to type a word before the confirm button works. Open it with DialogTrigger.",
   "dependencies": [
-    "react-aria-components@^1.21.1"
+    "react-aria-components@^1.22.1"
   ],
   "registryDependencies": [
     "tokens",

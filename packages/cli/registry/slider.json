@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "description": "Picks a number, or a range with two thumbs, by dragging along a track. Shows the formatted value.",
   "dependencies": [
-    "react-aria-components@^1.21.1"
+    "react-aria-components@^1.22.1"
   ],
   "registryDependencies": [
     "tokens",

@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "description": "A row or column of joined toggle buttons with shared borders, for formatting options or a choice between a few modes. Pick single or multiple selection.",
   "dependencies": [
-    "react-aria-components@^1.21.1"
+    "react-aria-components@^1.22.1"
   ],
   "registryDependencies": [
     "tokens",

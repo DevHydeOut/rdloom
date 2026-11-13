@@ -40,7 +40,11 @@ function turnTo(device: Device) {
 const phoneUpright: Device = { width: 390, height: 844, coarse: true };
 const phoneSideways: Device = { width: 844, height: 390, coarse: true };
 
-beforeEach(() => setDevice(phoneUpright));
+beforeEach(() => {
+  setDevice(phoneUpright);
+  // react-aria defines a landscape screen.orientation under test when there is none; the device here is the mocked one.
+  Object.defineProperty(window.screen, "orientation", { value: undefined, configurable: true });
+});
 afterEach(() => {
   window.matchMedia = original.matchMedia;
   Object.defineProperty(window, "innerWidth", { value: original.width, configurable: true, writable: true });

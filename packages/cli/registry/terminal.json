@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "description": "A command-line style panel that types its lines in once: a prompt, the commands, then the output. It has a copy button, and a still mode that shows every line at once. The lines are real text in the page from the start.",
   "dependencies": [
-    "react-aria-components@^1.21.1"
+    "react-aria-components@^1.22.1"
   ],
   "registryDependencies": [
     "tokens",

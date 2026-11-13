@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "description": "A chat bubble for plain, short messages. Bubble is the chrome around one message: alignment and colour for who sent it, an avatar, a name and a time, a delivery status with Retry, grouped bubbles that merge their corners, and a footer for actions. It does not render structured replies. Message renders an AI turn from typed parts (markdown, tools, charts, sources) and Chat holds the whole conversation; use Bubble for person-to-person or simple text chats, or put a Response inside a Bubble when you want the bubble look around formatted text.",
   "dependencies": [
-    "react-aria-components@^1.21.1"
+    "react-aria-components@^1.22.1"
   ],
   "registryDependencies": [
     "tokens",

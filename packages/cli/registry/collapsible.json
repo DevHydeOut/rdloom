@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "description": "One region that opens and closes under a trigger, for detail most people do not need at first. For a stack of related sections, use Accordion.",
   "dependencies": [
-    "react-aria-components@^1.21.1"
+    "react-aria-components@^1.22.1"
   ],
   "registryDependencies": [
     "tokens",

@@ -117,7 +117,7 @@
       "install": {
         "command": "npx rdloom add accordion",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -312,7 +312,7 @@
       "install": {
         "command": "npx rdloom add action-button",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -516,7 +516,7 @@
       "install": {
         "command": "npx rdloom add action-sheet",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -660,7 +660,7 @@
       "install": {
         "command": "npx rdloom add agent-activity",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -838,7 +838,7 @@
       "install": {
         "command": "npx rdloom add alert-dialog",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -993,7 +993,7 @@
       "install": {
         "command": "npx rdloom add alert",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -1314,7 +1314,7 @@
       "install": {
         "command": "npx rdloom add animated-circular-progress",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -2057,7 +2057,7 @@
       "install": {
         "command": "npx rdloom add app-header",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -2537,7 +2537,7 @@
       "install": {
         "command": "npx rdloom add attachment",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -3526,7 +3526,7 @@
       "install": {
         "command": "npx rdloom add bento-grid",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -3830,7 +3830,7 @@
       "install": {
         "command": "npx rdloom add bottom-nav",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -3985,7 +3985,7 @@
       "install": {
         "command": "npx rdloom add breadcrumbs",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -4191,7 +4191,7 @@
       "install": {
         "command": "npx rdloom add bubble",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -4504,7 +4504,7 @@
       "install": {
         "command": "npx rdloom add button",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -4669,7 +4669,7 @@
       "install": {
         "command": "npx rdloom add calendar",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -4899,7 +4899,7 @@
       "install": {
         "command": "npx rdloom add card",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -5623,7 +5623,7 @@
       "install": {
         "command": "npx rdloom add chat",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -5788,7 +5788,7 @@
       "install": {
         "command": "npx rdloom add checkbox",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -6178,7 +6178,7 @@
       "install": {
         "command": "npx rdloom add collapsible",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -6377,7 +6377,7 @@
       "install": {
         "command": "npx rdloom add color-picker",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -6618,7 +6618,7 @@
       "install": {
         "command": "npx rdloom add combobox",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -6918,7 +6918,7 @@
       "install": {
         "command": "npx rdloom add command-palette",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -7242,7 +7242,7 @@
       "install": {
         "command": "npx rdloom add context-menu",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -7531,7 +7531,7 @@
       "install": {
         "command": "npx rdloom add customer-table",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -8000,7 +8000,7 @@
       "install": {
         "command": "npx rdloom add dashboard-shell",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -8404,7 +8404,7 @@
         "dependencies": [
           "@tanstack/react-table@^8.21.3",
           "@tanstack/react-virtual@^3.14.13",
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -8866,7 +8866,7 @@
       "install": {
         "command": "npx rdloom add data-table",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -9111,7 +9111,7 @@
       "install": {
         "command": "npx rdloom add date-picker",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -9330,7 +9330,7 @@
         "command": "npx rdloom add date-range-picker",
         "dependencies": [
           "@internationalized/date@^3.12.4",
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -9648,7 +9648,7 @@
       "install": {
         "command": "npx rdloom add dialog",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -9763,7 +9763,7 @@
       "install": {
         "command": "npx rdloom add direction",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens"
@@ -9911,7 +9911,7 @@
       "install": {
         "command": "npx rdloom add dock",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -10188,7 +10188,7 @@
       "install": {
         "command": "npx rdloom add dotted-map",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -10365,7 +10365,7 @@
       "install": {
         "command": "npx rdloom add drawer",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -11016,7 +11016,7 @@
         "command": "npx rdloom add event-calendar",
         "dependencies": [
           "@internationalized/date@^3.12.4",
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -11235,7 +11235,7 @@
       "install": {
         "command": "npx rdloom add field-array",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -11593,7 +11593,7 @@
       "install": {
         "command": "npx rdloom add file-upload",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -11881,7 +11881,7 @@
         "command": "npx rdloom add form",
         "dependencies": [
           "@tanstack/react-form@^1.33.5",
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -12190,7 +12190,7 @@
       "install": {
         "command": "npx rdloom add generated-table",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -12443,7 +12443,7 @@
       "install": {
         "command": "npx rdloom add globe",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -12997,7 +12997,7 @@
       "install": {
         "command": "npx rdloom add hero-video-dialog",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -13292,7 +13292,7 @@
       "install": {
         "command": "npx rdloom add hover-card",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -13564,7 +13564,7 @@
       "install": {
         "command": "npx rdloom add icon-cloud",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -13760,7 +13760,7 @@
       "install": {
         "command": "npx rdloom add input-group",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -13967,7 +13967,7 @@
       "install": {
         "command": "npx rdloom add input-otp",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -14536,7 +14536,7 @@
       "install": {
         "command": "npx rdloom add invite-dialog",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -15124,7 +15124,7 @@
       "install": {
         "command": "npx rdloom add item",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -15868,7 +15868,7 @@
       "install": {
         "command": "npx rdloom add marker",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -16044,7 +16044,7 @@
       "install": {
         "command": "npx rdloom add marquee",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -16201,7 +16201,7 @@
       "install": {
         "command": "npx rdloom add menu",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -16339,7 +16339,7 @@
       "install": {
         "command": "npx rdloom add menubar",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -16497,7 +16497,7 @@
       "install": {
         "command": "npx rdloom add message-scroller",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -16646,7 +16646,7 @@
       "install": {
         "command": "npx rdloom add message",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -17250,7 +17250,7 @@
       "install": {
         "command": "npx rdloom add navigation-menu",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -17570,7 +17570,7 @@
       "install": {
         "command": "npx rdloom add number-field",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -17705,7 +17705,7 @@
       "install": {
         "command": "npx rdloom add number-ticker",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -18070,7 +18070,7 @@
       "install": {
         "command": "npx rdloom add orientation-guard",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -18421,7 +18421,7 @@
       "install": {
         "command": "npx rdloom add pagination",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -19109,7 +19109,7 @@
       "install": {
         "command": "npx rdloom add plan-card",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -19385,7 +19385,7 @@
       "install": {
         "command": "npx rdloom add popover",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -19552,7 +19552,7 @@
       "install": {
         "command": "npx rdloom add progress",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -19766,7 +19766,7 @@
       "install": {
         "command": "npx rdloom add prompt-input",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -19944,7 +19944,7 @@
       "install": {
         "command": "npx rdloom add pull-to-refresh",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -20294,7 +20294,7 @@
       "install": {
         "command": "npx rdloom add questionnaire",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -20469,7 +20469,7 @@
       "install": {
         "command": "npx rdloom add radio-group",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -20852,7 +20852,7 @@
       "install": {
         "command": "npx rdloom add rating",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -21148,7 +21148,7 @@
       "install": {
         "command": "npx rdloom add response",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -22115,7 +22115,7 @@
       "install": {
         "command": "npx rdloom add scroll-velocity",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -22415,7 +22415,7 @@
       "install": {
         "command": "npx rdloom add segmented-control",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -22608,7 +22608,7 @@
       "install": {
         "command": "npx rdloom add select",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -23265,7 +23265,7 @@
       "install": {
         "command": "npx rdloom add sheet",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -24112,7 +24112,7 @@
       "install": {
         "command": "npx rdloom add sidebar",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -24451,7 +24451,7 @@
       "install": {
         "command": "npx rdloom add slider",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -24810,7 +24810,7 @@
       "install": {
         "command": "npx rdloom add social-post-card",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -26260,7 +26260,7 @@
       "install": {
         "command": "npx rdloom add swipeable-row",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -26422,7 +26422,7 @@
       "install": {
         "command": "npx rdloom add switch",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -26604,7 +26604,7 @@
       "install": {
         "command": "npx rdloom add table",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -26764,7 +26764,7 @@
       "install": {
         "command": "npx rdloom add tabs",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -26945,7 +26945,7 @@
       "install": {
         "command": "npx rdloom add tag-input",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -27107,7 +27107,7 @@
       "install": {
         "command": "npx rdloom add terminal",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -27452,7 +27452,7 @@
       "install": {
         "command": "npx rdloom add text-field",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -28365,7 +28365,7 @@
       "install": {
         "command": "npx rdloom add time-field",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -28573,7 +28573,7 @@
         "command": "npx rdloom add time-slot-picker",
         "dependencies": [
           "@internationalized/date@^3.12.4",
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -28726,7 +28726,7 @@
       "install": {
         "command": "npx rdloom add toast",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -28893,7 +28893,7 @@
       "install": {
         "command": "npx rdloom add toggle-button",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -29075,7 +29075,7 @@
       "install": {
         "command": "npx rdloom add toggle-group",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -29224,7 +29224,7 @@
       "install": {
         "command": "npx rdloom add tool-call",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -29351,7 +29351,7 @@
       "install": {
         "command": "npx rdloom add tooltip",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -29554,7 +29554,7 @@
       "install": {
         "command": "npx rdloom add top-nav",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -29747,7 +29747,7 @@
       "install": {
         "command": "npx rdloom add tree",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -30535,7 +30535,7 @@
       "install": {
         "command": "npx rdloom add user-form",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",
@@ -30812,7 +30812,7 @@
       "install": {
         "command": "npx rdloom add user-menu",
         "dependencies": [
-          "react-aria-components@^1.21.1"
+          "react-aria-components@^1.22.1"
         ],
         "registryDependencies": [
           "tokens",

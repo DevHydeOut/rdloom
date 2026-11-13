@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "description": "The current subscription plan: name, price and interval, status with the right text, renewal or end date, feature list, a usage hint, and the actions Change plan and Cancel subscription (confirmed, with the end date). A past due plan shows an alert. PlanPicker, exported beside it, lets people choose another plan. Your callbacks do the work. UI permission is not security: the server must check again.",
   "dependencies": [
-    "react-aria-components@^1.21.1"
+    "react-aria-components@^1.22.1"
   ],
   "registryDependencies": [
     "tokens",
