@@ -10,6 +10,9 @@ import { add, init, type Context } from "../src/commands.ts";
 // or running the wrong one with --install.
 
 const REGISTRY = fileURLToPath(new URL("../registry", import.meta.url));
+// The range the button asks for, read from the library so a version bump does not need an edit here.
+const REACT_PACKAGE = JSON.parse(fs.readFileSync(fileURLToPath(new URL("../../react/package.json", import.meta.url)), "utf8"));
+const ARIA = `react-aria-components@${REACT_PACKAGE.dependencies["react-aria-components"]}`;
 
 let cwd: string;
 let messages: string[];
@@ -68,7 +71,7 @@ describe("package manager detection", () => {
     init(ctx);
     add(ctx, ["button"], { install: true });
     expect(ran.at(-1)?.slice(0, 2)).toEqual(["yarn", "add"]);
-    expect(ran.at(-1)).toContain("react-aria-components@^1.21.1");
+    expect(ran.at(-1)).toContain(ARIA);
   });
 
   it("quotes a version range so Windows cmd.exe cannot eat the caret", () => {
@@ -76,6 +79,6 @@ describe("package manager detection", () => {
     init(ctx);
     add(ctx, ["button"]);
     // Unquoted, cmd.exe turns pkg@^1.2.0 into pkg@1.2.0 and pins the floor.
-    expect(messages.join("\n")).toContain('"react-aria-components@^1.21.1"');
+    expect(messages.join("\n")).toContain(`"${ARIA}"`);
   });
 });
