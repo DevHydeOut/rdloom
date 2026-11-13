@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "description": "The list screen every admin, ERP and SaaS app has: a table of rows with search, filters, sorting, pages, selection with bulk actions, a row menu with confirmed actions, CSV export, loading, empty and error states, and cards on a narrow screen. It never fetches: you pass the rows (or one page of them with serverSide) and handle the actions. Permissions only change what people see and can try; they are not security, so the server must check every action again.",
   "dependencies": [
-    "react-aria-components@^1.21.1"
+    "react-aria-components@^1.22.1"
   ],
   "registryDependencies": [
     "tokens",

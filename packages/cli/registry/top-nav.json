@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "description": "Navigation across the top of an application or marketing site: your brand, links (some opening a short list), and a slot for buttons or the account menu. In a narrow space it becomes a menu button that opens the same links in a sheet. It comes plain, with a line, or as a floating pill.",
   "dependencies": [
-    "react-aria-components@^1.21.1"
+    "react-aria-components@^1.22.1"
   ],
   "registryDependencies": [
     "tokens",

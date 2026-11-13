@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "description": "A canvas globe of land dots that turns slowly, can be dragged to rotate, and can mark places with glowing dots. Still when off-screen, paused or for reduced motion.",
   "dependencies": [
-    "react-aria-components@^1.21.1"
+    "react-aria-components@^1.22.1"
   ],
   "registryDependencies": [
     "tokens",

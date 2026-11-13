@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "description": "A horizontal bar of menus like File, Edit and View, as in a desktop application. Each MenubarMenu opens a list of actions with shortcuts, checkbox and radio items and submenus. Arrow keys move between the menus.",
   "dependencies": [
-    "react-aria-components@^1.21.1"
+    "react-aria-components@^1.22.1"
   ],
   "registryDependencies": [
     "tokens",

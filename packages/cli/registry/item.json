@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "description": "A flexible list row with a leading media slot (icon box, avatar or picture), a title, a description and trailing actions. The whole row can be a link or a button while its actions stay separately clickable.",
   "dependencies": [
-    "react-aria-components@^1.21.1"
+    "react-aria-components@^1.22.1"
   ],
   "registryDependencies": [
     "tokens",
