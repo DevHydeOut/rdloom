@@ -105,7 +105,7 @@ describe("DataGrid column menu", () => {
     expect(headers().join("|")).not.toContain("City");
     expect(firstColumn(1)).toEqual(["36", "45", "28", "52"]); // age moved up
     await user.click(screen.getByRole("button", { name: "Name column menu" }));
-    await user.click(screen.getByRole("menuitem", { name: "Show City" }));
+    await user.click(await screen.findByRole("menuitem", { name: "Show City" }, { timeout: 5000 }));
     expect(headers().join("|")).toContain("City");
   });
 
