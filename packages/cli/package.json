@@ -28,7 +28,7 @@
   ],
   "dependencies": {
     "diff": "^9.0.0",
-    "node-diff3": "^3.2.1"
+    "node-diff3": "^4.0.0"
   },
   "devDependencies": {
     "vitest": "^5.1.0"
